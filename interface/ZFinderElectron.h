@@ -5,6 +5,8 @@
 #include <map>
 
 #include "DataFormats/Candidate/interface/Candidate.h"  // CandidateBaseRef
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
+
 
 struct CutResult{
     bool passed;
@@ -14,9 +16,25 @@ struct CutResult{
 
 class ZFinderElectron{
     public:
-        double pfIso;
+        // Constructor
+        ZFinderElectron(CadidateBaseRef* particle);
+        ZFinderElectron(GenParticle* particle);
+
+        // A pointer to the object ZFinderElectron was created from
         const reco::CandidateBaseRef* electron;
 
+        // Kinematics variables
+        double pt;
+        double eta;
+        double phi;
+
+        // Other physical properties
+        int charge;
+
+        // Calculated Quantities
+        double pfIso;
+
+        // Handling cuts
         CutResult* getCutResult(const std::string& cutName);
         bool cutPassed(const std::string& cutName);
         double cutWeight(const std::string& cutName);
@@ -25,6 +43,5 @@ class ZFinderElectron{
     private:
         std::map<std::string, CutResult> m_CutResults;
 };
-
 
 #endif // ZFinderElectron_h_included

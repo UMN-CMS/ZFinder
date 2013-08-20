@@ -1,6 +1,38 @@
 #include "ZShape/ZFinder/interface/ZFinderElectron.h"
 #include <iostream>
 
+ZFinderElectron::ZFinderElectron(CadidateBaseRef* particle){
+/* Extract the useful quantities from a reco electron
+ */
+    pt = particle->p4().pt();
+    phi = particle->p4().phi();
+    eta = particle->p4().eta();
+    charge = particle->charge();
+
+    // Assign internal pointer to the object used to create the ZFinderElectron
+    electron = particle;
+
+    // TODO: PF Iso
+}
+
+ZFinderElectron::ZFinderElectron(GenParticle* particle){
+/* Extract the useful quantities from a gen electron
+ */
+    pt = particle->momentum().perp();
+    phi = particle->momentum().phi();
+    eta = particle->momentum().eta();
+    if (particle->pdg_id() == 11) {
+        charge = -1;
+    } else if (particle->pdg_id() == -11) {
+        charge = 1;
+    }
+
+    // Assign internal pointer to the object used to create the ZFinderElectron
+    electron = particle;
+
+    // TODO: PF Iso
+}
+
 ZFinderElectron::getCutResult(const std::string& cutName){
     /* Return a CutResult based on the name */
     // Find the cut
