@@ -46,6 +46,14 @@ class ZFinderEvent{
             unsigned int eventNum;
         } id;
 
+        // Z Data
+        struct ZData{
+            double m;
+            double pt;
+            double y;
+            double phistar;
+        } z;
+
         // These are the special, selected electrons
         ZFinderElectron* e0;
         ZFinderElectron* e1;
