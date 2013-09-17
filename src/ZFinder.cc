@@ -29,6 +29,12 @@ Implementation:
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+
+// Particle Flow
+#include "RecoParticleFlow/Configuration/test/PFCandidateAnalyzer.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
+#include "DataFormats/ParticleFlowReco/interface/PFBlock.h"
+
 //
 // class declaration
 //
