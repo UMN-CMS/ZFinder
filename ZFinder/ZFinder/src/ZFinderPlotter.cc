@@ -1,4 +1,4 @@
-#include "ZFinderPlotter.h"
+#include "ZFinder/ZFinder/interface/ZFinderPlotter.h"
 
 // Constructor
 ZFinderPlotter::ZFinderPlotter(TDirectory* tdir){

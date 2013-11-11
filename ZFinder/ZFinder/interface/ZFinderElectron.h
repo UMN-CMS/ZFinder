@@ -5,6 +5,7 @@
 #include <map>
 
 #include "DataFormats/Candidate/interface/Candidate.h"  // CandidateBaseRef
+#include "DataFormats/Candidate/interface/CandidateFwd.h"
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
 
 
@@ -17,7 +18,7 @@ struct CutResult{
 class ZFinderElectron{
     public:
         // Constructor
-        ZFinderElectron(CadidateBaseRef* particle);
+        ZFinderElectron(reco::CadidateBaseRef* particle);
         ZFinderElectron(GenParticle* particle);
 
         // A pointer to the object ZFinderElectron was created from

@@ -3,10 +3,10 @@
 
 //#include "ZShape/Base/interface/ZShapeEvent.h"  // Parent class
 
-#include "ZShape/ZFinder/interface/ZFinderElectron.h"
+#include "ZFinder/ZFinder/interface/ZFinderElectron.h"
 #include "FWCore/Framework/interface/Event.h" 
 
-#include"CMSSW/DataFormats/Candidate/interface/Candidate.h"  // Candidate
+#include"DataFormats/Candidate/interface/Candidate.h"  // Candidate
 #include "DataFormats/Candidate/interface/Candidate.h"  // CandidateBaseRef
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
 
@@ -71,5 +71,4 @@ class ZFinderEvent{
         std::vector<ZFinderElectron*> m_electrons;
 
 };
-
 #endif

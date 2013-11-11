@@ -1,4 +1,4 @@
-#include "ZShape/ZFinder/interface/ZFidnerEvent.h"
+#include "ZFinder/ZFinder/interface/ZFinderEvent.h"
 
 
 ZFinderEvent::ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup iSetup, const bool useTruth=false){

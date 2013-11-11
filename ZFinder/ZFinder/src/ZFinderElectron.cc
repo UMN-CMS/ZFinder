@@ -1,7 +1,7 @@
-#include "ZShape/ZFinder/interface/ZFinderElectron.h"
+#include "ZFinder/ZFinder/interface/ZFinderElectron.h"
 #include <iostream>
 
-ZFinderElectron::ZFinderElectron(CadidateBaseRef* particle){
+ZFinderElectron::ZFinderElectron(reco::CadidateBaseRef* particle){
 /* Extract the useful quantities from a reco electron
  */
     pt = particle->p4().pt();
