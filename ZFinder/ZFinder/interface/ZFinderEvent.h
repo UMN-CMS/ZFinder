@@ -1,28 +1,33 @@
-#ifndef ZFINDEREVENT_H
-#define ZFINDEREVENT_H 1
+#ifndef ZFINDER_ZFINDEREVENT_H_
+#define ZFINDER_ZFINDEREVENT_H_
 
-//#include "ZShape/Base/interface/ZShapeEvent.h"  // Parent class
+// Standard Library
+#include <string>  // string
+#include <vector>  // vector
 
-#include "ZFinder/ZFinder/interface/ZFinderElectron.h"
-#include "FWCore/Framework/interface/Event.h" 
-
-#include"DataFormats/Candidate/interface/Candidate.h"  // Candidate
-#include "DataFormats/Candidate/interface/Candidate.h"  // CandidateBaseRef
+// CMSSW
+#include "FWCore/Framework/interface/Event.h"  // edm::Event, edm::EventSetup
+#include "DataFormats/Candidate/interface/Candidate.h"  // Candidate
+#include "DataFormats/Candidate/interface/CandidateFwd.h"  // CandidateBaseRef
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
+
+// ZFinder
+#include "ZFinder/ZFinder/interface/ZFinderElectron.h"
 
 struct BasicRequirements{
     // TODO: Fill in defaults
-    double ept_MIN;
-    double ept_MAX;
+    double ept_min;
+    double ept_max;
 };
 
 class ZFinderEvent{
     public:
-        // Constructor
-        ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup iSetup, const bool useTruth);
+        // Constructor (iEvent and iSetup violate our naming convention, but
+        // are almost ubiquitous in CMSSW code)
+        ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup, const bool use_truth);
 
         // Data or MC
-        bool isRealData;
+        bool is_real_data;
 
         // Beam Spot
         struct Beamspot{
@@ -41,9 +46,9 @@ class ZFinderEvent{
 
         // Event ID
         struct EventID{
-            unsigned int runNum;
-            unsigned int lumiNum;
-            unsigned int eventNum;
+            unsigned int run_num;
+            unsigned int lumi_num;
+            unsigned int event_num;
         } id;
 
         // Z Data
@@ -61,14 +66,16 @@ class ZFinderEvent{
         void setE1(const ZFinderElectron* electron);
         void setEs(const ZFinderElectron* e0, const ZFinderElectron* e1);
 
+        // Add an electron to the internal list
+        ZFinderElectron* AddElectron(Cadidate* particle);  // Both CandidateBaseRef and GenParticle inherit from Candidate
+
     private:
         // Called by the constructor to handle MC and Data separately
-        void init_reco(const edm::Event& iEvent, const edm::EventSetup iSetup, const BasicRequirements);
-        void init_truth(const edm::Event& iEvent, const edm::EventSetup iSetup, const BasicRequirements);
+        void init_reco(const edm::Event& iEvent, const edm::EventSetup iSetup, const BasicRequirements cuts);
+        void init_truth(const edm::Event& iEvent, const edm::EventSetup iSetup, const BasicRequirements cuts);
 
         // A list of all electrons
-        ZFinderElectron* addElectron(Cadidate* particle);  // Both CandidateBaseRef and GenParticle inherit from Candidate
-        std::vector<ZFinderElectron*> m_electrons;
+        std::vector<ZFinderElectron*> electrons_;
 
 };
-#endif
+#endif  // ZFINDER_ZFINDEREVENT_H_
