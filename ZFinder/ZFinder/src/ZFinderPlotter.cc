@@ -107,7 +107,7 @@ ZFinderPlotter::ZFinderPlotter(TDirectory* tdir) {
 
 }
 
-void ZFinderPlotter::Fill(ZFinderEvent const * const z_event, const short electron_0 = 0, const short electron_1 = 1) {
+void ZFinderPlotter::Fill(ZFinderEvent const * const z_event, const int electron_0 = 0, const int electron_1 = 1) {
     /* 
      * Given a ZEvent, fills all the histograms. 
      *

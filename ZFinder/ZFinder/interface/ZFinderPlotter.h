@@ -14,7 +14,7 @@ class ZFinderPlots{
         ZFinderPlots(TDirectory* td);
 
         // Add events
-        void Fill(ZFinderEvent const * const z_event, const short first_electron = 0, const short second_electron = 1);
+        void Fill(ZFinderEvent const * const z_event, const int first_electron = 0, const int second_electron = 1);
         // Make PNGs
         void Print();
 
