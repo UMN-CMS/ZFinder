@@ -36,9 +36,9 @@ class ZFinderElectron{
         double pf_iso;
 
         // Handling cuts
-        CutResult* GetCutResult(const std::string& cut_name);
-        bool CutPassed(const std::string& cut_name);
-        double CutWeight(const std::string& cut_name);
+        CutResult* GetCutResult(const std::string& cut_name) const;
+        bool CutPassed(const std::string& cut_name) const;
+        double CutWeight(const std::string& cut_name) const;
         void AddCutResult(const std::string& cut_name, const bool passed, const double weight);
 
     private:

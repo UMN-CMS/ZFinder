@@ -42,7 +42,7 @@ ZFinderElectron::ZFinderElectron(GenParticle* particle) {
     // TODO: PF Iso
 }
 
-ZFinderElectron::GetCutResult(const std::string& cut_name) {
+ZFinderElectron::GetCutResult(const std::string& cut_name) const {
     /* Return a CutResult based on the name */
     // Find the cut
     std::map<std::string, CutResult>::const_iterator i = cutresults_.find(cut_name);
@@ -54,7 +54,7 @@ ZFinderElectron::GetCutResult(const std::string& cut_name) {
     }
 }
 
-bool ZFinderElectron::CutPassed(const std::string& cut_name) {
+bool ZFinderElectron::CutPassed(const std::string& cut_name) const {
     /* Return the passed status of a cut based on the name */
     CutResult* cr = GetCutResult(cut_name);
     // If the CutResult exists, return the passed value, otherwise return false
@@ -65,7 +65,7 @@ bool ZFinderElectron::CutPassed(const std::string& cut_name) {
     }
 }
 
-double ZFinderElectron::CutWeight(const std::string& cut_name) {
+double ZFinderElectron::CutWeight(const std::string& cut_name) const {
     /* Return the weight of a cut based on the name */
     CutResult* cr = GetCutResult(cut_name);
     // If the CutResult exists, return the weight, otherwise return 0.
