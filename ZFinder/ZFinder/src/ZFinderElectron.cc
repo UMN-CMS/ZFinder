@@ -1,7 +1,15 @@
 #include "ZFinder/ZFinder/interface/ZFinderElectron.h"
+
+// Standard Library
 #include <iostream>
 
-ZFinderElectron::ZFinderElectron(reco::CadidateBaseRef* particle){
+// CMSSW
+#include "DataFormats/Candidate/interface/Candidate.h"  // Candidate
+
+// ZFinder
+#include "PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
+
+ZFinderElectron::ZFinderElectron(reco::CadidateBaseRef* particle) {
 /* Extract the useful quantities from a reco electron
  */
     pt = particle->p4().pt();
@@ -15,15 +23,16 @@ ZFinderElectron::ZFinderElectron(reco::CadidateBaseRef* particle){
     // TODO: PF Iso
 }
 
-ZFinderElectron::ZFinderElectron(GenParticle* particle){
-/* Extract the useful quantities from a gen electron
- */
+ZFinderElectron::ZFinderElectron(GenParticle* particle) {
+/* Extract the useful quantities from a gen electron */
     pt = particle->momentum().perp();
     phi = particle->momentum().phi();
     eta = particle->momentum().eta();
-    if (particle->pdg_id() == 11) {
+    // Using the Particle Data Group ID Number, determine if the particle is an
+    // electron or positron
+    if (particle->pdg_id() == ELECTRON) {
         charge = -1;
-    } else if (particle->pdg_id() == -11) {
+    } else if (particle->pdg_id() == POSITRON) {
         charge = 1;
     }
 
@@ -33,41 +42,41 @@ ZFinderElectron::ZFinderElectron(GenParticle* particle){
     // TODO: PF Iso
 }
 
-ZFinderElectron::getCutResult(const std::string& cutName){
+ZFinderElectron::GetCutResult(const std::string& cut_name) {
     /* Return a CutResult based on the name */
     // Find the cut
-    std::map<std::string, CutResult>::const_iterator i = m_CutResults.find(cutName);
+    std::map<std::string, CutResult>::const_iterator i = cutresults_.find(cut_name);
     // Return a CutResult if it exists, otherwise return NULL
-    if (i != m_CutResults.end()){
+    if (i != cutresults_.end()) {
         return &(i->second);
     } else {
         return NULL;
     }
 }
 
-bool ZFinderElectron::cutPassed(const std::string& cutName){
+bool ZFinderElectron::CutPassed(const std::string& cut_name) {
     /* Return the passed status of a cut based on the name */
-    CutResult* cr = getCutResult(cutName);
+    CutResult* cr = GetCutResult(cut_name);
     // If the CutResult exists, return the passed value, otherwise return false
-    if (CutResult != NULL){
-        return CutResult->passed;
+    if (cr != NULL) {
+        return cr->passed;
     } else {
         return false;
     }
 }
 
-double ZFinderElectron::cutWeight(const std::string& cutName){
+double ZFinderElectron::CutWeight(const std::string& cut_name) {
     /* Return the weight of a cut based on the name */
-    CutResult* cr = getCutResult(cutName);
+    CutResult* cr = GetCutResult(cut_name);
     // If the CutResult exists, return the weight, otherwise return 0.
-    if (CutResult != NULL){
-        return CutResult->weight;
+    if (cr != NULL) {
+        return cr->weight;
     } else {
         return 0.;
     }
 }
 
-void addCutResult(const std::string& cutName, const bool passed, const double weight=1.){
+void AddCutResult(const std::string& cut_name, const bool passed, const double weight=1.) {
     /* Given a name and passed status, will add it to the cutmap. It may also
      * be given a weight, but if not it is assumed to be 1.
      *
@@ -75,7 +84,7 @@ void addCutResult(const std::string& cutName, const bool passed, const double we
      */
     CutResult cr;
     cr.passed = passed;
-    cr.name = cutName;
+    cr.name = cut_name;
     cr.weight = weight;
-    m_CutResults[cutName] = cr;  // This will overwrite
+    cutresults_[cut_name] = cr;  // This will overwrite
 }

@@ -1,13 +1,13 @@
-#ifndef ZFinderElectron_h_included
-#define ZFinderElectron_h_included 1
+#ifndef ZFINDER_ZFINDERELECTRON_H_
+#define ZFINDER_ZFINDERELECTRON_H_
 
+// Standard Library
 #include <string>
 #include <map>
 
-#include "DataFormats/Candidate/interface/Candidate.h"  // CandidateBaseRef
-#include "DataFormats/Candidate/interface/CandidateFwd.h"
+// CMSSW
+#include "DataFormats/Candidate/interface/CandidateFwd.h"  // CandidateBaseRef
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
-
 
 struct CutResult{
     bool passed;
@@ -33,16 +33,16 @@ class ZFinderElectron{
         int charge;
 
         // Calculated Quantities
-        double pfIso;
+        double pf_iso;
 
         // Handling cuts
-        CutResult* getCutResult(const std::string& cutName);
-        bool cutPassed(const std::string& cutName);
-        double cutWeight(const std::string& cutName);
-        void addCutResult(const std::string& cutName, const bool passed, const double weight);
+        CutResult* GetCutResult(const std::string& cut_name);
+        bool CutPassed(const std::string& cut_name);
+        double CutWeight(const std::string& cut_name);
+        void AddCutResult(const std::string& cut_name, const bool passed, const double weight);
 
     private:
-        std::map<std::string, CutResult> m_CutResults;
+        std::map<std::string, CutResult> cutresults_;
 };
 
-#endif // ZFinderElectron_h_included
+#endif  // ZFINDER_ZFINDERELECTRON_H_
