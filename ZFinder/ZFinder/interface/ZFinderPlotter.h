@@ -1,42 +1,40 @@
-// ZFinder Code
-#include "ZFinderElectron.h"
-#include "ZFinderEvent.h"
+#ifndef ZFINDER_ZFINDERPLOTTER_H_
+#define ZFINDER_ZFINDERPLOTTER_H_
 
 // Root
-#include <TCanvas.h>
-#include <TDirectory.h>
-#include <TH1I.h>
+#include <TDirectory.h>  // TDirectory
+#include <TH1I.h>  // TH1I
 
-// Standard Library
-#include <string>
-
-#ifndef ZFINDERPLOTS_H_INCLUDED
-#define ZFINDERPLOTS_H_INCLUDED
+// ZFinder Code
+#include "ZFinderEvent.h"  // ZFinderEvent
 
 class ZFinderPlots{
     public:
         // Constructor
         ZFinderPlots(TDirectory* td);
-        
-        // Add events, and make PNGs
-        void fill(const ZFinderEvent* ZEvent, const short e0 = 0, const short e1 = 1);
-        void print();
+
+        // Add events
+        void Fill(ZFinderEvent const * const z_event, const short first_electron = 0, const short second_electron = 1);
+        // Make PNGs
+        void Print();
 
     private:
-        TDirectory* m_tdir;
+        // The TDirectory to store plots in
+        TDirectory* tdir_;
 
-        TH1I* Z0MassCoarse;
-        TH1I* Z0MassFine;
-        TH1I* Z0Rapidity;
-        TH1I* Z0pt;
-        TH1I* e0pt;
-        TH1I* e1pt;
-        TH1I* e0eta;
-        TH1I* e1eta;
-        TH1I* e0phi;
-        TH1I* e1phi;
-        TH1I* phistar;
-        TH1I* pileup;
+        // Histograms
+        TH1I* z0_mass_coarse_;
+        TH1I* z0_mass_fine_;
+        TH1I* z0_rapidity_;
+        TH1I* z0_pt_;
+        TH1I* e0_pt_;
+        TH1I* e1_pt_;
+        TH1I* e0_eta_;
+        TH1I* e1_eta_;
+        TH1I* e0_phi_;
+        TH1I* e1_phi_;
+        TH1I* phistar_;
+        TH1I* pileup_;
 };
 
-#endif
+#endif  // ZFINDER_ZFINDERPLOTTER_H_
