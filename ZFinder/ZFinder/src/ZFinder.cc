@@ -2,7 +2,7 @@
 //
 // Package:    ZFinder
 // Class:      ZFinder
-// 
+//
 /**\class ZFinder ZFinder.cc ZShape/ZFinder/src/ZFinder.cc
 
 Description: [one line class summary]
@@ -71,20 +71,14 @@ class ZFinder : public edm::EDAnalyzer {
 //
 // constructors and destructor
 //
-ZFinder::ZFinder(const edm::ParameterSet& iConfig)
-
-{
+ZFinder::ZFinder(const edm::ParameterSet& iConfig) {
     //now do what ever initialization is needed
-
 }
 
 
-ZFinder::~ZFinder()
-{
-
+ZFinder::~ZFinder() {
     // do anything here that needs to be done at desctruction time
     // (e.g. close files, deallocate resources etc.)
-
 }
 
 
@@ -93,16 +87,14 @@ ZFinder::~ZFinder()
 //
 
 // ------------ method called for each event  ------------
-    void
-ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
-{
+void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     using namespace edm;
 
 
 
 #ifdef THIS_IS_AN_EVENT_EXAMPLE
     Handle<ExampleData> pIn;
-    iEvent.getByLabel("example",pIn);
+    iEvent.getByLabel("example", pIn);
 #endif
 
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
@@ -113,44 +105,31 @@ ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 
 // ------------ method called once each job just before starting event loop  ------------
-    void 
-ZFinder::beginJob()
-{
+void ZFinder::beginJob() {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
-    void 
-ZFinder::endJob() 
-{
+void ZFinder::endJob() {
 }
 
 // ------------ method called when starting to processes a run  ------------
-    void 
-ZFinder::beginRun(edm::Run const&, edm::EventSetup const&)
-{
+void ZFinder::beginRun(edm::Run const&, edm::EventSetup const&) {
 }
 
 // ------------ method called when ending the processing of a run  ------------
-    void 
-ZFinder::endRun(edm::Run const&, edm::EventSetup const&)
-{
+void ZFinder::endRun(edm::Run const&, edm::EventSetup const&) {
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------
-    void 
-ZFinder::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
-{
+void ZFinder::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) {
 }
 
 // ------------ method called when ending the processing of a luminosity block  ------------
-    void 
-ZFinder::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
-{
+void ZFinder::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&) {
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void
-ZFinder::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void ZFinder::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
     //The following says we do not know what parameters are allowed so do no validation
     // Please change this to state exactly what you do use, even if it is no parameters
     edm::ParameterSetDescription desc;
