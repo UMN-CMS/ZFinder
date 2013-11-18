@@ -7,6 +7,7 @@
 
 // CMSSW
 #include "DataFormats/Candidate/interface/CandidateFwd.h"  // CandidateBaseRef
+#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // GsfElectron
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
 
 struct CutResult{
@@ -20,8 +21,9 @@ class ZFinderElectron{
         // Constructor
         ZFinderElectron(reco::CadidateBaseRef particle);
         ZFinderElectron(GenParticle particle);
+        ZFinderElectron(GsfElectron particle);
 
-        // A pointer to the object ZFinderElectron was created from
+        // A copy of the object ZFinderElectron was created from
         const reco::CandidateBaseRef electron;
 
         // Kinematics variables
@@ -31,9 +33,6 @@ class ZFinderElectron{
 
         // Other physical properties
         int charge;
-
-        // Calculated Quantities
-        double pf_iso;
 
         // Handling cuts
         CutResult* GetCutResult(const std::string& cut_name) const;

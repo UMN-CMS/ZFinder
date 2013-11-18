@@ -10,8 +10,7 @@
 #include "PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
 
 ZFinderElectron::ZFinderElectron(reco::CadidateBaseRef particle) {
-/* Extract the useful quantities from a reco electron
- */
+/* Extract the useful quantities from a reco electron */
     pt = particle.p4().pt();
     phi = particle.p4().phi();
     eta = particle.p4().eta();
@@ -40,6 +39,17 @@ ZFinderElectron::ZFinderElectron(GenParticle particle) {
     electron = particle;
 
     // TODO: PF Iso
+}
+
+ZFinderElectron::ZFinderElectron(GsfElectron particle) {
+    /* Extract the useful quantities from a GsfElectron */
+    pt = particle.pt();
+    eta = particle.superCluster()->eta(); 
+    phi = particle.superCluster()->phi();
+    charge = particle.charge();
+
+    // Copy the external electron
+    electron = particle;
 }
 
 ZFinderElectron::GetCutResult(const std::string& cut_name) const {
