@@ -18,11 +18,11 @@ struct CutResult{
 class ZFinderElectron{
     public:
         // Constructor
-        ZFinderElectron(reco::CadidateBaseRef* particle);
-        ZFinderElectron(GenParticle* particle);
+        ZFinderElectron(reco::CadidateBaseRef particle);
+        ZFinderElectron(GenParticle particle);
 
         // A pointer to the object ZFinderElectron was created from
-        const reco::CandidateBaseRef* electron;
+        const reco::CandidateBaseRef electron;
 
         // Kinematics variables
         double pt;

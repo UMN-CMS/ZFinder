@@ -9,13 +9,13 @@
 // ZFinder
 #include "PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
 
-ZFinderElectron::ZFinderElectron(reco::CadidateBaseRef* particle) {
+ZFinderElectron::ZFinderElectron(reco::CadidateBaseRef particle) {
 /* Extract the useful quantities from a reco electron
  */
-    pt = particle->p4().pt();
-    phi = particle->p4().phi();
-    eta = particle->p4().eta();
-    charge = particle->charge();
+    pt = particle.p4().pt();
+    phi = particle.p4().phi();
+    eta = particle.p4().eta();
+    charge = particle.charge();
 
     // Assign internal pointer to the object used to create the ZFinderElectron
     electron = particle;
@@ -23,16 +23,16 @@ ZFinderElectron::ZFinderElectron(reco::CadidateBaseRef* particle) {
     // TODO: PF Iso
 }
 
-ZFinderElectron::ZFinderElectron(GenParticle* particle) {
+ZFinderElectron::ZFinderElectron(GenParticle particle) {
 /* Extract the useful quantities from a gen electron */
-    pt = particle->momentum().perp();
-    phi = particle->momentum().phi();
-    eta = particle->momentum().eta();
+    pt = particle.momentum().perp();
+    phi = particle.momentum().phi();
+    eta = particle.momentum().eta();
     // Using the Particle Data Group ID Number, determine if the particle is an
     // electron or positron
-    if (particle->pdg_id() == ELECTRON) {
+    if (particle.pdg_id() == ELECTRON) {
         charge = -1;
-    } else if (particle->pdg_id() == POSITRON) {
+    } else if (particle.pdg_id() == POSITRON) {
         charge = 1;
     }
 
