@@ -6,9 +6,10 @@
 #include <vector>  // vector
 
 // CMSSW
+#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // reco::GsfElectron
 #include "FWCore/Framework/interface/Event.h"  // edm::Event, edm::EventSetup
-#include "DataFormats/Candidate/interface/Candidate.h"  // Candidate
-#include "DataFormats/Candidate/interface/CandidateFwd.h"  // CandidateBaseRef
+#include "FWCore/ParameterSet/interface/ParameterSet.h"  // edm::ParameterSet
+#include "FWCore/Utilities/interface/InputTag.h"  // edm::InputTag
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
 
 // ZFinder
@@ -22,9 +23,14 @@ struct BasicRequirements{
 
 class ZFinderEvent{
     public:
-        // Constructor (iEvent and iSetup violate our naming convention, but
-        // are almost ubiquitous in CMSSW code)
-        ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup, const bool use_truth);
+        // Constructor. Although iEvent, iSetup, and iConfig violate our naming
+        // convention, they are almost ubiquitous in CMSSW code
+        ZFinderEvent(
+                const edm::Event& iEvent, 
+                const edm::EventSetup& iSetup, 
+                const edm::ParameterSet& iConfig,
+                const bool use_truth
+                );
 
         // Data or MC
         bool is_real_data;
@@ -62,20 +68,39 @@ class ZFinderEvent{
         // These are the special, selected electrons
         ZFinderElectron* e0;
         ZFinderElectron* e1;
-        void setE0(const ZFinderElectron* electron);
-        void setE1(const ZFinderElectron* electron);
-        void setEs(const ZFinderElectron* e0, const ZFinderElectron* e1);
+        void set_e0(ZFinderElectron* electron) { e0 = electron; }
+        void set_e1(ZFinderElectron* electron) { e1 = electron; }
+        void set_both_e(ZFinderElectron* electron0, ZFinderElectron* electron1) { e0 = electron0; e1 = electron1; }
 
-        // Add an electron to the internal list
-        ZFinderElectron* AddElectron(Cadidate* particle);  // Both CandidateBaseRef and GenParticle inherit from Candidate
-
-    private:
+    protected:
         // Called by the constructor to handle MC and Data separately
-        void init_reco(const edm::Event& iEvent, const edm::EventSetup iSetup, const BasicRequirements cuts);
-        void init_truth(const edm::Event& iEvent, const edm::EventSetup iSetup, const BasicRequirements cuts);
+        void InitReco(const edm::Event& iEvent, const edm::EventSetup iSetup, const BasicRequirements cuts);
+        void InitTruth(const edm::Event& iEvent, const edm::EventSetup iSetup, const BasicRequirements cuts);
+
+        void InitRecoElectrons(const edm::Event& iEvent, const edm::EventSetup iSetup, const BasicRequirements cuts);
+        void InitZ();
+
+        // Input tags
+        struct InputTags{
+            edm::InputTag electron;
+            edm::InputTag conversion;
+            edm::InputTag beamspot;
+            edm::InputTag rho_iso;
+            edm::InputTag vertex;
+            edm::InputTag pileup;
+            edm::InputTag generator;
+            std::vector<edm::InputTag> iso_vals;
+        } inputtags_;
 
         // A list of all electrons
-        std::vector<ZFinderElectron*> electrons_;
+        std::vector<ZFinderElectron> electrons_;
+        ZFinderElectron* AddElectron(reco::GsfElectron electron);
+        ZFinderElectron* AddElectron(HepMC::GenParticle electron);
 
+        // Calculate phistar
+        double ReturnPhistar(const double& eta0, const double& phi0, const double& eta1, const double& phi1);
+
+        // Sorting functions
+        static bool SortByPTHighLow(const ZFinderElectron e0, const ZFinderElectron e1) { return (e0.pt > e1.pt); }
 };
 #endif  // ZFINDER_ZFINDEREVENT_H_

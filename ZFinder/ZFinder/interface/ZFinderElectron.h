@@ -6,7 +6,6 @@
 #include <map>
 
 // CMSSW
-#include "DataFormats/Candidate/interface/CandidateFwd.h"  // CandidateBaseRef
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // GsfElectron
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
 
@@ -19,8 +18,7 @@ struct CutResult{
 class ZFinderElectron{
     public:
         // Constructor
-        ZFinderElectron(reco::CadidateBaseRef particle);
-        ZFinderElectron(GenParticle particle);
+        ZFinderElectron(HepMC::GenParticle particle);
         ZFinderElectron(GsfElectron particle);
 
         // A copy of the object ZFinderElectron was created from
