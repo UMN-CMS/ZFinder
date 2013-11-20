@@ -5,7 +5,7 @@
 
 // CMSSW
 #include "DataFormats/Common/interface/Handle.h"  // edm::Handle
-#include "EGamma/EGammaAnalysisTools/interface/EGammaCutBasedEleId.h"  // EgammaCutBasedEleId::PassWP, EgammaCutBasedEleId::*
+#include "EgammaAnalysis/ElectronTools/interface/EGammaCutBasedEleId.h"  // EgammaCutBasedEleId::PassWP, EgammaCutBasedEleId::*
 
 // ZFinder
 #include "ZFinder/ZFinder/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
