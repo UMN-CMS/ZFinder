@@ -7,7 +7,7 @@
 //#include "DataFormats/Candidate/interface/Candidate.h"  // Candidate
 
 // ZFinder
-#include "PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
+#include "ZFinder/ZFinder/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
 
 ZFinderElectron::ZFinderElectron(HepMC::GenParticle particle) {
 /* Extract the useful quantities from a gen electron */

@@ -8,7 +8,7 @@
 #include "EGamma/EGammaAnalysisTools/interface/EGammaCutBasedEleId.h"  // EgammaCutBasedEleId::PassWP, EgammaCutBasedEleId::*
 
 // ZFinder
-#include "PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
+#include "ZFinder/ZFinder/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
 
 ZFinderEvent::ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup, const& edm::ParameterSet iConfig, const bool use_truth=false) {
     /* Given an event, parses them for the information needed to make the classe.

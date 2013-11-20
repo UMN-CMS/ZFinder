@@ -7,7 +7,7 @@
 #include <TCanvas.h>  // TCanvas
 
 // ZFinder Code
-#include "ZFinderElectron.h"  // ZFinderElectron
+#include "ZFinder/ZFinder/interface/ZFinderElectron.h"  // ZFinderElectron
 
 // Constructor
 ZFinderPlotter::ZFinderPlotter(TDirectory* tdir) {
