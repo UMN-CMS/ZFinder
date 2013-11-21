@@ -13,6 +13,21 @@ process.source = cms.Source("PoolSource",
     )
 )
 
-process.demo = cms.EDAnalyzer('ZFinder')
+process.demo = cms.EDAnalyzer('ZFinder'
+        # General tags
+        electronsInputTag       = cms.InputTag("gsfElectrons"),
+        conversionsInputTag     = cms.InputTag("allConversions"),
+        beamSpotInputTag        = cms.InputTag("offlineBeamSpot"),
+        rhoIsoInputTag          = cms.InputTag("kt6PFJetsForIsolation", "rho"),
+        primaryVertexInputTag   = cms.InputTag("offlinePrimaryVertices"),
+        isoValInputTags         = cms.VInputTag(
+            cms.InputTag('elPFIsoValueCharged03PFIdPFIso'),
+            cms.InputTag('elPFIsoValueGamma03PFIdPFIso'),
+            cms.InputTag('elPFIsoValueNeutral03PFIdPFIso')
+            ),
+        # MC, but still required to be something for data
+        pileupInputTag   = cms.InputTag("addPileupInfo"),
+        generatorInputTag   = cms.InputTag("generator"),
+        )
 
 process.p = cms.Path(process.demo)
