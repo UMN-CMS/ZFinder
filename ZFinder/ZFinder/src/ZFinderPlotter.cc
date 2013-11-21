@@ -9,6 +9,7 @@
 // ZFinder Code
 #include "ZFinder/ZFinder/interface/ZFinderElectron.h"  // ZFinderElectron
 
+
 // Constructor
 ZFinderPlotter::ZFinderPlotter(TDirectory* tdir) {
     /* 
@@ -44,24 +45,24 @@ ZFinderPlotter::ZFinderPlotter(TDirectory* tdir) {
 
     // z0_pt
     const std::string z0_pt_name = "Z0 p_{T}";
-    z0_pt = new TH1I(z0_pt_name.c_str(), z0_pt_name.c_str(), 200, 0., 200.);
-    z0_pt->SetDirectory(tdir_);
-    z0_pt->GetXaxis()->SetTitle("p_{T,Z}");
-    z0_pt->GetYaxis()->SetTitle("Counts / GeV");
+    z0_pt_ = new TH1I(z0_pt_name.c_str(), z0_pt_name.c_str(), 200, 0., 200.);
+    z0_pt_->SetDirectory(tdir_);
+    z0_pt_->GetXaxis()->SetTitle("p_{T,Z}");
+    z0_pt_->GetYaxis()->SetTitle("Counts / GeV");
 
     // e0_pt
     const std::string e0_pt_name = "p_{T,e_{0}}";
-    e0_pt = new TH1I(e0_pt_name.c_str(), e0_pt_name.c_str(), 200, 0., 200.);
-    e0_pt->SetDirectory(tdir_);
-    e0_pt->GetXaxis()->SetTitle("p_{T,e_{0}}");
-    e0_pt->GetYaxis()->SetTitle("Counts / GeV");
+    e0_pt_ = new TH1I(e0_pt_name.c_str(), e0_pt_name.c_str(), 200, 0., 200.);
+    e0_pt_->SetDirectory(tdir_);
+    e0_pt_->GetXaxis()->SetTitle("p_{T,e_{0}}");
+    e0_pt_->GetYaxis()->SetTitle("Counts / GeV");
 
     // e1_pt
     const std::string e1_pt_name = "p_{T,e_{1}}";
-    e1_pt = new TH1I(e1_pt_name.c_str(), e1_pt_name.c_str(), 200, 0., 200.);
-    e1_pt->SetDirectory(tdir_);
-    e1_pt->GetXaxis()->SetTitle("p_{T,e_{0}}");
-    e1_pt->GetYaxis()->SetTitle("Counts / GeV");
+    e1_pt_ = new TH1I(e1_pt_name.c_str(), e1_pt_name.c_str(), 200, 0., 200.);
+    e1_pt_->SetDirectory(tdir_);
+    e1_pt_->GetXaxis()->SetTitle("p_{T,e_{0}}");
+    e1_pt_->GetYaxis()->SetTitle("Counts / GeV");
 
     // e0_eta_
     const std::string e0_eta_name = "#eta_{e_{0}}";
@@ -107,109 +108,106 @@ ZFinderPlotter::ZFinderPlotter(TDirectory* tdir) {
 
 }
 
-void ZFinderPlotter::Fill(ZFinderEvent const * const z_event, const int electron_0 = 0, const int electron_1 = 1) {
+template <class Particle_T>
+void ZFinderPlotter::Fill(const ZFinderEvent<Particle_T>& zf_event, const int electron_0, const int electron_1) {
     /* 
-     * Given a ZEvent, fills all the histograms. 
+     * Given a zf_event, fills all the histograms. 
      *
-     * electron_0 and electron_1 can be used to assign ZEvent.eN to the given
+     * electron_0 and electron_1 can be used to assign zf_event.eN to the given
      * number in the histogram. For example, assigning electron_0 = 1 will fill
-     * the e0 histograms with data from ZEvent->e1.
+     * the e0 histograms with data from zf_event.e1.
      */
     // Z Info
-    z0_mass_coarse_->Fill(ZEvent->z.m);
-    z0_mass_fine_->Fill(ZEvent->z.m);
-    z0_rapidity_->Fill(ZEvent->z.y);
-    z0_pt->Fill(ZEvent->z.pt);
-    phistar->Fill(ZEvent->z.phistar);
+    z0_mass_coarse_->Fill(zf_event.z.m);
+    z0_mass_fine_->Fill(zf_event.z.m);
+    z0_rapidity_->Fill(zf_event.z.y);
+    z0_pt_->Fill(zf_event.z.pt);
+    phistar_->Fill(zf_event.z.phistar);
 
     // Fill the histograms with the information from the approriate electron
     if ( electron_0 == 0 && electron_1 == 1 ) {
-        e0_pt->Fill(ZEvent->e0->pt);
-        e0_eta_->Fill(ZEvent->e0->eta);
-        e0_phi_->Fill(ZEvent->e0->phi);
-        e1_pt->Fill(ZEvent->e1->pt);
-        e1_eta_->Fill(ZEvent->e1->eta);
-        e1_phi_->Fill(ZEvent->e1->phi);
+        e0_pt_->Fill(zf_event.e0->pt);
+        e0_eta_->Fill(zf_event.e0->eta);
+        e0_phi_->Fill(zf_event.e0->phi);
+        e1_pt_->Fill(zf_event.e1->pt);
+        e1_eta_->Fill(zf_event.e1->eta);
+        e1_phi_->Fill(zf_event.e1->phi);
     } else if ( electron_0 == 1 && electron_1 == 0 ) {
-        e0_pt->Fill(ZEvent->e1->pt);
-        e0_eta_->Fill(ZEvent->e1->eta);
-        e0_phi_->Fill(ZEvent->e1->phi);
-        e1_pt->Fill(ZEvent->e0->pt);
-        e1_eta_->Fill(ZEvent->e0->eta);
-        e1_phi_->Fill(ZEvent->e0->phi);
+        e0_pt_->Fill(zf_event.e1->pt);
+        e0_eta_->Fill(zf_event.e1->eta);
+        e0_phi_->Fill(zf_event.e1->phi);
+        e1_pt_->Fill(zf_event.e0->pt);
+        e1_eta_->Fill(zf_event.e0->eta);
+        e1_phi_->Fill(zf_event.e0->phi);
     }
 
     // Event Info
-    pileup->Fill(ZEvent->vert.num);
+    pileup_->Fill(zf_event.vert.num);
 }
 
 void ZFinderPlotter::Print() {
     // Get the name of the TDir
     std::string basename;
-    basename.assign(tdir->GetName());
-
-    // Set Image Sizes
-    const int X_SIZE = 1280;
-    const int Y_SIZE = 640;
+    basename.assign(tdir_->GetName());
 
     // Write all PNGs
     std::string z0_mass_coarse_Str = basename + "_";
-    TCanvas* z0_mass_coarse_C = new TCanvas(z0_mass_coarse_.c_str(), z0_mass_coarse_.c_str(), X_SIZE, Y_SIZE);
+    TCanvas* z0_mass_coarse_C = new TCanvas(z0_mass_coarse_Str.c_str(), z0_mass_coarse_Str.c_str(), X_SIZE, Y_SIZE);
     z0_mass_coarse_->Draw();
     z0_mass_coarse_C->Print(z0_mass_coarse_Str.c_str());
 
     std::string z0_mass_fine_Str = basename + "_";
-    TCanvas* z0_mass_fine_C = new TCanvas(z0_mass_fine_.c_str(), z0_mass_fine_.c_str(), X_SIZE, Y_SIZE);
+    TCanvas* z0_mass_fine_C = new TCanvas(z0_mass_fine_Str.c_str(), z0_mass_fine_Str.c_str(), X_SIZE, Y_SIZE);
     z0_mass_fine_->Draw();
     z0_mass_fine_C->Print(z0_mass_fine_Str.c_str());
 
     std::string z0_rapidity_Str = basename + "_";
-    TCanvas* z0_rapidity_C = new TCanvas(z0_rapidity_.c_str(), z0_rapidity_.c_str(), X_SIZE, Y_SIZE);
+    TCanvas* z0_rapidity_C = new TCanvas(z0_rapidity_Str.c_str(), z0_rapidity_Str.c_str(), X_SIZE, Y_SIZE);
     z0_rapidity_->Draw();
     z0_rapidity_C->Print(z0_rapidity_Str.c_str());
 
     std::string z0_ptStr = basename + "_";
-    TCanvas* z0_ptC = new TCanvas(z0_pt.c_str(), z0_pt.c_str(), X_SIZE, Y_SIZE);
-    z0_pt->Draw();
+    TCanvas* z0_ptC = new TCanvas(z0_ptStr.c_str(), z0_ptStr.c_str(), X_SIZE, Y_SIZE);
+    z0_pt_->Draw();
     z0_ptC->Print(z0_ptStr.c_str());
 
     std::string e0_ptStr = basename + "_";
-    TCanvas* e0_ptC = new TCanvas(e0_pt.c_str(), e0_pt.c_str(), X_SIZE, Y_SIZE);
-    e0_pt->Draw();
+    TCanvas* e0_ptC = new TCanvas(e0_ptStr.c_str(), e0_ptStr.c_str(), X_SIZE, Y_SIZE);
+    e0_pt_->Draw();
     e0_ptC->Print(e0_ptStr.c_str());
 
     std::string e1_ptStr = basename + "_";
-    TCanvas* e1_ptC = new TCanvas(e1_pt.c_str(), e1_pt.c_str(), X_SIZE, Y_SIZE);
-    e1_pt->Draw();
+    TCanvas* e1_ptC = new TCanvas(e1_ptStr.c_str(), e1_ptStr.c_str(), X_SIZE, Y_SIZE);
+    e1_pt_->Draw();
     e1_ptC->Print(e1_ptStr.c_str());
 
     std::string e0_eta_Str = basename + "_";
-    TCanvas* e0_eta_C = new TCanvas(e0_eta_.c_str(), e0_eta_.c_str(), X_SIZE, Y_SIZE);
+    TCanvas* e0_eta_C = new TCanvas(e0_eta_Str.c_str(), e0_eta_Str.c_str(), X_SIZE, Y_SIZE);
     e0_eta_->Draw();
     e0_eta_C->Print(e0_eta_Str.c_str());
 
     std::string e1_eta_Str = basename + "_";
-    TCanvas* e1_eta_C = new TCanvas(e1_eta_.c_str(), e1_eta_.c_str(), X_SIZE, Y_SIZE);
+    TCanvas* e1_eta_C = new TCanvas(e1_eta_Str.c_str(), e1_eta_Str.c_str(), X_SIZE, Y_SIZE);
     e1_eta_->Draw();
     e1_eta_C->Print(e1_eta_Str.c_str());
 
     std::string e0_phi_Str = basename + "_";
-    TCanvas* e0_phi_C = new TCanvas(e0_phi_.c_str(), e0_phi_.c_str(), X_SIZE, Y_SIZE);
+    TCanvas* e0_phi_C = new TCanvas(e0_phi_Str.c_str(), e0_phi_Str.c_str(), X_SIZE, Y_SIZE);
     e0_phi_->Draw();
     e0_phi_C->Print(e0_phi_Str.c_str());
 
     std::string e1_phi_Str = basename + "_";
-    TCanvas* e1_phi_C = new TCanvas(e1_phi_.c_str(), e1_phi_.c_str(), X_SIZE, Y_SIZE);
+    TCanvas* e1_phi_C = new TCanvas(e1_phi_Str.c_str(), e1_phi_Str.c_str(), X_SIZE, Y_SIZE);
     e1_phi_->Draw();
     e1_phi_C->Print(e1_phi_Str.c_str());
 
     std::string phistarStr = basename + "_";
-    TCanvas* phistarC = new TCanvas(phistar_.c_str(), phistar_.c_str(), X_SIZE, Y_SIZE);
+    TCanvas* phistarC = new TCanvas(phistarStr.c_str(), phistarStr.c_str(), X_SIZE, Y_SIZE);
     phistar_->Draw();
     phistarC->Print(phistarStr.c_str());
 
     std::string pileupStr = basename + "_";
-    TCanvas* pileupC = new TCanvas(pileup.c_str(), pileup.c_str(), X_SIZE, Y_SIZE);
-    pileup->Draw();
+    TCanvas* pileupC = new TCanvas(pileupStr.c_str(), pileupStr.c_str(), X_SIZE, Y_SIZE);
+    pileup_->Draw();
     pileupC->Print(pileupStr.c_str());
 }

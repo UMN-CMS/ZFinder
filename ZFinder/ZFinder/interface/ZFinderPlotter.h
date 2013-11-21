@@ -5,20 +5,26 @@
 #include <TDirectory.h>  // TDirectory
 #include <TH1I.h>  // TH1I
 
+// CMSSW
+#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // reco::GsfElectron
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // HepMC::GenParticle
+
 // ZFinder Code
 #include "ZFinderEvent.h"  // ZFinderEvent
 
-class ZFinderPlots{
+
+class ZFinderPlotter{
     public:
         // Constructor
-        ZFinderPlots(TDirectory* td);
+        ZFinderPlotter(TDirectory* td);
 
         // Add events
-        void Fill(ZFinderEvent const * const z_event, const int first_electron = 0, const int second_electron = 1);
+        template <class Particle_T>
+        void Fill(const ZFinderEvent<Particle_T>& z_event, const int first_electron = 0, const int second_electron = 1);
         // Make PNGs
         void Print();
 
-    private:
+    protected:
         // The TDirectory to store plots in
         TDirectory* tdir_;
 
@@ -35,6 +41,10 @@ class ZFinderPlots{
         TH1I* e1_phi_;
         TH1I* phistar_;
         TH1I* pileup_;
+
+        // Plotting variables
+        static const int X_SIZE = 1280;
+        static const int Y_SIZE = 640;
 };
 
 #endif  // ZFINDER_ZFINDERPLOTTER_H_
