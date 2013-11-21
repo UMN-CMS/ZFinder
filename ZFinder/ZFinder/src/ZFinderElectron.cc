@@ -6,6 +6,7 @@
 // ZFinder
 #include "ZFinder/ZFinder/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
 
+
 template <> 
 ZFinderElectron<reco::GsfElectron>::ZFinderElectron(reco::GsfElectron particle) : electron(particle) {
     /* Extract the useful quantities from a GsfElectron */
@@ -28,4 +29,55 @@ ZFinderElectron<HepMC::GenParticle>::ZFinderElectron(HepMC::GenParticle particle
     } else if (particle.pdg_id() == POSITRON) {
         charge = 1;
     }
+}
+
+template <class Particle_T>
+CutResult* ZFinderElectron<Particle_T>::GetCutResult(const std::string& cut_name) const {
+    /* Return a CutResult based on the name */
+    // Find the cut
+    std::map<std::string, CutResult>::const_iterator i = cutresults_.find(cut_name);
+    // Return a CutResult if it exists, otherwise return NULL
+    if (i != cutresults_.end()) {
+        return &(i->second);
+    } else {
+        return NULL;
+    }
+}
+
+template <class Particle_T>
+bool ZFinderElectron<Particle_T>::CutPassed(const std::string& cut_name) const {
+    /* Return the passed status of a cut based on the name */
+    CutResult* cr = GetCutResult(cut_name);
+    // If the CutResult exists, return the passed value, otherwise return false
+    if (cr != NULL) {
+        return cr->passed;
+    } else {
+        return false;
+    }
+}
+
+template <class Particle_T>
+double ZFinderElectron<Particle_T>::CutWeight(const std::string& cut_name) const {
+    /* Return the weight of a cut based on the name */
+    CutResult* cr = GetCutResult(cut_name);
+    // If the CutResult exists, return the weight, otherwise return 0.
+    if (cr != NULL) {
+        return cr->weight;
+    } else {
+        return 0.;
+    }
+}
+
+template <class Particle_T>
+void ZFinderElectron<Particle_T>::AddCutResult(const std::string& cut_name, const bool passed, const double weight) {
+    /* Given a name and passed status, will add it to the cutmap. It may also
+     * be given a weight, but if not it is assumed to be 1.
+     *
+     * This function will overwrite previous entries with the same name!
+     */
+    CutResult cr;
+    cr.passed = passed;
+    cr.name = cut_name;
+    cr.weight = weight;
+    cutresults_[cut_name] = cr;  // This will overwrite
 }
