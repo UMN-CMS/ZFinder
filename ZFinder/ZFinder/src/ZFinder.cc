@@ -35,6 +35,13 @@ Implementation:
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/ParticleFlowReco/interface/PFBlock.h"
 
+// Electrons
+#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // GsfElectron
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
+
+// ZFinder
+#include "ZFinder/ZFinder/interface/ZFinderEvent.h"  // ZFinderEvent
+
 //
 // class declaration
 //
@@ -58,6 +65,7 @@ class ZFinder : public edm::EDAnalyzer {
         virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
         // ----------member data ---------------------------
+        const edm::ParameterSet& iConfig_;
 };
 
 //
@@ -71,7 +79,7 @@ class ZFinder : public edm::EDAnalyzer {
 //
 // constructors and destructor
 //
-ZFinder::ZFinder(const edm::ParameterSet& iConfig) {
+ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     //now do what ever initialization is needed
 }
 
@@ -90,17 +98,8 @@ ZFinder::~ZFinder() {
 void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     using namespace edm;
 
-
-
-#ifdef THIS_IS_AN_EVENT_EXAMPLE
-    Handle<ExampleData> pIn;
-    iEvent.getByLabel("example", pIn);
-#endif
-
-#ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
-    ESHandle<SetupData> pSetup;
-    iSetup.get<SetupRecord>().get(pSetup);
-#endif
+    bool use_mc_truth = false;
+    ZFinderEvent<reco::GsfElectron>(iEvent, iSetup, iConfig_, use_mc_truth);
 }
 
 
