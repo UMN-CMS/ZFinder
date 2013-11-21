@@ -137,7 +137,7 @@ void ZFinderEvent<Particle_T>::InitRecoElectrons(const edm::Event& iEvent, const
         reco::GsfElectronRef ele_ref(els_h, i);
 
         // get particle flow isolation
-        const double ISO_CH =  (*(isoVals)[0])[ele_ref];
+        const double ISO_CH = (*(isoVals)[0])[ele_ref];
         const double ISO_EM = (*(isoVals)[1])[ele_ref];
         const double ISO_NH = (*(isoVals)[2])[ele_ref];
 
