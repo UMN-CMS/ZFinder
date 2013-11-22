@@ -2,6 +2,7 @@
 
 // Standard Library
 #include <algorithm>  // std::sort
+#include <iostream>  // std::cout, std::endl
 
 // CMSSW
 #include "DataFormats/Common/interface/Handle.h"  // edm::Handle
@@ -12,8 +13,7 @@
 #include "ZFinder/ZFinder/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
 
 
-template <class Particle_T>
-ZFinderEvent<Particle_T>::ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup, const edm::ParameterSet& iConfig, const bool use_truth=false) {
+ZFinderEvent::ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup, const edm::ParameterSet& iConfig, const bool use_truth=false) {
     /* Given an event, parses them for the information needed to make the classe.
      *
      * It selects electrons based on a minimum level of hard-coded cuts.
@@ -29,7 +29,7 @@ ZFinderEvent<Particle_T>::ZFinderEvent(const edm::Event& iEvent, const edm::Even
     id.event_num = iEvent.id().event();
 
     /* Set local is_real_data */
-    is_real_data = iEvent.isRealData;
+    is_real_data = iEvent.isRealData();
 
     /* Get InputTags */
     // Reco
@@ -53,8 +53,7 @@ ZFinderEvent<Particle_T>::ZFinderEvent(const edm::Event& iEvent, const edm::Even
     }   // Else do nothing
 }
 
-template <class Particle_T>
-void ZFinderEvent<Particle_T>::InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts) {
+void ZFinderEvent::InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts) {
 
     /* Count Pile Up and store first vertex location*/
     edm::Handle<reco::VertexCollection> reco_vertices;
@@ -90,8 +89,7 @@ void ZFinderEvent<Particle_T>::InitReco(const edm::Event& iEvent, const edm::Eve
     InitRecoElectrons(iEvent, iSetup, cuts);
 }
 
-template <class Particle_T>
-void ZFinderEvent<Particle_T>::InitRecoElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts) {
+void ZFinderEvent::InitRecoElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts) {
     // We split this part into a new function because it is very long
     // Most of this code is stolen from the example here:
     // http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/EGamma/EGammaAnalysisTools/src/EGammaCutBasedEleIdAnalyzer.cc?view=markup
@@ -131,7 +129,7 @@ void ZFinderEvent<Particle_T>::InitRecoElectrons(const edm::Event& iEvent, const
     for(unsigned int i = 0; i < els_h->size(); ++i) {
         // Get the electron and set put it into the electrons vector
         reco::GsfElectron electron = els_h->at(i);
-        ZFinderElectron<Particle_T>* zf_electron = AddElectron(electron);
+        ZFinderElectronBase* zf_electron = static_cast<ZFinderElectronBase*>(AddElectron(electron));
 
         // get reference to electron and the electron
         reco::GsfElectronRef ele_ref(els_h, i);
@@ -156,7 +154,7 @@ void ZFinderEvent<Particle_T>::InitRecoElectrons(const edm::Event& iEvent, const
 
         // for 2011 WP70 trigger
         bool trigwp70 = EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERWP70, ele_ref);
-        
+
         // Add the cuts to our electron
         const double WEIGHT = 1.;
         zf_electron->AddCutResult("wp:veto", veto, WEIGHT);
@@ -169,30 +167,38 @@ void ZFinderEvent<Particle_T>::InitRecoElectrons(const edm::Event& iEvent, const
     }
 
     // Set up the Z
-    InitZ();
+    n_electrons = electrons_.size();
+    if (n_electrons >= 2) {
+        InitZ();
+    } else {
+        z.m = -1;
+        z.y = -1000;
+        z.pt = -1;
+        z.phistar = -1;
+    }
 }
 
-template <class Particle_T>
-void ZFinderEvent<Particle_T>::InitZ() {
+void ZFinderEvent::InitZ() {
     // Sort our electrons and set e0, e1 as the two with the highest pt
     std::sort(electrons_.begin(), electrons_.end(), SortByPTHighLow);
-    set_both_e(&electrons_[0], &electrons_[1]);
+    set_both_e(electrons_[0], electrons_[1]);
 
     // Set Z properties
     const double ELECTRON_MASS = 5.109989e-4;
-    math::PtEtaPhiMLorentzVector e0lv(e0->pt(), e0->eta(), e0->phi(), ELECTRON_MASS);
-    math::PtEtaPhiMLorentzVector e1lv(e1->pt(), e1->eta(), e1->phi(), ELECTRON_MASS);
+    math::PtEtaPhiMLorentzVector e0lv(e0->pt, e0->eta, e0->phi, ELECTRON_MASS);
+    math::PtEtaPhiMLorentzVector e1lv(e1->pt, e1->eta, e1->phi, ELECTRON_MASS);
     math::PtEtaPhiMLorentzVector zlv;
     zlv = e0lv + e1lv;
-        
+
     z.m = zlv.mass();
     z.y = zlv.Rapidity();
     z.pt = zlv.pt();
     z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
+
+    std::cout << "Z Mass: " << z.m << std::endl;
 }
 
-template <class Particle_T>
-void ZFinderEvent<Particle_T>::InitTruth(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts) {
+void ZFinderEvent::InitTruth(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts) {
     /* Count Pile Up */
     edm::Handle<std::vector<PileupSummaryInfo> > pileup_info;
     iEvent.getByLabel("addPileupInfo", pileup_info);
@@ -239,17 +245,17 @@ void ZFinderEvent<Particle_T>::InitTruth(const edm::Event& iEvent, const edm::Ev
     }
 
     // Check cuts and add electrons
-    if (    cuts.ept_min < outgoing_electron_0->momentum().perp() 
+    if (    cuts.ept_min < outgoing_electron_0->momentum().perp()
             && outgoing_electron_0->momentum().perp() < cuts.ept_max
        ) {
-        ZFinderElectron<Particle_T> zf_electron = AddElectron(*outgoing_electron_0);
-        set_e0(&zf_electron);
+        ZFinderElectronBase* zf_electron = AddElectron(*outgoing_electron_0);
+        set_e0(zf_electron);
     }
-    if (    cuts.ept_min < outgoing_electron_1->momentum().perp() 
+    if (    cuts.ept_min < outgoing_electron_1->momentum().perp()
             && outgoing_electron_1->momentum().perp() < cuts.ept_max
        ) {
-        ZFinderElectron<Particle_T> zf_electron = AddElectron(*outgoing_electron_1);
-        set_e1(&zf_electron);
+        ZFinderElectronBase* zf_electron = AddElectron(*outgoing_electron_1);
+        set_e1(zf_electron);
     }
 
     // Z Properties
@@ -261,23 +267,7 @@ void ZFinderEvent<Particle_T>::InitTruth(const edm::Event& iEvent, const edm::Ev
     z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
 }
 
-/* Add an electron to electrons_ */
-template <class Particle_T>
-ZFinderElectron<Particle_T>* ZFinderEvent<Particle_T>::AddElectron(reco::GsfElectron electron) {
-    ZFinderElectron<Particle_T> zf_electron(electron);
-    electrons_.push_back(zf_electron);
-    return &electrons_.back();
-}
-
-template <class Particle_T>
-ZFinderElectron<Particle_T>* ZFinderEvent<Particle_T>::AddElectron(HepMC::GenParticle electron) {
-    ZFinderElectron<Particle_T> zf_electron(electron);
-    electrons_.push_back(zf_electron);
-    return &electrons_.back();
-}
-
-template <class Particle_T>
-double ZFinderEvent<Particle_T>::ReturnPhistar(const double& eta0, const double& phi0, const double& eta1, const double& phi1) {
+double ZFinderEvent::ReturnPhistar(const double& eta0, const double& phi0, const double& eta1, const double& phi1) {
     /* Calculate phi star */
     const double PI = 3.14159265358979323846;
     double dphi = phi0 - phi1;
@@ -299,4 +289,15 @@ double ZFinderEvent<Particle_T>::ReturnPhistar(const double& eta0, const double&
 
     /* PhiStar */
     return ( 1 / cosh( DETA / 2 ) ) * (1 / tan( dphi / 2 ) );
+}
+
+void ZFinderEvent::PrintElectrons() {
+    using std::cout;
+    using std::endl;
+    /*
+     * Loops over the electrons, and prints out the information about them.
+     */
+    for (std::vector<ZFinderElectronBase*>::const_iterator i_elec = electrons_.begin(); i_elec != electrons_.end(); ++i_elec) {
+        cout << "pt: " << i_elec->pt << endl;
+    }
 }

@@ -108,8 +108,7 @@ ZFinderPlotter::ZFinderPlotter(TDirectory* tdir) {
 
 }
 
-template <class Particle_T>
-void ZFinderPlotter::Fill(const ZFinderEvent<Particle_T>& zf_event, const int electron_0, const int electron_1) {
+void ZFinderPlotter::Fill(const ZFinderEvent& zf_event, const int electron_0, const int electron_1) {
     /* 
      * Given a zf_event, fills all the histograms. 
      *

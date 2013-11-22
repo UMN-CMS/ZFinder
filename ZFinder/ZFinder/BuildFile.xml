@@ -2,6 +2,7 @@
 <use name="DataFormats/EgammaCandidates"/>
 <use name="DataFormats/HepMCCandidate"/>
 <use name="DataFormats/TrackReco"/>
+<use name="EgammaAnalysis/ElectronTools"/>
 <use name="FWCore/Framework"/>
 <use name="FWCore/ParameterSet"/>
 <use name="FWCore/PluginManager"/>

@@ -19,8 +19,7 @@ class ZFinderPlotter{
         ZFinderPlotter(TDirectory* td);
 
         // Add events
-        template <class Particle_T>
-        void Fill(const ZFinderEvent<Particle_T>& z_event, const int first_electron = 0, const int second_electron = 1);
+        void Fill(const ZFinderEvent& zf_event, const int first_electron = 0, const int second_electron = 1);
         // Make PNGs
         void Print();
 
