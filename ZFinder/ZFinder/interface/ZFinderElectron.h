@@ -2,12 +2,15 @@
 #define ZFINDER_ZFINDERELECTRON_H_
 
 // Standard Library
-#include <string>
-#include <map>
+#include <string>  // std::string
+#include <map>  // std::map
+#include <iostream>  // std::cout, std::endl
+
 
 // CMSSW
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // GsfElectron
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
+#include "DataFormats/Candidate/interface/Candidate.h"  // reco::Candidate
 
 // ZFinder
 #include "ZFinder/ZFinder/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
@@ -19,9 +22,11 @@ struct CutResult{
     double weight;
 };
 
-class ZFinderElectronBase {
+class ZFinderElectron {
     public:
-        ZFinderElectronBase() {};
+        ZFinderElectron() {};
+        ZFinderElectron(reco::GsfElectron input_electron);
+        ZFinderElectron(HepMC::GenParticle input_electron);
 
         // Kinematics variables
         double pt;
@@ -39,19 +44,8 @@ class ZFinderElectronBase {
 
     protected:
         std::map<std::string, CutResult> cutresults_;
-};
-
-template <class Particle_T> 
-class ZFinderElectron : public ZFinderElectronBase {
-    public:
-        // Constructor
-        ZFinderElectron(Particle_T particle) : parent_electron(particle) {
-            // We need to construct specialized versions, so this should never
-            // be called directly 
-        }
-
-        // A copy of the object ZFinderElectron was created from
-        const Particle_T parent_electron;
+        // TODO: fill out the candidate field
+        const reco::Candidate* candidate_;
 };
 
 #endif  // ZFINDER_ZFINDERELECTRON_H_

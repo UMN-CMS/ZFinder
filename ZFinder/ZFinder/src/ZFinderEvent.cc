@@ -129,7 +129,7 @@ void ZFinderEvent::InitRecoElectrons(const edm::Event& iEvent, const edm::EventS
     for(unsigned int i = 0; i < els_h->size(); ++i) {
         // Get the electron and set put it into the electrons vector
         reco::GsfElectron electron = els_h->at(i);
-        ZFinderElectronBase* zf_electron = static_cast<ZFinderElectronBase*>(AddElectron(electron));
+        ZFinderElectron* zf_electron = AddElectron(electron);
 
         // get reference to electron and the electron
         reco::GsfElectronRef ele_ref(els_h, i);
@@ -248,13 +248,13 @@ void ZFinderEvent::InitTruth(const edm::Event& iEvent, const edm::EventSetup& iS
     if (    cuts.ept_min < outgoing_electron_0->momentum().perp()
             && outgoing_electron_0->momentum().perp() < cuts.ept_max
        ) {
-        ZFinderElectronBase* zf_electron = AddElectron(*outgoing_electron_0);
+        ZFinderElectron* zf_electron = AddElectron(*outgoing_electron_0);
         set_e0(zf_electron);
     }
     if (    cuts.ept_min < outgoing_electron_1->momentum().perp()
             && outgoing_electron_1->momentum().perp() < cuts.ept_max
        ) {
-        ZFinderElectronBase* zf_electron = AddElectron(*outgoing_electron_1);
+        ZFinderElectron* zf_electron = AddElectron(*outgoing_electron_1);
         set_e1(zf_electron);
     }
 
@@ -265,6 +265,18 @@ void ZFinderEvent::InitTruth(const edm::Event& iEvent, const edm::EventSetup& iS
     const double ZEMP = Z->momentum().e() - Z->momentum().pz();
     z.y = 0.5 * log(ZEPP / ZEMP);
     z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
+}
+
+ZFinderElectron* ZFinderEvent::AddElectron(reco::GsfElectron electron) {
+    ZFinderElectron* zf_electron = new ZFinderElectron(electron);
+    electrons_.push_back(zf_electron);
+    return zf_electron;
+}
+
+ZFinderElectron* ZFinderEvent::AddElectron(HepMC::GenParticle electron) {
+    ZFinderElectron* zf_electron = new ZFinderElectron(electron);
+    electrons_.push_back(zf_electron);
+    return zf_electron;
 }
 
 double ZFinderEvent::ReturnPhistar(const double& eta0, const double& phi0, const double& eta1, const double& phi1) {
@@ -297,7 +309,7 @@ void ZFinderEvent::PrintElectrons() {
     /*
      * Loops over the electrons, and prints out the information about them.
      */
-    for (std::vector<ZFinderElectronBase*>::const_iterator i_elec = electrons_.begin(); i_elec != electrons_.end(); ++i_elec) {
-        cout << "pt: " << i_elec->pt << endl;
+    for (std::vector<ZFinderElectron*>::const_iterator i_elec = electrons_.begin(); i_elec != electrons_.end(); ++i_elec) {
+        cout << "pt: " << (*i_elec)->pt << endl;
     }
 }

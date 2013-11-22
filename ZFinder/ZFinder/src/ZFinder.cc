@@ -99,7 +99,8 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     using namespace edm;
 
     bool use_mc_truth = false;
-    ZFinderEvent(iEvent, iSetup, iConfig_, use_mc_truth);
+    ZFinderEvent zfe(iEvent, iSetup, iConfig_, use_mc_truth);
+    zfe.PrintElectrons();
 }
 
 
