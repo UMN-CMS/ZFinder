@@ -7,8 +7,6 @@ process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 100  # Report status ever 100 events
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
-## REMOVE REMOVE REMOVE for real data!!!
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
@@ -16,6 +14,10 @@ process.source = cms.Source("PoolSource",
         'file:/local/cms/phedex/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/F8C30E72-AE67-E211-A375-002618943922.root'
     )
 )
+
+process.TFileService = cms.Service("TFileService",
+        fileName = cms.string("test.root")
+        )
 
 #
 # rho value for isolation
