@@ -194,8 +194,6 @@ void ZFinderEvent::InitZ() {
     z.y = zlv.Rapidity();
     z.pt = zlv.pt();
     z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
-
-    std::cout << "Z Mass: " << z.m << std::endl;
 }
 
 void ZFinderEvent::InitTruth(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts) {
