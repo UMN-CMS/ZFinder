@@ -124,24 +124,24 @@ void ZFinderPlotter::Fill(const ZFinderEvent& zf_event, const int electron_0, co
     phistar_->Fill(zf_event.z.phistar);
 
     // Fill the histograms with the information from the approriate electron
-    if ( electron_0 == 0 && electron_1 == 1 ) {
-        e0_pt_->Fill(zf_event.e0->pt);
-        e0_eta_->Fill(zf_event.e0->eta);
-        e0_phi_->Fill(zf_event.e0->phi);
-        e1_pt_->Fill(zf_event.e1->pt);
-        e1_eta_->Fill(zf_event.e1->eta);
-        e1_phi_->Fill(zf_event.e1->phi);
-    } else if ( electron_0 == 1 && electron_1 == 0 ) {
-        e0_pt_->Fill(zf_event.e1->pt);
-        e0_eta_->Fill(zf_event.e1->eta);
-        e0_phi_->Fill(zf_event.e1->phi);
-        e1_pt_->Fill(zf_event.e0->pt);
-        e1_eta_->Fill(zf_event.e0->eta);
-        e1_phi_->Fill(zf_event.e0->phi);
-    }
+    // if ( electron_0 == 0 && electron_1 == 1 ) {
+    //     e0_pt_->Fill(zf_event.e0->pt);
+    //     e0_eta_->Fill(zf_event.e0->eta);
+    //     e0_phi_->Fill(zf_event.e0->phi);
+    //     e1_pt_->Fill(zf_event.e1->pt);
+    //     e1_eta_->Fill(zf_event.e1->eta);
+    //     e1_phi_->Fill(zf_event.e1->phi);
+    // } else if ( electron_0 == 1 && electron_1 == 0 ) {
+    //     e0_pt_->Fill(zf_event.e1->pt);
+    //     e0_eta_->Fill(zf_event.e1->eta);
+    //     e0_phi_->Fill(zf_event.e1->phi);
+    //     e1_pt_->Fill(zf_event.e0->pt);
+    //     e1_eta_->Fill(zf_event.e0->eta);
+    //     e1_phi_->Fill(zf_event.e0->phi);
+    // }
 
-    // Event Info
-    pileup_->Fill(zf_event.vert.num);
+    // // Event Info
+    // pileup_->Fill(zf_event.vert.num);
 }
 
 void ZFinderPlotter::Print() {
