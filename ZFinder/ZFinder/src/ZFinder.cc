@@ -30,6 +30,10 @@ Implementation:
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+// CMSSW
+#include "FWCore/ServiceRegistry/interface/Service.h" // edm::Service
+#include "CommonTools/UtilAlgos/interface/TFileService.h" // TFileService
+
 // Particle Flow
 #include "RecoParticleFlow/Configuration/test/PFCandidateAnalyzer.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
@@ -41,6 +45,7 @@ Implementation:
 
 // ZFinder
 #include "ZFinder/ZFinder/interface/ZFinderEvent.h"  // ZFinderEvent
+#include "ZFinder/ZFinder/interface/ZFinderPlotter.h"  // ZFinderPlotter
 
 //
 // class declaration
@@ -66,6 +71,9 @@ class ZFinder : public edm::EDAnalyzer {
 
         // ----------member data ---------------------------
         const edm::ParameterSet& iConfig_;
+        TFile* output_file_;
+        TDirectory* tdir_;
+        ZFinderPlotter* z_plotter;
 };
 
 //
@@ -81,6 +89,10 @@ class ZFinder : public edm::EDAnalyzer {
 //
 ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     //now do what ever initialization is needed
+    edm::Service<TFileService> ts;
+    output_file_ = &(ts->file());
+    tdir_ = output_file_->mkdir("outputdir", "outputdir");
+    z_plotter = new ZFinderPlotter(tdir_);
 }
 
 
@@ -101,8 +113,10 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     bool use_mc_truth = false;
     ZFinderEvent zfe(iEvent, iSetup, iConfig_, use_mc_truth);
     zfe.PrintElectrons();
-}
 
+    // Add plots
+    z_plotter->Fill(zfe);
+}
 
 // ------------ method called once each job just before starting event loop  ------------
 void ZFinder::beginJob() {
