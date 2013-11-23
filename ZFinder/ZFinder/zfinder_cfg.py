@@ -6,7 +6,14 @@ process = cms.Process("Demo")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = 100  # Report status ever 100 events
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+# Number of events from each file to process. It should be -1 (all) when
+# running for an analysis
+N_EVENTS_TO_PROCESS = -1
+if N_EVENTS_TO_PROCESS == -1:
+    print "NOT RUNNING ON ALL EVENTS IN THE FILE!"
+process.maxEvents = cms.untracked.PSet(
+        input = cms.untracked.int32(N_EVENTS_TO_PROCESS)
+        )
 
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use

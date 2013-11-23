@@ -18,20 +18,23 @@ ZFinderEvent::ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup& iSet
      *
      * It selects electrons based on a minimum level of hard-coded cuts.
      */
-    /* Cuts */
+    // Clear Events
+    InitVariables();
+
+    // Cuts
     BasicRequirements cuts;
     cuts.ept_min = 20.;
     cuts.ept_max = 1e12;
 
-    /* Get event info */
+    // Get event info
     id.run_num = iEvent.run();
     id.lumi_num = iEvent.luminosityBlock();
     id.event_num = iEvent.id().event();
 
-    /* Set local is_real_data */
+    // Set local is_real_data
     is_real_data = iEvent.isRealData();
 
-    /* Get InputTags */
+    // Get InputTags
     // Reco
     inputtags_.electron = iConfig.getParameter<edm::InputTag>("electronsInputTag");
     inputtags_.conversion = iConfig.getParameter<edm::InputTag>("conversionsInputTag");
@@ -43,7 +46,7 @@ ZFinderEvent::ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup& iSet
     inputtags_.pileup = iConfig.getParameter<edm::InputTag>("pileupInputTag");
     inputtags_.generator = iConfig.getParameter<edm::InputTag>("generatorInputTag");
 
-    /* Finish initialization based on MC or not */
+    // Finish initialization based on MC or not
     if (is_real_data && !use_truth) {
         // Data
         InitReco(iEvent, iSetup, cuts);
@@ -170,11 +173,6 @@ void ZFinderEvent::InitRecoElectrons(const edm::Event& iEvent, const edm::EventS
     n_electrons = electrons_.size();
     if (n_electrons >= 2) {
         InitZ();
-    } else {
-        z.m = -1;
-        z.y = -1000;
-        z.pt = -1;
-        z.phistar = -1;
     }
 }
 
@@ -194,6 +192,38 @@ void ZFinderEvent::InitZ() {
     z.y = zlv.Rapidity();
     z.pt = zlv.pt();
     z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
+}
+
+void ZFinderEvent::InitVariables() {
+    // Beamspot
+    bs.x = -1000;
+    bs.y = -1000;
+    bs.z = -1000;
+
+    // Vertexes
+    vert.num = -1;
+    vert.x = -1000;
+    vert.y = -1000;
+    vert.z = -1000;
+
+    // Event ID
+    id.run_num = 0;
+    id.lumi_num = 0;
+    id.event_num = 0;
+
+    // Z Data
+    z.m = -1;
+    z.y = -1000;
+    z.pt = -1;
+    z.phistar = -1;
+
+    // Electrons
+    e0 = NULL;
+    e1 = NULL;
+    n_electrons = -1;
+    
+    // Is Data
+    is_real_data = false;
 }
 
 void ZFinderEvent::InitTruth(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts) {

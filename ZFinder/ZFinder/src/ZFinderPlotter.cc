@@ -12,9 +12,9 @@
 
 // Constructor
 ZFinderPlotter::ZFinderPlotter(TDirectory* tdir) {
-    /* 
+    /*
      * Initialize a set of histograms and associate them with a given TDirectory.
-     */ 
+     */
 
     // Set tdir to the internal directory and then set it as the current
     // working directory
@@ -109,8 +109,8 @@ ZFinderPlotter::ZFinderPlotter(TDirectory* tdir) {
 }
 
 void ZFinderPlotter::Fill(const ZFinderEvent& zf_event, const int electron_0, const int electron_1) {
-    /* 
-     * Given a zf_event, fills all the histograms. 
+    /*
+     * Given a zf_event, fills all the histograms.
      *
      * electron_0 and electron_1 can be used to assign zf_event.eN to the given
      * number in the histogram. For example, assigning electron_0 = 1 will fill
@@ -124,24 +124,26 @@ void ZFinderPlotter::Fill(const ZFinderEvent& zf_event, const int electron_0, co
     phistar_->Fill(zf_event.z.phistar);
 
     // Fill the histograms with the information from the approriate electron
-    // if ( electron_0 == 0 && electron_1 == 1 ) {
-    //     e0_pt_->Fill(zf_event.e0->pt);
-    //     e0_eta_->Fill(zf_event.e0->eta);
-    //     e0_phi_->Fill(zf_event.e0->phi);
-    //     e1_pt_->Fill(zf_event.e1->pt);
-    //     e1_eta_->Fill(zf_event.e1->eta);
-    //     e1_phi_->Fill(zf_event.e1->phi);
-    // } else if ( electron_0 == 1 && electron_1 == 0 ) {
-    //     e0_pt_->Fill(zf_event.e1->pt);
-    //     e0_eta_->Fill(zf_event.e1->eta);
-    //     e0_phi_->Fill(zf_event.e1->phi);
-    //     e1_pt_->Fill(zf_event.e0->pt);
-    //     e1_eta_->Fill(zf_event.e0->eta);
-    //     e1_phi_->Fill(zf_event.e0->phi);
-    // }
+    if (zf_event.e0 != NULL && zf_event.e1 != NULL){
+        if (electron_0 == 0 && electron_1 == 1) {
+            e0_pt_->Fill(zf_event.e0->pt);
+            e0_eta_->Fill(zf_event.e0->eta);
+            e0_phi_->Fill(zf_event.e0->phi);
+            e1_pt_->Fill(zf_event.e1->pt);
+            e1_eta_->Fill(zf_event.e1->eta);
+            e1_phi_->Fill(zf_event.e1->phi);
+        } else if (electron_0 == 1 && electron_1 == 0) {
+            e0_pt_->Fill(zf_event.e1->pt);
+            e0_eta_->Fill(zf_event.e1->eta);
+            e0_phi_->Fill(zf_event.e1->phi);
+            e1_pt_->Fill(zf_event.e0->pt);
+            e1_eta_->Fill(zf_event.e0->eta);
+            e1_phi_->Fill(zf_event.e0->phi);
+        }
+    }
 
-    // // Event Info
-    // pileup_->Fill(zf_event.vert.num);
+    // Event Info
+    pileup_->Fill(zf_event.vert.num);
 }
 
 void ZFinderPlotter::Print() {

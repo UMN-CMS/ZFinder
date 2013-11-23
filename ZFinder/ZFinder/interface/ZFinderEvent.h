@@ -85,6 +85,9 @@ class ZFinderEvent{
         void InitRecoElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
         void InitZ();
 
+        // Initialize all variables to safe values
+        void InitVariables();
+
         // Input tags
         struct InputTags{
             edm::InputTag electron;

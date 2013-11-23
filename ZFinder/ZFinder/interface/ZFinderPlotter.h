@@ -5,10 +5,6 @@
 #include <TDirectory.h>  // TDirectory
 #include <TH1I.h>  // TH1I
 
-// CMSSW
-#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // reco::GsfElectron
-#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // HepMC::GenParticle
-
 // ZFinder Code
 #include "ZFinderEvent.h"  // ZFinderEvent
 
