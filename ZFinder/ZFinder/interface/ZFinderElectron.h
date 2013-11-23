@@ -16,6 +16,12 @@
 
 
 namespace zf {
+
+    enum ElectronType {
+        GSFELECTRON,
+        GENPARTICLE
+    };
+
     struct CutResult {
         bool passed;
         std::string name;  // Redundant, but nice to have as a check
@@ -42,10 +48,14 @@ namespace zf {
             double CutWeight(const std::string& cut_name) const;
             void AddCutResult(const std::string& cut_name, const bool passed, const double weight=1.);
 
+            // Return type
+            ElectronType get_type() const { return candidate_type_; }
+
         protected:
             std::map<std::string, CutResult> cutresults_;
             // TODO: fill out the candidate field
             const reco::Candidate* candidate_;
+            ElectronType candidate_type_;
     };
 }  // namespace zfe
 #endif  // ZFINDER_ZFINDERELECTRON_H_

@@ -6,6 +6,8 @@
 
 namespace zf {
     ZFinderElectron::ZFinderElectron(reco::GsfElectron particle) {
+        /* Set type */
+        candidate_type_ = GSFELECTRON;
         /* Extract the useful quantities from a GsfElectron */
         pt = particle.pt();
         eta = particle.superCluster()->eta(); 
@@ -14,6 +16,8 @@ namespace zf {
     }
 
     ZFinderElectron::ZFinderElectron(HepMC::GenParticle particle) {
+        /* Set type */
+        candidate_type_ = GENPARTICLE;
         /* Extract the useful quantities from a gen electron */
         pt = particle.momentum().perp();
         phi = particle.momentum().phi();
