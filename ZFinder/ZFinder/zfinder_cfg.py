@@ -9,7 +9,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100  # Report status ever 100
 # Number of events from each file to process. It should be -1 (all) when
 # running for an analysis
 N_EVENTS_TO_PROCESS = -1
-if N_EVENTS_TO_PROCESS == -1:
+if N_EVENTS_TO_PROCESS is not -1:
     print "NOT RUNNING ON ALL EVENTS IN THE FILE!"
 process.maxEvents = cms.untracked.PSet(
         input = cms.untracked.int32(N_EVENTS_TO_PROCESS)
