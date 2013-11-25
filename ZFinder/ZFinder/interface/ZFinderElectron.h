@@ -4,7 +4,6 @@
 // Standard Library
 #include <string>  // std::string
 #include <map>  // std::map
-#include <iostream>  // std::cout, std::endl
 
 // CMSSW
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // GsfElectron
