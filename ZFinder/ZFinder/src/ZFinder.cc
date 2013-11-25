@@ -112,10 +112,12 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     bool use_mc_truth = false;
     zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_, use_mc_truth);
-    zfe.PrintElectrons();
+    if (zfe.z.m > -1) {
+        zfe.PrintElectrons();
+        z_plotter->Fill(zfe);
+    }
 
     // Add plots
-    z_plotter->Fill(zfe);
 }
 
 // ------------ method called once each job just before starting event loop  ------------

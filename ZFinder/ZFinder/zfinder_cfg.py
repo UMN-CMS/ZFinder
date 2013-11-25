@@ -4,7 +4,7 @@ process = cms.Process("Demo")
 
 # Set up message output and logging
 process.load("FWCore.MessageService.MessageLogger_cfi")
-process.MessageLogger.cerr.FwkReport.reportEvery = 100  # Report status ever 100 events
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000  # Report status ever 100 events
 
 # Number of events from each file to process. It should be -1 (all) when
 # running for an analysis
@@ -18,7 +18,10 @@ process.maxEvents = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(
+        # Data
         'file:/local/cms/phedex/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/F8C30E72-AE67-E211-A375-002618943922.root'
+        # MC
+        #'file:/local/cms/phedex/store/mc/Summer11/DYToEE_M-20_CT10_TuneZ2_7TeV-powheg-pythia/GEN-SIM-RECO/PU_S4_START42_V11-v1/0000/3C059997-49A8-E011-8844-0024E87682A6.root'
     )
 )
 
