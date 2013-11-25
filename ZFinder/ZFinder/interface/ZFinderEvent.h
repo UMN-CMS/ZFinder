@@ -84,6 +84,8 @@ namespace zf {
             void InitTruth(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
 
             void InitRecoElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
+
+            // Update the Z Info from e0, e1
             void InitZ();
 
             // Initialize all variables to safe values

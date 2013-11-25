@@ -133,41 +133,60 @@ namespace zf {
         for(unsigned int i = 0; i < els_h->size(); ++i) {
             // Get the electron and set put it into the electrons vector
             reco::GsfElectron electron = els_h->at(i);
-            ZFinderElectron* zf_electron = AddElectron(electron);
+            if (cuts.ept_min < electron.pt() &&  electron.pt() < cuts.ept_max) {
+                ZFinderElectron* zf_electron = AddElectron(electron);
 
-            // get reference to electron and the electron
-            reco::GsfElectronRef ele_ref(els_h, i);
+                // get reference to electron and the electron
+                reco::GsfElectronRef ele_ref(els_h, i);
 
-            // get particle flow isolation
-            const double ISO_CH = (*(isoVals)[0])[ele_ref];
-            const double ISO_EM = (*(isoVals)[1])[ele_ref];
-            const double ISO_NH = (*(isoVals)[2])[ele_ref];
+                // get particle flow isolation
+                const double ISO_CH = (*(isoVals)[0])[ele_ref];
+                const double ISO_EM = (*(isoVals)[1])[ele_ref];
+                const double ISO_NH = (*(isoVals)[2])[ele_ref];
 
-            // test ID
-            // working points
-            bool veto = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::VETO, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, rhoIso);
-            bool loose = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::LOOSE, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, rhoIso);
-            bool medium = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, rhoIso);
-            bool tight = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::TIGHT, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, rhoIso);
+                // test ID
+                // working points
+                bool veto = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::VETO, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, rhoIso);
+                bool loose = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::LOOSE, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, rhoIso);
+                bool medium = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, rhoIso);
+                bool tight = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::TIGHT, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, rhoIso);
 
-            // eop/fbrem cuts for extra tight ID
-            bool fbremeopin = EgammaCutBasedEleId::PassEoverPCuts(ele_ref);
+                // eop/fbrem cuts for extra tight ID
+                bool fbremeopin = EgammaCutBasedEleId::PassEoverPCuts(ele_ref);
 
-            // cuts to match tight trigger requirements
-            bool trigtight = EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERTIGHT, ele_ref);
+                // cuts to match tight trigger requirements
+                bool trigtight = EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERTIGHT, ele_ref);
 
-            // for 2011 WP70 trigger
-            bool trigwp70 = EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERWP70, ele_ref);
+                // for 2011 WP70 trigger
+                bool trigwp70 = EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERWP70, ele_ref);
 
-            // Add the cuts to our electron
-            const double WEIGHT = 1.;
-            zf_electron->AddCutResult("wp:veto", veto, WEIGHT);
-            zf_electron->AddCutResult("wp:loose", loose, WEIGHT);
-            zf_electron->AddCutResult("wp:medium", medium, WEIGHT);
-            zf_electron->AddCutResult("wp:tight", tight, WEIGHT);
-            zf_electron->AddCutResult("wp:eop_cut", fbremeopin, WEIGHT);
-            zf_electron->AddCutResult("wp:trigtight", trigtight, WEIGHT);
-            zf_electron->AddCutResult("wp:trigwp70", trigwp70, WEIGHT);
+                // Add the cuts to our electron
+                const double WEIGHT = 1.;
+                zf_electron->AddCutResult("wp:veto", veto, WEIGHT);
+                zf_electron->AddCutResult("wp:loose", loose, WEIGHT);
+                zf_electron->AddCutResult("wp:medium", medium, WEIGHT);
+                zf_electron->AddCutResult("wp:tight", tight, WEIGHT);
+                zf_electron->AddCutResult("wp:eop_cut", fbremeopin, WEIGHT);
+                zf_electron->AddCutResult("wp:trigtight", trigtight, WEIGHT);
+                zf_electron->AddCutResult("wp:trigwp70", trigwp70, WEIGHT);
+            }
+        }
+
+        // Sort our electrons and set e0, e1 as the two with the highest pt
+        // electrons that pass wp:medium
+        std::sort(electrons_.begin(), electrons_.end(), SortByPTHighLow);
+        for (std::vector<ZFinderElectron*>::const_iterator i_elec = electrons_.begin(); i_elec != electrons_.end(); ++i_elec) {
+            ZFinderElectron* elec = (*i_elec);
+            if (elec->CutPassed("wp:medium")) {
+                if (e0 == NULL) {
+                    set_e0(elec);
+                } else if (e1 == NULL) {
+                    set_e1(elec);
+                }
+                if (e0 != NULL and e1 != NULL) {
+                    break;  // Already set both electrons
+                }
+            }
         }
 
         // Set up the Z
@@ -178,21 +197,19 @@ namespace zf {
     }
 
     void ZFinderEvent::InitZ() {
-        // Sort our electrons and set e0, e1 as the two with the highest pt
-        std::sort(electrons_.begin(), electrons_.end(), SortByPTHighLow);
-        set_both_e(electrons_[0], electrons_[1]);
+        if (e0 != NULL and e1 != NULL) {
+            // Set Z properties
+            const double ELECTRON_MASS = 5.109989e-4;
+            math::PtEtaPhiMLorentzVector e0lv(e0->pt, e0->eta, e0->phi, ELECTRON_MASS);
+            math::PtEtaPhiMLorentzVector e1lv(e1->pt, e1->eta, e1->phi, ELECTRON_MASS);
+            math::PtEtaPhiMLorentzVector zlv;
+            zlv = e0lv + e1lv;
 
-        // Set Z properties
-        const double ELECTRON_MASS = 5.109989e-4;
-        math::PtEtaPhiMLorentzVector e0lv(e0->pt, e0->eta, e0->phi, ELECTRON_MASS);
-        math::PtEtaPhiMLorentzVector e1lv(e1->pt, e1->eta, e1->phi, ELECTRON_MASS);
-        math::PtEtaPhiMLorentzVector zlv;
-        zlv = e0lv + e1lv;
-
-        z.m = zlv.mass();
-        z.y = zlv.Rapidity();
-        z.pt = zlv.pt();
-        z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
+            z.m = zlv.mass();
+            z.y = zlv.Rapidity();
+            z.pt = zlv.pt();
+            z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
+        }
     }
 
     void ZFinderEvent::InitVariables() {
@@ -338,8 +355,14 @@ namespace zf {
         /*
          * Loops over the electrons, and prints out the information about them.
          */
+        cout << "Run " << id.run_num;
+        cout << " event " << id.event_num;
+        cout << " Z Mass " << z.m << std::endl;
         for (std::vector<ZFinderElectron*>::const_iterator i_elec = electrons_.begin(); i_elec != electrons_.end(); ++i_elec) {
-            cout << "pt: " << (*i_elec)->pt << endl;
+            ZFinderElectron* elec = (*i_elec);
+            cout << "\tpt: " << elec->pt;
+            cout << " eta: " << elec->eta; 
+            cout << " phi: " << elec->phi << endl;
         }
     }
 }  // namespace zf
