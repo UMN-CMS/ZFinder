@@ -101,10 +101,10 @@ namespace zf {
         phistar_->GetYaxis()->SetTitle("Counts");
 
         // pileup
-        const std::string pileup_name = "Pileup";
+        const std::string pileup_name = "N_{Vertices}";
         pileup_ = new TH1I(pileup_name.c_str(), pileup_name.c_str(), 100, 0., 100.);
         pileup_->SetDirectory(tdir_);
-        pileup_->GetXaxis()->SetTitle("Pileup");
+        pileup_->GetXaxis()->SetTitle("Number of Vertices");
         pileup_->GetYaxis()->SetTitle("Counts");
 
         // nelectrons
