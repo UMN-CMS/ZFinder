@@ -107,6 +107,13 @@ namespace zf {
         pileup_->GetXaxis()->SetTitle("Pileup");
         pileup_->GetYaxis()->SetTitle("Counts");
 
+        // nelectrons
+        const std::string nelectrons_name = "N_{e}";
+        nelectrons_ = new TH1I(nelectrons_name.c_str(), nelectrons_name.c_str(), 10, 0., 10.);
+        nelectrons_->SetDirectory(tdir_);
+        nelectrons_->GetXaxis()->SetTitle("N_{e}");
+        nelectrons_->GetYaxis()->SetTitle("Events");
+
     }
 
     void ZFinderPlotter::Fill(const ZFinderEvent& zf_event, const int electron_0, const int electron_1) {
@@ -145,6 +152,7 @@ namespace zf {
 
         // Event Info
         pileup_->Fill(zf_event.vert.num);
+        nelectrons_->Fill(zf_event.n_electrons);
     }
 
     void ZFinderPlotter::Print() {
@@ -212,5 +220,10 @@ namespace zf {
         TCanvas* pileupC = new TCanvas(pileupStr.c_str(), pileupStr.c_str(), X_SIZE, Y_SIZE);
         pileup_->Draw();
         pileupC->Print(pileupStr.c_str());
+
+        std::string nelectronsStr = basename + "_";
+        TCanvas* nelectronsC = new TCanvas(nelectronsStr.c_str(), nelectronsStr.c_str(), X_SIZE, Y_SIZE);
+        nelectrons_->Draw();
+        nelectronsC->Print(nelectronsStr.c_str());
     }
 }  // namespace zf

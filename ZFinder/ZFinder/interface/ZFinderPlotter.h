@@ -37,6 +37,7 @@ namespace zf {
             TH1I* e1_phi_;
             TH1I* phistar_;
             TH1I* pileup_;
+            TH1I* nelectrons_;
 
             // Plotting variables
             static const int X_SIZE = 1280;
