@@ -71,9 +71,8 @@ class ZFinder : public edm::EDAnalyzer {
 
         // ----------member data ---------------------------
         const edm::ParameterSet& iConfig_;
-        TFile* output_file_;
-        TDirectory* tdir_;
         zf::ZFinderPlotter* z_plotter;
+
 };
 
 //
@@ -89,12 +88,11 @@ class ZFinder : public edm::EDAnalyzer {
 //
 ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     //now do what ever initialization is needed
-    edm::Service<TFileService> ts;
-    output_file_ = &(ts->file());
-    tdir_ = output_file_->mkdir("outputdir", "outputdir");
-    z_plotter = new zf::ZFinderPlotter(tdir_);
+    edm::Service<TFileService> fs;
+    TFileDirectory* tdir = new TFileDirectory(fs->mkdir("outputdir"));
+    z_plotter = new zf::ZFinderPlotter(tdir);
+    delete tdir;
 }
-
 
 ZFinder::~ZFinder() {
     // do anything here that needs to be done at desctruction time

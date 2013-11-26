@@ -2,8 +2,10 @@
 #define ZFINDER_ZFINDERPLOTTER_H_
 
 // Root
-#include <TDirectory.h>  // TDirectory
 #include <TH1I.h>  // TH1I
+
+// CMSSW
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 // ZFinder Code
 #include "ZFinderEvent.h"  // ZFinderEvent
@@ -13,17 +15,14 @@ namespace zf {
     class ZFinderPlotter{
         public:
             // Constructor
-            ZFinderPlotter(TDirectory* td);
+            ZFinderPlotter(TFileDirectory* tdir);
 
             // Add events
             void Fill(const ZFinderEvent& zf_event, const int first_electron = 0, const int second_electron = 1);
             // Make PNGs
-            void Print();
+            void Print(const std::string& basename);
 
         protected:
-            // The TDirectory to store plots in
-            TDirectory* tdir_;
-
             // Histograms
             TH1I* z0_mass_coarse_;
             TH1I* z0_mass_fine_;
