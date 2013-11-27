@@ -65,12 +65,16 @@ namespace zf {
                 double phistar;
             } z;
 
-            // These are the special, selected electrons
+            // These are the special, selected electrons used to make the Z
             ZFinderElectron* e0;
             ZFinderElectron* e1;
             void set_e0(ZFinderElectron* electron) { e0 = electron; }
             void set_e1(ZFinderElectron* electron) { e1 = electron; }
             void set_both_e(ZFinderElectron* electron0, ZFinderElectron* electron1) { e0 = electron0; e1 = electron1; }
+
+            // Access pruned lists of the internal electrons
+            std::vector<ZFinderElectron*>* FilteredElectrons();
+            std::vector<ZFinderElectron*>* FilteredElectrons(const std::string& cut_name);
 
             // Number of Electrons
             int n_electrons;

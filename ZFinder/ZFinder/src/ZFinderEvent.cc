@@ -353,4 +353,31 @@ namespace zf {
             cout << " phi: " << elec->phi << endl;
         }
     }
+
+    std::vector<ZFinderElectron*>* ZFinderEvent::FilteredElectrons() {
+        /*
+         * Return all electrons
+         */
+        std::vector<ZFinderElectron*>* tmp_vec = new std::vector<ZFinderElectron*>(electrons_.size());
+        for (std::vector<ZFinderElectron*>::iterator i_elec = electrons_.begin(); i_elec != electrons_.end(); ++i_elec) {
+            tmp_vec->push_back(*i_elec);
+        }
+
+        return tmp_vec;
+    }
+
+    std::vector<ZFinderElectron*>* ZFinderEvent::FilteredElectrons(const std::string& cut_name) {
+        /*
+         * Return all electrons that pass a specified cut
+         */
+        std::vector< ZFinderElectron*>* tmp_vec = new std::vector< ZFinderElectron*>(electrons_.size());
+        for (std::vector<ZFinderElectron*>::iterator i_elec = electrons_.begin(); i_elec != electrons_.end(); ++i_elec) {
+             ZFinderElectron* zfe = (*i_elec);
+            if (zfe->CutPassed(cut_name)) {
+                tmp_vec->push_back(zfe);
+            }
+        }
+
+        return tmp_vec;
+    }
 }  // namespace zf
