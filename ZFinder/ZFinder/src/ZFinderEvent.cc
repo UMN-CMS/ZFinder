@@ -173,25 +173,13 @@ namespace zf {
         }
 
         // Sort our electrons and set e0, e1 as the two with the highest pt
-        // electrons that pass wp:medium
         std::sort(electrons_.begin(), electrons_.end(), SortByPTHighLow);
-        for (std::vector<ZFinderElectron*>::const_iterator i_elec = electrons_.begin(); i_elec != electrons_.end(); ++i_elec) {
-            ZFinderElectron* elec = (*i_elec);
-            if (elec->CutPassed("wp:medium")) {
-                if (e0 == NULL) {
-                    set_e0(elec);
-                } else if (e1 == NULL) {
-                    set_e1(elec);
-                }
-                if (e0 != NULL and e1 != NULL) {
-                    break;  // Already set both electrons
-                }
-            }
-        }
 
-        // Set up the Z
         n_electrons = electrons_.size();
         if (n_electrons >= 2) {
+            // Set our internal electrons
+            set_both_e(electrons_[0], electrons_[1]);
+            // Set up the Z
             InitZ();
         }
     }
