@@ -12,8 +12,8 @@ namespace zf {
         candidate_ = &input_electron;
         /* Extract the useful quantities from a GsfElectron */
         pt = input_electron.pt();
-        eta = input_electron.superCluster()->eta(); 
-        phi = input_electron.superCluster()->phi();
+        eta = input_electron.eta();
+        phi = input_electron.phi();
         charge = input_electron.charge();
     }
 
@@ -34,6 +34,18 @@ namespace zf {
         } else if (input_electron.pdg_id() == POSITRON) {
             charge = 1;
         }
+    }
+
+    ZFinderElectron::ZFinderElectron(reco::RecoEcalCandidate input_electron) {
+        /* Set type of candidate and assign */
+        candidate_type_ = RECOECALCANDIDATE;
+        recan_elec_ = input_electron;
+        candidate_ = &input_electron;
+        /* Extract the useful quantities from a GsfElectron */
+        pt = input_electron.pt();
+        eta = input_electron.eta();
+        phi = input_electron.phi();
+        charge = input_electron.charge();
     }
 
     const CutResult* ZFinderElectron::GetCutResult(const std::string& cut_name) const {

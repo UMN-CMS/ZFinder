@@ -9,6 +9,7 @@
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // GsfElectron
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
 #include "DataFormats/Candidate/interface/Candidate.h"  // reco::Candidate
+#include "DataFormats/RecoCandidate/interface/RecoEcalCandidate.h"  // reco::RecoEcalCandidate
 
 // ZFinder
 #include "ZFinder/ZFinder/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
@@ -18,7 +19,8 @@ namespace zf {
 
     enum ElectronType {
         GSFELECTRON,
-        GENPARTICLE
+        GENPARTICLE,
+        RECOECALCANDIDATE
     };
 
     struct CutResult {
@@ -32,6 +34,7 @@ namespace zf {
             ZFinderElectron() {};
             ZFinderElectron(reco::GsfElectron input_electron);
             ZFinderElectron(HepMC::GenParticle input_electron);
+            ZFinderElectron(reco::RecoEcalCandidate input_electron);
 
             // Kinematics variables
             double pt;
@@ -58,6 +61,7 @@ namespace zf {
             // Used to store a copy of the object used to create the ZFElectron
             reco::GsfElectron gsf_elec_;
             HepMC::GenParticle gen_elec_;
+            reco::RecoEcalCandidate recan_elec_;
     };
 }  // namespace zfe
 #endif  // ZFINDER_ZFINDERELECTRON_H_
