@@ -5,28 +5,33 @@
 
 
 namespace zf {
-    ZFinderElectron::ZFinderElectron(reco::GsfElectron particle) {
-        /* Set type */
+    ZFinderElectron::ZFinderElectron(reco::GsfElectron input_electron) {
+        /* Set type of candidate and assign */
         candidate_type_ = GSFELECTRON;
+        gsf_elec_ = input_electron;
+        candidate_ = &input_electron;
         /* Extract the useful quantities from a GsfElectron */
-        pt = particle.pt();
-        eta = particle.superCluster()->eta(); 
-        phi = particle.superCluster()->phi();
-        charge = particle.charge();
+        pt = input_electron.pt();
+        eta = input_electron.superCluster()->eta(); 
+        phi = input_electron.superCluster()->phi();
+        charge = input_electron.charge();
     }
 
-    ZFinderElectron::ZFinderElectron(HepMC::GenParticle particle) {
-        /* Set type */
+    ZFinderElectron::ZFinderElectron(HepMC::GenParticle input_electron) {
+        /* Set type of candidate and assign */
         candidate_type_ = GENPARTICLE;
+        gen_elec_ = input_electron;
+        // HepMC::GenParticle is a child of reco::candidate
+        candidate_ = dynamic_cast<reco::Candidate*>(&gen_elec_);
         /* Extract the useful quantities from a gen electron */
-        pt = particle.momentum().perp();
-        phi = particle.momentum().phi();
-        eta = particle.momentum().eta();
-        // Using the Particle Data Group ID Number, determine if the particle is an
+        pt = input_electron.momentum().perp();
+        phi = input_electron.momentum().phi();
+        eta = input_electron.momentum().eta();
+        // Using the input_electron Data Group ID Number, determine if the input_electron is an
         // electron or positron
-        if (particle.pdg_id() == ELECTRON) {
+        if (input_electron.pdg_id() == ELECTRON) {
             charge = -1;
-        } else if (particle.pdg_id() == POSITRON) {
+        } else if (input_electron.pdg_id() == POSITRON) {
             charge = 1;
         }
     }

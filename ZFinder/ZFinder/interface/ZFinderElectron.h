@@ -53,8 +53,11 @@ namespace zf {
         protected:
             std::map<std::string, CutResult> cutresults_;
             // TODO: fill out the candidate field
-            const reco::Candidate* candidate_;
+            reco::Candidate* candidate_;
             ElectronType candidate_type_;
+            // Used to store a copy of the object used to create the ZFElectron
+            reco::GsfElectron gsf_elec_;
+            HepMC::GenParticle gen_elec_;
     };
 }  // namespace zfe
 #endif  // ZFINDER_ZFINDERELECTRON_H_
