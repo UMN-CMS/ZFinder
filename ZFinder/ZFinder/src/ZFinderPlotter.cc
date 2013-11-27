@@ -106,11 +106,11 @@ namespace zf {
          * the e0 histograms with data from zf_event.e1.
          */
         // Z Info
-        z0_mass_coarse_->Fill(zf_event.z.m);
-        z0_mass_fine_->Fill(zf_event.z.m);
-        z0_rapidity_->Fill(zf_event.z.y);
-        z0_pt_->Fill(zf_event.z.pt);
-        phistar_->Fill(zf_event.z.phistar);
+        z0_mass_coarse_->Fill(zf_event.reco_z.m);
+        z0_mass_fine_->Fill(zf_event.reco_z.m);
+        z0_rapidity_->Fill(zf_event.reco_z.y);
+        z0_pt_->Fill(zf_event.reco_z.pt);
+        phistar_->Fill(zf_event.reco_z.phistar);
 
         // Fill the histograms with the information from the approriate electron
         if (zf_event.e0 != NULL && zf_event.e1 != NULL){
@@ -132,7 +132,7 @@ namespace zf {
         }
 
         // Event Info
-        pileup_->Fill(zf_event.vert.num);
+        pileup_->Fill(zf_event.reco_vert.num);
         nelectrons_->Fill(zf_event.n_electrons);
     }
 

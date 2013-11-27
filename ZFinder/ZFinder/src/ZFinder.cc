@@ -108,9 +108,8 @@ ZFinder::~ZFinder() {
 void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     using namespace edm;
 
-    bool use_mc_truth = false;
-    zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_, use_mc_truth);
-    if (zfe.z.m > -1) {
+    zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_);
+    if (zfe.reco_z.m > -1) {
         zfe.PrintElectrons();
         z_plotter->Fill(zfe);
     }

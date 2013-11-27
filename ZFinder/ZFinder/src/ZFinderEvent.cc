@@ -14,7 +14,7 @@
 
 
 namespace zf {
-    ZFinderEvent::ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup, const edm::ParameterSet& iConfig, const bool use_truth=false) {
+    ZFinderEvent::ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup, const edm::ParameterSet& iConfig) {
         /* Given an event, parses them for the information needed to make the classe.
          *
          * It selects electrons based on a minimum level of hard-coded cuts.
@@ -47,14 +47,11 @@ namespace zf {
         inputtags_.pileup = iConfig.getParameter<edm::InputTag>("pileupInputTag");
         inputtags_.generator = iConfig.getParameter<edm::InputTag>("generatorInputTag");
 
-        // Finish initialization based on MC or not
-        if (is_real_data && !use_truth) {
-            // Data
-            InitReco(iEvent, iSetup, cuts);
-        } else if (!is_real_data && use_truth) {
-            // MC
-            InitTruth(iEvent, iSetup, cuts);
-        }   // Else do nothing
+        // Finish initialization of electrons
+        InitReco(iEvent, iSetup, cuts);  // Data
+        if (!is_real_data) {
+            InitTruth(iEvent, iSetup, cuts);  // MC
+        }
     }
 
     void ZFinderEvent::InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts) {
@@ -62,7 +59,7 @@ namespace zf {
         /* Count Pile Up and store first vertex location*/
         edm::Handle<reco::VertexCollection> reco_vertices;
         iEvent.getByLabel(inputtags_.vertex, reco_vertices);
-        vert.num = 0;
+        reco_vert.num = 0;
         bool first_vertex = true;
         for(unsigned int vertex=0; vertex < reco_vertices->size(); ++vertex) {
             if (    // Criteria copied from twiki
@@ -71,13 +68,13 @@ namespace zf {
                     && (fabs((*reco_vertices)[vertex].z()) <= 24.0)
                     && ((*reco_vertices)[vertex].position().Rho() <= 2.0)
                ) {
-                vert.num++;
+                reco_vert.num++;
                 // Store first good vertex as "primary"
                 if (first_vertex) {
                     first_vertex = false;
-                    vert.x = (*reco_vertices)[vertex].x();
-                    vert.y = (*reco_vertices)[vertex].y();
-                    vert.z = (*reco_vertices)[vertex].z();
+                    reco_vert.x = (*reco_vertices)[vertex].x();
+                    reco_vert.y = (*reco_vertices)[vertex].y();
+                    reco_vert.z = (*reco_vertices)[vertex].z();
                 }
             }
         }
@@ -85,9 +82,9 @@ namespace zf {
         /* Beamspot */
         edm::Handle<reco::BeamSpot> beam_spot;
         iEvent.getByLabel(inputtags_.beamspot, beam_spot);
-        bs.x = beam_spot->position().X();
-        bs.y = beam_spot->position().Y();
-        bs.z = beam_spot->position().Z();
+        reco_bs.x = beam_spot->position().X();
+        reco_bs.y = beam_spot->position().Y();
+        reco_bs.z = beam_spot->position().Z();
 
         /* Find electrons */
         InitRecoElectrons(iEvent, iSetup, cuts);
@@ -134,7 +131,7 @@ namespace zf {
             // Get the electron and set put it into the electrons vector
             reco::GsfElectron electron = els_h->at(i);
             if (cuts.ept_min < electron.pt() &&  electron.pt() < cuts.ept_max) {
-                ZFinderElectron* zf_electron = AddElectron(electron);
+                ZFinderElectron* zf_electron = AddRecoElectron(electron);
 
                 // get reference to electron and the electron
                 reco::GsfElectronRef ele_ref(els_h, i);
@@ -173,19 +170,19 @@ namespace zf {
         }
 
         // Sort our electrons and set e0, e1 as the two with the highest pt
-        std::sort(electrons_.begin(), electrons_.end(), SortByPTHighLow);
+        std::sort(reco_electrons_.begin(), reco_electrons_.end(), SortByPTHighLow);
 
-        n_electrons = electrons_.size();
+        n_electrons = reco_electrons_.size();
         if (n_electrons >= 2) {
             // Set our internal electrons
-            set_both_e(electrons_[0], electrons_[1]);
+            set_both_e(reco_electrons_[0], reco_electrons_[1]);
             // Set up the Z
             InitZ();
         }
     }
 
     void ZFinderEvent::InitZ() {
-        if (e0 != NULL and e1 != NULL) {
+        if (e0 != NULL && e1 != NULL) {
             // Set Z properties
             const double ELECTRON_MASS = 5.109989e-4;
             math::PtEtaPhiMLorentzVector e0lv(e0->pt, e0->eta, e0->phi, ELECTRON_MASS);
@@ -193,24 +190,28 @@ namespace zf {
             math::PtEtaPhiMLorentzVector zlv;
             zlv = e0lv + e1lv;
 
-            z.m = zlv.mass();
-            z.y = zlv.Rapidity();
-            z.pt = zlv.pt();
-            z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
+            reco_z.m = zlv.mass();
+            reco_z.y = zlv.Rapidity();
+            reco_z.pt = zlv.pt();
+            reco_z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
         }
     }
 
     void ZFinderEvent::InitVariables() {
         // Beamspot
-        bs.x = -1000;
-        bs.y = -1000;
-        bs.z = -1000;
+        reco_bs.x = -1000;
+        reco_bs.y = -1000;
+        reco_bs.z = -1000;
 
         // Vertexes
-        vert.num = -1;
-        vert.x = -1000;
-        vert.y = -1000;
-        vert.z = -1000;
+        reco_vert.num = -1;
+        reco_vert.x = -1000;
+        reco_vert.y = -1000;
+        reco_vert.z = -1000;
+        truth_vert.num = -1;
+        truth_vert.x = -1000;
+        truth_vert.y = -1000;
+        truth_vert.z = -1000;
 
         // Event ID
         id.run_num = 0;
@@ -218,10 +219,14 @@ namespace zf {
         id.event_num = 0;
 
         // Z Data
-        z.m = -1;
-        z.y = -1000;
-        z.pt = -1;
-        z.phistar = -1;
+        reco_z.m = -1;
+        reco_z.y = -1000;
+        reco_z.pt = -1;
+        reco_z.phistar = -1;
+        truth_z.m = -1;
+        truth_z.y = -1000;
+        truth_z.pt = -1;
+        truth_z.phistar = -1;
 
         // Electrons
         e0 = NULL;
@@ -237,14 +242,10 @@ namespace zf {
         edm::Handle<std::vector<PileupSummaryInfo> > pileup_info;
         iEvent.getByLabel("addPileupInfo", pileup_info);
         if (pileup_info.isValid()) {
-            vert.num = pileup_info->size();
+            truth_vert.num = pileup_info->size();
         } else {
-            vert.num = -1;
+            truth_vert.num = -1;
         }
-
-        /* Beamspot */
-        // No beamspot in MC
-        bs.x = bs.y = bs.z = -1.;
 
         /*
          * We don't need to select electrons with cuts, because in Monte Carlo we
@@ -282,34 +283,34 @@ namespace zf {
         if (    cuts.ept_min < outgoing_electron_0->momentum().perp()
                 && outgoing_electron_0->momentum().perp() < cuts.ept_max
            ) {
-            ZFinderElectron* zf_electron = AddElectron(*outgoing_electron_0);
+            ZFinderElectron* zf_electron = AddTruthElectron(*outgoing_electron_0);
             set_e0(zf_electron);
         }
         if (    cuts.ept_min < outgoing_electron_1->momentum().perp()
                 && outgoing_electron_1->momentum().perp() < cuts.ept_max
            ) {
-            ZFinderElectron* zf_electron = AddElectron(*outgoing_electron_1);
+            ZFinderElectron* zf_electron = AddTruthElectron(*outgoing_electron_1);
             set_e1(zf_electron);
         }
 
         // Z Properties
-        z.m = Z->momentum().m();
-        z.pt = Z->momentum().perp();
+        truth_z.m = Z->momentum().m();
+        truth_z.pt = Z->momentum().perp();
         const double ZEPP = Z->momentum().e() + Z->momentum().pz();
         const double ZEMP = Z->momentum().e() - Z->momentum().pz();
-        z.y = 0.5 * log(ZEPP / ZEMP);
-        z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
+        truth_z.y = 0.5 * log(ZEPP / ZEMP);
+        truth_z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
     }
 
-    ZFinderElectron* ZFinderEvent::AddElectron(reco::GsfElectron electron) {
+    ZFinderElectron* ZFinderEvent::AddRecoElectron(reco::GsfElectron electron) {
         ZFinderElectron* zf_electron = new ZFinderElectron(electron);
-        electrons_.push_back(zf_electron);
+        reco_electrons_.push_back(zf_electron);
         return zf_electron;
     }
 
-    ZFinderElectron* ZFinderEvent::AddElectron(HepMC::GenParticle electron) {
+    ZFinderElectron* ZFinderEvent::AddTruthElectron(HepMC::GenParticle electron) {
         ZFinderElectron* zf_electron = new ZFinderElectron(electron);
-        electrons_.push_back(zf_electron);
+        truth_electrons_.push_back(zf_electron);
         return zf_electron;
     }
 
@@ -345,39 +346,39 @@ namespace zf {
          */
         cout << "Run " << id.run_num;
         cout << " event " << id.event_num;
-        cout << " Z Mass " << z.m << std::endl;
-        for (std::vector<ZFinderElectron*>::const_iterator i_elec = electrons_.begin(); i_elec != electrons_.end(); ++i_elec) {
+        cout << " Z Mass " << reco_z.m << std::endl;
+        for (std::vector<ZFinderElectron*>::const_iterator i_elec = reco_electrons_.begin(); i_elec != reco_electrons_.end(); ++i_elec) {
             ZFinderElectron* elec = (*i_elec);
             cout << "\tpt: " << elec->pt;
-            cout << " eta: " << elec->eta; 
+            cout << " eta: " << elec->eta;
             cout << " phi: " << elec->phi << endl;
         }
     }
 
-    std::vector<ZFinderElectron*>* ZFinderEvent::FilteredElectrons() {
-        /*
-         * Return all electrons
-         */
-        std::vector<ZFinderElectron*>* tmp_vec = new std::vector<ZFinderElectron*>(electrons_.size());
-        for (std::vector<ZFinderElectron*>::iterator i_elec = electrons_.begin(); i_elec != electrons_.end(); ++i_elec) {
-            tmp_vec->push_back(*i_elec);
-        }
+    // std::vector<ZFinderElectron*>* ZFinderEvent::FilteredElectrons() {
+    //     /*
+    //      * Return all electrons
+    //      */
+    //     std::vector<ZFinderElectron*>* tmp_vec = new std::vector<ZFinderElectron*>(electrons_.size());
+    //     for (std::vector<ZFinderElectron*>::iterator i_elec = electrons_.begin(); i_elec != electrons_.end(); ++i_elec) {
+    //         tmp_vec->push_back(*i_elec);
+    //     }
 
-        return tmp_vec;
-    }
+    //     return tmp_vec;
+    // }
 
-    std::vector<ZFinderElectron*>* ZFinderEvent::FilteredElectrons(const std::string& cut_name) {
-        /*
-         * Return all electrons that pass a specified cut
-         */
-        std::vector< ZFinderElectron*>* tmp_vec = new std::vector< ZFinderElectron*>(electrons_.size());
-        for (std::vector<ZFinderElectron*>::iterator i_elec = electrons_.begin(); i_elec != electrons_.end(); ++i_elec) {
-             ZFinderElectron* zfe = (*i_elec);
-            if (zfe->CutPassed(cut_name)) {
-                tmp_vec->push_back(zfe);
-            }
-        }
+    // std::vector<ZFinderElectron*>* ZFinderEvent::FilteredElectrons(const std::string& cut_name) {
+    //     /*
+    //      * Return all electrons that pass a specified cut
+    //      */
+    //     std::vector< ZFinderElectron*>* tmp_vec = new std::vector< ZFinderElectron*>(electrons_.size());
+    //     for (std::vector<ZFinderElectron*>::iterator i_elec = electrons_.begin(); i_elec != electrons_.end(); ++i_elec) {
+    //          ZFinderElectron* zfe = (*i_elec);
+    //         if (zfe->CutPassed(cut_name)) {
+    //             tmp_vec->push_back(zfe);
+    //         }
+    //     }
 
-        return tmp_vec;
-    }
+    //     return tmp_vec;
+    // }
 }  // namespace zf

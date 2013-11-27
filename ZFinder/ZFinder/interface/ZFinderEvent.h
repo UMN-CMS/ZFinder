@@ -28,8 +28,7 @@ namespace zf {
             ZFinderEvent(
                     const edm::Event& iEvent,
                     const edm::EventSetup& iSetup,
-                    const edm::ParameterSet& iConfig,
-                    const bool use_truth
+                    const edm::ParameterSet& iConfig
                     );
 
             // Data or MC
@@ -40,7 +39,7 @@ namespace zf {
                 double x;
                 double y;
                 double z;
-            } bs;
+            } reco_bs;
 
             // Primary vertexes
             struct Vertexes{
@@ -48,7 +47,7 @@ namespace zf {
                 double x;
                 double y;
                 double z;
-            } vert;
+            } truth_vert, reco_vert;
 
             // Event ID
             struct EventID{
@@ -63,7 +62,7 @@ namespace zf {
                 double pt;
                 double y;
                 double phistar;
-            } z;
+            } reco_z, truth_z;
 
             // These are the special, selected electrons used to make the Z
             ZFinderElectron* e0;
@@ -73,8 +72,8 @@ namespace zf {
             void set_both_e(ZFinderElectron* electron0, ZFinderElectron* electron1) { e0 = electron0; e1 = electron1; }
 
             // Access pruned lists of the internal electrons
-            std::vector<ZFinderElectron*>* FilteredElectrons();
-            std::vector<ZFinderElectron*>* FilteredElectrons(const std::string& cut_name);
+            //std::vector<ZFinderElectron*>* FilteredElectrons();
+            //std::vector<ZFinderElectron*>* FilteredElectrons(const std::string& cut_name);
 
             // Number of Electrons
             int n_electrons;
@@ -107,10 +106,12 @@ namespace zf {
                 std::vector<edm::InputTag> iso_vals;
             } inputtags_;
 
-            // A list of all electrons and ways to manipulate the list
-            std::vector<ZFinderElectron*> electrons_;
-            ZFinderElectron* AddElectron(reco::GsfElectron electron);
-            ZFinderElectron* AddElectron(HepMC::GenParticle electron);
+            // A list of all electrons, split into reco and gen
+            std::vector<ZFinderElectron*> reco_electrons_;
+            ZFinderElectron* AddRecoElectron(reco::GsfElectron electron);
+
+            std::vector<ZFinderElectron*> truth_electrons_;
+            ZFinderElectron* AddTruthElectron(HepMC::GenParticle electron);
 
             // Calculate phistar
             static double ReturnPhistar(const double& eta0, const double& phi0, const double& eta1, const double& phi1);
