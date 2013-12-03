@@ -7,6 +7,7 @@
 
 // CMSSW
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // reco::GsfElectron
+#include "DataFormats/RecoCandidate/interface/RecoEcalCandidate.h"  // reco::RecoEcalCandidate
 #include "FWCore/Framework/interface/Event.h"  // edm::Event, edm::EventSetup
 #include "FWCore/ParameterSet/interface/ParameterSet.h"  // edm::ParameterSet
 #include "FWCore/Utilities/interface/InputTag.h"  // edm::InputTag
@@ -86,7 +87,8 @@ namespace zf {
             void InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
             void InitTruth(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
 
-            void InitRecoElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
+            void InitGSFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
+            void InitHFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
 
             // Update the Z Info from e0, e1
             void InitZ();
@@ -96,7 +98,7 @@ namespace zf {
 
             // Input tags
             struct InputTags{
-                edm::InputTag electron;
+                edm::InputTag ecal_electron;
                 edm::InputTag conversion;
                 edm::InputTag beamspot;
                 edm::InputTag rho_iso;
@@ -104,11 +106,14 @@ namespace zf {
                 edm::InputTag pileup;
                 edm::InputTag generator;
                 std::vector<edm::InputTag> iso_vals;
+                edm::InputTag hf_electron;
+                edm::InputTag hf_clusters;
             } inputtags_;
 
             // A list of all electrons, split into reco and gen
             std::vector<ZFinderElectron*> reco_electrons_;
             ZFinderElectron* AddRecoElectron(reco::GsfElectron electron);
+            ZFinderElectron* AddRecoElectron(reco::RecoEcalCandidate electron);
 
             std::vector<ZFinderElectron*> truth_electrons_;
             ZFinderElectron* AddTruthElectron(HepMC::GenParticle electron);

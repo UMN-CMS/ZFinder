@@ -21,7 +21,7 @@ process.source = cms.Source("PoolSource",
         # Data
         'file:/local/cms/phedex/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/F8C30E72-AE67-E211-A375-002618943922.root'
         # MC
-        #'file:/local/cms/phedex/store/mc/Summer11/DYToEE_M-20_CT10_TuneZ2_7TeV-powheg-pythia/GEN-SIM-RECO/PU_S4_START42_V11-v1/0000/3C059997-49A8-E011-8844-0024E87682A6.root'
+        #'file:/data/whybee1b/phedex/store/mc/Summer11/DYToEE_M-20_CT10_TuneZ2_7TeV-powheg-pythia/GEN-SIM-RECO/PU_S4_START42_V11-v1/0000/3A5E80B6-14A8-E011-9E8C-0015178C49F8.root'
     )
 )
 
@@ -48,19 +48,22 @@ process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIs
 
 process.ZFinder = cms.EDAnalyzer('ZFinder',
         # General tags
-        electronsInputTag       = cms.InputTag("gsfElectrons"),
-        conversionsInputTag     = cms.InputTag("allConversions"),
-        beamSpotInputTag        = cms.InputTag("offlineBeamSpot"),
-        rhoIsoInputTag          = cms.InputTag("kt6PFJetsForIsolation", "rho"),
-        primaryVertexInputTag   = cms.InputTag("offlinePrimaryVertices"),
-        isoValInputTags         = cms.VInputTag(
+        ecalElectronsInputTag  = cms.InputTag("gsfElectrons"),
+        hfElectronsInputTag    = cms.InputTag("hfRecoEcalCandidate"),
+        hfClustersInputTag     = cms.InputTag("hfEMClusters"),
+        conversionsInputTag    = cms.InputTag("allConversions"),
+        beamSpotInputTag       = cms.InputTag("offlineBeamSpot"),
+        rhoIsoInputTag         = cms.InputTag("kt6PFJetsForIsolation", "rho"),
+        primaryVertexInputTag  = cms.InputTag("offlinePrimaryVertices"),
+
+        isoValInputTags        = cms.VInputTag(
             cms.InputTag('elPFIsoValueCharged03PFIdPFIso'),
             cms.InputTag('elPFIsoValueGamma03PFIdPFIso'),
             cms.InputTag('elPFIsoValueNeutral03PFIdPFIso')
             ),
         # MC, but still required to be something for data
-        pileupInputTag   = cms.InputTag("addPileupInfo"),
-        generatorInputTag   = cms.InputTag("generator"),
+        pileupInputTag = cms.InputTag("addPileupInfo"),
+        generatorInputTag = cms.InputTag("generator"),
         )
 
 # RUN
