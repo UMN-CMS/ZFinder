@@ -17,21 +17,21 @@ namespace zf {
         charge = input_electron.charge();
     }
 
-    ZFinderElectron::ZFinderElectron(HepMC::GenParticle input_electron) {
+    ZFinderElectron::ZFinderElectron(reco::GenParticle input_electron) {
         /* Set type of candidate and assign */
         candidate_type_ = GENPARTICLE;
         gen_elec_ = input_electron;
-        // HepMC::GenParticle is a child of reco::candidate
+        // reco::GenParticle is a child of reco::candidate
         candidate_ = dynamic_cast<reco::Candidate*>(&gen_elec_);
         /* Extract the useful quantities from a gen electron */
-        pt = input_electron.momentum().perp();
-        phi = input_electron.momentum().phi();
-        eta = input_electron.momentum().eta();
+        pt = input_electron.pt();
+        phi = input_electron.phi();
+        eta = input_electron.eta();
         // Using the input_electron Data Group ID Number, determine if the input_electron is an
         // electron or positron
-        if (input_electron.pdg_id() == ELECTRON) {
+        if (input_electron.pdgId() == ELECTRON) {
             charge = -1;
-        } else if (input_electron.pdg_id() == POSITRON) {
+        } else if (input_electron.pdgId() == POSITRON) {
             charge = 1;
         }
     }

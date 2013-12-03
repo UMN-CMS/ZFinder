@@ -1,14 +1,15 @@
 #include "ZFinder/ZFinder/interface/ZFinderEvent.h"
 
 // Standard Library
-#include <algorithm>  // std::sort
+#include <algorithm>  // std::sort, std::swap
 #include <iostream>  // std::cout, std::endl
+
 
 // CMSSW
 #include "DataFormats/Common/interface/Handle.h"  // edm::Handle
 #include "DataFormats/EgammaReco/interface/HFEMClusterShapeAssociation.h"  // reco::HFEMClusterShapeAssociationCollection
 #include "DataFormats/EgammaReco/interface/HFEMClusterShape.h"  // reco::HFEMClusterShape
-#include "DataFormats/EgammaReco/interface/HFEMClusterShapeFwd.h"  // reco::HFEMClusterShapeRef, 
+#include "DataFormats/EgammaReco/interface/HFEMClusterShapeFwd.h"  // reco::HFEMClusterShapeRef,
 #include "DataFormats/EgammaReco/interface/SuperClusterFwd.h"  // reco::SuperClusterCollection, reco::SuperClusterRef
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidateFwd.h"  // reco::RecoEcalCandidateCollection
 #include "EgammaAnalysis/ElectronTools/interface/EGammaCutBasedEleId.h"  // EgammaCutBasedEleId::PassWP, EgammaCutBasedEleId::*
@@ -102,8 +103,8 @@ namespace zf {
         std::sort(reco_electrons_.begin(), reco_electrons_.end(), SortByPTHighLow);
 
         // For Zs
-        n_electrons = reco_electrons_.size();
-        if (n_electrons >= 2) {
+        n_reco_electrons = reco_electrons_.size();
+        if (n_reco_electrons >= 2) {
             // Set our internal electrons
             set_both_e(reco_electrons_[0], reco_electrons_[1]);
             // Set up the Z
@@ -287,7 +288,9 @@ namespace zf {
         // Electrons
         e0 = NULL;
         e1 = NULL;
-        n_electrons = -1;
+        n_reco_electrons = -1;
+        e0_truth = NULL;
+        e1_truth = NULL;
 
         // Is Data
         is_real_data = false;
@@ -307,55 +310,72 @@ namespace zf {
          * We don't need to select electrons with cuts, because in Monte Carlo we
          * can just ask for the Z.
          */
-        edm::Handle<edm::HepMCProduct> mc_particles;
+        edm::Handle<reco::GenParticleCollection> mc_particles;
         iEvent.getByLabel(inputtags_.generator, mc_particles);
-        const HepMC::GenEvent* gen_event = mc_particles->GetEvent();
 
-        // Read through the MC, looking for Z -> ee
-        HepMC::GenEvent::vertex_const_iterator vertex;
-        HepMC::GenVertex::particles_out_const_iterator outgoing_particle;
-        HepMC::GenParticle* outgoing_electron_0 = NULL;
-        HepMC::GenParticle* outgoing_electron_1 = NULL;
-        HepMC::GenParticle* Z = NULL;
-        for (vertex = gen_event->vertices_begin(); vertex != gen_event->vertices_end(); ++vertex) {
-            // Make sure there is 1 incoming particle, and it is a ZBOSON
-            if (    (*vertex)->particles_in_size() == 1
-                    && (*((*vertex)->particles_in_const_begin()))->pdg_id() == ZBOSON
-               ) {
-                Z = (*((*vertex)->particles_in_const_begin()));
-                for (outgoing_particle = (*vertex)->particles_out_const_begin(); outgoing_particle != (*vertex)->particles_out_const_end(); ++outgoing_particle) {
-                    if (abs((*outgoing_particle)->pdg_id()) == ELECTRON) {
-                        if(outgoing_electron_0 == NULL) {
-                            outgoing_electron_0 = *outgoing_particle;
+        /* Finding the Z and daughter electrons
+         *
+         * We loop over all gen particles. If it is a Z, we check its daughters
+         * until we find an electron, then we know that it is a Z->ee decay. If
+         * this is the first Z we save it. If the particle is an electron, we
+         * make sure it came from a Z. This might have problems in ZZ->eeee
+         * decays, but we expect those to be impossibly rare.
+         */
+        const reco::GenParticle* electron_0 = NULL;
+        const reco::GenParticle* electron_1 = NULL;
+        const reco::GenParticle* z_boson = NULL;
+
+        for(unsigned int i = 0; i < mc_particles->size(); ++i) {
+            const reco::GenParticle* gen_particle = &mc_particles->at(i);
+            // Is a Z
+            if (gen_particle->pdgId() == ZBOSON && z_boson == NULL) {
+                for (size_t j = 0; j < gen_particle->numberOfDaughters(); ++j) {
+                    if (gen_particle->daughter(j)->pdgId() == ELECTRON) {
+                        z_boson = gen_particle;
+                        break;
+                    }
+                }
+                // Is an electron
+            } else if (   fabs(gen_particle->pdgId()) == ELECTRON  // In pdgId, fabs(POSITRON) == ELECTRON
+                    && (electron_0 == NULL || electron_1 == NULL)
+                    ) {
+                for (size_t j = 0; j < gen_particle->numberOfMothers(); ++j) {
+                    if (gen_particle->mother(j)->pdgId() == ZBOSON) {
+                        if (electron_0 == NULL) {
+                            electron_0 = gen_particle;
                         } else {
-                            outgoing_electron_1 = *outgoing_particle;
+                            electron_1 = gen_particle;
                         }
                     }
                 }
             }
         }
 
-        // Check cuts and add electrons
-        if (    cuts.ept_min < outgoing_electron_0->momentum().perp()
-                && outgoing_electron_0->momentum().perp() < cuts.ept_max
-           ) {
-            ZFinderElectron* zf_electron = AddTruthElectron(*outgoing_electron_0);
-            set_e0(zf_electron);
-        }
-        if (    cuts.ept_min < outgoing_electron_1->momentum().perp()
-                && outgoing_electron_1->momentum().perp() < cuts.ept_max
-           ) {
-            ZFinderElectron* zf_electron = AddTruthElectron(*outgoing_electron_1);
-            set_e1(zf_electron);
-        }
+        // Continue only if all particles have been found
+        if (z_boson != NULL && electron_0 != NULL && electron_1 != NULL) {
+            // We set electron_0 to the higher pt electron
+            if (electron_0->pt() < electron_1->pt()) {
+                std::swap(electron_0, electron_1);
+            }
 
-        // Z Properties
-        truth_z.m = Z->momentum().m();
-        truth_z.pt = Z->momentum().perp();
-        const double ZEPP = Z->momentum().e() + Z->momentum().pz();
-        const double ZEMP = Z->momentum().e() - Z->momentum().pz();
-        truth_z.y = 0.5 * log(ZEPP / ZEMP);
-        truth_z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
+            // Check cuts and add electrons
+            if (   cuts.ept_min < electron_0->pt() && electron_0->pt() < cuts.ept_max
+                    && cuts.ept_min < electron_1->pt() && electron_1->pt() < cuts.ept_max
+               ) {
+                ZFinderElectron* zf_electron_0 = AddTruthElectron(*electron_0);
+                set_e0_truth(zf_electron_0);
+                ZFinderElectron* zf_electron_1 = AddTruthElectron(*electron_1);
+                set_e1_truth(zf_electron_1);
+            }
+
+            // Z Properties
+            truth_z.m = z_boson->mass();
+            truth_z.pt = z_boson->pt();
+            const double ZEPP = z_boson->energy() + z_boson->pz();
+            const double ZEMP = z_boson->energy() - z_boson->pz();
+            truth_z.y = 0.5 * log(ZEPP / ZEMP);
+            truth_z.phistar = ReturnPhistar(electron_0->eta(), electron_0->phi(), electron_1->eta(), electron_1->phi());
+        }
     }
 
     ZFinderElectron* ZFinderEvent::AddRecoElectron(reco::GsfElectron electron) {
@@ -370,7 +390,7 @@ namespace zf {
         return zf_electron;
     }
 
-    ZFinderElectron* ZFinderEvent::AddTruthElectron(HepMC::GenParticle electron) {
+    ZFinderElectron* ZFinderEvent::AddTruthElectron(reco::GenParticle electron) {
         ZFinderElectron* zf_electron = new ZFinderElectron(electron);
         truth_electrons_.push_back(zf_electron);
         return zf_electron;
@@ -400,7 +420,7 @@ namespace zf {
         return ( 1 / cosh( DETA / 2 ) ) * (1 / tan( dphi / 2 ) );
     }
 
-    void ZFinderEvent::PrintElectrons() {
+    void ZFinderEvent::PrintElectrons(const bool USE_MC) {
         using std::cout;
         using std::endl;
         /*
@@ -408,12 +428,24 @@ namespace zf {
          */
         cout << "Run " << id.run_num;
         cout << " event " << id.event_num;
-        cout << " Z Mass " << reco_z.m << std::endl;
-        for (std::vector<ZFinderElectron*>::const_iterator i_elec = reco_electrons_.begin(); i_elec != reco_electrons_.end(); ++i_elec) {
-            ZFinderElectron* elec = (*i_elec);
-            cout << "\tpt: " << elec->pt;
-            cout << " eta: " << elec->eta;
-            cout << " phi: " << elec->phi << endl;
+        if (!USE_MC) {
+            cout << " Reco Z Mass " << reco_z.m << std::endl;
+            for (std::vector<ZFinderElectron*>::const_iterator i_elec = reco_electrons_.begin(); i_elec != reco_electrons_.end(); ++i_elec) {
+                ZFinderElectron* elec = (*i_elec);
+                cout << "\tpt: " << elec->pt;
+                cout << " eta: " << elec->eta;
+                cout << " phi: " << elec->phi << endl;
+            }
+        } else if (USE_MC && !is_real_data) {
+            if (e0_truth != NULL && e1_truth != NULL) {
+            cout << " Truth Z Mass " << truth_z.m << std::endl;
+                cout << "\tpt: " << e0_truth->pt;
+                cout << " eta: " << e0_truth->eta;
+                cout << " phi: " << e0_truth->phi << endl;
+                cout << "\tpt: " << e1_truth->pt;
+                cout << " eta: " << e1_truth->eta;
+                cout << " phi: " << e1_truth->phi << endl;
+            }
         }
     }
 

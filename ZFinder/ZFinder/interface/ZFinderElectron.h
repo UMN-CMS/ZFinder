@@ -6,9 +6,9 @@
 #include <map>  // std::map
 
 // CMSSW
-#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // GsfElectron
-#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
 #include "DataFormats/Candidate/interface/Candidate.h"  // reco::Candidate
+#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // GsfElectron
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"  // reco::GenParticle
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidate.h"  // reco::RecoEcalCandidate
 
 // ZFinder
@@ -33,7 +33,7 @@ namespace zf {
         public:
             ZFinderElectron() {};
             ZFinderElectron(reco::GsfElectron input_electron);
-            ZFinderElectron(HepMC::GenParticle input_electron);
+            ZFinderElectron(reco::GenParticle input_electron);
             ZFinderElectron(reco::RecoEcalCandidate input_electron);
 
             // Kinematics variables
@@ -60,7 +60,7 @@ namespace zf {
             ElectronType candidate_type_;
             // Used to store a copy of the object used to create the ZFElectron
             reco::GsfElectron gsf_elec_;
-            HepMC::GenParticle gen_elec_;
+            reco::GenParticle gen_elec_;
             reco::RecoEcalCandidate recan_elec_;
     };
 }  // namespace zfe

@@ -15,7 +15,7 @@ namespace zf {
     class ZFinderPlotter{
         public:
             // Constructor
-            ZFinderPlotter(TFileDirectory* tdir);
+            ZFinderPlotter(TFileDirectory* tdir, const bool USE_MC = false);
 
             // Add events
             void Fill(const ZFinderEvent& zf_event, const int first_electron = 0, const int second_electron = 1);
@@ -37,6 +37,9 @@ namespace zf {
             TH1I* phistar_;
             TH1I* pileup_;
             TH1I* nelectrons_;
+
+            // Use the MC or reco data
+            const bool USE_MC_;
 
             // Plotting variables
             static const int X_SIZE = 1280;
