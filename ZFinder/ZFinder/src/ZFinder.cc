@@ -135,16 +135,17 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         for (std::vector<zf::SetterBase*>::const_iterator i_set = setters_.begin(); i_set != setters_.end(); ++i_set) {
             (*i_set)->SetCuts(&zfe);
         }
+        // Print all information about each electron
+        //const bool NO_PRINT_MC = false;
+        //const bool PRINT_CUTS = true;
+        //zfe.PrintElectrons(NO_PRINT_MC, PRINT_CUTS);
+        //const bool PRINT_MC = true;
+        //zfe.PrintElectrons(PRINT_MC, PRINT_CUTS);
 
-        zfe.PrintElectrons();
-        const bool PRINT_MC = false;
-        const bool PRINT_CUTS = true;
-        zfe.PrintElectrons(PRINT_MC, PRINT_CUTS);
+        // Make plots
         z_plotter_map_["reco"]->Fill(zfe);
         z_plotter_map_["truth"]->Fill(zfe);
     }
-
-    // Add plots
 }
 
 // ------------ method called once each job just before starting event loop  ------------

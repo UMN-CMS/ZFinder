@@ -407,6 +407,17 @@ namespace zf {
         return ( 1 / cosh( DETA / 2 ) ) * (1 / tan( dphi / 2 ) );
     }
 
+    void ZFinderEvent::PrintCuts(ZFinderElectron* zf_elec) {
+        using std::cout;
+        using std::endl;
+        // Print all the cuts of the given zf_elec
+        std::vector<const CutResult*>* cuts = zf_elec->GetAllCuts();
+        std::vector<const CutResult*>::const_iterator i_cut;
+        for (i_cut = cuts->begin(); i_cut != cuts->end(); ++i_cut) {
+            cout << "\t\t" << (*i_cut)->name << ": " << (*i_cut)->passed << endl;
+        }
+    }
+
     void ZFinderEvent::PrintElectrons(const bool USE_MC, const bool PRINT_CUTS) {
         using std::cout;
         using std::endl;
@@ -421,19 +432,20 @@ namespace zf {
                 ZFinderElectron* elec = (*i_elec);
                 cout << "\tpt: " << elec->pt;
                 cout << " eta: " << elec->eta;
-                cout << " phi: " << elec->phi;
-                cout << endl;
-
+                cout << " phi: " << elec->phi << endl;
+                if (PRINT_CUTS) { PrintCuts(elec); }
             }
         } else if (USE_MC && !is_real_data) {
             if (e0_truth != NULL && e1_truth != NULL) {
-            cout << " Truth Z Mass " << truth_z.m << std::endl;
+            cout << " Truth Z Mass " << truth_z.m << endl;
                 cout << "\tpt: " << e0_truth->pt;
                 cout << " eta: " << e0_truth->eta;
                 cout << " phi: " << e0_truth->phi << endl;
+                if (PRINT_CUTS) { PrintCuts(e0_truth); }
                 cout << "\tpt: " << e1_truth->pt;
                 cout << " eta: " << e1_truth->eta;
                 cout << " phi: " << e1_truth->phi << endl;
+                if (PRINT_CUTS) { PrintCuts(e1_truth); }
             }
         }
     }

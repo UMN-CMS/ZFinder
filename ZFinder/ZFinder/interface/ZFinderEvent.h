@@ -124,6 +124,9 @@ namespace zf {
 
             // Sorting functions
             static bool SortByPTHighLow(const ZFinderElectron* e0, const ZFinderElectron* e1) { return (e0->pt > e1->pt); }
+
+            // Print cuts
+            void PrintCuts(ZFinderElectron* zf_elec);
     };
 }  // namespace zf
 #endif  // ZFINDER_ZFINDEREVENT_H_

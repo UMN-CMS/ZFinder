@@ -57,11 +57,11 @@ namespace zf {
         eff = -1;
         eff_uncertainty = -1;
         for (uint ieta=0; ieta<(sizeof(EfficiencyEtaBins)/sizeof(EfficiencyEtaBins[0]))-1 && eff==-1; ieta++){
-            if (fabs(eta)<EfficiencyEtaBins[ieta] || fabs(eta)>EfficiencyEtaBins[ieta+1]) { 
+            if (fabs(eta)<EfficiencyEtaBins[ieta] || fabs(eta)>EfficiencyEtaBins[ieta+1]) {
                 continue;
             }
             for (uint iet=0; iet<(sizeof(EfficiencyETBins)/sizeof(EfficiencyETBins[0]))-1 && eff==-1; iet++) {
-                if (pt<EfficiencyETBins[iet] || pt>EfficiencyETBins[iet+1]) { 
+                if (pt<EfficiencyETBins[iet] || pt>EfficiencyETBins[iet+1]) {
                     continue;
                 }
                 eff = Efficiency[ieta][iet][0];
@@ -115,5 +115,27 @@ namespace zf {
         cr.name = cut_name;
         cr.weight = weight;
         cutresults_[cut_name] = cr;  // This will overwrite
+    }
+
+    std::vector<const CutResult*>* ZFinderElectron::GetAllCuts() {
+        /* Return all cuts */
+        std::vector<const CutResult*>* tmp_vec = new std::vector<const CutResult*>();
+        std::map<std::string, CutResult>::const_iterator i_cut;
+        for (i_cut = cutresults_.begin(); i_cut != cutresults_.end(); ++i_cut) {
+            tmp_vec->push_back(&(i_cut->second));
+        }
+        return tmp_vec;
+    }
+
+    std::vector<const CutResult*>* ZFinderElectron::GetCutsBool_(const bool PASSED) {
+        /* Finds all cuts that have passed matching PASSED */
+        std::vector<const CutResult*>* tmp_vec = new std::vector<const CutResult*>();
+        std::map<std::string, CutResult>::const_iterator i_cut;
+        for (i_cut = cutresults_.begin(); i_cut != cutresults_.end(); ++i_cut) {
+            if (i_cut->second.passed == PASSED) {
+                tmp_vec->push_back(&(i_cut->second));
+            }
+        }
+        return tmp_vec;
     }
 }
