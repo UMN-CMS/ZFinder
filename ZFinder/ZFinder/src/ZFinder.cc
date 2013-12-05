@@ -49,6 +49,8 @@ Implementation:
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
 
 // ZFinder
+#include "ZFinder/ZFinder/interface/AcceptanceSetter.h"  // AcceptanceSetter
+#include "ZFinder/ZFinder/interface/SetterBase.h"  // SetterBase
 #include "ZFinder/ZFinder/interface/ZFinderEvent.h"  // ZFinderEvent
 #include "ZFinder/ZFinder/interface/ZFinderPlotter.h"  // ZFinderPlotter
 
@@ -76,7 +78,8 @@ class ZFinder : public edm::EDAnalyzer {
 
         // ----------member data ---------------------------
         const edm::ParameterSet& iConfig_;
-        std::map<std::string, zf::ZFinderPlotter*> z_plotter_map;
+        std::map<std::string, zf::ZFinderPlotter*> z_plotter_map_;
+        std::vector<zf::SetterBase*> setters_;
 
 };
 
@@ -93,6 +96,12 @@ class ZFinder : public edm::EDAnalyzer {
 //
 ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     //now do what ever initialization is needed
+
+    // Set up Cut Setters
+    zf::AcceptanceSetter* accset = new zf::AcceptanceSetter();
+    setters_.push_back(accset);
+
+    // Set up plotters
     edm::Service<TFileService> fs;
 
     TFileDirectory* tdir_1 = new TFileDirectory(fs->mkdir("reco"));
@@ -102,8 +111,8 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     const bool USE_MC = true;
     zf::ZFinderPlotter* z_plotter_truth = new zf::ZFinderPlotter(tdir_2, USE_MC);
 
-    z_plotter_map.insert( std::pair<std::string, zf::ZFinderPlotter*>("reco", z_plotter_reco));
-    z_plotter_map.insert( std::pair<std::string, zf::ZFinderPlotter*>("truth", z_plotter_truth));
+    z_plotter_map_.insert(std::pair<std::string, zf::ZFinderPlotter*>("reco", z_plotter_reco));
+    z_plotter_map_.insert(std::pair<std::string, zf::ZFinderPlotter*>("truth", z_plotter_truth));
 }
 
 ZFinder::~ZFinder() {
@@ -121,12 +130,18 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     using namespace edm;
 
     zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_);
-    if (zfe.reco_z.m > -1) {
+    if (zfe.reco_z.m > -1) {  // We have a good Z
+        // Set all cuts
+        for (std::vector<zf::SetterBase*>::const_iterator i_set = setters_.begin(); i_set != setters_.end(); ++i_set) {
+            (*i_set)->SetCuts(&zfe);
+        }
+
         zfe.PrintElectrons();
-        const bool PRINT_MC = true;
-        zfe.PrintElectrons(PRINT_MC);
-        z_plotter_map["reco"]->Fill(zfe);
-        z_plotter_map["truth"]->Fill(zfe);
+        const bool PRINT_MC = false;
+        const bool PRINT_CUTS = true;
+        zfe.PrintElectrons(PRINT_MC, PRINT_CUTS);
+        z_plotter_map_["reco"]->Fill(zfe);
+        z_plotter_map_["truth"]->Fill(zfe);
     }
 
     // Add plots

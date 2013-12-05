@@ -73,14 +73,15 @@ namespace zf {
             void set_both_e_truth(ZFinderElectron* electron0, ZFinderElectron* electron1) { e0_truth = electron0; e1_truth = electron1; }
 
             // Access pruned lists of the internal electrons
-            //std::vector<ZFinderElectron*>* FilteredElectrons();
+            std::vector<ZFinderElectron*>* FilteredElectrons();
+            std::vector<ZFinderElectron*>* AllElectrons() { return FilteredElectrons(); };
             //std::vector<ZFinderElectron*>* FilteredElectrons(const std::string& cut_name);
 
             // Number of Electrons
             int n_reco_electrons;
 
             // Output
-            void PrintElectrons(const bool USE_MC = false);
+            void PrintElectrons(const bool USE_MC = false, const bool PRINT_CUTS = false);
 
         protected:
             // Called by the constructor to handle MC and Data separately

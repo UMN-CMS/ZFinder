@@ -407,7 +407,7 @@ namespace zf {
         return ( 1 / cosh( DETA / 2 ) ) * (1 / tan( dphi / 2 ) );
     }
 
-    void ZFinderEvent::PrintElectrons(const bool USE_MC) {
+    void ZFinderEvent::PrintElectrons(const bool USE_MC, const bool PRINT_CUTS) {
         using std::cout;
         using std::endl;
         /*
@@ -421,7 +421,9 @@ namespace zf {
                 ZFinderElectron* elec = (*i_elec);
                 cout << "\tpt: " << elec->pt;
                 cout << " eta: " << elec->eta;
-                cout << " phi: " << elec->phi << endl;
+                cout << " phi: " << elec->phi;
+                cout << endl;
+
             }
         } else if (USE_MC && !is_real_data) {
             if (e0_truth != NULL && e1_truth != NULL) {
@@ -436,24 +438,24 @@ namespace zf {
         }
     }
 
-    // std::vector<ZFinderElectron*>* ZFinderEvent::FilteredElectrons() {
-    //     /*
-    //      * Return all electrons
-    //      */
-    //     std::vector<ZFinderElectron*>* tmp_vec = new std::vector<ZFinderElectron*>(electrons_.size());
-    //     for (std::vector<ZFinderElectron*>::iterator i_elec = electrons_.begin(); i_elec != electrons_.end(); ++i_elec) {
-    //         tmp_vec->push_back(*i_elec);
-    //     }
+    std::vector<ZFinderElectron*>* ZFinderEvent::FilteredElectrons() {
+        /*
+         * Return all electrons
+         */
+        std::vector<ZFinderElectron*>* tmp_vec = new std::vector<ZFinderElectron*>();
+        for (std::vector<ZFinderElectron*>::iterator i_elec = reco_electrons_.begin(); i_elec != reco_electrons_.end(); ++i_elec) {
+            tmp_vec->push_back(*i_elec);
+        }
 
-    //     return tmp_vec;
-    // }
+        return tmp_vec;
+    }
 
     // std::vector<ZFinderElectron*>* ZFinderEvent::FilteredElectrons(const std::string& cut_name) {
     //     /*
     //      * Return all electrons that pass a specified cut
     //      */
-    //     std::vector< ZFinderElectron*>* tmp_vec = new std::vector< ZFinderElectron*>(electrons_.size());
-    //     for (std::vector<ZFinderElectron*>::iterator i_elec = electrons_.begin(); i_elec != electrons_.end(); ++i_elec) {
+    //     std::vector< ZFinderElectron*>* tmp_vec = new std::vector< ZFinderElectron*>(reco_electrons_.size());
+    //     for (std::vector<ZFinderElectron*>::iterator i_elec = reco_electrons_.begin(); i_elec != reco_electrons_.end(); ++i_elec) {
     //          ZFinderElectron* zfe = (*i_elec);
     //         if (zfe->CutPassed(cut_name)) {
     //             tmp_vec->push_back(zfe);
