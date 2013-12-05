@@ -11,9 +11,6 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"  // reco::GenParticle
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidate.h"  // reco::RecoEcalCandidate
 
-// ZFinder
-#include "ZFinder/ZFinder/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
-
 namespace zf {
 
     enum ElectronType {
@@ -43,9 +40,9 @@ namespace zf {
             // Other physical properties
             int charge;
 
-	    //Efficiency
-	    double eff;
-	    double eff_uncertainty;
+            //Efficiency
+            double eff;
+            double eff_uncertainty;
 
             // Handling cuts
             const CutResult* GetCutResult(const std::string& cut_name) const;
