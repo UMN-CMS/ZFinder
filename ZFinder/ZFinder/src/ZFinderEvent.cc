@@ -1,11 +1,17 @@
 #include "ZFinder/ZFinder/interface/ZFinderEvent.h"
 
 // Standard Library
-#include <algorithm>  // std::sort
+#include <algorithm>  // std::sort, std::swap
 #include <iostream>  // std::cout, std::endl
+
 
 // CMSSW
 #include "DataFormats/Common/interface/Handle.h"  // edm::Handle
+#include "DataFormats/EgammaReco/interface/HFEMClusterShapeAssociation.h"  // reco::HFEMClusterShapeAssociationCollection
+#include "DataFormats/EgammaReco/interface/HFEMClusterShape.h"  // reco::HFEMClusterShape
+#include "DataFormats/EgammaReco/interface/HFEMClusterShapeFwd.h"  // reco::HFEMClusterShapeRef,
+#include "DataFormats/EgammaReco/interface/SuperClusterFwd.h"  // reco::SuperClusterCollection, reco::SuperClusterRef
+#include "DataFormats/RecoCandidate/interface/RecoEcalCandidateFwd.h"  // reco::RecoEcalCandidateCollection
 #include "EgammaAnalysis/ElectronTools/interface/EGammaCutBasedEleId.h"  // EgammaCutBasedEleId::PassWP, EgammaCutBasedEleId::*
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"  // PileupSummaryInfo
 
@@ -37,12 +43,15 @@ namespace zf {
 
         // Get InputTags
         // Reco
-        inputtags_.electron = iConfig.getParameter<edm::InputTag>("electronsInputTag");
+        inputtags_.ecal_electron = iConfig.getParameter<edm::InputTag>("ecalElectronsInputTag");
+        inputtags_.hf_electron = iConfig.getParameter<edm::InputTag>("hfElectronsInputTag");
+        inputtags_.hf_clusters = iConfig.getParameter<edm::InputTag>("hfClustersInputTag");
         inputtags_.conversion = iConfig.getParameter<edm::InputTag>("conversionsInputTag");
         inputtags_.beamspot = iConfig.getParameter<edm::InputTag>("beamSpotInputTag");
         inputtags_.rho_iso = iConfig.getParameter<edm::InputTag>("rhoIsoInputTag");
         inputtags_.vertex = iConfig.getParameter<edm::InputTag>("primaryVertexInputTag");
         inputtags_.iso_vals = iConfig.getParameter<std::vector<edm::InputTag> >("isoValInputTags");
+
         // Truth
         inputtags_.pileup = iConfig.getParameter<edm::InputTag>("pileupInputTag");
         inputtags_.generator = iConfig.getParameter<edm::InputTag>("generatorInputTag");
@@ -87,17 +96,30 @@ namespace zf {
         reco_bs.z = beam_spot->position().Z();
 
         /* Find electrons */
-        InitRecoElectrons(iEvent, iSetup, cuts);
+        InitGSFElectrons(iEvent, iSetup, cuts);
+        InitHFElectrons(iEvent, iSetup, cuts);
+
+        // Sort our electrons and set e0, e1 as the two with the highest pt
+        std::sort(reco_electrons_.begin(), reco_electrons_.end(), SortByPTHighLow);
+
+        // For Zs
+        n_reco_electrons = reco_electrons_.size();
+        if (n_reco_electrons >= 2) {
+            // Set our internal electrons
+            set_both_e(reco_electrons_[0], reco_electrons_[1]);
+            // Set up the Z
+            InitZ();
+        }
     }
 
-    void ZFinderEvent::InitRecoElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts) {
+    void ZFinderEvent::InitGSFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts) {
         // We split this part into a new function because it is very long
         // Most of this code is stolen from the example here:
         // http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/EGamma/EGammaAnalysisTools/src/EGammaCutBasedEleIdAnalyzer.cc?view=markup
 
         // electrons
         edm::Handle<reco::GsfElectronCollection> els_h;
-        iEvent.getByLabel(inputtags_.electron, els_h);
+        iEvent.getByLabel(inputtags_.ecal_electron, els_h);
 
         // conversions
         edm::Handle<reco::ConversionCollection> conversions_h;
@@ -122,9 +144,9 @@ namespace zf {
         // rho for isolation
         // The python uses:
         // cms.InputTag("kt6PFJetsForIsolation", "rho")
-        edm::Handle<double> rhoIso_h;
-        iEvent.getByLabel(inputtags_.rho_iso, rhoIso_h);
-        double rhoIso = *(rhoIso_h.product());
+        edm::Handle<double> rho_iso_h;
+        iEvent.getByLabel(inputtags_.rho_iso, rho_iso_h);
+        double RHO_ISO = *(rho_iso_h.product());
 
         // loop on electrons
         for(unsigned int i = 0; i < els_h->size(); ++i) {
@@ -143,41 +165,76 @@ namespace zf {
 
                 // test ID
                 // working points
-                bool veto = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::VETO, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, rhoIso);
-                bool loose = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::LOOSE, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, rhoIso);
-                bool medium = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, rhoIso);
-                bool tight = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::TIGHT, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, rhoIso);
+                const bool VETO = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::VETO, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
+                const bool LOOSE = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::LOOSE, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
+                const bool MEDIUM = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
+                const bool TIGHT = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::TIGHT, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
 
                 // eop/fbrem cuts for extra tight ID
-                bool fbremeopin = EgammaCutBasedEleId::PassEoverPCuts(ele_ref);
+                const bool FBREMEOPIN = EgammaCutBasedEleId::PassEoverPCuts(ele_ref);
 
                 // cuts to match tight trigger requirements
-                bool trigtight = EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERTIGHT, ele_ref);
+                const bool TRIGTIGHT = EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERTIGHT, ele_ref);
 
                 // for 2011 WP70 trigger
-                bool trigwp70 = EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERWP70, ele_ref);
+                const bool TRIGWP70 = EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERWP70, ele_ref);
 
                 // Add the cuts to our electron
                 const double WEIGHT = 1.;
-                zf_electron->AddCutResult("wp:veto", veto, WEIGHT);
-                zf_electron->AddCutResult("wp:loose", loose, WEIGHT);
-                zf_electron->AddCutResult("wp:medium", medium, WEIGHT);
-                zf_electron->AddCutResult("wp:tight", tight, WEIGHT);
-                zf_electron->AddCutResult("wp:eop_cut", fbremeopin, WEIGHT);
-                zf_electron->AddCutResult("wp:trigtight", trigtight, WEIGHT);
-                zf_electron->AddCutResult("wp:trigwp70", trigwp70, WEIGHT);
+                zf_electron->AddCutResult("wp:veto", VETO, WEIGHT);
+                zf_electron->AddCutResult("wp:loose", LOOSE, WEIGHT);
+                zf_electron->AddCutResult("wp:medium", MEDIUM, WEIGHT);
+                zf_electron->AddCutResult("wp:tight", TIGHT, WEIGHT);
+                zf_electron->AddCutResult("wp:eop_cut", FBREMEOPIN, WEIGHT);
+                zf_electron->AddCutResult("wp:trigtight", TRIGTIGHT, WEIGHT);
+                zf_electron->AddCutResult("wp:trigwp70", TRIGWP70, WEIGHT);
             }
         }
+    }
 
-        // Sort our electrons and set e0, e1 as the two with the highest pt
-        std::sort(reco_electrons_.begin(), reco_electrons_.end(), SortByPTHighLow);
+    void ZFinderEvent::InitHFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts) {
+        // HF Electrons
+        edm::Handle<reco::RecoEcalCandidateCollection> els_h;
+        iEvent.getByLabel(inputtags_.hf_electron, els_h);
+        // HF Superclusters
+        edm::Handle<reco::SuperClusterCollection> scs_h;
+        iEvent.getByLabel(inputtags_.hf_clusters, scs_h);
+        edm::Handle<reco::HFEMClusterShapeAssociationCollection> scas_h;
+        iEvent.getByLabel(inputtags_.hf_clusters, scas_h);
 
-        n_electrons = reco_electrons_.size();
-        if (n_electrons >= 2) {
-            // Set our internal electrons
-            set_both_e(reco_electrons_[0], reco_electrons_[1]);
-            // Set up the Z
-            InitZ();
+        // Loop over electrons
+        for(unsigned int i = 0; i < els_h->size(); ++i) {
+            // Get the electron and set put it into the electrons vector
+            reco::RecoEcalCandidate electron = els_h->at(i);
+            if (cuts.ept_min < electron.pt() &&  electron.pt() < cuts.ept_max) {
+                ZFinderElectron* zf_electron = AddRecoElectron(electron);
+
+                reco::SuperClusterRef cluster_ref = electron.superCluster();
+                const reco::HFEMClusterShapeRef CLUSTER_SHAPE_REF = scas_h->find(cluster_ref)->val;
+                const reco::HFEMClusterShape& CLUSTER_SHAPE = *CLUSTER_SHAPE_REF;
+
+                const double ECE9 = CLUSTER_SHAPE.eCOREe9();
+                const double ESEL = CLUSTER_SHAPE.eSeL();
+                const double E9E25 = (CLUSTER_SHAPE.eLong3x3() * 1.0 / CLUSTER_SHAPE.eLong5x5());
+
+                // HF Tight (as defined in hfRecoEcalCandidate_cfi.py in ZShape)
+                const double TIGHT2D = (ECE9 - (ESEL * 0.20));
+                const bool HFTIGHT = (TIGHT2D > 0.92);
+
+                // HF Medium
+                const double MEDIUM2D = (ECE9 - (ESEL * 0.275));
+                const bool HFMEDIUM = (MEDIUM2D > 0.875);
+
+                // HF Loose
+                const double LOOSE2D = (ECE9 - (ESEL * 0.475));
+                const bool HFLOOSE = (LOOSE2D > 0.815);
+
+                // Add the cuts to our electron
+                const double WEIGHT = 1.;
+                zf_electron->AddCutResult("hf_tight", HFTIGHT, WEIGHT);
+                zf_electron->AddCutResult("hf_medium", HFMEDIUM, WEIGHT);
+                zf_electron->AddCutResult("hf_loose", HFLOOSE, WEIGHT);
+            }
         }
     }
 
@@ -231,7 +288,9 @@ namespace zf {
         // Electrons
         e0 = NULL;
         e1 = NULL;
-        n_electrons = -1;
+        n_reco_electrons = -1;
+        e0_truth = NULL;
+        e1_truth = NULL;
 
         // Is Data
         is_real_data = false;
@@ -240,7 +299,7 @@ namespace zf {
     void ZFinderEvent::InitTruth(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts) {
         /* Count Pile Up */
         edm::Handle<std::vector<PileupSummaryInfo> > pileup_info;
-        iEvent.getByLabel("addPileupInfo", pileup_info);
+        iEvent.getByLabel(inputtags_.pileup, pileup_info);
         if (pileup_info.isValid()) {
             truth_vert.num = pileup_info->size();
         } else {
@@ -251,55 +310,72 @@ namespace zf {
          * We don't need to select electrons with cuts, because in Monte Carlo we
          * can just ask for the Z.
          */
-        edm::Handle<edm::HepMCProduct> mc_particles;
-        iEvent.getByLabel("generator", mc_particles);
-        const HepMC::GenEvent* gen_event = mc_particles->GetEvent();
+        edm::Handle<reco::GenParticleCollection> mc_particles;
+        iEvent.getByLabel(inputtags_.generator, mc_particles);
 
-        // Read through the MC, looking for Z -> ee
-        HepMC::GenEvent::vertex_const_iterator vertex;
-        HepMC::GenVertex::particles_out_const_iterator outgoing_particle;
-        HepMC::GenParticle* outgoing_electron_0 = NULL;
-        HepMC::GenParticle* outgoing_electron_1 = NULL;
-        HepMC::GenParticle* Z = NULL;
-        for (vertex = gen_event->vertices_begin(); vertex != gen_event->vertices_end(); ++vertex) {
-            // Make sure there is 1 incoming particle, and it is a ZBOSON
-            if (    (*vertex)->particles_in_size() == 1
-                    && (*((*vertex)->particles_in_const_begin()))->pdg_id() == ZBOSON
-               ) {
-                Z = (*((*vertex)->particles_in_const_begin()));
-                for (outgoing_particle = (*vertex)->particles_out_const_begin(); outgoing_particle != (*vertex)->particles_out_const_end(); ++outgoing_particle) {
-                    if (abs((*outgoing_particle)->pdg_id()) == ELECTRON) {
-                        if(outgoing_electron_0 == NULL) {
-                            outgoing_electron_0 = *outgoing_particle;
+        /* Finding the Z and daughter electrons
+         *
+         * We loop over all gen particles. If it is a Z, we check its daughters
+         * until we find an electron, then we know that it is a Z->ee decay. If
+         * this is the first Z we save it. If the particle is an electron, we
+         * make sure it came from a Z. This might have problems in ZZ->eeee
+         * decays, but we expect those to be impossibly rare.
+         */
+        const reco::GenParticle* electron_0 = NULL;
+        const reco::GenParticle* electron_1 = NULL;
+        const reco::GenParticle* z_boson = NULL;
+
+        for(unsigned int i = 0; i < mc_particles->size(); ++i) {
+            const reco::GenParticle* gen_particle = &mc_particles->at(i);
+            // Is a Z
+            if (gen_particle->pdgId() == ZBOSON && z_boson == NULL) {
+                for (size_t j = 0; j < gen_particle->numberOfDaughters(); ++j) {
+                    if (gen_particle->daughter(j)->pdgId() == ELECTRON) {
+                        z_boson = gen_particle;
+                        break;
+                    }
+                }
+                // Is an electron
+            } else if (   fabs(gen_particle->pdgId()) == ELECTRON  // In pdgId, fabs(POSITRON) == ELECTRON
+                    && (electron_0 == NULL || electron_1 == NULL)
+                    ) {
+                for (size_t j = 0; j < gen_particle->numberOfMothers(); ++j) {
+                    if (gen_particle->mother(j)->pdgId() == ZBOSON) {
+                        if (electron_0 == NULL) {
+                            electron_0 = gen_particle;
                         } else {
-                            outgoing_electron_1 = *outgoing_particle;
+                            electron_1 = gen_particle;
                         }
                     }
                 }
             }
         }
 
-        // Check cuts and add electrons
-        if (    cuts.ept_min < outgoing_electron_0->momentum().perp()
-                && outgoing_electron_0->momentum().perp() < cuts.ept_max
-           ) {
-            ZFinderElectron* zf_electron = AddTruthElectron(*outgoing_electron_0);
-            set_e0(zf_electron);
-        }
-        if (    cuts.ept_min < outgoing_electron_1->momentum().perp()
-                && outgoing_electron_1->momentum().perp() < cuts.ept_max
-           ) {
-            ZFinderElectron* zf_electron = AddTruthElectron(*outgoing_electron_1);
-            set_e1(zf_electron);
-        }
+        // Continue only if all particles have been found
+        if (z_boson != NULL && electron_0 != NULL && electron_1 != NULL) {
+            // We set electron_0 to the higher pt electron
+            if (electron_0->pt() < electron_1->pt()) {
+                std::swap(electron_0, electron_1);
+            }
 
-        // Z Properties
-        truth_z.m = Z->momentum().m();
-        truth_z.pt = Z->momentum().perp();
-        const double ZEPP = Z->momentum().e() + Z->momentum().pz();
-        const double ZEMP = Z->momentum().e() - Z->momentum().pz();
-        truth_z.y = 0.5 * log(ZEPP / ZEMP);
-        truth_z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
+            // Check cuts and add electrons
+            if (   cuts.ept_min < electron_0->pt() && electron_0->pt() < cuts.ept_max
+                    && cuts.ept_min < electron_1->pt() && electron_1->pt() < cuts.ept_max
+               ) {
+                ZFinderElectron* zf_electron_0 = AddTruthElectron(*electron_0);
+                set_e0_truth(zf_electron_0);
+                ZFinderElectron* zf_electron_1 = AddTruthElectron(*electron_1);
+                set_e1_truth(zf_electron_1);
+            }
+
+            // Z Properties
+            truth_z.m = z_boson->mass();
+            truth_z.pt = z_boson->pt();
+            const double ZEPP = z_boson->energy() + z_boson->pz();
+            const double ZEMP = z_boson->energy() - z_boson->pz();
+            truth_z.y = 0.5 * log(ZEPP / ZEMP);
+            truth_z.phistar = ReturnPhistar(electron_0->eta(), electron_0->phi(), electron_1->eta(), electron_1->phi());
+        }
     }
 
     ZFinderElectron* ZFinderEvent::AddRecoElectron(reco::GsfElectron electron) {
@@ -308,7 +384,13 @@ namespace zf {
         return zf_electron;
     }
 
-    ZFinderElectron* ZFinderEvent::AddTruthElectron(HepMC::GenParticle electron) {
+    ZFinderElectron* ZFinderEvent::AddRecoElectron(reco::RecoEcalCandidate electron) {
+        ZFinderElectron* zf_electron = new ZFinderElectron(electron);
+        reco_electrons_.push_back(zf_electron);
+        return zf_electron;
+    }
+
+    ZFinderElectron* ZFinderEvent::AddTruthElectron(reco::GenParticle electron) {
         ZFinderElectron* zf_electron = new ZFinderElectron(electron);
         truth_electrons_.push_back(zf_electron);
         return zf_electron;
@@ -338,7 +420,7 @@ namespace zf {
         return ( 1 / cosh( DETA / 2 ) ) * (1 / tan( dphi / 2 ) );
     }
 
-    void ZFinderEvent::PrintElectrons() {
+    void ZFinderEvent::PrintElectrons(const bool USE_MC) {
         using std::cout;
         using std::endl;
         /*
@@ -346,12 +428,24 @@ namespace zf {
          */
         cout << "Run " << id.run_num;
         cout << " event " << id.event_num;
-        cout << " Z Mass " << reco_z.m << std::endl;
-        for (std::vector<ZFinderElectron*>::const_iterator i_elec = reco_electrons_.begin(); i_elec != reco_electrons_.end(); ++i_elec) {
-            ZFinderElectron* elec = (*i_elec);
-            cout << "\tpt: " << elec->pt;
-            cout << " eta: " << elec->eta;
-            cout << " phi: " << elec->phi << endl;
+        if (!USE_MC) {
+            cout << " Reco Z Mass " << reco_z.m << std::endl;
+            for (std::vector<ZFinderElectron*>::const_iterator i_elec = reco_electrons_.begin(); i_elec != reco_electrons_.end(); ++i_elec) {
+                ZFinderElectron* elec = (*i_elec);
+                cout << "\tpt: " << elec->pt;
+                cout << " eta: " << elec->eta;
+                cout << " phi: " << elec->phi << endl;
+            }
+        } else if (USE_MC && !is_real_data) {
+            if (e0_truth != NULL && e1_truth != NULL) {
+            cout << " Truth Z Mass " << truth_z.m << std::endl;
+                cout << "\tpt: " << e0_truth->pt;
+                cout << " eta: " << e0_truth->eta;
+                cout << " phi: " << e0_truth->phi << endl;
+                cout << "\tpt: " << e1_truth->pt;
+                cout << " eta: " << e1_truth->eta;
+                cout << " phi: " << e1_truth->phi << endl;
+            }
         }
     }
 

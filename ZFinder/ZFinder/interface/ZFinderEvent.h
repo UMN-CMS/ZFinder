@@ -7,10 +7,11 @@
 
 // CMSSW
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // reco::GsfElectron
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"  // reco::GenParticle
+#include "DataFormats/RecoCandidate/interface/RecoEcalCandidate.h"  // reco::RecoEcalCandidate
 #include "FWCore/Framework/interface/Event.h"  // edm::Event, edm::EventSetup
 #include "FWCore/ParameterSet/interface/ParameterSet.h"  // edm::ParameterSet
 #include "FWCore/Utilities/interface/InputTag.h"  // edm::InputTag
-#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
 
 // ZFinder
 #include "ZFinder/ZFinder/interface/ZFinderElectron.h"  // ZFinderElectron, ZFinderElectron
@@ -70,23 +71,29 @@ namespace zf {
             void set_e0(ZFinderElectron* electron) { e0 = electron; }
             void set_e1(ZFinderElectron* electron) { e1 = electron; }
             void set_both_e(ZFinderElectron* electron0, ZFinderElectron* electron1) { e0 = electron0; e1 = electron1; }
+            ZFinderElectron* e0_truth;
+            ZFinderElectron* e1_truth;
+            void set_e0_truth(ZFinderElectron* electron) { e0_truth = electron; }
+            void set_e1_truth(ZFinderElectron* electron) { e1_truth = electron; }
+            void set_both_e_truth(ZFinderElectron* electron0, ZFinderElectron* electron1) { e0_truth = electron0; e1_truth = electron1; }
 
             // Access pruned lists of the internal electrons
             //std::vector<ZFinderElectron*>* FilteredElectrons();
             //std::vector<ZFinderElectron*>* FilteredElectrons(const std::string& cut_name);
 
             // Number of Electrons
-            int n_electrons;
+            int n_reco_electrons;
 
             // Output
-            void PrintElectrons();
+            void PrintElectrons(const bool USE_MC = false);
 
         protected:
             // Called by the constructor to handle MC and Data separately
             void InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
             void InitTruth(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
 
-            void InitRecoElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
+            void InitGSFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
+            void InitHFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
 
             // Update the Z Info from e0, e1
             void InitZ();
@@ -96,7 +103,7 @@ namespace zf {
 
             // Input tags
             struct InputTags{
-                edm::InputTag electron;
+                edm::InputTag ecal_electron;
                 edm::InputTag conversion;
                 edm::InputTag beamspot;
                 edm::InputTag rho_iso;
@@ -104,14 +111,17 @@ namespace zf {
                 edm::InputTag pileup;
                 edm::InputTag generator;
                 std::vector<edm::InputTag> iso_vals;
+                edm::InputTag hf_electron;
+                edm::InputTag hf_clusters;
             } inputtags_;
 
             // A list of all electrons, split into reco and gen
             std::vector<ZFinderElectron*> reco_electrons_;
             ZFinderElectron* AddRecoElectron(reco::GsfElectron electron);
+            ZFinderElectron* AddRecoElectron(reco::RecoEcalCandidate electron);
 
             std::vector<ZFinderElectron*> truth_electrons_;
-            ZFinderElectron* AddTruthElectron(HepMC::GenParticle electron);
+            ZFinderElectron* AddTruthElectron(reco::GenParticle electron);
 
             // Calculate phistar
             static double ReturnPhistar(const double& eta0, const double& phi0, const double& eta1, const double& phi1);

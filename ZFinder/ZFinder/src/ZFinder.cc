@@ -21,6 +21,11 @@ Implementation:
 // system include files
 #include <memory>
 
+// standard library files
+#include <map>  // std::map
+#include <string>  // std::string
+#include <utility>  // std::pair
+
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
@@ -71,7 +76,7 @@ class ZFinder : public edm::EDAnalyzer {
 
         // ----------member data ---------------------------
         const edm::ParameterSet& iConfig_;
-        zf::ZFinderPlotter* z_plotter;
+        std::map<std::string, zf::ZFinderPlotter*> z_plotter_map;
 
 };
 
@@ -89,9 +94,16 @@ class ZFinder : public edm::EDAnalyzer {
 ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     //now do what ever initialization is needed
     edm::Service<TFileService> fs;
-    TFileDirectory* tdir = new TFileDirectory(fs->mkdir("outputdir"));
-    z_plotter = new zf::ZFinderPlotter(tdir);
-    delete tdir;
+
+    TFileDirectory* tdir_1 = new TFileDirectory(fs->mkdir("reco"));
+    zf::ZFinderPlotter* z_plotter_reco = new zf::ZFinderPlotter(tdir_1);
+
+    TFileDirectory* tdir_2 = new TFileDirectory(fs->mkdir("truth"));
+    const bool USE_MC = true;
+    zf::ZFinderPlotter* z_plotter_truth = new zf::ZFinderPlotter(tdir_2, USE_MC);
+
+    z_plotter_map.insert( std::pair<std::string, zf::ZFinderPlotter*>("reco", z_plotter_reco));
+    z_plotter_map.insert( std::pair<std::string, zf::ZFinderPlotter*>("truth", z_plotter_truth));
 }
 
 ZFinder::~ZFinder() {
@@ -111,7 +123,10 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_);
     if (zfe.reco_z.m > -1) {
         zfe.PrintElectrons();
-        z_plotter->Fill(zfe);
+        const bool PRINT_MC = true;
+        zfe.PrintElectrons(PRINT_MC);
+        z_plotter_map["reco"]->Fill(zfe);
+        z_plotter_map["truth"]->Fill(zfe);
     }
 
     // Add plots

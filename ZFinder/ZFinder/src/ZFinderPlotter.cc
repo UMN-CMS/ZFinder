@@ -12,7 +12,7 @@
 
 namespace zf {
     // Constructor
-    ZFinderPlotter::ZFinderPlotter(TFileDirectory* tdir) {
+    ZFinderPlotter::ZFinderPlotter(TFileDirectory* tdir, const bool USE_MC) : USE_MC_(USE_MC) {
         /*
          * Initialize a set of histograms and associate them with a given TDirectory.
          */
@@ -106,34 +106,63 @@ namespace zf {
          * the e0 histograms with data from zf_event.e1.
          */
         // Z Info
-        z0_mass_coarse_->Fill(zf_event.reco_z.m);
-        z0_mass_fine_->Fill(zf_event.reco_z.m);
-        z0_rapidity_->Fill(zf_event.reco_z.y);
-        z0_pt_->Fill(zf_event.reco_z.pt);
-        phistar_->Fill(zf_event.reco_z.phistar);
+        if (!USE_MC_) {
+            z0_mass_coarse_->Fill(zf_event.reco_z.m);
+            z0_mass_fine_->Fill(zf_event.reco_z.m);
+            z0_rapidity_->Fill(zf_event.reco_z.y);
+            z0_pt_->Fill(zf_event.reco_z.pt);
+            phistar_->Fill(zf_event.reco_z.phistar);
 
-        // Fill the histograms with the information from the approriate electron
-        if (zf_event.e0 != NULL && zf_event.e1 != NULL){
-            if (electron_0 == 0 && electron_1 == 1) {
-                e0_pt_->Fill(zf_event.e0->pt);
-                e0_eta_->Fill(zf_event.e0->eta);
-                e0_phi_->Fill(zf_event.e0->phi);
-                e1_pt_->Fill(zf_event.e1->pt);
-                e1_eta_->Fill(zf_event.e1->eta);
-                e1_phi_->Fill(zf_event.e1->phi);
-            } else if (electron_0 == 1 && electron_1 == 0) {
-                e0_pt_->Fill(zf_event.e1->pt);
-                e0_eta_->Fill(zf_event.e1->eta);
-                e0_phi_->Fill(zf_event.e1->phi);
-                e1_pt_->Fill(zf_event.e0->pt);
-                e1_eta_->Fill(zf_event.e0->eta);
-                e1_phi_->Fill(zf_event.e0->phi);
+            // Fill the histograms with the information from the approriate electron
+            if (zf_event.e0 != NULL && zf_event.e1 != NULL){
+                if (electron_0 == 0 && electron_1 == 1) {
+                    e0_pt_->Fill(zf_event.e0->pt);
+                    e0_eta_->Fill(zf_event.e0->eta);
+                    e0_phi_->Fill(zf_event.e0->phi);
+                    e1_pt_->Fill(zf_event.e1->pt);
+                    e1_eta_->Fill(zf_event.e1->eta);
+                    e1_phi_->Fill(zf_event.e1->phi);
+                } else if (electron_0 == 1 && electron_1 == 0) {
+                    e0_pt_->Fill(zf_event.e1->pt);
+                    e0_eta_->Fill(zf_event.e1->eta);
+                    e0_phi_->Fill(zf_event.e1->phi);
+                    e1_pt_->Fill(zf_event.e0->pt);
+                    e1_eta_->Fill(zf_event.e0->eta);
+                    e1_phi_->Fill(zf_event.e0->phi);
+                }
             }
-        }
+            // Event Info
+            pileup_->Fill(zf_event.reco_vert.num);
+            nelectrons_->Fill(zf_event.n_reco_electrons);
+        } else if (USE_MC_ && !zf_event.is_real_data) {
+            z0_mass_coarse_->Fill(zf_event.truth_z.m);
+            z0_mass_fine_->Fill(zf_event.truth_z.m);
+            z0_rapidity_->Fill(zf_event.truth_z.y);
+            z0_pt_->Fill(zf_event.truth_z.pt);
+            phistar_->Fill(zf_event.truth_z.phistar);
 
-        // Event Info
-        pileup_->Fill(zf_event.reco_vert.num);
-        nelectrons_->Fill(zf_event.n_electrons);
+            // Fill the histograms with the information from the approriate electron
+            if (zf_event.e0_truth != NULL && zf_event.e1_truth != NULL){
+                if (electron_0 == 0 && electron_1 == 1) {
+                    e0_pt_->Fill(zf_event.e0_truth->pt);
+                    e0_eta_->Fill(zf_event.e0_truth->eta);
+                    e0_phi_->Fill(zf_event.e0_truth->phi);
+                    e1_pt_->Fill(zf_event.e1_truth->pt);
+                    e1_eta_->Fill(zf_event.e1_truth->eta);
+                    e1_phi_->Fill(zf_event.e1_truth->phi);
+                } else if (electron_0 == 1 && electron_1 == 0) {
+                    e0_pt_->Fill(zf_event.e1_truth->pt);
+                    e0_eta_->Fill(zf_event.e1_truth->eta);
+                    e0_phi_->Fill(zf_event.e1_truth->phi);
+                    e1_pt_->Fill(zf_event.e0_truth->pt);
+                    e1_eta_->Fill(zf_event.e0_truth->eta);
+                    e1_phi_->Fill(zf_event.e0_truth->phi);
+                }
+            }
+            // Event Info
+            pileup_->Fill(zf_event.truth_vert.num);
+            nelectrons_->Fill(2);  // We only ever grab the two electrons from the Z
+        }
     }
 
     void ZFinderPlotter::Print(const std::string& basename) {
