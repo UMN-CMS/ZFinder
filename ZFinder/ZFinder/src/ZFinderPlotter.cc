@@ -167,69 +167,69 @@ namespace zf {
 
     void ZFinderPlotter::Print(const std::string& basename) {
         // Write all PNGs
-        std::string z0_mass_coarse_Str = basename + "_";
+        std::string z0_mass_coarse_Str = basename + "_z0_mass_coarse" ;
         TCanvas* z0_mass_coarse_C = new TCanvas(z0_mass_coarse_Str.c_str(), z0_mass_coarse_Str.c_str(), X_SIZE, Y_SIZE);
         z0_mass_coarse_->Draw();
-        z0_mass_coarse_C->Print(z0_mass_coarse_Str.c_str());
+        z0_mass_coarse_C->Print((z0_mass_coarse_Str+".png").c_str());
 
-        std::string z0_mass_fine_Str = basename + "_";
+        std::string z0_mass_fine_Str = basename + "_z0_mass_fine";
         TCanvas* z0_mass_fine_C = new TCanvas(z0_mass_fine_Str.c_str(), z0_mass_fine_Str.c_str(), X_SIZE, Y_SIZE);
         z0_mass_fine_->Draw();
-        z0_mass_fine_C->Print(z0_mass_fine_Str.c_str());
+        z0_mass_fine_C->Print((z0_mass_fine_Str+".png").c_str());
 
-        std::string z0_rapidity_Str = basename + "_";
+        std::string z0_rapidity_Str = basename + "_z0_rapidity";
         TCanvas* z0_rapidity_C = new TCanvas(z0_rapidity_Str.c_str(), z0_rapidity_Str.c_str(), X_SIZE, Y_SIZE);
         z0_rapidity_->Draw();
-        z0_rapidity_C->Print(z0_rapidity_Str.c_str());
+        z0_rapidity_C->Print((z0_rapidity_Str+".png").c_str());
 
-        std::string z0_ptStr = basename + "_";
+        std::string z0_ptStr = basename + "_z0_pt";
         TCanvas* z0_ptC = new TCanvas(z0_ptStr.c_str(), z0_ptStr.c_str(), X_SIZE, Y_SIZE);
         z0_pt_->Draw();
-        z0_ptC->Print(z0_ptStr.c_str());
+        z0_ptC->Print((z0_ptStr+".png").c_str());
 
-        std::string e0_ptStr = basename + "_";
+        std::string e0_ptStr = basename + "_e0_pt";
         TCanvas* e0_ptC = new TCanvas(e0_ptStr.c_str(), e0_ptStr.c_str(), X_SIZE, Y_SIZE);
         e0_pt_->Draw();
-        e0_ptC->Print(e0_ptStr.c_str());
+        e0_ptC->Print((e0_ptStr+".png").c_str());
 
-        std::string e1_ptStr = basename + "_";
+        std::string e1_ptStr = basename + "_e1_pt";
         TCanvas* e1_ptC = new TCanvas(e1_ptStr.c_str(), e1_ptStr.c_str(), X_SIZE, Y_SIZE);
         e1_pt_->Draw();
-        e1_ptC->Print(e1_ptStr.c_str());
+        e1_ptC->Print((e1_ptStr+".png").c_str());
 
-        std::string e0_eta_Str = basename + "_";
+        std::string e0_eta_Str = basename + "_e0_eta";
         TCanvas* e0_eta_C = new TCanvas(e0_eta_Str.c_str(), e0_eta_Str.c_str(), X_SIZE, Y_SIZE);
         e0_eta_->Draw();
-        e0_eta_C->Print(e0_eta_Str.c_str());
+        e0_eta_C->Print((e0_eta_Str+".png").c_str());
 
-        std::string e1_eta_Str = basename + "_";
+        std::string e1_eta_Str = basename + "_e1_eta";
         TCanvas* e1_eta_C = new TCanvas(e1_eta_Str.c_str(), e1_eta_Str.c_str(), X_SIZE, Y_SIZE);
         e1_eta_->Draw();
-        e1_eta_C->Print(e1_eta_Str.c_str());
+        e1_eta_C->Print((e1_eta_Str+".png").c_str());
 
-        std::string e0_phi_Str = basename + "_";
+        std::string e0_phi_Str = basename + "_e0_phi";
         TCanvas* e0_phi_C = new TCanvas(e0_phi_Str.c_str(), e0_phi_Str.c_str(), X_SIZE, Y_SIZE);
         e0_phi_->Draw();
-        e0_phi_C->Print(e0_phi_Str.c_str());
+        e0_phi_C->Print((e0_phi_Str+".png").c_str());
 
-        std::string e1_phi_Str = basename + "_";
+        std::string e1_phi_Str = basename + "_e1_phi";
         TCanvas* e1_phi_C = new TCanvas(e1_phi_Str.c_str(), e1_phi_Str.c_str(), X_SIZE, Y_SIZE);
         e1_phi_->Draw();
-        e1_phi_C->Print(e1_phi_Str.c_str());
+        e1_phi_C->Print((e1_phi_Str+".png").c_str());
 
-        std::string phistarStr = basename + "_";
+        std::string phistarStr = basename + "_phistar";
         TCanvas* phistarC = new TCanvas(phistarStr.c_str(), phistarStr.c_str(), X_SIZE, Y_SIZE);
         phistar_->Draw();
-        phistarC->Print(phistarStr.c_str());
+        phistarC->Print((phistarStr+".png").c_str());
 
-        std::string pileupStr = basename + "_";
+        std::string pileupStr = basename + "_pileup";
         TCanvas* pileupC = new TCanvas(pileupStr.c_str(), pileupStr.c_str(), X_SIZE, Y_SIZE);
         pileup_->Draw();
-        pileupC->Print(pileupStr.c_str());
+        pileupC->Print((pileupStr+".png").c_str());
 
-        std::string nelectronsStr = basename + "_";
+        std::string nelectronsStr = basename + "_nelectrons";
         TCanvas* nelectronsC = new TCanvas(nelectronsStr.c_str(), nelectronsStr.c_str(), X_SIZE, Y_SIZE);
         nelectrons_->Draw();
-        nelectronsC->Print(nelectronsStr.c_str());
+        nelectronsC->Print((nelectronsStr+".png").c_str());
     }
 }  // namespace zf
