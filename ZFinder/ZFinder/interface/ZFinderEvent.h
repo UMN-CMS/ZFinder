@@ -17,11 +17,6 @@
 #include "ZFinder/ZFinder/interface/ZFinderElectron.h"  // ZFinderElectron, ZFinderElectron
 
 namespace zf {
-    struct BasicRequirements{
-        double ept_min;
-        double ept_max;
-    };
-
     class ZFinderEvent{
         public:
             // Constructor. Although iEvent, iSetup, and iConfig violate our naming
@@ -89,11 +84,11 @@ namespace zf {
 
         protected:
             // Called by the constructor to handle MC and Data separately
-            void InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
-            void InitTruth(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
+            void InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup);
+            void InitTruth(const edm::Event& iEvent, const edm::EventSetup& iSetup);
 
-            void InitGSFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
-            void InitHFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup, const BasicRequirements& cuts);
+            void InitGSFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
+            void InitHFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
 
             // Update the Z Info from e0, e1
             void InitZ();
