@@ -51,8 +51,8 @@ namespace zf {
             bool CutPassed(const std::string& cut_name) const;
             double CutWeight(const std::string& cut_name) const;
 
-            std::vector<const CutResult*>* GetPassedCuts() { return GetCutsBool_(true); };
-            std::vector<const CutResult*>* GetFailedCuts() { return GetCutsBool_(false); };
+            std::vector<const CutResult*>* GetPassedCuts() { return GetCutsBool(true); };
+            std::vector<const CutResult*>* GetFailedCuts() { return GetCutsBool(false); };
             std::vector<const CutResult*>* GetAllCuts();
 
             // Return type
@@ -61,7 +61,7 @@ namespace zf {
         protected:
             std::map<std::string, CutResult> cutresults_;
 
-            std::vector<const CutResult*>* GetCutsBool_(const bool PASSED);
+            std::vector<const CutResult*>* GetCutsBool(const bool PASSED);
 
             // TODO: fill out the candidate field
             reco::Candidate* candidate_;

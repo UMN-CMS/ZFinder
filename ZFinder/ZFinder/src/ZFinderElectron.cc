@@ -127,7 +127,7 @@ namespace zf {
         return tmp_vec;
     }
 
-    std::vector<const CutResult*>* ZFinderElectron::GetCutsBool_(const bool PASSED) {
+    std::vector<const CutResult*>* ZFinderElectron::GetCutsBool(const bool PASSED) {
         /* Finds all cuts that have passed matching PASSED */
         std::vector<const CutResult*>* tmp_vec = new std::vector<const CutResult*>();
         std::map<std::string, CutResult>::const_iterator i_cut;
