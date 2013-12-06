@@ -1,9 +1,9 @@
 // -*- C++ -*-
 //
-// Package:    ZDefinition
-// Class:      ZDefinition
+// Package:    ZDefinitionAnalyser
+// Class:      ZDefinitionAnalyser
 // 
-/**\class ZDefinition ZDefinition.cc Z/ZDefinition/src/ZDefinition.cc
+/**\class ZDefinitionAnalyser ZDefinitionAnalyser.cc Z/ZDefinitionAnalyser/src/ZDefinitionAnalyser.cc
 
  Description: [one line class summary]
 
@@ -33,10 +33,10 @@
 // class declaration
 //
 
-class ZDefinition : public edm::EDAnalyzer {
+class ZDefinitionAnalyser : public edm::EDAnalyzer {
    public:
-      explicit ZDefinition(const edm::ParameterSet&);
-      ~ZDefinition();
+      explicit ZDefinitionAnalyser(const edm::ParameterSet&);
+      ~ZDefinitionAnalyser();
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -65,7 +65,7 @@ class ZDefinition : public edm::EDAnalyzer {
 //
 // constructors and destructor
 //
-ZDefinition::ZDefinition(const edm::ParameterSet& iConfig)
+ZDefinitionAnalyser::ZDefinitionAnalyser(const edm::ParameterSet& iConfig)
 
 {
    //now do what ever initialization is needed
@@ -73,7 +73,7 @@ ZDefinition::ZDefinition(const edm::ParameterSet& iConfig)
 }
 
 
-ZDefinition::~ZDefinition()
+ZDefinitionAnalyser::~ZDefinitionAnalyser()
 {
  
    // do anything here that needs to be done at desctruction time
@@ -88,7 +88,7 @@ ZDefinition::~ZDefinition()
 
 // ------------ method called for each event  ------------
 void
-ZDefinition::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+ZDefinitionAnalyser::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
 
@@ -108,43 +108,43 @@ ZDefinition::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-ZDefinition::beginJob()
+ZDefinitionAnalyser::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void 
-ZDefinition::endJob() 
+ZDefinitionAnalyser::endJob() 
 {
 }
 
 // ------------ method called when starting to processes a run  ------------
 void 
-ZDefinition::beginRun(edm::Run const&, edm::EventSetup const&)
+ZDefinitionAnalyser::beginRun(edm::Run const&, edm::EventSetup const&)
 {
 }
 
 // ------------ method called when ending the processing of a run  ------------
 void 
-ZDefinition::endRun(edm::Run const&, edm::EventSetup const&)
+ZDefinitionAnalyser::endRun(edm::Run const&, edm::EventSetup const&)
 {
 }
 
 // ------------ method called when starting to processes a luminosity block  ------------
 void 
-ZDefinition::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
+ZDefinitionAnalyser::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
 {
 }
 
 // ------------ method called when ending the processing of a luminosity block  ------------
 void 
-ZDefinition::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
+ZDefinitionAnalyser::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&)
 {
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
-ZDefinition::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+ZDefinitionAnalyser::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
@@ -153,4 +153,4 @@ ZDefinition::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(ZDefinition);
+DEFINE_FWK_MODULE(ZDefinitionAnalyser);

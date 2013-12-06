@@ -1,4 +1,4 @@
 import FWCore.ParameterSet.Config as cms
 
-demo = cms.EDAnalyzer('ZFinderDefinition'
+demo = cms.EDAnalyzer('ZDefinitionAnalyser'
 )
