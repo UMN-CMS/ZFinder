@@ -462,18 +462,18 @@ namespace zf {
         return tmp_vec;
     }
 
-    // std::vector<ZFinderElectron*>* ZFinderEvent::FilteredElectrons(const std::string& cut_name) {
-    //     /*
-    //      * Return all electrons that pass a specified cut
-    //      */
-    //     std::vector< ZFinderElectron*>* tmp_vec = new std::vector< ZFinderElectron*>(reco_electrons_.size());
-    //     for (std::vector<ZFinderElectron*>::iterator i_elec = reco_electrons_.begin(); i_elec != reco_electrons_.end(); ++i_elec) {
-    //          ZFinderElectron* zfe = (*i_elec);
-    //         if (zfe->CutPassed(cut_name)) {
-    //             tmp_vec->push_back(zfe);
-    //         }
-    //     }
+    std::vector<ZFinderElectron*>* ZFinderEvent::FilteredElectrons(const std::string& cut_name) {
+        /*
+         * Return all electrons that pass a specified cut
+         */
+        std::vector< ZFinderElectron*>* tmp_vec = new std::vector< ZFinderElectron*>();
+        for (std::vector<ZFinderElectron*>::iterator i_elec = reco_electrons_.begin(); i_elec != reco_electrons_.end(); ++i_elec) {
+             ZFinderElectron* zfe = (*i_elec);
+            if (zfe->CutPassed(cut_name)) {
+                tmp_vec->push_back(zfe);
+            }
+        }
 
-    //     return tmp_vec;
-    // }
+        return tmp_vec;
+    }
 }  // namespace zf

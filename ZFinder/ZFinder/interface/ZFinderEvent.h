@@ -75,7 +75,7 @@ namespace zf {
             // Access pruned lists of the internal electrons
             std::vector<ZFinderElectron*>* FilteredElectrons();
             std::vector<ZFinderElectron*>* AllElectrons() { return FilteredElectrons(); };
-            //std::vector<ZFinderElectron*>* FilteredElectrons(const std::string& cut_name);
+            std::vector<ZFinderElectron*>* FilteredElectrons(const std::string& cut_name);
 
             // Number of Electrons
             int n_reco_electrons;
