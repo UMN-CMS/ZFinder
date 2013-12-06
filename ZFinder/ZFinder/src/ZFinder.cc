@@ -136,11 +136,9 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
             (*i_set)->SetCuts(&zfe);
         }
         // Print all information about each electron
-        //const bool NO_PRINT_MC = false;
         //const bool PRINT_CUTS = true;
-        //zfe.PrintElectrons(NO_PRINT_MC, PRINT_CUTS);
-        //const bool PRINT_MC = true;
-        //zfe.PrintElectrons(PRINT_MC, PRINT_CUTS);
+        //zfe.PrintRecoElectrons(PRINT_CUTS);
+        //zfe.PrintTruthElectrons(PRINT_CUTS);
 
         // Make plots
         z_plotter_map_["reco"]->Fill(zfe);

@@ -82,6 +82,8 @@ namespace zf {
 
             // Output
             void PrintElectrons(const bool USE_MC = false, const bool PRINT_CUTS = false);
+            void PrintTruthElectrons(const bool PRINT_CUTS = false) { PrintElectrons(true, PRINT_CUTS); };
+            void PrintRecoElectrons(const bool PRINT_CUTS = false) { PrintElectrons(false, PRINT_CUTS); };
 
         protected:
             // Called by the constructor to handle MC and Data separately
