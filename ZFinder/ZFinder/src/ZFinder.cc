@@ -51,6 +51,7 @@ Implementation:
 // ZFinder
 #include "ZFinder/ZFinder/interface/AcceptanceSetter.h"  // AcceptanceSetter
 #include "ZFinder/ZFinder/interface/SetterBase.h"  // SetterBase
+#include "ZFinder/ZFinder/interface/ZDefinition.h"  // ZDefinition
 #include "ZFinder/ZFinder/interface/ZFinderEvent.h"  // ZFinderEvent
 #include "ZFinder/ZFinder/interface/ZFinderPlotter.h"  // ZFinderPlotter
 
@@ -80,6 +81,7 @@ class ZFinder : public edm::EDAnalyzer {
         const edm::ParameterSet& iConfig_;
         std::map<std::string, zf::ZFinderPlotter*> z_plotter_map_;
         std::vector<zf::SetterBase*> setters_;
+        zf::ZDefinition* zdef_;
 
 };
 
@@ -113,6 +115,17 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
 
     z_plotter_map_.insert(std::pair<std::string, zf::ZFinderPlotter*>("reco", z_plotter_reco));
     z_plotter_map_.insert(std::pair<std::string, zf::ZFinderPlotter*>("truth", z_plotter_truth));
+
+    // Set up ZDefinitions
+    std::vector<std::string> cuts0;
+    cuts0.push_back("acc(EB)");
+    //cuts0.push_back("pt>20");
+    //cuts0.push_back("wp:medium");
+    std::vector<std::string> cuts1;
+    cuts1.push_back("acc(HF)");
+    //cuts1.push_back("pt>20");
+    //cuts1.push_back("hf_medium");
+    zdef_ = new zf::ZDefinition("ET-HF", cuts0, cuts1, 80, 110);
 }
 
 ZFinder::~ZFinder() {
@@ -135,13 +148,19 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         for (std::vector<zf::SetterBase*>::const_iterator i_set = setters_.begin(); i_set != setters_.end(); ++i_set) {
             (*i_set)->SetCuts(&zfe);
         }
+
+        // Check ZDefinitions
+        zdef_->ApplySelection(&zfe);
         // Print all information about each electron
         //const bool PRINT_CUTS = true;
         //zfe.PrintRecoElectrons(PRINT_CUTS);
         //zfe.PrintTruthElectrons(PRINT_CUTS);
 
         // Make plots
-        z_plotter_map_["reco"]->Fill(zfe);
+        zfe.PrintZDefs();
+        if (zfe.ZDefPassed("ET-HF")) {
+            z_plotter_map_["reco"]->Fill(zfe);
+        }
         z_plotter_map_["truth"]->Fill(zfe);
     }
 }

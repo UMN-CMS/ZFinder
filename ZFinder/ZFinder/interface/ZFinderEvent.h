@@ -2,8 +2,9 @@
 #define ZFINDER_ZFINDEREVENT_H_
 
 // Standard Library
-#include <string>  // string
-#include <vector>  // vector
+#include <map>  // std::map
+#include <string>  // std::string
+#include <vector>  // std::vector
 
 // CMSSW
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // reco::GsfElectron
@@ -85,6 +86,11 @@ namespace zf {
             void PrintTruthElectrons(const bool PRINT_CUTS = false) { PrintElectrons(true, PRINT_CUTS); };
             void PrintRecoElectrons(const bool PRINT_CUTS = false) { PrintElectrons(false, PRINT_CUTS); };
 
+            // Access ZDefinition information
+            void AddZDef(const std::string NAME, const bool PASS) { zdef_map_[NAME] = PASS; };
+            bool ZDefPassed(const std::string NAME) const;
+            void PrintZDefs() const;
+
         protected:
             // Called by the constructor to handle MC and Data separately
             void InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup);
@@ -129,6 +135,10 @@ namespace zf {
 
             // Print cuts
             void PrintCuts(ZFinderElectron* zf_elec);
+
+            // Store ZDefinition Information
+            std::map<std::string, bool> zdef_map_;
+
     };
 }  // namespace zf
 #endif  // ZFINDER_ZFINDEREVENT_H_

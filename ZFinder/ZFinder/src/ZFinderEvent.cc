@@ -4,7 +4,6 @@
 #include <algorithm>  // std::sort, std::swap
 #include <iostream>  // std::cout, std::endl
 
-
 // CMSSW
 #include "DataFormats/Common/interface/Handle.h"  // edm::Handle
 #include "DataFormats/EgammaReco/interface/HFEMClusterShapeAssociation.h"  // reco::HFEMClusterShapeAssociationCollection
@@ -475,5 +474,31 @@ namespace zf {
         }
 
         return tmp_vec;
+    }
+
+    bool ZFinderEvent::ZDefPassed(const std::string NAME) const {
+        /*
+         * Try to find the ZDef name in the map, if it exists return the pass
+         * value, else return false.
+         */
+        std::map<std::string, bool>::const_iterator it = zdef_map_.find(NAME);
+        if (it != zdef_map_.end()) {
+            return it->second;
+        } else {
+            return false;
+        }
+    }
+
+    void ZFinderEvent::PrintZDefs() const {
+        /*
+         * Loop over all ZDefs and print the results.
+         */
+        using std::cout;
+        using std::endl;
+        cout << "ZDefinitions:" << endl;
+        std::map<std::string, bool>::const_iterator i_map;
+        for (i_map = zdef_map_.begin(); i_map != zdef_map_.end(); ++i_map) {
+            cout << "\t" << i_map->first << ": " << i_map->second << endl;
+        }
     }
 }  // namespace zf
