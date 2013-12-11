@@ -4,9 +4,10 @@
 // Standard Library
 #include <string>  // string
 #include <vector>  // vector
+#include <utility>  // std::pair
 
 // ZFinder
-#include "ZFinder/ZFinder/interface/ZFinderEvent.h"  // ZFinderEvent
+#include "ZFinder/ZFinder/interface/ZFinderEvent.h"  // ZFinderEvent, cutlevel_vector
 #include "ZFinder/ZFinder/interface/ZFinderElectron.h"  // ZFinderElectron
 
 
@@ -30,6 +31,7 @@ namespace zf {
             // MZ cuts
             const double MZ_MIN_;
             const double MZ_MAX_;
+            bool pass_mz_cut_;
 
             // ZDef Name
             const std::string NAME_;
@@ -43,7 +45,6 @@ namespace zf {
                 CT_GTE,    // >=
                 CT_LTE     // <=
             };
-
 
             // Comparison Cut Variable, G indicates a generator quantity
             enum ComparisonVariable {
@@ -82,6 +83,9 @@ namespace zf {
             bool ComparisonCut(const CutInfo& CUTINFO, const int I_ELEC, ZFinderEvent* zf_event);
             bool NormalCut(const CutInfo& CUTINFO, const int I_ELEC, ZFinderEvent* zf_event);
             bool CompCutEqual(const ComparisonVariable COMP_VAR, const ZFinderElectron* ZF_ELEC);
+
+            // Build a cut level vector
+            cutlevel_vector GetCutLevelVector();
     };
 }  // namespace zf
 #endif  // ZDEFINITION_ZDEFINITION_H_

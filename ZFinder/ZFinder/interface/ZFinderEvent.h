@@ -4,6 +4,7 @@
 // Standard Library
 #include <map>  // std::map
 #include <string>  // std::string
+#include <utility>  // std::pair
 #include <vector>  // std::vector
 
 // CMSSW
@@ -18,6 +19,9 @@
 #include "ZFinder/ZFinder/interface/ZFinderElectron.h"  // ZFinderElectron, ZFinderElectron
 
 namespace zf {
+
+    typedef std::vector<std::pair<std::string, bool> > cutlevel_vector;
+
     class ZFinderEvent{
         public:
             // Constructor. Although iEvent, iSetup, and iConfig violate our naming
@@ -87,9 +91,9 @@ namespace zf {
             void PrintRecoElectrons(const bool PRINT_CUTS = false) { PrintElectrons(false, PRINT_CUTS); };
 
             // Access ZDefinition information
-            void AddZDef(const std::string NAME, const bool PASS) { zdef_map_[NAME] = PASS; };
-            bool ZDefPassed(const std::string NAME) const;
-            void PrintZDefs() const;
+            void AddZDef(const std::string NAME, cutlevel_vector PASS_OBJ) { zdef_map_[NAME] = PASS_OBJ; };
+            bool ZDefPassed(const std::string& NAME) const;
+            void PrintZDefs(const bool VERBOSE = false) const;
 
         protected:
             // Called by the constructor to handle MC and Data separately
@@ -137,7 +141,7 @@ namespace zf {
             void PrintCuts(ZFinderElectron* zf_elec);
 
             // Store ZDefinition Information
-            std::map<std::string, bool> zdef_map_;
+            std::map<std::string, cutlevel_vector> zdef_map_;
 
     };
 }  // namespace zf

@@ -118,14 +118,15 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
 
     // Set up ZDefinitions
     std::vector<std::string> cuts0;
-    cuts0.push_back("acc(EB)");
-    //cuts0.push_back("pt>20");
-    //cuts0.push_back("wp:medium");
+    cuts0.push_back("acc(ET)");
+    cuts0.push_back("pt>20");
+    cuts0.push_back("wp:medium");
     std::vector<std::string> cuts1;
     cuts1.push_back("acc(HF)");
-    //cuts1.push_back("pt>20");
+    cuts1.push_back("pt>20");
+    cuts1.push_back("hf_loose");
     //cuts1.push_back("hf_medium");
-    zdef_ = new zf::ZDefinition("ET-HF", cuts0, cuts1, 80, 110);
+    zdef_ = new zf::ZDefinition("ET-HF", cuts0, cuts1, 40, 140);
 }
 
 ZFinder::~ZFinder() {
@@ -156,12 +157,14 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         //zfe.PrintRecoElectrons(PRINT_CUTS);
         //zfe.PrintTruthElectrons(PRINT_CUTS);
 
+        // Print all information about the ZDefinitions
+        //const bool VERBOSE = true;
+        //zfe.PrintZDefs(VERBOSE);
         // Make plots
-        zfe.PrintZDefs();
         if (zfe.ZDefPassed("ET-HF")) {
             z_plotter_map_["reco"]->Fill(zfe);
+            z_plotter_map_["truth"]->Fill(zfe);
         }
-        z_plotter_map_["truth"]->Fill(zfe);
     }
 }
 

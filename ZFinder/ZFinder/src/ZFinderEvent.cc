@@ -476,29 +476,45 @@ namespace zf {
         return tmp_vec;
     }
 
-    bool ZFinderEvent::ZDefPassed(const std::string NAME) const {
+    bool ZFinderEvent::ZDefPassed(const std::string& NAME) const {
         /*
          * Try to find the ZDef name in the map, if it exists return the pass
          * value, else return false.
          */
-        std::map<std::string, bool>::const_iterator it = zdef_map_.find(NAME);
+        std::map<std::string, cutlevel_vector>::const_iterator it = zdef_map_.find(NAME);
         if (it != zdef_map_.end()) {
-            return it->second;
+            const cutlevel_vector* cuts_vec = &it->second;
+            cutlevel_vector::const_iterator v_it;
+            bool has_passed = true;
+            for (v_it = cuts_vec->begin(); v_it != cuts_vec->end(); ++v_it) {
+               has_passed = v_it->second && has_passed;
+            }
+            return has_passed;
         } else {
             return false;
         }
     }
 
-    void ZFinderEvent::PrintZDefs() const {
+    void ZFinderEvent::PrintZDefs(const bool VERBOSE) const {
         /*
          * Loop over all ZDefs and print the results.
          */
         using std::cout;
         using std::endl;
         cout << "ZDefinitions:" << endl;
-        std::map<std::string, bool>::const_iterator i_map;
+        std::map<std::string, cutlevel_vector>::const_iterator i_map;
         for (i_map = zdef_map_.begin(); i_map != zdef_map_.end(); ++i_map) {
-            cout << "\t" << i_map->first << ": " << i_map->second << endl;
+            cout << "\t" << i_map->first << ": ";
+            cout << ZDefPassed(i_map->first) << endl;
+            // If VERBOSE, print out each cutlevel as well
+            if (VERBOSE) {
+                const cutlevel_vector* clv = &i_map->second;
+                cutlevel_vector::const_iterator i_cutlevel;
+
+                for (i_cutlevel = clv->begin(); i_cutlevel != clv->end(); ++i_cutlevel) {
+                    cout << "\t\t" << i_cutlevel->first << ": " << i_cutlevel->second << endl;
+                }
+            }
         }
     }
 }  // namespace zf

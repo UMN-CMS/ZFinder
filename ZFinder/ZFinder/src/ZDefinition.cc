@@ -1,7 +1,7 @@
 #include "ZFinder/ZFinder/interface/ZDefinition.h"
 
 // Standard Libraries
-#include <algorithm>  // std::swap
+#include <sstream>  // std::ostringstream
 
 
 namespace zf {
@@ -86,8 +86,9 @@ namespace zf {
          * electron and determine which combinations pass.
          */
         if (zf_event->reco_z.m > MZ_MAX_ || zf_event->reco_z.m < MZ_MIN_) {
-            zf_event->AddZDef(NAME_, false);
-            return;
+            pass_mz_cut_ = false;
+        } else {
+            pass_mz_cut_ = true;
         }
 
         for (int i_cutset = 0; i_cutset < 2; ++i_cutset) {
@@ -105,47 +106,10 @@ namespace zf {
         }
 
         /*
-         * We now check for the electron pairing that passed the most cuts.
-         * We check e0 with cuts0 and e1 with cuts1, and if they fail we try e1
-         * with cuts0 and e0 with cuts1.
+         * We now produce a cutlevel_vector and store it in the zf_event
          */
-        // e0 && cut0 case
-        bool pass_0011 = true;
-        bool pass_0110 = true;
-        std::vector<bool>::const_iterator i_pass;
-        for (i_pass = pass_[0][0].begin(); i_pass != pass_[0][0].end(); ++i_pass) {
-            pass_0011 = (*i_pass) && pass_0011;
-            if (!pass_0011) { break; }
-        }
-        if (pass_0011) {
-            for (i_pass = pass_[1][1].begin(); i_pass != pass_[1][1].end(); ++i_pass) {
-                pass_0011 = (*i_pass) && pass_0011;
-                if (!pass_0011) { break; }
-            }
-        }
-        if (pass_0011) {
-            zf_event->AddZDef(NAME_, true);
-        }
-        // e1 && cut0 case
-        else {
-            for (i_pass = pass_[0][1].begin(); i_pass != pass_[0][1].end(); ++i_pass) {
-                pass_0110 = (*i_pass) && pass_0110;
-                if (!pass_0110) { break; }
-            }
-            if (pass_0110) {
-                for (i_pass = pass_[1][0].begin(); i_pass != pass_[1][0].end(); ++i_pass) {
-                    pass_0110 = (*i_pass) && pass_0110;
-                    if (!pass_0110) { break; }
-                }
-            }
-        }
-        if (pass_0110) {
-            zf_event->AddZDef(NAME_, true);
-        }
-        // Failed both sets
-        else {
-            zf_event->AddZDef(NAME_, false);
-        }
+        cutlevel_vector clv = GetCutLevelVector();
+        zf_event->AddZDef(NAME_, clv);
     }
 
     bool ZDefinition::NormalCut(const CutInfo& CUTINFO, const int I_ELEC, ZFinderEvent* zf_event) {
@@ -349,5 +313,50 @@ namespace zf {
         double x;
         iss >> x;
         return x;
+    }
+
+    cutlevel_vector ZDefinition::GetCutLevelVector() {
+        std::vector<bool>* set0 = NULL;
+        std::vector<bool>* set1 = NULL;
+
+        // First we find the combination of cut path and electron that gets us
+        // the furthest
+        const size_t SIZE = pass_[0][0].size();
+        for (size_t i = 0; i < SIZE; ++i) {
+            bool normal_pass = pass_[0][0].at(i) && pass_[1][1].at(i);
+            bool other_pass = pass_[1][0].at(i) && pass_[0][1].at(i);
+            if (normal_pass && !other_pass) {
+                set0 = &pass_[0][0];
+                set1 = &pass_[1][1];
+                break;
+            } else if (!normal_pass && other_pass) {
+                set0 = &pass_[0][1];
+                set1 = &pass_[1][0];
+                break;
+            } else {  // Both pass, so use normal and keep trying
+                set0 = &pass_[0][0];
+                set1 = &pass_[1][1];
+            }
+        }
+
+        cutlevel_vector clv;
+        // Now we got level by level and save the cut status
+        for (size_t i = 0; i < SIZE; ++i) {
+            const std::string CUTLEVEL_NAME = cutinfo_[0].at(i).cut + " AND " + cutinfo_[1].at(i).cut;
+            const bool CUTLEVEL_PASS = set0->at(i) && set1->at(i);
+            std::pair<std::string, bool> cut_pair(CUTLEVEL_NAME, CUTLEVEL_PASS);
+            clv.push_back(cut_pair);
+        }
+
+        // Finally, we add the Mass window cut
+        std::ostringstream ss0;
+        ss0 << MZ_MIN_;
+        std::ostringstream ss1;
+        ss1 << MZ_MAX_;
+        const std::string CUTLEVEL_NAME = ss0.str() + " < M_{ee} < " + ss1.str();
+        std::pair<std::string, bool> cut_pair(CUTLEVEL_NAME, pass_mz_cut_);
+        clv.push_back(cut_pair);
+
+        return clv;
     }
 }  // namespace zf
