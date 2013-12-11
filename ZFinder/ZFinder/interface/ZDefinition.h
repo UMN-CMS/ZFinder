@@ -26,7 +26,8 @@ namespace zf {
             void ApplySelection(ZFinderEvent* zf_event);
 
         protected:
-            void InitVariables(const unsigned int SIZE);
+            void InitVariables(const size_t SIZE);
+            void InitCutlevelVector(const size_t SIZE);
 
             // MZ cuts
             const double MZ_MIN_;
@@ -85,7 +86,9 @@ namespace zf {
             bool CompCutEqual(const ComparisonVariable COMP_VAR, const ZFinderElectron* ZF_ELEC);
 
             // Build a cut level vector
-            cutlevel_vector GetCutLevelVector();
+            cutlevel_vector clv_;
+            void FillCutLevelVector();
+            void ResetCutlevelVector();
     };
 }  // namespace zf
 #endif  // ZDEFINITION_ZDEFINITION_H_

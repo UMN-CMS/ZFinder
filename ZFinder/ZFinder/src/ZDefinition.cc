@@ -56,9 +56,12 @@ namespace zf {
                     }
                 }
             }
+
+            // Initialize the cutlevel_vector
+            InitCutlevelVector(cuts[0].size());
         }
 
-    void ZDefinition::InitVariables(const unsigned int SIZE) {
+    void ZDefinition::InitVariables(const size_t SIZE) {
         /*
          * We fill in cutinfo_ with default values, as well as pass_
          */
@@ -75,7 +78,32 @@ namespace zf {
                 // Initialize pass_
                 pass_[j][0].push_back(false);
                 pass_[j][1].push_back(false);
+                // Now we got level by level and save the cut status
             }
+        }
+    }
+
+    void ZDefinition::InitCutlevelVector(const size_t SIZE) {
+        // cutlevel_vector
+        for (size_t i = 0; i < SIZE; ++i) {
+            const std::string CUTLEVEL_NAME = cutinfo_[0].at(i).cut + " AND " + cutinfo_[1].at(i).cut;
+            std::pair<std::string, bool> cut_pair(CUTLEVEL_NAME, false);
+            clv_.push_back(cut_pair);
+        }
+        // Finally we add the level for MZ cuts
+        std::ostringstream ss0;
+        ss0 << MZ_MIN_;
+        std::ostringstream ss1;
+        ss1 << MZ_MAX_;
+        const std::string CUTLEVEL_NAME = ss0.str() + " < M_{ee} < " + ss1.str();
+        std::pair<std::string, bool> cut_pair(CUTLEVEL_NAME, false);
+        clv_.push_back(cut_pair);
+    }
+
+    void ZDefinition::ResetCutlevelVector() {
+        cutlevel_vector::iterator i_cutlevel;
+        for (i_cutlevel = clv_.begin(); i_cutlevel != clv_.end(); ++i_cutlevel) {
+            i_cutlevel->second = false;
         }
     }
 
@@ -85,6 +113,10 @@ namespace zf {
          * loop over the each cut stage, then each set of cuts, then each
          * electron and determine which combinations pass.
          */
+
+        // Clear our vector
+        ResetCutlevelVector();
+
         if (zf_event->reco_z.m > MZ_MAX_ || zf_event->reco_z.m < MZ_MIN_) {
             pass_mz_cut_ = false;
         } else {
@@ -108,8 +140,8 @@ namespace zf {
         /*
          * We now produce a cutlevel_vector and store it in the zf_event
          */
-        cutlevel_vector clv = GetCutLevelVector();
-        zf_event->AddZDef(NAME_, clv);
+        FillCutLevelVector();
+        zf_event->AddZDef(NAME_, clv_);
     }
 
     bool ZDefinition::NormalCut(const CutInfo& CUTINFO, const int I_ELEC, ZFinderEvent* zf_event) {
@@ -315,7 +347,7 @@ namespace zf {
         return x;
     }
 
-    cutlevel_vector ZDefinition::GetCutLevelVector() {
+    void ZDefinition::FillCutLevelVector() {
         std::vector<bool>* set0 = NULL;
         std::vector<bool>* set1 = NULL;
 
@@ -338,25 +370,13 @@ namespace zf {
                 set1 = &pass_[1][1];
             }
         }
-
-        cutlevel_vector clv;
-        // Now we got level by level and save the cut status
+        // Now set the cut levels that pass
         for (size_t i = 0; i < SIZE; ++i) {
-            const std::string CUTLEVEL_NAME = cutinfo_[0].at(i).cut + " AND " + cutinfo_[1].at(i).cut;
-            const bool CUTLEVEL_PASS = set0->at(i) && set1->at(i);
-            std::pair<std::string, bool> cut_pair(CUTLEVEL_NAME, CUTLEVEL_PASS);
-            clv.push_back(cut_pair);
+            std::pair<std::string, bool>* cut_pair = &clv_.at(i);
+            cut_pair->second = set0->at(i) && set1->at(i);
         }
-
-        // Finally, we add the Mass window cut
-        std::ostringstream ss0;
-        ss0 << MZ_MIN_;
-        std::ostringstream ss1;
-        ss1 << MZ_MAX_;
-        const std::string CUTLEVEL_NAME = ss0.str() + " < M_{ee} < " + ss1.str();
-        std::pair<std::string, bool> cut_pair(CUTLEVEL_NAME, pass_mz_cut_);
-        clv.push_back(cut_pair);
-
-        return clv;
+        // Finally, we add the Mass window cut, which is the very last one (and
+        // not included in the above loop)
+        clv_.back().second = pass_mz_cut_;
     }
 }  // namespace zf
