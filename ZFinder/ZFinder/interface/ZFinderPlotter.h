@@ -15,7 +15,7 @@ namespace zf {
     class ZFinderPlotter{
         public:
             // Constructor
-            ZFinderPlotter(TFileDirectory* tdir, const bool USE_MC = false);
+            ZFinderPlotter(TFileDirectory& tdir, const bool USE_MC = false);
 
             // Add events
             void Fill(const ZFinderEvent& zf_event, const int first_electron = 0, const int second_electron = 1);

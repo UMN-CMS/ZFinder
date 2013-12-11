@@ -11,7 +11,7 @@ namespace zf {
             const std::vector<std::string>& CUTS1,
             const double MZ_MIN, const double MZ_MAX
             )
-        : MZ_MIN_(MZ_MIN), MZ_MAX_(MZ_MAX), NAME_(NAME) {
+        : NAME(NAME), MZ_MIN_(MZ_MIN), MZ_MAX_(MZ_MAX) {
             /*
              * Save the cut values, and check that they are sane.
              */
@@ -88,7 +88,7 @@ namespace zf {
         for (size_t i = 0; i < SIZE; ++i) {
             const std::string CUTLEVEL_NAME = cutinfo_[0].at(i).cut + " AND " + cutinfo_[1].at(i).cut;
             std::pair<std::string, bool> cut_pair(CUTLEVEL_NAME, false);
-            clv_.push_back(cut_pair);
+            clv.push_back(cut_pair);
         }
         // Finally we add the level for MZ cuts
         std::ostringstream ss0;
@@ -97,12 +97,12 @@ namespace zf {
         ss1 << MZ_MAX_;
         const std::string CUTLEVEL_NAME = ss0.str() + " < M_{ee} < " + ss1.str();
         std::pair<std::string, bool> cut_pair(CUTLEVEL_NAME, false);
-        clv_.push_back(cut_pair);
+        clv.push_back(cut_pair);
     }
 
     void ZDefinition::ResetCutlevelVector() {
         cutlevel_vector::iterator i_cutlevel;
-        for (i_cutlevel = clv_.begin(); i_cutlevel != clv_.end(); ++i_cutlevel) {
+        for (i_cutlevel = clv.begin(); i_cutlevel != clv.end(); ++i_cutlevel) {
             i_cutlevel->second = false;
         }
     }
@@ -141,7 +141,7 @@ namespace zf {
          * We now produce a cutlevel_vector and store it in the zf_event
          */
         FillCutLevelVector();
-        zf_event->AddZDef(NAME_, clv_);
+        zf_event->AddZDef(NAME, clv);
     }
 
     bool ZDefinition::NormalCut(const CutInfo& CUTINFO, const int I_ELEC, ZFinderEvent* zf_event) {
@@ -372,11 +372,11 @@ namespace zf {
         }
         // Now set the cut levels that pass
         for (size_t i = 0; i < SIZE; ++i) {
-            std::pair<std::string, bool>* cut_pair = &clv_.at(i);
+            std::pair<std::string, bool>* cut_pair = &clv.at(i);
             cut_pair->second = set0->at(i) && set1->at(i);
         }
         // Finally, we add the Mass window cut, which is the very last one (and
         // not included in the above loop)
-        clv_.back().second = pass_mz_cut_;
+        clv.back().second = pass_mz_cut_;
     }
 }  // namespace zf

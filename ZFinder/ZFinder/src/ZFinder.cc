@@ -52,6 +52,7 @@ Implementation:
 #include "ZFinder/ZFinder/interface/AcceptanceSetter.h"  // AcceptanceSetter
 #include "ZFinder/ZFinder/interface/SetterBase.h"  // SetterBase
 #include "ZFinder/ZFinder/interface/ZDefinition.h"  // ZDefinition
+#include "ZFinder/ZFinder/interface/ZDefinitionPlotter.h"  // ZDefinitionPlotter
 #include "ZFinder/ZFinder/interface/ZFinderEvent.h"  // ZFinderEvent
 #include "ZFinder/ZFinder/interface/ZFinderPlotter.h"  // ZFinderPlotter
 
@@ -82,6 +83,7 @@ class ZFinder : public edm::EDAnalyzer {
         std::map<std::string, zf::ZFinderPlotter*> z_plotter_map_;
         std::vector<zf::SetterBase*> setters_;
         zf::ZDefinition* zdef_;
+        zf::ZDefinitionPlotter* zdef_plot_;
 
 };
 
@@ -106,10 +108,10 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     // Set up plotters
     edm::Service<TFileService> fs;
 
-    TFileDirectory* tdir_1 = new TFileDirectory(fs->mkdir("reco"));
+    TFileDirectory tdir_1(fs->mkdir("reco"));
     zf::ZFinderPlotter* z_plotter_reco = new zf::ZFinderPlotter(tdir_1);
 
-    TFileDirectory* tdir_2 = new TFileDirectory(fs->mkdir("truth"));
+    TFileDirectory tdir_2(fs->mkdir("truth"));
     const bool USE_MC = true;
     zf::ZFinderPlotter* z_plotter_truth = new zf::ZFinderPlotter(tdir_2, USE_MC);
 
@@ -120,13 +122,16 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     std::vector<std::string> cuts0;
     cuts0.push_back("acc(ET)");
     cuts0.push_back("pt>20");
-    cuts0.push_back("wp:medium");
+    //cuts0.push_back("wp:medium");
     std::vector<std::string> cuts1;
     cuts1.push_back("acc(HF)");
-    cuts1.push_back("pt>20");
-    cuts1.push_back("hf_loose");
-    //cuts1.push_back("hf_medium");
-    zdef_ = new zf::ZDefinition("ET-HF", cuts0, cuts1, 40, 140);
+    cuts1.push_back("acc(pt>20)");
+    //cuts1.push_back("hf_loose");
+    zdef_ = new zf::ZDefinition("ET-HF", cuts0, cuts1, 80, 100);
+
+    // Set up the ZDefinitionPlotter
+    TFileDirectory tdir_3(fs->mkdir("ET-HF"));
+    zdef_plot_ = new zf::ZDefinitionPlotter(*zdef_, tdir_3, false);
 }
 
 ZFinder::~ZFinder() {
@@ -161,6 +166,7 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         //const bool VERBOSE = true;
         //zfe.PrintZDefs(VERBOSE);
         // Make plots
+        zdef_plot_->Fill(zfe);
         if (zfe.ZDefPassed("ET-HF")) {
             z_plotter_map_["reco"]->Fill(zfe);
             z_plotter_map_["truth"]->Fill(zfe);

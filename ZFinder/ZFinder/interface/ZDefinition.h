@@ -25,6 +25,11 @@ namespace zf {
 
             void ApplySelection(ZFinderEvent* zf_event);
 
+            // Making clv and NAME public so that other classes can find out about the
+            // cuts it contains.
+            cutlevel_vector clv;
+            const std::string NAME;
+
         protected:
             void InitVariables(const size_t SIZE);
             void InitCutlevelVector(const size_t SIZE);
@@ -35,7 +40,6 @@ namespace zf {
             bool pass_mz_cut_;
 
             // ZDef Name
-            const std::string NAME_;
 
             // Comparison Cut Types
             enum ComparisonType {
@@ -86,7 +90,6 @@ namespace zf {
             bool CompCutEqual(const ComparisonVariable COMP_VAR, const ZFinderElectron* ZF_ELEC);
 
             // Build a cut level vector
-            cutlevel_vector clv_;
             void FillCutLevelVector();
             void ResetCutlevelVector();
     };

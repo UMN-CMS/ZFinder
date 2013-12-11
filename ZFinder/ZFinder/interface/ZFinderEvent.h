@@ -92,6 +92,7 @@ namespace zf {
 
             // Access ZDefinition information
             void AddZDef(const std::string NAME, cutlevel_vector PASS_OBJ) { zdef_map_[NAME] = PASS_OBJ; };
+            const cutlevel_vector* GetZDef(const std::string& NAME) const;
             bool ZDefPassed(const std::string& NAME) const;
             void PrintZDefs(const bool VERBOSE = false) const;
 

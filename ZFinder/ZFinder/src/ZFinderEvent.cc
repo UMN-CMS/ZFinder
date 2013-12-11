@@ -517,4 +517,14 @@ namespace zf {
             }
         }
     }
+
+    const cutlevel_vector* ZFinderEvent::GetZDef(const std::string& NAME) const {
+        std::map<std::string, cutlevel_vector>::const_iterator it = zdef_map_.find(NAME);
+        if (it != zdef_map_.end()) {
+            return &(it->second);
+        } else {
+            return NULL;
+        }
+
+    }
 }  // namespace zf
