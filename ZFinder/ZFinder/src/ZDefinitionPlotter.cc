@@ -20,13 +20,13 @@ namespace zf {
             std::ostringstream oss;
             oss << counter;
             std::string level_name = oss.str() + " " + CUT_NAME;
+            ++counter;
 
             // Make our TFileDirectory for the plotter
             TFileDirectory t_subdir = tdir.mkdir(level_name.c_str(), level_name.c_str());
             ZFinderPlotter zf_plotter(t_subdir, USE_MC_); 
             std::pair<std::string, ZFinderPlotter> new_pair(CUT_NAME, zf_plotter);
             zf_plotters.insert(new_pair);
-            ++counter;
         }
     }
 

@@ -48,10 +48,11 @@ namespace zf {
                     // from the ZElectron, otherwise we assume it is a cut and pass it
                     // through. We also pull out the variable being compared.
                     cutinfo->comp_type = GetComparisonType(&cutinfo->cut);
-                    cutinfo->comp_var = GetComparisonVariable(&cutinfo->cut);
                     if (cutinfo->comp_type != CT_NONE) {  // Is a comparison
+                        cutinfo->comp_var = GetComparisonVariable(&cutinfo->cut);
                         cutinfo->comp_val = GetComparisonValue(&cutinfo->cut);
                     } else {
+                        cutinfo->comp_var = CV_NONE;
                         cutinfo->comp_val = -1;
                     }
                 }
@@ -184,20 +185,31 @@ namespace zf {
             use_truth = false;
         }
 
+        // If we're not MC, always fail Gen cuts
+        if (use_truth && zf_event->is_real_data) {
+            std::cout << "MC CUT ON DATA" << std::endl;
+            return false;
+        }
+
         // Get the electron we want
-        ZFinderElectron* zf_elec;
+        ZFinderElectron* zf_elec = NULL;
         if (I_ELEC == 0) {
-            if (use_truth) {
+            if (use_truth && zf_event->e0 != NULL && zf_event->e1 != NULL) {
                 zf_elec = zf_event->e0_truth;
             } else {
                 zf_elec = zf_event->e0;
             }
         } else {
-            if (use_truth) {
+            if (use_truth && zf_event->e0 != NULL && zf_event->e1 != NULL) {
                 zf_elec = zf_event->e1_truth;
             } else {
                 zf_elec = zf_event->e1;
             }
+        }
+
+        // Not all the required electrons existed, so fail
+        if (zf_elec == NULL) {
+            return false;
         }
 
         // Pull the value from the electron
@@ -293,28 +305,28 @@ namespace zf {
          * We just check all possibilities.
          */
         using std::string;
-        if (cut->compare(0, 2, "pt")) {
+        if (cut->compare(0, 2, "pt") == 0) {
             return CV_PT;
         }
-        else if (cut->compare(0, 3, "gpt")) {
+        else if (cut->compare(0, 3, "gpt") == 0 ) {
             return CV_GPT;
         }
-        else if (cut->compare(0, 3, "eta")) {
+        else if (cut->compare(0, 3, "eta") == 0 ) {
             return CV_ETA;
         }
-        else if (cut->compare(0, 4, "geta")) {
+        else if (cut->compare(0, 4, "geta") == 0 ) {
             return CV_GETA;
         }
-        else if (cut->compare(0, 3, "phi")) {
+        else if (cut->compare(0, 3, "phi") == 0 ) {
             return CV_PHI;
         }
-        else if (cut->compare(0, 4, "gphi")) {
+        else if (cut->compare(0, 4, "gphi") == 0 ) {
             return CV_GPHI;
         }
-        else if (cut->compare(0, 6, "charge")) {
+        else if (cut->compare(0, 6, "charge") == 0 ) {
             return CV_CHARGE;
         }
-        else if (cut->compare(0, 7, "gcharge")) {
+        else if (cut->compare(0, 7, "gcharge") == 0 ) {
             return CV_GCHARGE;
         }
         return CV_NONE;
