@@ -12,6 +12,7 @@ namespace zf {
     ZFinderElectron::ZFinderElectron(reco::GsfElectron input_electron) {
         /* Set type of candidate and assign */
         candidate_type_ = RECO_GSFELECTRON;
+        AddCutResult("type_gsf", true, 1.);
         gsf_elec_ = input_electron;
         candidate_ = &input_electron;
         /* Extract the useful quantities from a GsfElectron */
@@ -26,6 +27,7 @@ namespace zf {
     ZFinderElectron::ZFinderElectron(reco::GenParticle input_electron) {
         /* Set type of candidate and assign */
         candidate_type_ = RECO_GENPARTICLE;
+        AddCutResult("type_gen", true, 1.);
         gen_elec_ = input_electron;
         // reco::GenParticle is a child of reco::candidate
         candidate_ = dynamic_cast<reco::Candidate*>(&gen_elec_);
@@ -47,6 +49,7 @@ namespace zf {
     ZFinderElectron::ZFinderElectron(reco::RecoEcalCandidate input_electron) {
         /* Set type of candidate and assign */
         candidate_type_ = RECO_RECOECALCANDIDATE;
+        AddCutResult("type_ecalcandidate", true, 1.);
         recan_elec_ = input_electron;
         candidate_ = &input_electron;
         /* Extract the useful quantities from a GsfElectron */
@@ -68,11 +71,13 @@ namespace zf {
                 eff_uncertainty = Efficiency[ieta][iet][1];
             }
         }
+        // Add cut result to store parent information
     }
 
     ZFinderElectron::ZFinderElectron(reco::Photon input_electron) {
         /* Set type of candidate and assign */
         candidate_type_ = RECO_PHOTON;
+        AddCutResult("type_photon", true, 1.);
         photon_elec_ = input_electron;
         candidate_ = &input_electron;
         /* Extract the useful quantities from a GsfElectron */
