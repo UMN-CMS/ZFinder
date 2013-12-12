@@ -78,6 +78,18 @@ namespace zf {
         e1_phi_->GetXaxis()->SetTitle("#phi_{e_{1}}");
         e1_phi_->GetYaxis()->SetTitle("counts");
 
+        // e0_charge_
+        const std::string e0_charge_name = "#charge_{e_{0}}";
+        e0_charge_ = tdir.make<TH1I>(e0_charge_name.c_str(), e0_charge_name.c_str(), 60, -3.15, 3.15);
+        e0_charge_->GetXaxis()->SetTitle("#charge_{e_{0}}");
+        e0_charge_->GetYaxis()->SetTitle("Counts");
+
+        // e1_charge_
+        const std::string e1_charge_name = "#charge_{e_{1}}";
+        e1_charge_ = tdir.make<TH1I>(e1_charge_name.c_str(), e1_charge_name.c_str(), 50, -3.15, 3.15);
+        e1_charge_->GetXaxis()->SetTitle("#charge_{e_{1}}");
+        e1_charge_->GetYaxis()->SetTitle("counts");
+
         // phistar
         const std::string phistar_name = "#phi^{*}";
         phistar_ = tdir.make<TH1I>(phistar_name.c_str(), phistar_name.c_str(), 100, 0., 1.);
@@ -119,16 +131,20 @@ namespace zf {
                     e0_pt_->Fill(zf_event.e0->pt);
                     e0_eta_->Fill(zf_event.e0->eta);
                     e0_phi_->Fill(zf_event.e0->phi);
+                    e0_charge_->Fill(zf_event.e0->charge);
                     e1_pt_->Fill(zf_event.e1->pt);
                     e1_eta_->Fill(zf_event.e1->eta);
                     e1_phi_->Fill(zf_event.e1->phi);
+                    e1_charge_->Fill(zf_event.e1->charge);
                 } else if (electron_0 == 1 && electron_1 == 0) {
                     e0_pt_->Fill(zf_event.e1->pt);
                     e0_eta_->Fill(zf_event.e1->eta);
                     e0_phi_->Fill(zf_event.e1->phi);
+                    e0_charge_->Fill(zf_event.e1->charge);
                     e1_pt_->Fill(zf_event.e0->pt);
                     e1_eta_->Fill(zf_event.e0->eta);
                     e1_phi_->Fill(zf_event.e0->phi);
+                    e1_charge_->Fill(zf_event.e0->charge);
                 }
             }
             // Event Info
@@ -216,6 +232,16 @@ namespace zf {
         TCanvas* e1_phi_C = new TCanvas(e1_phi_Str.c_str(), e1_phi_Str.c_str(), X_SIZE, Y_SIZE);
         e1_phi_->Draw();
         e1_phi_C->Print((e1_phi_Str+".png").c_str());
+
+        std::string e0_charge_Str = basename + "_e0_charge";
+        TCanvas* e0_charge_C = new TCanvas(e0_charge_Str.c_str(), e0_charge_Str.c_str(), X_SIZE, Y_SIZE);
+        e0_charge_->Draw();
+        e0_charge_C->Print((e0_charge_Str+".png").c_str());
+
+        std::string e1_charge_Str = basename + "_e1_charge";
+        TCanvas* e1_charge_C = new TCanvas(e1_charge_Str.c_str(), e1_charge_Str.c_str(), X_SIZE, Y_SIZE);
+        e1_charge_->Draw();
+        e1_charge_C->Print((e1_charge_Str+".png").c_str());
 
         std::string phistarStr = basename + "_phistar";
         TCanvas* phistarC = new TCanvas(phistarStr.c_str(), phistarStr.c_str(), X_SIZE, Y_SIZE);

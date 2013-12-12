@@ -34,6 +34,8 @@ namespace zf {
             TH1I* e1_eta_;
             TH1I* e0_phi_;
             TH1I* e1_phi_;
+            TH1I* e0_charge_;
+            TH1I* e1_charge_;
             TH1I* phistar_;
             TH1I* pileup_;
             TH1I* nelectrons_;
