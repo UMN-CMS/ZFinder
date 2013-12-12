@@ -64,6 +64,30 @@ process.ZFinder = cms.EDAnalyzer('ZFinder',
         # MC, but still required to be something for data
         pileupInputTag = cms.InputTag("addPileupInfo"),
         generatorInputTag = cms.InputTag("genParticles"),
+        # ZDefinitions
+        ZDefinitions = cms.untracked.VPSet(
+            cms.untracked.PSet(
+                name = cms.untracked.string("ET-HF"),
+                cuts0 = cms.untracked.vstring("acc(ET)", "pt>20", "eg_medium"),
+                cuts1 = cms.untracked.vstring("acc(HF)", "pt>20", "hf_loose"),
+                min_mz = cms.untracked.double(40.),
+                max_mz = cms.untracked.double(150.),
+                ),
+            cms.untracked.PSet(
+                name = cms.untracked.string("ET-EE"),
+                cuts0 = cms.untracked.vstring("acc(ET)", "pt>20", "eg_medium"),
+                cuts1 = cms.untracked.vstring("acc(EE)", "pt>20", "eg_loose"),
+                min_mz = cms.untracked.double(40.),
+                max_mz = cms.untracked.double(150.),
+                ),
+            cms.untracked.PSet(
+                name = cms.untracked.string("ET-EB"),
+                cuts0 = cms.untracked.vstring("acc(ET)", "pt>20", "eg_medium"),
+                cuts1 = cms.untracked.vstring("acc(EB)", "pt>20", "eg_loose"),
+                min_mz = cms.untracked.double(40.),
+                max_mz = cms.untracked.double(150.),
+                )
+            )
         )
 
 # RUN

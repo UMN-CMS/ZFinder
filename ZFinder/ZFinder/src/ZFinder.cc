@@ -82,8 +82,9 @@ class ZFinder : public edm::EDAnalyzer {
         const edm::ParameterSet& iConfig_;
         std::map<std::string, zf::ZFinderPlotter*> z_plotter_map_;
         std::vector<zf::SetterBase*> setters_;
-        zf::ZDefinition* zdef_;
-        zf::ZDefinitionPlotter* zdef_plot_;
+        std::vector<edm::ParameterSet> zdef_psets_;
+        std::vector<zf::ZDefinition*> zdefs_;
+        std::vector<zf::ZDefinitionPlotter*> zdef_plotters_;
 
 };
 
@@ -118,20 +119,24 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     z_plotter_map_.insert(std::pair<std::string, zf::ZFinderPlotter*>("reco", z_plotter_reco));
     z_plotter_map_.insert(std::pair<std::string, zf::ZFinderPlotter*>("truth", z_plotter_truth));
 
-    // Set up ZDefinitions
-    std::vector<std::string> cuts0;
-    cuts0.push_back("acc(ET)");
-    cuts0.push_back("pt>20");
-    //cuts0.push_back("wp:medium");
-    std::vector<std::string> cuts1;
-    cuts1.push_back("acc(HF)");
-    cuts1.push_back("acc(pt>20)");
-    //cuts1.push_back("hf_loose");
-    zdef_ = new zf::ZDefinition("ET-HF", cuts0, cuts1, 80, 100);
-
-    // Set up the ZDefinitionPlotter
-    TFileDirectory tdir_3(fs->mkdir("ET-HF"));
-    zdef_plot_ = new zf::ZDefinitionPlotter(*zdef_, tdir_3, false);
+    // Set up ZDefinitions and plotters
+    zdef_psets_ = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet> >("ZDefinitions");
+    std::vector<edm::ParameterSet>::const_iterator i_pset;
+    for (i_pset = zdef_psets_.begin(); i_pset != zdef_psets_.end(); ++i_pset) {
+        std::string name = i_pset->getUntrackedParameter<std::string>("name");
+        std::vector<std::string> cuts0 = i_pset->getUntrackedParameter<std::vector<std::string> >("cuts0");
+        std::vector<std::string> cuts1 = i_pset->getUntrackedParameter<std::vector<std::string> >("cuts1");
+        double min_mz = i_pset->getUntrackedParameter<double>("min_mz");
+        double max_mz = i_pset->getUntrackedParameter<double>("max_mz");
+        // Make the ZDef
+        zf::ZDefinition* zd = new zf::ZDefinition(name, cuts0, cuts1, min_mz, max_mz);
+        zdefs_.push_back(zd);
+        // Make the Plotter for the ZDef
+        TFileDirectory tdir_zd(fs->mkdir(name));
+        const bool PLOT_MC = false;
+        zf::ZDefinitionPlotter* zdp = new zf::ZDefinitionPlotter(*zd, tdir_zd, PLOT_MC);
+        zdef_plotters_.push_back(zdp);
+    }
 }
 
 ZFinder::~ZFinder() {
@@ -151,12 +156,21 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_);
     if (zfe.reco_z.m > -1) {  // We have a good Z
         // Set all cuts
-        for (std::vector<zf::SetterBase*>::const_iterator i_set = setters_.begin(); i_set != setters_.end(); ++i_set) {
+        std::vector<zf::SetterBase*>::const_iterator i_set;
+        for (i_set = setters_.begin(); i_set != setters_.end(); ++i_set) {
             (*i_set)->SetCuts(&zfe);
         }
+        // Set all ZDefs
+        std::vector<zf::ZDefinition*>::const_iterator i_zdef;
+        for (i_zdef = zdefs_.begin(); i_zdef != zdefs_.end(); ++i_zdef) {
+            (*i_zdef)->ApplySelection(&zfe);
+        }
+        // Make all ZDef plots
+        std::vector<zf::ZDefinitionPlotter*>::const_iterator i_zdefp;
+        for (i_zdefp = zdef_plotters_.begin(); i_zdefp != zdef_plotters_.end(); ++i_zdefp) {
+            (*i_zdefp)->Fill(zfe);
+        }
 
-        // Check ZDefinitions
-        zdef_->ApplySelection(&zfe);
         // Print all information about each electron
         //const bool PRINT_CUTS = true;
         //zfe.PrintRecoElectrons(PRINT_CUTS);
@@ -166,7 +180,7 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         //const bool VERBOSE = true;
         //zfe.PrintZDefs(VERBOSE);
         // Make plots
-        zdef_plot_->Fill(zfe);
+        //zdef_plot_->Fill(zfe);
         if (zfe.ZDefPassed("ET-HF")) {
             z_plotter_map_["reco"]->Fill(zfe);
             z_plotter_map_["truth"]->Fill(zfe);
