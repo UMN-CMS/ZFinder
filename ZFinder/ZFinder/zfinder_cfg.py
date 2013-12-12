@@ -55,7 +55,7 @@ process.ZFinder = cms.EDAnalyzer('ZFinder',
         beamSpotInputTag       = cms.InputTag("offlineBeamSpot"),
         rhoIsoInputTag         = cms.InputTag("kt6PFJetsForIsolation", "rho"),
         primaryVertexInputTag  = cms.InputTag("offlinePrimaryVertices"),
-
+        ntElectronsInputTag    = cms.InputTag("photons"),
         isoValInputTags        = cms.VInputTag(
             cms.InputTag('elPFIsoValueCharged03PFIdPFIso'),
             cms.InputTag('elPFIsoValueGamma03PFIdPFIso'),
@@ -67,23 +67,30 @@ process.ZFinder = cms.EDAnalyzer('ZFinder',
         # ZDefinitions
         ZDefinitions = cms.untracked.VPSet(
             cms.untracked.PSet(
-                name = cms.untracked.string("ET-HF"),
+                name = cms.untracked.string("ET-EB"),
                 cuts0 = cms.untracked.vstring("acc(ET)", "pt>20", "eg_medium"),
-                cuts1 = cms.untracked.vstring("acc(HF)", "pt>20", "hf_loose"),
+                cuts1 = cms.untracked.vstring("acc(EB)", "pt>20", "eg_loose"),
                 min_mz = cms.untracked.double(40.),
                 max_mz = cms.untracked.double(150.),
                 ),
             cms.untracked.PSet(
                 name = cms.untracked.string("ET-EE"),
-                cuts0 = cms.untracked.vstring("acc(ET)", "pt>20", "eg_medium"),
-                cuts1 = cms.untracked.vstring("acc(EE)", "pt>20", "eg_loose"),
+                cuts0 = cms.untracked.vstring("acc(ET)", "acc(ET)", "pt>20", "eg_medium"),
+                cuts1 = cms.untracked.vstring("acc(EE)", "!acc(NT)", "pt>20", "eg_loose"),
                 min_mz = cms.untracked.double(40.),
                 max_mz = cms.untracked.double(150.),
                 ),
             cms.untracked.PSet(
-                name = cms.untracked.string("ET-EB"),
+                name = cms.untracked.string("ET-NT"),
                 cuts0 = cms.untracked.vstring("acc(ET)", "pt>20", "eg_medium"),
-                cuts1 = cms.untracked.vstring("acc(EB)", "pt>20", "eg_loose"),
+                cuts1 = cms.untracked.vstring("acc(NT)", "pt>20", "nt_loose"),
+                min_mz = cms.untracked.double(40.),
+                max_mz = cms.untracked.double(150.),
+                ),
+            cms.untracked.PSet(
+                name = cms.untracked.string("ET-HF"),
+                cuts0 = cms.untracked.vstring("acc(ET)", "pt>20", "eg_medium"),
+                cuts1 = cms.untracked.vstring("acc(HF)", "pt>20", "hf_loose"),
                 min_mz = cms.untracked.double(40.),
                 max_mz = cms.untracked.double(150.),
                 )

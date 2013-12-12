@@ -6,8 +6,9 @@
 
 // CMSSW
 #include "DataFormats/Common/interface/Handle.h"  // edm::Handle
-#include "DataFormats/EgammaReco/interface/HFEMClusterShapeAssociation.h"  // reco::HFEMClusterShapeAssociationCollection
+#include "DataFormats/EgammaCandidates/interface/PhotonFwd.h"  // reco::PhotonCollection
 #include "DataFormats/EgammaReco/interface/HFEMClusterShape.h"  // reco::HFEMClusterShape
+#include "DataFormats/EgammaReco/interface/HFEMClusterShapeAssociation.h"  // reco::HFEMClusterShapeAssociationCollection
 #include "DataFormats/EgammaReco/interface/HFEMClusterShapeFwd.h"  // reco::HFEMClusterShapeRef,
 #include "DataFormats/EgammaReco/interface/SuperClusterFwd.h"  // reco::SuperClusterCollection, reco::SuperClusterRef
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidateFwd.h"  // reco::RecoEcalCandidateCollection
@@ -38,6 +39,7 @@ namespace zf {
         // Get InputTags
         // Reco
         inputtags_.ecal_electron = iConfig.getParameter<edm::InputTag>("ecalElectronsInputTag");
+        inputtags_.nt_electron = iConfig.getParameter<edm::InputTag>("ntElectronsInputTag");
         inputtags_.hf_electron = iConfig.getParameter<edm::InputTag>("hfElectronsInputTag");
         inputtags_.hf_clusters = iConfig.getParameter<edm::InputTag>("hfClustersInputTag");
         inputtags_.conversion = iConfig.getParameter<edm::InputTag>("conversionsInputTag");
@@ -92,6 +94,7 @@ namespace zf {
         /* Find electrons */
         InitGSFElectrons(iEvent, iSetup);
         InitHFElectrons(iEvent, iSetup);
+        InitNTElectrons(iEvent, iSetup);
 
         // Sort our electrons and set e0, e1 as the two with the highest pt
         std::sort(reco_electrons_.begin(), reco_electrons_.end(), SortByPTHighLow);
@@ -225,6 +228,33 @@ namespace zf {
             zf_electron->AddCutResult("hf_tight", HFTIGHT, WEIGHT);
             zf_electron->AddCutResult("hf_medium", HFMEDIUM, WEIGHT);
             zf_electron->AddCutResult("hf_loose", HFLOOSE, WEIGHT);
+        }
+    }
+
+    void ZFinderEvent::InitNTElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+        // NT Electrons
+        edm::Handle<reco::PhotonCollection> els_h;
+        iEvent.getByLabel(inputtags_.nt_electron, els_h);
+
+        // Loop over all electrons
+        for(unsigned int i = 0; i < els_h->size(); ++i) {
+            reco::Photon electron = els_h->at(i);
+            ZFinderElectron* zf_electron = AddRecoElectron(electron);
+
+            // Apply Alexey's Cuts
+            //const double PHOTON_ET = electron.superCluster()->rawEnergy() * sin(electron.superCluster()->theta());
+            if (       0.89 < electron.r9() && electron.r9() < 1.02
+                    && electron.hadronicOverEm() < 0.05
+                    && abs(electron.superCluster()->eta()) > 2.5
+                    //&& PHOTON_ET > 20.
+                    && electron.sigmaIetaIeta() < 0.029
+                    && (electron.ecalRecHitSumEtConeDR03() / electron.pt()) < 0.035
+                    && (electron.hcalTowerSumEtConeDR03() / electron.pt()) < 0.11
+               ) {
+                const bool PASSED = true;
+                const double WEIGHT = 1.;
+                zf_electron->AddCutResult("nt_loose", PASSED, WEIGHT);
+            }
         }
     }
 
@@ -376,6 +406,12 @@ namespace zf {
         return zf_electron;
     }
 
+    ZFinderElectron* ZFinderEvent::AddRecoElectron(reco::Photon electron) {
+        ZFinderElectron* zf_electron = new ZFinderElectron(electron);
+        reco_electrons_.push_back(zf_electron);
+        return zf_electron;
+    }
+
     ZFinderElectron* ZFinderEvent::AddTruthElectron(reco::GenParticle electron) {
         ZFinderElectron* zf_electron = new ZFinderElectron(electron);
         truth_electrons_.push_back(zf_electron);
@@ -436,7 +472,7 @@ namespace zf {
             }
         } else if (USE_MC && !is_real_data) {
             if (e0_truth != NULL && e1_truth != NULL) {
-            cout << " Truth Z Mass " << truth_z.m << endl;
+                cout << " Truth Z Mass " << truth_z.m << endl;
                 cout << "\tpt: " << e0_truth->pt;
                 cout << " eta: " << e0_truth->eta;
                 cout << " phi: " << e0_truth->phi << endl;
@@ -467,7 +503,7 @@ namespace zf {
          */
         std::vector< ZFinderElectron*>* tmp_vec = new std::vector< ZFinderElectron*>();
         for (std::vector<ZFinderElectron*>::iterator i_elec = reco_electrons_.begin(); i_elec != reco_electrons_.end(); ++i_elec) {
-             ZFinderElectron* zfe = (*i_elec);
+            ZFinderElectron* zfe = (*i_elec);
             if (zfe->CutPassed(cut_name)) {
                 tmp_vec->push_back(zfe);
             }
@@ -487,7 +523,7 @@ namespace zf {
             cutlevel_vector::const_iterator v_it;
             bool has_passed = true;
             for (v_it = cuts_vec->begin(); v_it != cuts_vec->end(); ++v_it) {
-               has_passed = v_it->second && has_passed;
+                has_passed = v_it->second && has_passed;
             }
             return has_passed;
         } else {

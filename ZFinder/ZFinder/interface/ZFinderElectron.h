@@ -9,15 +9,17 @@
 // CMSSW
 #include "DataFormats/Candidate/interface/Candidate.h"  // reco::Candidate
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // GsfElectron
+#include "DataFormats/EgammaCandidates/interface/Photon.h"  // reco::Photon
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"  // reco::GenParticle
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidate.h"  // reco::RecoEcalCandidate
 
 namespace zf {
 
     enum ElectronType {
-        GSFELECTRON,
-        GENPARTICLE,
-        RECOECALCANDIDATE
+        RECO_GSFELECTRON,
+        RECO_GENPARTICLE,
+        RECO_RECOECALCANDIDATE,
+        RECO_PHOTON
     };
 
     struct CutResult {
@@ -32,6 +34,7 @@ namespace zf {
             ZFinderElectron(reco::GsfElectron input_electron);
             ZFinderElectron(reco::GenParticle input_electron);
             ZFinderElectron(reco::RecoEcalCandidate input_electron);
+            ZFinderElectron(reco::Photon input_electron);
 
             // Kinematics variables
             double pt;
@@ -71,6 +74,7 @@ namespace zf {
             reco::GsfElectron gsf_elec_;
             reco::GenParticle gen_elec_;
             reco::RecoEcalCandidate recan_elec_;
+            reco::Photon photon_elec_;
 
     };
 }  // namespace zfe

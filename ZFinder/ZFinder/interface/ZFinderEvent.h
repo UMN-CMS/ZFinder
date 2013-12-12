@@ -9,6 +9,7 @@
 
 // CMSSW
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // reco::GsfElectron
+#include "DataFormats/EgammaCandidates/interface/Photon.h"  // reco::Photon
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"  // reco::GenParticle
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidate.h"  // reco::RecoEcalCandidate
 #include "FWCore/Framework/interface/Event.h"  // edm::Event, edm::EventSetup
@@ -103,6 +104,7 @@ namespace zf {
 
             void InitGSFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
             void InitHFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
+            void InitNTElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
 
             // Update the Z Info from e0, e1
             void InitZ();
@@ -113,6 +115,7 @@ namespace zf {
             // Input tags
             struct InputTags{
                 edm::InputTag ecal_electron;
+                edm::InputTag nt_electron;
                 edm::InputTag conversion;
                 edm::InputTag beamspot;
                 edm::InputTag rho_iso;
@@ -128,6 +131,7 @@ namespace zf {
             std::vector<ZFinderElectron*> reco_electrons_;
             ZFinderElectron* AddRecoElectron(reco::GsfElectron electron);
             ZFinderElectron* AddRecoElectron(reco::RecoEcalCandidate electron);
+            ZFinderElectron* AddRecoElectron(reco::Photon electron);
 
             std::vector<ZFinderElectron*> truth_electrons_;
             ZFinderElectron* AddTruthElectron(reco::GenParticle electron);
