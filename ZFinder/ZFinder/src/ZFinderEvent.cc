@@ -174,13 +174,13 @@ namespace zf {
 
             // Add the cuts to our electron
             const double WEIGHT = 1.;
-            zf_electron->AddCutResult("wp:veto", VETO, WEIGHT);
-            zf_electron->AddCutResult("wp:loose", LOOSE, WEIGHT);
-            zf_electron->AddCutResult("wp:medium", MEDIUM, WEIGHT);
-            zf_electron->AddCutResult("wp:tight", TIGHT, WEIGHT);
-            zf_electron->AddCutResult("wp:eop_cut", FBREMEOPIN, WEIGHT);
-            zf_electron->AddCutResult("wp:trigtight", TRIGTIGHT, WEIGHT);
-            zf_electron->AddCutResult("wp:trigwp70", TRIGWP70, WEIGHT);
+            zf_electron->AddCutResult("eg_veto", VETO, WEIGHT);
+            zf_electron->AddCutResult("eg_loose", LOOSE, WEIGHT);
+            zf_electron->AddCutResult("eg_medium", MEDIUM, WEIGHT);
+            zf_electron->AddCutResult("eg_tight", TIGHT, WEIGHT);
+            zf_electron->AddCutResult("eg_eop_cut", FBREMEOPIN, WEIGHT);
+            zf_electron->AddCutResult("eg_trigtight", TRIGTIGHT, WEIGHT);
+            zf_electron->AddCutResult("eg_trigwp70", TRIGWP70, WEIGHT);
         }
     }
 
