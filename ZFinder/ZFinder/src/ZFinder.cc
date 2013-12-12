@@ -154,7 +154,7 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     using namespace edm;
 
     zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_);
-    if (zfe.reco_z.m > -1) {  // We have a good Z
+    if (zfe.reco_z.m > -1 && zfe.e0 != NULL && zfe.e1 != NULL) {  // We have a good Z
         // Set all cuts
         std::vector<zf::SetterBase*>::const_iterator i_set;
         for (i_set = setters_.begin(); i_set != setters_.end(); ++i_set) {
