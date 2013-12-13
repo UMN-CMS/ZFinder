@@ -158,10 +158,16 @@ namespace zf {
             passed = zf_event->e1->CutPassed(CUT);
         }
 
-        if (INVERT) {
-            return !passed;
+        // -1 is used to indicate a missing cut, we never invert this, they are
+        // just always false
+        if (passed == -1) {
+            return false;
         } else {
-            return passed;
+            if (INVERT) {
+                return !passed;
+            } else {
+                return passed;
+            }
         }
     }
 

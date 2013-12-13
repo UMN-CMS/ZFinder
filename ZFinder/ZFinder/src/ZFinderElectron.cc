@@ -99,14 +99,14 @@ namespace zf {
         }
     }
 
-    bool ZFinderElectron::CutPassed(const std::string& cut_name) const {
+    int ZFinderElectron::CutPassed(const std::string& cut_name) const {
         /* Return the passed status of a cut based on the name */
         const CutResult* cr = GetCutResult(cut_name);
-        // If the CutResult exists, return the passed value, otherwise return false
+        // If the CutResult exists, return the passed value, otherwise return -1
         if (cr != NULL) {
             return cr->passed;
         } else {
-            return false;
+            return -1;
         }
     }
 
