@@ -211,6 +211,9 @@ namespace zf {
             const double ESEL = CLUSTER_SHAPE.eSeL();
             const double E9E25 = (CLUSTER_SHAPE.eLong3x3() * 1.0 / CLUSTER_SHAPE.eLong5x5());
 
+            // e9e25 cut
+            const bool PASS_E9E25 = (E9E25 > 0.94);
+
             // HF Tight (as defined in hfRecoEcalCandidate_cfi.py in ZShape)
             const double TIGHT2D = (ECE9 - (ESEL * 0.20));
             const bool HFTIGHT = (TIGHT2D > 0.92);
@@ -225,9 +228,10 @@ namespace zf {
 
             // Add the cuts to our electron
             const double WEIGHT = 1.;
-            zf_electron->AddCutResult("hf_tight", HFTIGHT, WEIGHT);
-            zf_electron->AddCutResult("hf_medium", HFMEDIUM, WEIGHT);
-            zf_electron->AddCutResult("hf_loose", HFLOOSE, WEIGHT);
+            zf_electron->AddCutResult("hf_e9e25", PASS_E9E25, WEIGHT);
+            zf_electron->AddCutResult("hf_2dtight", HFTIGHT, WEIGHT);
+            zf_electron->AddCutResult("hf_2dmedium", HFMEDIUM, WEIGHT);
+            zf_electron->AddCutResult("hf_2dloose", HFLOOSE, WEIGHT);
         }
     }
 
