@@ -46,6 +46,13 @@ process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
 process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIsoSequence)
 
 
+#
+# ZFinder
+#
+
+# Import ZDefinitions
+from ZFinder.ZFinder.ZDefinitions_cfi import zdefs
+
 process.ZFinder = cms.EDAnalyzer('ZFinder',
         # General tags
         ecalElectronsInputTag  = cms.InputTag("gsfElectrons"),
@@ -64,37 +71,8 @@ process.ZFinder = cms.EDAnalyzer('ZFinder',
         # MC, but still required to be something for data
         pileupInputTag = cms.InputTag("addPileupInfo"),
         generatorInputTag = cms.InputTag("genParticles"),
-        # ZDefinitions
-        ZDefinitions = cms.untracked.VPSet(
-            cms.untracked.PSet(
-                name = cms.untracked.string("ET-EB"),
-                cuts0 = cms.untracked.vstring("acc(ET)", "pt>20", "eg_medium"),
-                cuts1 = cms.untracked.vstring("acc(EB)", "pt>20", "eg_loose"),
-                min_mz = cms.untracked.double(40.),
-                max_mz = cms.untracked.double(150.),
-                ),
-            cms.untracked.PSet(
-                name = cms.untracked.string("ET-EE"),
-                cuts0 = cms.untracked.vstring("acc(ET)", "acc(ET)", "pt>20", "eg_medium"),
-                cuts1 = cms.untracked.vstring("acc(EE)", "!acc(NT)", "pt>20", "eg_loose"),
-                min_mz = cms.untracked.double(40.),
-                max_mz = cms.untracked.double(150.),
-                ),
-            cms.untracked.PSet(
-                name = cms.untracked.string("ET-NT"),
-                cuts0 = cms.untracked.vstring("acc(ET)", "pt>20", "eg_medium"),
-                cuts1 = cms.untracked.vstring("acc(NT)", "pt>20", "nt_loose"),
-                min_mz = cms.untracked.double(40.),
-                max_mz = cms.untracked.double(150.),
-                ),
-            cms.untracked.PSet(
-                name = cms.untracked.string("ET-HF"),
-                cuts0 = cms.untracked.vstring("acc(ET)", "pt>20", "eg_medium"),
-                cuts1 = cms.untracked.vstring("acc(HF)", "pt>20", "hf_loose"),
-                min_mz = cms.untracked.double(40.),
-                max_mz = cms.untracked.double(150.),
-                )
-            )
+        # ZDefinitions from ZFinder.ZFinder.ZDefinitions_cfi
+        ZDefinitions = zdefs
         )
 
 # RUN
