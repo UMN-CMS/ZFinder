@@ -19,6 +19,12 @@ namespace zf {
 
         // Set up histograms
         // z0_mass_coarse_
+        const std::string z0_mass_all_name = "Z0 Mass: All";
+        z0_mass_all_ = tdir.make<TH1I>(z0_mass_all_name.c_str(), z0_mass_all_name.c_str(), 300, 0., 300.);
+        z0_mass_all_->GetXaxis()->SetTitle("m_{ee} [GeV]");
+        z0_mass_all_->GetYaxis()->SetTitle("Counts / GeV");
+
+        // z0_mass_coarse_
         const std::string z0_mass_coarse_name = "Z0 Mass: Coarse";
         z0_mass_coarse_ = tdir.make<TH1I>(z0_mass_coarse_name.c_str(), z0_mass_coarse_name.c_str(), 100, 50., 150.);
         z0_mass_coarse_->GetXaxis()->SetTitle("m_{ee} [GeV]");
@@ -119,6 +125,7 @@ namespace zf {
          */
         // Z Info
         if (!USE_MC_) {
+            z0_mass_all_->Fill(zf_event.reco_z.m);
             z0_mass_coarse_->Fill(zf_event.reco_z.m);
             z0_mass_fine_->Fill(zf_event.reco_z.m);
             z0_rapidity_->Fill(zf_event.reco_z.y);
@@ -151,6 +158,7 @@ namespace zf {
             pileup_->Fill(zf_event.reco_vert.num);
             nelectrons_->Fill(zf_event.n_reco_electrons);
         } else if (USE_MC_ && !zf_event.is_real_data) {
+            z0_mass_all_->Fill(zf_event.truth_z.m);
             z0_mass_coarse_->Fill(zf_event.truth_z.m);
             z0_mass_fine_->Fill(zf_event.truth_z.m);
             z0_rapidity_->Fill(zf_event.truth_z.y);
@@ -183,6 +191,11 @@ namespace zf {
 
     void ZFinderPlotter::Print(const std::string& basename) {
         // Write all PNGs
+        std::string z0_mass_all_Str = basename + "_z0_mass_all" ;
+        TCanvas* z0_mass_all_C = new TCanvas(z0_mass_all_Str.c_str(), z0_mass_all_Str.c_str(), X_SIZE, Y_SIZE);
+        z0_mass_all_->Draw();
+        z0_mass_all_C->Print((z0_mass_all_Str+".png").c_str());
+
         std::string z0_mass_coarse_Str = basename + "_z0_mass_coarse" ;
         TCanvas* z0_mass_coarse_C = new TCanvas(z0_mass_coarse_Str.c_str(), z0_mass_coarse_Str.c_str(), X_SIZE, Y_SIZE);
         z0_mass_coarse_->Draw();

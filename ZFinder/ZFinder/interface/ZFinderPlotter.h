@@ -24,6 +24,7 @@ namespace zf {
 
         protected:
             // Histograms
+            TH1I* z0_mass_all_;
             TH1I* z0_mass_coarse_;
             TH1I* z0_mass_fine_;
             TH1I* z0_rapidity_;

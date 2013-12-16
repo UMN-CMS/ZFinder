@@ -116,6 +116,7 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     const bool USE_MC = true;
     zf::ZFinderPlotter* z_plotter_truth = new zf::ZFinderPlotter(tdir_2, USE_MC);
 
+    // Make single cut plots
     z_plotter_map_.insert(std::pair<std::string, zf::ZFinderPlotter*>("reco", z_plotter_reco));
     z_plotter_map_.insert(std::pair<std::string, zf::ZFinderPlotter*>("truth", z_plotter_truth));
 
@@ -132,10 +133,14 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
         zf::ZDefinition* zd = new zf::ZDefinition(name, cuts0, cuts1, min_mz, max_mz);
         zdefs_.push_back(zd);
         // Make the Plotter for the ZDef
-        TFileDirectory tdir_zd(fs->mkdir(name));
-        const bool PLOT_MC = false;
-        zf::ZDefinitionPlotter* zdp = new zf::ZDefinitionPlotter(*zd, tdir_zd, PLOT_MC);
-        zdef_plotters_.push_back(zdp);
+        // Reco
+        TFileDirectory tdir_zd(fs->mkdir(name + " Reco"));
+        zf::ZDefinitionPlotter* zdp_reco = new zf::ZDefinitionPlotter(*zd, tdir_zd, false);  // False = do not plot Truth
+        zdef_plotters_.push_back(zdp_reco);
+        // MC
+        TFileDirectory tdir_zd_truth(fs->mkdir(name + " MC"));
+        zf::ZDefinitionPlotter* zdp_truth = new zf::ZDefinitionPlotter(*zd, tdir_zd_truth, true);
+        zdef_plotters_.push_back(zdp_truth);
     }
 }
 
@@ -181,6 +186,7 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         //zfe.PrintZDefs(VERBOSE);
         // Make plots
         //zdef_plot_->Fill(zfe);
+        // Fill specific plots
         if (zfe.ZDefPassed("ET-HF")) {
             z_plotter_map_["reco"]->Fill(zfe);
             z_plotter_map_["truth"]->Fill(zfe);
