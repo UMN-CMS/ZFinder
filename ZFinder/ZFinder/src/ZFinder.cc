@@ -51,6 +51,7 @@ Implementation:
 // ZFinder
 #include "ZFinder/ZFinder/interface/AcceptanceSetter.h"  // AcceptanceSetter
 #include "ZFinder/ZFinder/interface/SetterBase.h"  // SetterBase
+#include "ZFinder/ZFinder/interface/TruthMatchSetter.h"  // TruthMatchSetter
 #include "ZFinder/ZFinder/interface/ZDefinition.h"  // ZDefinition
 #include "ZFinder/ZFinder/interface/ZDefinitionPlotter.h"  // ZDefinitionPlotter
 #include "ZFinder/ZFinder/interface/ZFinderEvent.h"  // ZFinderEvent
@@ -105,6 +106,8 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     // Set up Cut Setters
     zf::AcceptanceSetter* accset = new zf::AcceptanceSetter();
     setters_.push_back(accset);
+    zf::TruthMatchSetter* tmset = new zf::TruthMatchSetter();
+    setters_.push_back(tmset);
 
     // Set up plotters
     edm::Service<TFileService> fs;
