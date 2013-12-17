@@ -243,21 +243,25 @@ namespace zf {
         // Loop over all electrons
         for(unsigned int i = 0; i < els_h->size(); ++i) {
             reco::Photon electron = els_h->at(i);
-            ZFinderElectron* zf_electron = AddRecoElectron(electron);
+            // Because the photon collect is NOT filtered for electrons, we
+            // reject all electrons outside of the NT region of ECAL.
+            if (2.5 < abs(electron.eta()) && abs(electron.eta()) < 2.850) {
+                ZFinderElectron* zf_electron = AddRecoElectron(electron);
 
-            // Apply Alexey's Cuts
-            //const double PHOTON_ET = electron.superCluster()->rawEnergy() * sin(electron.superCluster()->theta());
-            if (       0.89 < electron.r9() && electron.r9() < 1.02
-                    && electron.hadronicOverEm() < 0.05
-                    && abs(electron.superCluster()->eta()) > 2.5
-                    //&& PHOTON_ET > 20.
-                    && electron.sigmaIetaIeta() < 0.029
-                    && (electron.ecalRecHitSumEtConeDR03() / electron.pt()) < 0.035
-                    && (electron.hcalTowerSumEtConeDR03() / electron.pt()) < 0.11
-               ) {
-                const bool PASSED = true;
-                const double WEIGHT = 1.;
-                zf_electron->AddCutResult("nt_loose", PASSED, WEIGHT);
+                // Apply Alexey's Cuts
+                //const double PHOTON_ET = electron.superCluster()->rawEnergy() * sin(electron.superCluster()->theta());
+                if (       0.89 < electron.r9() && electron.r9() < 1.02
+                        && electron.hadronicOverEm() < 0.05
+                        && abs(electron.superCluster()->eta()) > 2.5
+                        //&& PHOTON_ET > 20.
+                        && electron.sigmaIetaIeta() < 0.029
+                        && (electron.ecalRecHitSumEtConeDR03() / electron.pt()) < 0.035
+                        && (electron.hcalTowerSumEtConeDR03() / electron.pt()) < 0.11
+                   ) {
+                    const bool PASSED = true;
+                    const double WEIGHT = 1.;
+                    zf_electron->AddCutResult("nt_loose", PASSED, WEIGHT);
+                }
             }
         }
     }
