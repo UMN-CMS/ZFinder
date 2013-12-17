@@ -22,7 +22,6 @@ namespace zf {
 
     void TruthMatchSetter::SetCut_(ZFinderElectron* zf_elec) {
         const double WEIGHT = 1.;
-        std::cout << "SETTING CUTS" << std::endl;
         // Now set all cuts
         zf_elec->AddCutResult("dr(0.05)", MatchTruth(*zf_elec, 0.05), WEIGHT);
         zf_elec->AddCutResult("dr(0.1)", MatchTruth(*zf_elec, 0.1), WEIGHT);
@@ -30,6 +29,7 @@ namespace zf {
         zf_elec->AddCutResult("dr(0.3)", MatchTruth(*zf_elec, 0.3), WEIGHT);
         zf_elec->AddCutResult("dr(0.4)", MatchTruth(*zf_elec, 0.4), WEIGHT);
         zf_elec->AddCutResult("dr(0.5)", MatchTruth(*zf_elec, 0.5), WEIGHT);
+
     }
 
     bool TruthMatchSetter::MatchTruth(const ZFinderElectron& ZF_ELEC, const double DELTA_R) {
