@@ -1,0 +1,4 @@
+<lcgdict>
+    <class name="zf::ZFinderEvent"/>
+    <class name="edm::Wrapper<zf::ZFinderEvent>"/>
+</lcgdict>
