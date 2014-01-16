@@ -1,4 +1,4 @@
-#include "ZFinder/ZFinder/interface/ZFinderPlotter.h"
+#include "ZFinder/Event/interface/ZFinderPlotter.h"
 
 // Standard Library
 #include <string>  // string
@@ -7,7 +7,7 @@
 #include <TCanvas.h>  // TCanvas
 
 // ZFinder Code
-#include "ZFinder/ZFinder/interface/ZFinderElectron.h"  // ZFinderElectron
+#include "ZFinder/Event/interface/ZFinderElectron.h"  // ZFinderElectron
 
 
 namespace zf {

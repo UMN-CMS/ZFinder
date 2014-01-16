@@ -1,4 +1,4 @@
-#include "ZFinder/ZFinder/interface/ZDefinitionPlotter.h"
+#include "ZFinder/Event/interface/ZDefinitionPlotter.h"
 
 // Standard Library
 #include <utility>      // std::make_pair

@@ -1,4 +1,4 @@
-#include "ZFinder/ZFinder/interface/ZDefinition.h"
+#include "ZFinder/Event/interface/ZDefinition.h"
 
 // Standard Libraries
 #include <sstream>  // std::ostringstream

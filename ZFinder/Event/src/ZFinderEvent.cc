@@ -1,4 +1,4 @@
-#include "ZFinder/ZFinder/interface/ZFinderEvent.h"
+#include "ZFinder/Event/interface/ZFinderEvent.h"
 
 // Standard Library
 #include <algorithm>  // std::sort, std::swap
@@ -16,7 +16,7 @@
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"  // PileupSummaryInfo
 
 // ZFinder
-#include "ZFinder/ZFinder/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
+#include "ZFinder/Event/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
 
 
 namespace zf {

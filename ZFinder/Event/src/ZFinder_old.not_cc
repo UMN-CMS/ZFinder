@@ -49,13 +49,13 @@ Implementation:
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
 
 // ZFinder
-#include "ZFinder/ZFinder/interface/AcceptanceSetter.h"  // AcceptanceSetter
-#include "ZFinder/ZFinder/interface/SetterBase.h"  // SetterBase
-#include "ZFinder/ZFinder/interface/TruthMatchSetter.h"  // TruthMatchSetter
-#include "ZFinder/ZFinder/interface/ZDefinition.h"  // ZDefinition
-#include "ZFinder/ZFinder/interface/ZDefinitionPlotter.h"  // ZDefinitionPlotter
-#include "ZFinder/ZFinder/interface/ZFinderEvent.h"  // ZFinderEvent
-#include "ZFinder/ZFinder/interface/ZFinderPlotter.h"  // ZFinderPlotter
+#include "ZFinder/Event/interface/AcceptanceSetter.h"  // AcceptanceSetter
+#include "ZFinder/Event/interface/SetterBase.h"  // SetterBase
+#include "ZFinder/Event/interface/TruthMatchSetter.h"  // TruthMatchSetter
+#include "ZFinder/Event/interface/ZDefinition.h"  // ZDefinition
+#include "ZFinder/Event/interface/ZDefinitionPlotter.h"  // ZDefinitionPlotter
+#include "ZFinder/Event/interface/ZFinderEvent.h"  // ZFinderEvent
+#include "ZFinder/Event/interface/ZFinderPlotter.h"  // ZFinderPlotter
 
 //
 // class declaration

@@ -1,11 +1,11 @@
-#include "ZFinder/ZFinder/interface/ZFinderElectron.h"
+#include "ZFinder/Event/interface/ZFinderElectron.h"
 
 // Standard Library
 #include <iostream>  // std::cout, std::endl;
 
 // ZFinder
-#include "ZFinder/ZFinder/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
-#include "ZFinder/ZFinder/interface/ArraysDefinition.h"  // EfficiencyEtaBins, EfficiencyETBins, Efficiency, phistarBins, etaBins
+#include "ZFinder/Event/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
+#include "ZFinder/Event/interface/ArraysDefinition.h"  // EfficiencyEtaBins, EfficiencyETBins, Efficiency, phistarBins, etaBins
 
 
 namespace zf {

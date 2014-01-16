@@ -1,4 +1,4 @@
-#include "ZFinder/ZFinder/interface/TruthMatchSetter.h"
+#include "ZFinder/Event/interface/TruthMatchSetter.h"
 
 // Standard Library
 #include <vector>  // std::vector

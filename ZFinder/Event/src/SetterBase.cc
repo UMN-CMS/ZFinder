@@ -1,4 +1,4 @@
-#include "ZFinder/ZFinder/interface/SetterBase.h"
+#include "ZFinder/Event/interface/SetterBase.h"
 
 // Standard Library
 #include <string>  // std::string

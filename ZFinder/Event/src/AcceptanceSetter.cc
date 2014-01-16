@@ -1,4 +1,4 @@
-#include "ZFinder/ZFinder/interface/AcceptanceSetter.h"
+#include "ZFinder/Event/interface/AcceptanceSetter.h"
 
 // Standard Library
 #include <string>  // std::string

@@ -17,7 +17,7 @@
 #include "FWCore/Utilities/interface/InputTag.h"  // edm::InputTag
 
 // ZFinder
-#include "ZFinder/ZFinder/interface/ZFinderElectron.h"  // ZFinderElectron, ZFinderElectron
+#include "ZFinder/Event/interface/ZFinderElectron.h"  // ZFinderElectron, ZFinderElectron
 
 namespace zf {
 
@@ -27,6 +27,7 @@ namespace zf {
         public:
             // Constructor. Although iEvent, iSetup, and iConfig violate our naming
             // convention, they are almost ubiquitous in CMSSW code
+            ZFinderEvent() {};
             ZFinderEvent(
                     const edm::Event& iEvent,
                     const edm::EventSetup& iSetup,
