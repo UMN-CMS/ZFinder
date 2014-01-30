@@ -44,10 +44,6 @@ namespace zf {
             // Other physical properties
             int charge;
 
-            //Efficiency
-            double eff;
-            double eff_uncertainty;
-
             // Handling cuts
             const CutResult* GetCutResult(const std::string& cut_name) const;
             void AddCutResult(const std::string& cut_name, const bool passed, const double weight=1.);

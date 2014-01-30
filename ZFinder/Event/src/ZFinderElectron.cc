@@ -5,7 +5,6 @@
 
 // ZFinder
 #include "ZFinder/Event/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
-#include "ZFinder/Event/interface/ArraysDefinition.h"  // EfficiencyEtaBins, EfficiencyETBins, Efficiency, phistarBins, etaBins
 
 
 namespace zf {
@@ -20,8 +19,6 @@ namespace zf {
         eta = input_electron.eta();
         phi = input_electron.phi();
         charge = input_electron.charge();
-        eff = -1;
-        eff_uncertainty = -1;
     }
 
     ZFinderElectron::ZFinderElectron(reco::GenParticle input_electron) {
@@ -35,8 +32,6 @@ namespace zf {
         pt = input_electron.pt();
         phi = input_electron.phi();
         eta = input_electron.eta();
-        eff = -1;
-        eff_uncertainty = -1;
         // Using the input_electron Data Group ID Number, determine if the input_electron is an
         // electron or positron
         if (input_electron.pdgId() == ELECTRON) {
@@ -57,21 +52,7 @@ namespace zf {
         eta = input_electron.eta();
         phi = input_electron.phi();
         charge = input_electron.charge();
-        eff = -1;
-        eff_uncertainty = -1;
-        for (uint ieta=0; ieta<(sizeof(EfficiencyEtaBins)/sizeof(EfficiencyEtaBins[0]))-1 && eff==-1; ieta++){
-            if (fabs(eta)<EfficiencyEtaBins[ieta] || fabs(eta)>EfficiencyEtaBins[ieta+1]) {
-                continue;
-            }
-            for (uint iet=0; iet<(sizeof(EfficiencyETBins)/sizeof(EfficiencyETBins[0]))-1 && eff==-1; iet++) {
-                if (pt<EfficiencyETBins[iet] || pt>EfficiencyETBins[iet+1]) {
-                    continue;
-                }
-                eff = Efficiency[ieta][iet][0];
-                eff_uncertainty = Efficiency[ieta][iet][1];
-            }
-        }
-        // Add cut result to store parent information
+         // Add cut result to store parent information
     }
 
     ZFinderElectron::ZFinderElectron(reco::Photon input_electron) {
