@@ -10,8 +10,8 @@
 <use name="SimDataFormats/PileupSummaryInfo"/>
 <use name="root"/>
 <use name="rootrflx"/>
-<use name="roofit">
-<use name="roostats">
+<use name="roofit"/>
+<use name="roostats"/>
 <export>
        <lib name="1"/>
 </export>
