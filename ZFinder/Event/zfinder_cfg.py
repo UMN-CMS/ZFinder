@@ -51,7 +51,7 @@ process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIs
 #
 
 # Import ZDefinitions
-from ZFinder.ZFinder.ZDefinitions_cfi import zdefs
+from ZFinder.Event.ZDefinitions_cfi import zdefs
 
 process.ZFinder = cms.EDAnalyzer('ZFinder',
         # General tags
