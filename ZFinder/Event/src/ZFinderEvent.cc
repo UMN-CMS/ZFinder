@@ -279,8 +279,8 @@ namespace zf {
             reco_z.y = zlv.Rapidity();
             reco_z.pt = zlv.pt();
             reco_z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
-	    reco_z.eta = zlv.eta();
-       }
+            reco_z.eta = zlv.eta();
+        }
     }
 
     void ZFinderEvent::InitVariables() {
@@ -309,12 +309,12 @@ namespace zf {
         reco_z.y = -1000;
         reco_z.pt = -1;
         reco_z.phistar = -1;
-	reco_z.eta = -1000; 
+        reco_z.eta = -1000;
         truth_z.m = -1;
         truth_z.y = -1000;
         truth_z.pt = -1;
         truth_z.phistar = -1;
-	truth_z.eta = -1000;
+        truth_z.eta = -1000;
 
         // Electrons
         e0 = NULL;
@@ -402,7 +402,7 @@ namespace zf {
             const double ZEMP = z_boson->energy() - z_boson->pz();
             truth_z.y = 0.5 * log(ZEPP / ZEMP);
             truth_z.phistar = ReturnPhistar(electron_0->eta(), electron_0->phi(), electron_1->eta(), electron_1->phi());
-	    truth_z.eta = z_boson->eta();
+            truth_z.eta = z_boson->eta();
         }
     }
 
