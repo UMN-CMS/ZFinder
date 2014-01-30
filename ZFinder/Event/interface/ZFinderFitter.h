@@ -1,9 +1,6 @@
 #ifndef ZFINDER_ZFINDERFITTER_H_
 #define ZFINDER_ZFINDERFITTER_H_
 
-// Standard Library
-#include <string>  // std::string
-
 // Root
 #include <RooArgSet.h>
 #include <RooDataSet.h>

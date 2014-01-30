@@ -1,8 +1,5 @@
 #include "ZFinder/Event/interface/ZFinderFitter.h"
 
-// Standard Library
-#include <string>  // string
-
 // Root
 #include <TCanvas.h>  // TCanvas
 #include <TDirectory.h>  // TDirectory
