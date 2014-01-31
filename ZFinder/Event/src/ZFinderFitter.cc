@@ -26,9 +26,12 @@ namespace zf {
       Weight = new RooRealVar("Weight","Weight",0,100);
       Pass = new RooRealVar("Pass","Pass",-2,2);
       ZEventArgSet = new RooArgSet(*Zmass, *Zphistar, *Zpt, *Zeta, *Zy, *Weight, *Pass);
-      MC_true_all = new RooDataSet("MC_true_all","MC_true_all",*ZEventArgSet);
-      MC_reco = new RooDataSet("MC_reco","MC_reco",*ZEventArgSet); 
-      Data_reco = new RooDataSet("Data_reco","Data_reco",*ZEventArgSet); 
+      edm::Service<TFileService> fs;
+      MC_true_all = fs->make<RooDataSet>("MC_true_all","MC_true_all",*ZEventArgSet);
+      MC_reco = fs->make<RooDataSet>("MC_reco","MC_reco",*ZEventArgSet);
+      Data_reco = fs->make<RooDataSet>("Data_reco","Data_reco",*ZEventArgSet);
+//       MC_reco = new RooDataSet("MC_reco","MC_reco",*ZEventArgSet); 
+//       Data_reco = new RooDataSet("Data_reco","Data_reco",*ZEventArgSet); 
     }
 
     void ZFinderFitter::FillAll(const ZFinderEvent& zf_event) {
@@ -69,11 +72,11 @@ namespace zf {
     }
 
   void ZFinderFitter::Write(const char* filename) {
-    edm::Service<TFileService> fs;
-    //      RooWorkspace *w = new RooWorkspace("w","workspace");
-      RooWorkspace *w = fs->make<RooWorkspace>("w","workspace");
-      w->import(*MC_true_all);
-      w->import(*MC_reco);
-      w->import(*Data_reco);
-    }
+//     edm::Service<TFileService> fs;
+//     //      RooWorkspace *w = new RooWorkspace("w","workspace");
+//       RooWorkspace *w = fs->make<RooWorkspace>("w","workspace");
+//       w->import(*MC_true_all);
+//       w->import(*MC_reco);
+//       w->import(*Data_reco);
+  }
 }

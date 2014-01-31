@@ -12,6 +12,13 @@ zdefs = cms.untracked.VPSet(
             max_mz = cms.untracked.double(MAX_MZ),
             ),
         cms.untracked.PSet(
+            name = cms.untracked.string("ET-ET"),
+            cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>20", "eg_medium"),
+            cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>20", "eg_medium"),
+            min_mz = cms.untracked.double(MIN_MZ),
+            max_mz = cms.untracked.double(MAX_MZ),
+            ),
+        cms.untracked.PSet(
             name = cms.untracked.string("ET-EB"),
             cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>20", "eg_medium"),
             cuts1 = cms.untracked.vstring("acc(ALL)", "acc(EB)", "pt>20", "eg_loose"),

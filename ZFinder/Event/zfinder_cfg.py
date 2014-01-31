@@ -19,9 +19,9 @@ process.source = cms.Source("PoolSource",
     # replace 'myfile.root' with the source file you want to use
     fileNames = cms.untracked.vstring(
         # Data
-        #'file:/local/cms/phedex/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/F8C30E72-AE67-E211-A375-002618943922.root'
+###        'file:/local/cms/phedex/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/003EC246-5E67-E211-B103-00259059642E.root',
         # MC
-        'file:/local/cms/phedex/store/mc/Summer12_DR53X/DYToEE_M-20_CT10_TuneZ2star_8TeV-powheg-pythia6/AODSIM/PU_S10_START53_V7A-v1/0000/AC6646E7-36F0-E111-B2F8-00259073E3FC.root'
+        'file:/local/cms/phedex/store/mc/Summer12_DR53X/DYToEE_M-20_CT10_TuneZ2star_8TeV-powheg-pythia6/AODSIM/PU_S10_START53_V7A-v1/0000/0027DCA9-24F0-E111-BB27-20CF3027A634.root'#/local/cms/phedex/store/mc/Summer12_DR53X/DYToEE_M-20_CT10_TuneZ2star_8TeV-powheg-pythia6/AODSIM/PU_S10_START53_V7A-v1/0000/AC6646E7-36F0-E111-B2F8-00259073E3FC.root'
     )
 )
 
@@ -46,13 +46,6 @@ process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
 process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIsoSequence)
 
 
-#
-# ZFinder
-#
-
-# Import ZDefinitions
-from ZFinder.ZFinder.ZDefinitions_cfi import zdefs
-
 process.ZFinder = cms.EDAnalyzer('ZFinder',
         # General tags
         ecalElectronsInputTag  = cms.InputTag("gsfElectrons"),
@@ -62,7 +55,7 @@ process.ZFinder = cms.EDAnalyzer('ZFinder',
         beamSpotInputTag       = cms.InputTag("offlineBeamSpot"),
         rhoIsoInputTag         = cms.InputTag("kt6PFJetsForIsolation", "rho"),
         primaryVertexInputTag  = cms.InputTag("offlinePrimaryVertices"),
-        ntElectronsInputTag    = cms.InputTag("photons"),
+
         isoValInputTags        = cms.VInputTag(
             cms.InputTag('elPFIsoValueCharged03PFIdPFIso'),
             cms.InputTag('elPFIsoValueGamma03PFIdPFIso'),
@@ -71,8 +64,6 @@ process.ZFinder = cms.EDAnalyzer('ZFinder',
         # MC, but still required to be something for data
         pileupInputTag = cms.InputTag("addPileupInfo"),
         generatorInputTag = cms.InputTag("genParticles"),
-        # ZDefinitions from ZFinder.ZFinder.ZDefinitions_cfi
-        ZDefinitions = zdefs
         )
 
 # RUN
