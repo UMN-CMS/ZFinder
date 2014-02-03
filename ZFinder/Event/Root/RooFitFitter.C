@@ -10,7 +10,11 @@
 #include "RooArgSet.h"
 #include "RooRealVar.h"
 #include "RooWorkspace.h"
+#include "RooDataHist.h"
 #include "RooPlot.h"
+#include "RooAddPdf.h"
+#include "RooKeysPdf.h"
+#include "RooHistPdf.h"
 #include <TH2D.h>
 #include <TH1D.h>
 #include <TFile.h>
@@ -24,11 +28,12 @@
 using namespace RooFit;
 //using namespace RooStats;
 
-const double phistarBins[] = {0, 0.5,2};
+const double phistarBins[] = {0.0,0.1,0.2,0.5,0.7,2.0};
 const double etaBins[] = {-5.0,-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5,5.0};
 
-void RooFitFitter(const char* filename){
-  RooRealVar Zmass("Zmass","Zmass",0,300);
+void RooFitFitter(const char* dataname, const char*mcname){
+  RooRealVar Zmass("Zmass","Zmass",40,150);
+  Zmass.setBins(110);
   RooRealVar Zeta("Zeta","Zeta",-20,20);
   RooRealVar Zy("Zy","Zy",-1000,1000);
   RooRealVar Zpt("Zpt","Zpt",0,10000);
@@ -37,29 +42,28 @@ void RooFitFitter(const char* filename){
   RooRealVar Pass("Pass","Pass",-2,2);
   RooArgSet ZEventArgSet(Zmass, Zphistar, Zpt, Zeta, Zy, Weight, Pass);
 
-  TFile * f= new TFile(filename, "READ");
-  f->ls();
-  f->cd("ZFinder");
-  f->ls();
-  cout<<"hoi"<<endl;
-  RooWorkspace* w =(RooWorkspace*) f->Get("w");
-  cout<<"hoi2"<<endl;
-  RooDataSet& MC_reco = *((RooDataSet*) w->data("MC_reco") );
-  RooDataSet& Data_reco = *((RooDataSet*) w->data("Data_reco") );
-  RooDataSet& MC_true_all = *((RooDataSet*) w->data("MC_true_all") );
-  cout<<"hoi3"<<endl;
+  TFile * f_data= new TFile(dataname, "READ");
+  RooWorkspace* w_data =(RooWorkspace*) f_data->Get("w_merged");
+  RooDataSet& Data_reco = *((RooDataSet*) w_data->data("Data_reco") );
+
+  TFile * f_mc= new TFile(mcname, "READ");
+  RooWorkspace* w_mc =(RooWorkspace*) f_mc->Get("w_merged");
+  RooDataSet& MC_reco = *((RooDataSet*) w_mc->data("MC_reco") );
+  RooDataSet& MC_true_all = *((RooDataSet*) w_mc->data("MC_true_all") );
 
   int neta=(sizeof(etaBins)/sizeof(etaBins[0]))-1;
   int nphistar=(sizeof(phistarBins)/sizeof(phistarBins[0]))-1;
 
-  RooRealVar x("x","x",50,150);
+  RooRealVar x("x","x",40,150);
   RooRealVar alpha("alpha","alpha",60.,0.1,100000.);
   RooRealVar gamma("gamma","gamma",0.01,0.0001,0.3);
   RooRealVar delta("delta","delta",10.,3.,80.);
   RooFormulaVar var1("var1","(alpha-x)/delta",RooArgSet(alpha,x,delta));
-  RooFormulaVar var2("var2","gamma*x",RooArgSet(gamma,x));
+  RooFormulaVar var2("var2","-1.0*gamma*x",RooArgSet(gamma,x));
   RooGenericPdf MyBackgroundPdf("MyBackgroundPdf","ROOT::Math::erfc(var1)*exp(var2)",RooArgSet(var1, var2));
-
+//   alpha.setRange(60,60);
+//   gamma.setRange(0.01,0.01);
+//   delta.setRange(10,10);
   double acceptance[neta*nphistar];
   double nsignal[neta*nphistar];
 
@@ -84,16 +88,46 @@ void RooFitFitter(const char* filename){
 
       acceptance[bin]=0;
       if (MC_true_all_phistarbin->sumEntries()>0) acceptance[bin]=MC_reco_phistarbin->sumEntries()/MC_true_all_phistarbin->sumEntries();
-      TCanvas* c=new TCanvas();
-      c->cd();
-      RooPlot* fitFrame = Zmass.frame();
-      MC_reco_phistarbin->plotOn(fitFrame);
-      fitFrame->Draw();
 
+      RooDataHist h_data("h_data","h_data",RooArgSet(Zmass),*Data_reco_phistarbin);
+      RooDataHist h_mc("h_mc","h_mc",RooArgSet(Zmass),*MC_reco_phistarbin);
+      cout<<"going to make keyspdf"<<endl;
+      RooHistPdf signalpdf("signalpdf","signalpdf",Zmass,h_mc);
+      //      RooKeysPdf signalpdf("signalpdf","signalpdf",Zmass,*MC_reco_phistarbin);
+      cout<<"Pdf done"<<endl;
+      RooRealVar sigratio("sigratio","sigratio",0.5,0.0,1.0);
+//       sigratio.setRange(0.5,0.5);
+      RooAddPdf fitpdf("fitpdf","fitpdf",RooArgList(MyBackgroundPdf,signalpdf),RooArgList(sigratio));
+
+      fitpdf.fitTo(h_data);
       cout<<acceptance[bin]<<endl;
 
+      TString name="";
+      name+=double(etaBins[ieta]);
+      name+="<eta<";
+      name+=double(etaBins[ieta+1]);
+      name+=", ";
+      name+=double(phistarBins[iphistar]);
+      name+="<phistar<";
+      name+=double(phistarBins[iphistar+1]);
+
+      TCanvas* c=new TCanvas();
+      c->cd();
+      RooPlot* fitFrame = Zmass.frame(Title(name));
+      h_data.plotOn(fitFrame);
+      //      fitpdf.plotOn(fitFrame);
+      fitpdf.plotOn(fitFrame,Components(MyBackgroundPdf),LineColor(kRed));
+      fitpdf.plotOn(fitFrame,Components(signalpdf),LineColor(kBlue));
+      fitFrame->Draw();
+
+
+
+
+
       bin++;
+      break;
     }
+    break;
   }
 }
 

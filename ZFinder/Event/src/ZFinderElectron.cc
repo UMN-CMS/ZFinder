@@ -52,7 +52,7 @@ namespace zf {
         eta = input_electron.eta();
         phi = input_electron.phi();
         charge = input_electron.charge();
-         // Add cut result to store parent information
+        // Add cut result to store parent information
     }
 
     ZFinderElectron::ZFinderElectron(reco::Photon input_electron) {

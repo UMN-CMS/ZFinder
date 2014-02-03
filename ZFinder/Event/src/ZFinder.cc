@@ -125,7 +125,7 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     z_plotter_map_.insert(std::pair<std::string, zf::ZFinderPlotter*>("reco", z_plotter_reco));
     z_plotter_map_.insert(std::pair<std::string, zf::ZFinderPlotter*>("truth", z_plotter_truth));
 
-     z_fitter= new zf::ZFinderFitter();
+    z_fitter= new zf::ZFinderFitter();
 
     // Set up ZDefinitions and plotters
     zdef_psets_ = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet> >("ZDefinitions");
@@ -212,6 +212,7 @@ void ZFinder::beginJob() {
 
 // ------------ method called once each job just after ending the event loop  ------------
 void ZFinder::endJob() {
+    z_fitter->Write();
 }
 
 // ------------ method called when starting to processes a run  ------------

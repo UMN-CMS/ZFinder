@@ -1,5 +1,4 @@
 import FWCore.ParameterSet.Config as cms
-
 MIN_MZ = 40.
 MAX_MZ = 150.
 
