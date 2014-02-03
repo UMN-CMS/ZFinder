@@ -40,7 +40,7 @@ void RooMerger(const std::string dirname, int njobs, const char* outputfile){
   RooDataSet& MC_true_all_merged = *((RooDataSet*) w->data("MC_true_all") );
   f->Close();
   for (int i=1; i<njobs;i++){
-    if (i==56)continue;
+    //    if (i==56)continue;
     stringstream ssnum;
     ssnum<<i;
     num = ssnum.str();
