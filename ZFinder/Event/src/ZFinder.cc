@@ -173,10 +173,10 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
             (*i_zdefp)->Fill(zfe);
         }
 
-	if (zfe.ZDefPassed("ET-ET")) {
-	  z_fitter->FillSelected(zfe);
-	}
-
+        // Add event to a RooWorkspace
+        if (zfe.ZDefPassed("ET-ET")) {
+            z_fitter->FillSelected(zfe);
+        }
     }
 }
 
