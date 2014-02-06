@@ -97,9 +97,9 @@ namespace zf {
         e1_charge_->GetYaxis()->SetTitle("counts");
 
         // phistar
-        const std::string phistar_name = "#phi^{*}";
+        const std::string phistar_name = "#phi*";
         phistar_ = tdir.make<TH1I>(phistar_name.c_str(), phistar_name.c_str(), 100, 0., 1.);
-        phistar_->GetXaxis()->SetTitle("#phi^{*}");
+        phistar_->GetXaxis()->SetTitle("#phi*");
         phistar_->GetYaxis()->SetTitle("Counts");
 
         // pileup
