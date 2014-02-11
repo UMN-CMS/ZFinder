@@ -39,7 +39,7 @@ namespace zf {
         // z0_rapidity_
         const std::string z0_rapidity_name = "Z0 Rapidity";
         z0_rapidity_ = tdir.make<TH1D>(z0_rapidity_name.c_str(), z0_rapidity_name.c_str(), 100, -5., 5.);
-        z0_rapidity_->GetXaxis()->SetTitle("Y_{ee}");
+        z0_rapidity_->GetXaxis()->SetTitle("Z_{Y}");
         z0_rapidity_->GetYaxis()->SetTitle("Counts");
 
         // z0_pt
@@ -85,15 +85,15 @@ namespace zf {
         e1_phi_->GetYaxis()->SetTitle("counts");
 
         // e0_charge_
-        const std::string e0_charge_name = "#charge_{e_{0}}";
+        const std::string e0_charge_name = "charge_{e_{0}}";
         e0_charge_ = tdir.make<TH1D>(e0_charge_name.c_str(), e0_charge_name.c_str(), 60, -3.15, 3.15);
-        e0_charge_->GetXaxis()->SetTitle("#charge_{e_{0}}");
+        e0_charge_->GetXaxis()->SetTitle("charge_{e_{0}}");
         e0_charge_->GetYaxis()->SetTitle("Counts");
 
         // e1_charge_
-        const std::string e1_charge_name = "#charge_{e_{1}}";
+        const std::string e1_charge_name = "charge_{e_{1}}";
         e1_charge_ = tdir.make<TH1D>(e1_charge_name.c_str(), e1_charge_name.c_str(), 50, -3.15, 3.15);
-        e1_charge_->GetXaxis()->SetTitle("#charge_{e_{1}}");
+        e1_charge_->GetXaxis()->SetTitle("charge_{e_{1}}");
         e1_charge_->GetYaxis()->SetTitle("counts");
 
         // phistar
