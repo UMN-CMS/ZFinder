@@ -202,10 +202,6 @@ namespace zf {
             zf_electron->AddCutResult("Trig(ET_NT_ETLeg)", EE_DZ, WEIGHT);
             zf_electron->AddCutResult("Trig(ET_HF_Tight)", EEHF_TIGHT, WEIGHT);
             zf_electron->AddCutResult("Trig(ET_HF_Loose)", EEHF_LOOSE, WEIGHT);
-
-            if ( EE_TIGHT && !EE_LOOSE ) {
-            std::cout << EE_TIGHT << " " << EE_LOOSE << " " << EE_DZ << " " << EENT_TIGHT << " " << EEHF_TIGHT << " " << EEHF_LOOSE << std::endl;
-            }
         }
     }
 
