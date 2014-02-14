@@ -4,8 +4,7 @@
 #include <utility>  // std::pair
 
 #include "TH1.h"
-#include "TH1F.h"
-#include "TH1I.h"
+#include "TH1D.h"
 #include "TFile.h"
 #include "TLatex.h"
 #include "TLegend.h"
@@ -46,128 +45,104 @@ int MakePlots(
         return 1;
     }
 
-    /* Set up the three regions we care about */
-    static const int TMPSIZE = 3;
-    static const string TMP[TMPSIZE] = {"ET-ET", "ET-NT", "ET-HF"};
-    const vector<string> e_pairs(TMP, TMP+TMPSIZE);
-
     /* Loop over each region, and then each plot in the region */
-    for (vector<string>::const_iterator i_pair = e_pairs.begin(); i_pair != e_pairs.end(); ++i_pair) {
-        const string BASE_DIR_NAME = "ZFinder/" + (*i_pair) + " ";
-        const string LOSE_DIR = BASE_DIR_NAME + "158 Cut Test Reco/4 60 < M_{ee} < 120/";
-        const string MEDIUM_DIR = BASE_DIR_NAME + "2020 Cut Test Reco/4 60 < M_{ee} < 120/";
-        const string TIGHT_DIR = BASE_DIR_NAME + "3020 Cut Test Reco/4 60 < M_{ee} < 120/";
+    const string BASE_DIR_NAME = "/ZFinder/";
+    const string ALL_DIR = BASE_DIR_NAME + "All Electrons Reco/1 60 < M_{ee} < 120/";
+    const string COMB_DIR = BASE_DIR_NAME + "ET-ET Combined Reco/6 60 < M_{ee} < 120/";
+    const string ET_DIR = BASE_DIR_NAME + "ET-ET Rapidity Reco/4 60 < M_{ee} < 120/";
+    const string NT_DIR = BASE_DIR_NAME + "ET-NT Rapidity Reco/4 60 < M_{ee} < 120/";
+    const string HF_DIR = BASE_DIR_NAME + "ET-HF Reco/4 60 < M_{ee} < 120/";
 
-        vector<pair<string, string> > histo_to_name;
-        histo_to_name.push_back(std::make_pair("Z0 Rapidity", "Z_{Y}"));
-        histo_to_name.push_back(std::make_pair("#phi*", "#phi*"));
+    vector<pair<string, string> > histo_to_name;
+    histo_to_name.push_back(std::make_pair("Z0 Rapidity", "Z_{Y}"));
+    histo_to_name.push_back(std::make_pair("#phi*", "#phi*"));
 
-        for (vector<pair<string, string> >::const_iterator i_h2n = histo_to_name.begin(); i_h2n != histo_to_name.end(); ++i_h2n) {
-            /* Extract the histograms */
-            string hist_names[3];
-            hist_names[0] = LOSE_DIR + (*i_h2n).first;
-            hist_names[1] = MEDIUM_DIR + (*i_h2n).first;
-            hist_names[2] = TIGHT_DIR + (*i_h2n).first;
-            TH1I* in_hist_tmp[3];
+    for (vector<pair<string, string> >::const_iterator i_h2n = histo_to_name.begin(); i_h2n != histo_to_name.end(); ++i_h2n) {
+        /* Extract the histograms */
+        const int HIST_LEN = 5;
+        string hist_names[HIST_LEN];
+        hist_names[0] = ALL_DIR + (*i_h2n).first;
+        hist_names[1] = COMB_DIR + (*i_h2n).first;
+        hist_names[2] = ET_DIR + (*i_h2n).first;
+        hist_names[3] = NT_DIR + (*i_h2n).first;
+        hist_names[4] = HF_DIR + (*i_h2n).first;
+        TH1D* in_hist[HIST_LEN];
 
-            /* Try to load the histograms from the file */
-            for (int i = 0; i <= 2; ++i) {
-                in_tfile->GetObject(hist_names[i].c_str(), in_hist_tmp[i]);
-                if (!in_hist_tmp[i]){
-                    std::cout << "Failed to get Histogram " << i << std::endl;
-                    return 1;
-                }
+        /* Try to load the histograms from the file */
+        for (int i = 0; i <= HIST_LEN-1; ++i) {
+            in_tfile->GetObject(hist_names[i].c_str(), in_hist[i]);
+            if (!in_hist[i]){
+                std::cout << "Failed to get Histogram named: '" << hist_names[i] << "'" << std::endl;
+                return 1;
             }
-
-            // The Histograms are TH1Is, so we need to deep copy them as TH1Fs for the divide to work...
-            TH1F* in_hist[3];
-            in_hist[0] = new TH1F("0", "0", in_hist_tmp[0]->GetNbinsX(), in_hist_tmp[0]->GetBinLowEdge(1), in_hist_tmp[0]->GetBinLowEdge(in_hist_tmp[0]->GetNbinsX()) + in_hist_tmp[0]->GetBinWidth(in_hist_tmp[0]->GetNbinsX()));
-            in_hist[1] = new TH1F("1", "1", in_hist_tmp[1]->GetNbinsX(), in_hist_tmp[1]->GetBinLowEdge(1), in_hist_tmp[1]->GetBinLowEdge(in_hist_tmp[1]->GetNbinsX()) + in_hist_tmp[1]->GetBinWidth(in_hist_tmp[1]->GetNbinsX()));
-            in_hist[2] = new TH1F("2", "2", in_hist_tmp[2]->GetNbinsX(), in_hist_tmp[2]->GetBinLowEdge(1), in_hist_tmp[2]->GetBinLowEdge(in_hist_tmp[2]->GetNbinsX()) + in_hist_tmp[2]->GetBinWidth(in_hist_tmp[2]->GetNbinsX()));
-
-            for (int i = 0; i <= 2; ++i) {
-                in_hist[i]->GetXaxis()->SetTitle((*i_h2n).second.c_str());
-                in_hist[i]->GetYaxis()->SetTitle(in_hist_tmp[i]->GetYaxis()->GetTitle());
-                for (int nbin = 0; nbin < in_hist_tmp[i]->GetNbinsX(); ++nbin) {
-                    in_hist[i]->SetBinContent(nbin, in_hist_tmp[i]->GetBinContent(nbin));
-                }
-            }
-
-            /* Make a canvas to store the results */
-            //TCanvas* canvas = new TCanvas("canvas", "canvas", 1200, 400);
-            TCanvas* canvas = new TCanvas("canvas", "canvas", 830, 1000);
-
-            /* Set up the histogram styles */
-            for (int i = 0; i <= 2; ++i) {
-                in_hist[i]->SetMarkerStyle(19+i);
-                in_hist[i]->SetMarkerColor(COLOR[i]);
-                in_hist[i]->SetTitle(0);  // Remove title
-                in_hist[i]->GetYaxis()->SetTitleOffset(1.3);  // Move the title left
-                //in_hist[i]->SetLineWidth(2);
-                in_hist[i]->SetLineColor(COLOR[i]);
-                in_hist[i]->Sumw2();
-                in_hist[i]->SetMaximum(1.5);
-            }
-
-            /* Add title */
-            const string TITLE = (*i_pair) + " " + (*i_h2n).second;
-            TLatex *plabel = new TLatex(.4, .93, TITLE.c_str());
-            plabel->SetNDC();
-            plabel->SetTextFont(42);
-            plabel->SetTextColor(1);
-            plabel->SetTextSize(0.06);
-            plabel->SetTextAlign(22);
-            plabel->SetTextAngle(0);
-
-            /* Add normalization method */
-            TLatex *norm_label = new TLatex(.8, .80, "#splitline{Points normalized to}{gpt > 15,8 acceptance}");
-            norm_label->SetNDC();
-            norm_label->SetTextFont(42);
-            norm_label->SetTextColor(1);
-            norm_label->SetTextSize(0.035);
-            norm_label->SetTextAlign(22);
-            norm_label->SetTextAngle(0);
-
-            /* Make a legend */
-            TLegend* leg = new TLegend(0.7, 0.85, 0.959, 0.959);
-            leg->SetFillColor(kWhite);
-            //leg->AddEntry(in_hist[0], "gpt>15, gpt>8", "l");
-            leg->AddEntry(in_hist[1], "gpt>20,20 / gpt>15,8", "p");
-            leg->AddEntry(in_hist[2], "gpt>30,20 / gpt>15,8", "p");
-
-            /* Save the plot as a png  */
-            in_hist[1]->Divide(in_hist[0]);
-            in_hist[2]->Divide(in_hist[0]);
-            //in_hist[0]->Draw();
-            in_hist[1]->Draw();
-            in_hist[2]->Draw("SAME");
-            leg->Draw();
-            plabel->Draw();
-            //norm_label->Draw();
-            const string OUT_PNG = output_dir + "/" + (*i_pair) + "_" + (*i_h2n).second + ".png";
-            canvas->Print(OUT_PNG.c_str(), "png");
         }
+
+        /* Make a canvas to store the results */
+        //TCanvas* canvas = new TCanvas("canvas", "canvas", 1200, 400);
+        TCanvas* canvas = new TCanvas("canvas", "canvas", 830, 1000);
+
+        /* Set up the histogram styles */
+        for (int i = 0; i <= HIST_LEN-1; ++i) {
+            in_hist[i]->SetMarkerStyle(19+i);
+            in_hist[i]->SetMarkerColor(COLOR[i]);
+            in_hist[i]->SetTitle(0);  // Remove title
+            in_hist[i]->GetYaxis()->SetTitleOffset(1.3);  // Move the title left
+            in_hist[i]->GetYaxis()->SetTitle("Ratio");  // Change title
+            in_hist[i]->SetLineColor(COLOR[i]);
+            in_hist[i]->Sumw2();
+            in_hist[i]->SetMaximum(1.0);
+            in_hist[i]->SetMinimum(0.);
+            if ((*i_h2n).second == "#phi*") {
+                in_hist[i]->Rebin(4);
+            } else {
+                in_hist[i]->GetXaxis()->SetRangeUser(-4, 4);
+            }
+        }
+
+        /* Sum Rapidity set */
+        in_hist[2]->Add(in_hist[3]);
+        in_hist[2]->Add(in_hist[4]);
+
+        /* Add title */
+        const string TITLE = (*i_h2n).second;
+        TLatex *plabel = new TLatex(0.18, 0.93, TITLE.c_str());
+        plabel->SetNDC();
+        plabel->SetTextFont(42);
+        plabel->SetTextColor(1);
+        plabel->SetTextSize(0.06);
+        plabel->SetTextAlign(22);
+        plabel->SetTextAngle(0);
+
+        /* Make a legend */
+        TLegend* leg = new TLegend(0.4, 0.87, 0.959, 0.959);
+        leg->SetFillColor(kWhite);
+        //leg->AddEntry(in_hist[0], "gpt>15, gpt>8", "l");
+        //leg->AddEntry(in_hist[1], "p_{T}>20,20; |Eta|< 2.1,2.4 / All Z->ee", "p");
+        //leg->AddEntry(in_hist[2], "p_{T}>30,20 / All Z->ee", "p");
+        leg->AddEntry(in_hist[1], "p_{T}>20,20; |Eta|< 2.1,2.4", "p");
+        leg->AddEntry(in_hist[2], "p_{T}>30 and |ETA|<2.5 plus p_{T}>20", "p");
+
+        /* Add information about the ratio */
+        TLatex *norm_label = new TLatex(.69, 0.83, "#splitline{Acceptance requirements compared to}{all Z->ee events with 60 < m_{ee} < 120}");
+        norm_label->SetNDC();
+        norm_label->SetTextFont(42);
+        norm_label->SetTextColor(1);
+        norm_label->SetTextSize(0.035);
+        norm_label->SetTextAlign(22);
+        norm_label->SetTextAngle(0);
+
+        /* Save the plot as a png  */
+        in_hist[1]->Divide(in_hist[0]);
+        in_hist[2]->Divide(in_hist[0]);
+        //in_hist[0]->Draw();
+        in_hist[1]->Draw();
+        in_hist[2]->Draw("SAME");
+        leg->Draw();
+        plabel->Draw();
+        norm_label->Draw();
+        const string OUT_PNG = output_dir + "/" + (*i_h2n).second + ".png";
+        canvas->Print(OUT_PNG.c_str(), "png");
     }
-
-    ///* Figure out the largest Y value and set the plot accordingly */
-    //const double DATA_MAX = data_hist->GetMaximum();
-    //const double MC_MAX = mc_hist->GetMaximum();
-    //if (MC_MAX > DATA_MAX) {
-    //    data_hist->SetMaximum(MC_MAX * 1.1);
-    //}
-
-    // /* Add Lumi */
-    // // ~5.288 ~= 5.3/pb
-    // TLatex *lumi_label = new TLatex(.78, .8, "#int L dt = 5.3 fb^{-1} at 8 TeV");
-    // lumi_label->SetNDC();
-    // lumi_label->SetTextFont(42);
-    // lumi_label->SetTextColor(1);
-    // lumi_label->SetTextSize(0.035);
-    // lumi_label->SetTextAlign(22);
-    // lumi_label->SetTextAngle(0);
-
-
-
 }
 
 int main(int argc, char* argv[]) {
