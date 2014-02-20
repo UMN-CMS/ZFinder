@@ -48,11 +48,9 @@ int MakePlots(
     /* Loop over each region, and then each plot in the region */
     const string BASE_DIR_NAME = "/ZFinder/";
     const string ALL_DIR = BASE_DIR_NAME + "All Electrons Reco/1 60 < M_{ee} < 120/";
-    const string COMB_DIR = BASE_DIR_NAME + "ET-ET Combined Reco/6 60 < M_{ee} < 120/";
-    const string COMB_TIGHT_DIR = BASE_DIR_NAME + "ET-ET Tighter Combined Reco/6 60 < M_{ee} < 120/";
-    const string ET_DIR = BASE_DIR_NAME + "ET-ET Rapidity Reco/4 60 < M_{ee} < 120/";
-    const string NT_DIR = BASE_DIR_NAME + "ET-NT Rapidity Reco/4 60 < M_{ee} < 120/";
-    const string HF_DIR = BASE_DIR_NAME + "ET-HF Rapidity Reco/4 60 < M_{ee} < 120/";
+    const string COMB_DIR = BASE_DIR_NAME + "ET-ET No ID Combined Reco/5 60 < M_{ee} < 120/";
+    const string COMB_TIGHT_DIR = BASE_DIR_NAME + "ET-ET Tighter No ID Combined Reco/5 60 < M_{ee} < 120/";
+    const string COMB_LOSE_DIR = BASE_DIR_NAME + "ET-ET Looser No ID Combined Reco/5 60 < M_{ee} < 120/";
 
     vector<pair<string, string> > histo_to_name;
     histo_to_name.push_back(std::make_pair("Z0 Rapidity", "Z_{Y}"));
@@ -60,14 +58,12 @@ int MakePlots(
 
     for (vector<pair<string, string> >::const_iterator i_h2n = histo_to_name.begin(); i_h2n != histo_to_name.end(); ++i_h2n) {
         /* Extract the histograms */
-        const int HIST_LEN = 6;
+        const int HIST_LEN = 4;
         string hist_names[HIST_LEN];
         hist_names[0] = ALL_DIR + (*i_h2n).first;
         hist_names[1] = COMB_DIR + (*i_h2n).first;
         hist_names[2] = COMB_TIGHT_DIR + (*i_h2n).first;
-        hist_names[3] = ET_DIR + (*i_h2n).first;
-        hist_names[4] = NT_DIR + (*i_h2n).first;
-        hist_names[5] = HF_DIR + (*i_h2n).first;
+        hist_names[3] = COMB_LOSE_DIR + (*i_h2n).first;
         TH1D* in_hist[HIST_LEN];
 
         /* Try to load the histograms from the file */
@@ -92,7 +88,7 @@ int MakePlots(
             in_hist[i]->GetYaxis()->SetTitle("Ratio");  // Change title
             in_hist[i]->SetLineColor(COLOR[i]);
             in_hist[i]->Sumw2();
-            in_hist[i]->SetMaximum(1.0);
+            in_hist[i]->SetMaximum(1.5);
             in_hist[i]->SetMinimum(0.);
             if ((*i_h2n).second == "#phi*") {
                 in_hist[i]->Rebin(4);
@@ -100,10 +96,6 @@ int MakePlots(
                 in_hist[i]->GetXaxis()->SetRangeUser(-4, 4);
             }
         }
-
-        /* Sum Rapidity set */
-        in_hist[3]->Add(in_hist[4]);
-        in_hist[3]->Add(in_hist[5]);
 
         /* Add title */
         const string TITLE = (*i_h2n).second;
@@ -123,7 +115,7 @@ int MakePlots(
         //leg->AddEntry(in_hist[2], "p_{T}>30,20 / All Z->ee", "p");
         leg->AddEntry(in_hist[1], "p_{T}>20,20; |Eta|< 2.1,2.4", "p");
         leg->AddEntry(in_hist[2], "p_{T}>30,20; |Eta|< 2.1,2.4", "p");
-        leg->AddEntry(in_hist[3], "p_{T}>30 and |ETA|<2.5 plus p_{T}>20", "p");
+        leg->AddEntry(in_hist[3], "p_{T}>30,10; |Eta|< 2.1,2.4", "p");
 
         /* Add information about the ratio */
         TLatex *norm_label = new TLatex(.69, 0.83, "#splitline{Acceptance requirements compared to}{all Z->ee events with 60 < m_{ee} < 120}");
