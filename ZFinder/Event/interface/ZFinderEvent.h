@@ -15,6 +15,7 @@
 #include "FWCore/Framework/interface/Event.h"  // edm::Event, edm::EventSetup
 #include "FWCore/ParameterSet/interface/ParameterSet.h"  // edm::ParameterSet
 #include "FWCore/Utilities/interface/InputTag.h"  // edm::InputTag
+#include "DataFormats/HLTReco/interface/TriggerObject.h"  // trigger::TriggerObject
 
 // ZFinder
 #include "ZFinder/Event/interface/ZFinderElectron.h"  // ZFinderElectron, ZFinderElectron
@@ -128,6 +129,18 @@ namespace zf {
                 edm::InputTag hf_electron;
                 edm::InputTag hf_clusters;
             } inputtags_;
+
+            // Find matching trigger objects
+            const trigger::TriggerObject* GetMatchedTriggerObject(
+                    const edm::Event& iEvent,
+                    const std::vector<std::string>& trig_names,
+                    const double ETA, const double PHI, const double DR_CUT
+                    );
+            bool TriggerMatch(
+                    const edm::Event& iEvent,
+                    const std::vector<std::string>& trig_names,
+                    const double ETA, const double PHI, const double DR_CUT
+                    );
 
             // A list of all electrons, split into reco and gen
             std::vector<ZFinderElectron*> reco_electrons_;

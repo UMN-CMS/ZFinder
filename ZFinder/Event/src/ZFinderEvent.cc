@@ -14,14 +14,17 @@
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidateFwd.h"  // reco::RecoEcalCandidateCollection
 #include "EgammaAnalysis/ElectronTools/interface/EGammaCutBasedEleId.h"  // EgammaCutBasedEleId::PassWP, EgammaCutBasedEleId::*
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"  // PileupSummaryInfo
+#include "DataFormats/HLTReco/interface/TriggerEvent.h" // trigger::TriggerEvent
 
 // ZFinder
 #include "ZFinder/Event/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
+#include "ZFinder/Event/interface/TriggerList.h"  // ET_ET_TIGHT, ET_ET_DZ, ET_ET_LOOSE, ET_NT_ET_TIGHT, ET_HF_ET_TIGHT, ET_HF_ET_LOOSE, ET_HF_HF_TIGHT, ET_HF_HF_LOOSE
 
 
 namespace zf {
     ZFinderEvent::ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup, const edm::ParameterSet& iConfig) {
-        /* Given an event, parses them for the information needed to make the classe.
+        /* Given an event, parses them for the information needed to make the
+         * classe.
          *
          * It selects electrons based on a minimum level of hard-coded cuts.
          */
@@ -184,6 +187,21 @@ namespace zf {
             zf_electron->AddCutResult("eg_eop_cut", FBREMEOPIN, WEIGHT);
             zf_electron->AddCutResult("eg_trigtight", TRIGTIGHT, WEIGHT);
             zf_electron->AddCutResult("eg_trigwp70", TRIGWP70, WEIGHT);
+
+            // Check for trigger matching
+            const bool EE_TIGHT = TriggerMatch(iEvent, ET_ET_TIGHT, zf_electron->eta, zf_electron->phi, 0.3);
+            const bool EE_LOOSE = TriggerMatch(iEvent, ET_ET_LOOSE, zf_electron->eta, zf_electron->phi, 0.3);
+            const bool EE_DZ = TriggerMatch(iEvent, ET_ET_DZ, zf_electron->eta, zf_electron->phi, 0.3);
+            const bool EENT_TIGHT = TriggerMatch(iEvent, ET_NT_ET_TIGHT, zf_electron->eta, zf_electron->phi, 0.3);
+            const bool EEHF_TIGHT = EENT_TIGHT;
+            const bool EEHF_LOOSE = TriggerMatch(iEvent, ET_HF_ET_LOOSE, zf_electron->eta, zf_electron->phi, 0.3);
+
+            zf_electron->AddCutResult("Trig(ET_ET_Tight)", EE_TIGHT, WEIGHT);
+            zf_electron->AddCutResult("Trig(ET_ET_Loose)", EE_LOOSE, WEIGHT);
+            zf_electron->AddCutResult("Trig(ET_ET_DZ)", EE_DZ, WEIGHT);
+            zf_electron->AddCutResult("Trig(ET_NT_ETLeg)", EE_DZ, WEIGHT);
+            zf_electron->AddCutResult("Trig(ET_HF_Tight)", EEHF_TIGHT, WEIGHT);
+            zf_electron->AddCutResult("Trig(ET_HF_Loose)", EEHF_LOOSE, WEIGHT);
         }
     }
 
@@ -232,6 +250,13 @@ namespace zf {
             zf_electron->AddCutResult("hf_2dtight", HFTIGHT, WEIGHT);
             zf_electron->AddCutResult("hf_2dmedium", HFMEDIUM, WEIGHT);
             zf_electron->AddCutResult("hf_2dloose", HFLOOSE, WEIGHT);
+
+            // Check for trigger matching
+            const bool HIGHLOW_03 = TriggerMatch(iEvent, ET_HF_HF_LOOSE, zf_electron->eta, zf_electron->phi, 0.3);
+            zf_electron->AddCutResult("Trig(HF_loose)", HIGHLOW_03, WEIGHT);
+
+            const bool LOWHIGH_03 = TriggerMatch(iEvent, ET_HF_HF_TIGHT, zf_electron->eta, zf_electron->phi, 0.3);
+            zf_electron->AddCutResult("Trig(HF_Tight)", LOWHIGH_03, WEIGHT);
         }
     }
 
@@ -262,6 +287,9 @@ namespace zf {
                     const double WEIGHT = 1.;
                     zf_electron->AddCutResult("nt_loose", PASSED, WEIGHT);
                 }
+
+                // Check for trigger matching
+                // HLT_Ele27_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele15_CaloIdT_CaloIsoVL_trackless_v8
             }
         }
     }
@@ -573,6 +601,67 @@ namespace zf {
         } else {
             return NULL;
         }
+    }
 
+    const trigger::TriggerObject* ZFinderEvent::GetMatchedTriggerObject(
+            const edm::Event& iEvent,
+            const std::vector<std::string>& trig_names,
+            const double ETA, const double PHI, const double DR_CUT
+            ) {
+        // If our vector is empty or the first item is blank
+        if (trig_names.size() == 0 || trig_names[0].size() == 0) {
+            return NULL;
+        }
+
+        // Initial values
+        double dr = 1000;
+        const trigger::TriggerObject* trig_obj = NULL;
+
+        // Load Trigger Objects
+        edm::InputTag hltTrigInfoTag("hltTriggerSummaryAOD","","HLT");
+        edm::Handle<trigger::TriggerEvent> trig_event;
+
+        iEvent.getByLabel(hltTrigInfoTag, trig_event);
+        if (!trig_event.isValid() ){
+            std::cout << "No valid hltTriggerSummaryAOD." << std::endl;
+            return NULL;
+        }
+        // Loop over triggers, filter the objects from these triggers, and then try to match
+        for(std::vector<std::string>::const_iterator trig_name = trig_names.begin(); trig_name != trig_names.end(); ++trig_name) {
+            // Grab objects that pass our filter
+            edm::InputTag filter_tag((*trig_name), "", "HLT");
+            trigger::size_type filter_index = trig_event->filterIndex(filter_tag);
+            // Test
+            //for (int iii=0; iii<trig_event->sizeFilters(); iii++) std::cout << trig_event->filterTag(iii) << "\n";
+            if(filter_index < trig_event->sizeFilters()) { // Check that the filter is in triggerEvent
+                // Get the trigger keys that pass the filter
+                const trigger::Keys& trig_keys = trig_event->filterKeys(filter_index);
+                const trigger::TriggerObjectCollection& trig_obj_collection(trig_event->getObjects());
+                // Get the objects from the trigger keys
+                for(trigger::Keys::const_iterator i_key = trig_keys.begin(); i_key!=trig_keys.end(); ++i_key){
+                    const trigger::TriggerObject* new_trig_obj = &trig_obj_collection[*i_key];
+                    const double newdr = deltaR(ETA, PHI, new_trig_obj->eta(), new_trig_obj->phi());
+                    // Do Delta R matching, and assign a new object if we have a
+                    // better match
+                    if (newdr < DR_CUT && newdr < dr){
+                        dr = newdr;
+                        trig_obj = new_trig_obj;
+                    }
+                }
+            }
+        }
+        return trig_obj;
+    }
+
+    bool ZFinderEvent::TriggerMatch(
+            const edm::Event& iEvent,
+            const std::vector<std::string>& trig_names,
+            const double ETA, const double PHI, const double DR_CUT
+            ) {
+        if (GetMatchedTriggerObject(iEvent, trig_names, ETA, PHI, DR_CUT) != NULL) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }  // namespace zf

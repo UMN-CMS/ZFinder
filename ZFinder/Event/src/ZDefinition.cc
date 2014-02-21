@@ -351,7 +351,7 @@ namespace zf {
         if (gt_pos > lt_pos && gt_pos > eq_pos) {
             pos = gt_pos;
         } else if (lt_pos > gt_pos && lt_pos > eq_pos) {
-            pos = gt_pos;
+            pos = lt_pos;
         } else {
             pos = eq_pos;
         }

@@ -114,17 +114,6 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     // Set up plotters
     edm::Service<TFileService> fs;
 
-    TFileDirectory tdir_1(fs->mkdir("reco"));
-    zf::ZFinderPlotter* z_plotter_reco = new zf::ZFinderPlotter(tdir_1);
-
-    TFileDirectory tdir_2(fs->mkdir("truth"));
-    const bool USE_MC = true;
-    zf::ZFinderPlotter* z_plotter_truth = new zf::ZFinderPlotter(tdir_2, USE_MC);
-
-    // Make single cut plots
-    z_plotter_map_.insert(std::pair<std::string, zf::ZFinderPlotter*>("reco", z_plotter_reco));
-    z_plotter_map_.insert(std::pair<std::string, zf::ZFinderPlotter*>("truth", z_plotter_truth));
-
     z_fitter= new zf::ZFinderFitter();
 
     // Set up ZDefinitions and plotters
@@ -184,25 +173,10 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
             (*i_zdefp)->Fill(zfe);
         }
 
-        // Print all information about each electron
-        //const bool PRINT_CUTS = true;
-        //zfe.PrintRecoElectrons(PRINT_CUTS);
-        //zfe.PrintTruthElectrons(PRINT_CUTS);
-
-        // Print all information about the ZDefinitions
-        //const bool VERBOSE = true;
-        //zfe.PrintZDefs(VERBOSE);
-        // Make plots
-        //zdef_plot_->Fill(zfe);
-        // Fill specific plots
-        if (zfe.ZDefPassed("ET-HF")) {
-            z_plotter_map_["reco"]->Fill(zfe);
-            z_plotter_map_["truth"]->Fill(zfe);
+        // Add event to a RooWorkspace
+        if (zfe.ZDefPassed("ET-ET")) {
+            z_fitter->FillSelected(zfe);
         }
-	if (zfe.ZDefPassed("ET-ET")) {
-	  z_fitter->FillSelected(zfe);
-	}
-
     }
 }
 

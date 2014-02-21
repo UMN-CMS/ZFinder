@@ -2,7 +2,7 @@
 #define ZFINDER_ZFINDERPLOTTER_H_
 
 // Root
-#include <TH1I.h>  // TH1I
+#include <TH1D.h>  // TH1D
 
 // CMSSW
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
@@ -24,22 +24,22 @@ namespace zf {
 
         protected:
             // Histograms
-            TH1I* z0_mass_all_;
-            TH1I* z0_mass_coarse_;
-            TH1I* z0_mass_fine_;
-            TH1I* z0_rapidity_;
-            TH1I* z0_pt_;
-            TH1I* e0_pt_;
-            TH1I* e1_pt_;
-            TH1I* e0_eta_;
-            TH1I* e1_eta_;
-            TH1I* e0_phi_;
-            TH1I* e1_phi_;
-            TH1I* e0_charge_;
-            TH1I* e1_charge_;
-            TH1I* phistar_;
-            TH1I* pileup_;
-            TH1I* nelectrons_;
+            TH1D* z0_mass_all_;
+            TH1D* z0_mass_coarse_;
+            TH1D* z0_mass_fine_;
+            TH1D* z0_rapidity_;
+            TH1D* z0_pt_;
+            TH1D* e0_pt_;
+            TH1D* e1_pt_;
+            TH1D* e0_eta_;
+            TH1D* e1_eta_;
+            TH1D* e0_phi_;
+            TH1D* e1_phi_;
+            TH1D* e0_charge_;
+            TH1D* e1_charge_;
+            TH1D* phistar_;
+            TH1D* pileup_;
+            TH1D* nelectrons_;
 
             // Use the MC or reco data
             const bool USE_MC_;
