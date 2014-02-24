@@ -22,7 +22,11 @@
 
 namespace zf {
 
+    // Used to pass around cut levels
     typedef std::vector<std::pair<std::string, bool> > cutlevel_vector;
+    // Used to pass around trigger objects for matching
+    typedef std::pair<const trigger::TriggerObject*, double> trig_dr_pair;
+    typedef std::vector<trig_dr_pair> trig_dr_vec;
 
     class ZFinderEvent{
         public:
@@ -80,6 +84,11 @@ namespace zf {
             void set_e0_truth(ZFinderElectron* electron) { e0_truth = electron; }
             void set_e1_truth(ZFinderElectron* electron) { e1_truth = electron; }
             void set_both_e_truth(ZFinderElectron* electron0, ZFinderElectron* electron1) { e0_truth = electron0; e1_truth = electron1; }
+            ZFinderElectron* e0_trig;
+            ZFinderElectron* e1_trig;
+            void set_e0_trig(ZFinderElectron* electron) { e0_trig = electron; }
+            void set_e1_trig(ZFinderElectron* electron) { e1_trig = electron; }
+            void set_both_e_trig(ZFinderElectron* electron0, ZFinderElectron* electron1) { e0_trig = electron0; e1_trig = electron1; }
 
             // Access pruned lists of the internal electrons
             std::vector<ZFinderElectron*>* FilteredElectrons();
@@ -90,7 +99,7 @@ namespace zf {
             int n_reco_electrons;
 
             // Output
-            void PrintElectrons(const bool USE_MC = false, const bool PRINT_CUTS = false);
+            void PrintElectrons(const int TYPE = 0, const bool PRINT_CUTS = false);  // 0 is reco, 1 is truth, 2 is trig
             void PrintTruthElectrons(const bool PRINT_CUTS = false) { PrintElectrons(true, PRINT_CUTS); };
             void PrintRecoElectrons(const bool PRINT_CUTS = false) { PrintElectrons(false, PRINT_CUTS); };
 
@@ -104,6 +113,7 @@ namespace zf {
             // Called by the constructor to handle MC and Data separately
             void InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup);
             void InitTruth(const edm::Event& iEvent, const edm::EventSetup& iSetup);
+            void InitTrigger(const edm::Event& iEvent, const edm::EventSetup& iSetup);
 
             void InitGSFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
             void InitHFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
@@ -131,10 +141,15 @@ namespace zf {
             } inputtags_;
 
             // Find matching trigger objects
-            const trigger::TriggerObject* GetMatchedTriggerObject(
+            const trig_dr_vec* GetMatchedTriggerObjects(
                     const edm::Event& iEvent,
                     const std::vector<std::string>& trig_names,
                     const double ETA, const double PHI, const double DR_CUT
+                    );
+            const trigger::TriggerObject* GetBestMatchedTriggerObject(
+                    const edm::Event& iEvent,
+                    const std::vector<std::string>& trig_names,
+                    const double ETA, const double PHI
                     );
             bool TriggerMatch(
                     const edm::Event& iEvent,
@@ -150,6 +165,9 @@ namespace zf {
 
             std::vector<ZFinderElectron*> truth_electrons_;
             ZFinderElectron* AddTruthElectron(reco::GenParticle electron);
+
+            std::vector<ZFinderElectron*> hlt_electrons_;
+            ZFinderElectron* AddHLTElectron(trigger::TriggerObject electron);
 
             // Calculate phistar
             static double ReturnPhistar(const double& eta0, const double& phi0, const double& eta1, const double& phi1);

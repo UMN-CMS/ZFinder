@@ -18,7 +18,7 @@
 
 // ZFinder
 #include "ZFinder/Event/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
-#include "ZFinder/Event/interface/TriggerList.h"  // ET_ET_TIGHT, ET_ET_DZ, ET_ET_LOOSE, ET_NT_ET_TIGHT, ET_HF_ET_TIGHT, ET_HF_ET_LOOSE, ET_HF_HF_TIGHT, ET_HF_HF_LOOSE
+#include "ZFinder/Event/interface/TriggerList.h"  // ET_ET_TIGHT, ET_ET_DZ, ET_ET_LOOSE, ET_NT_ET_TIGHT, ET_HF_ET_TIGHT, ET_HF_ET_LOOSE, ET_HF_HF_TIGHT, ET_HF_HF_LOOSE, ALL_TRIGGERS
 
 
 namespace zf {
@@ -59,6 +59,8 @@ namespace zf {
         InitReco(iEvent, iSetup);  // Data
         if (!is_real_data) {
             InitTruth(iEvent, iSetup);  // MC
+        } else {
+            InitTrigger(iEvent, iSetup);  // Trigger Matching
         }
     }
 
@@ -202,10 +204,6 @@ namespace zf {
             zf_electron->AddCutResult("Trig(ET_NT_ETLeg)", EE_DZ, WEIGHT);
             zf_electron->AddCutResult("Trig(ET_HF_Tight)", EEHF_TIGHT, WEIGHT);
             zf_electron->AddCutResult("Trig(ET_HF_Loose)", EEHF_LOOSE, WEIGHT);
-
-            if ( EE_TIGHT && !EE_LOOSE ) {
-            std::cout << EE_TIGHT << " " << EE_LOOSE << " " << EE_DZ << " " << EENT_TIGHT << " " << EEHF_TIGHT << " " << EEHF_LOOSE << std::endl;
-            }
         }
     }
 
@@ -354,6 +352,8 @@ namespace zf {
         n_reco_electrons = -1;
         e0_truth = NULL;
         e1_truth = NULL;
+        e0_trig = NULL;
+        e1_trig = NULL;
 
         // Is Data
         is_real_data = false;
@@ -438,6 +438,24 @@ namespace zf {
         }
     }
 
+    void ZFinderEvent::InitTrigger(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+        // Get the trigger objects that are closest in dR to our reco electrons
+        if (e0 != NULL && e1 != NULL) {
+            const trigger::TriggerObject* trig_obj_0 = GetBestMatchedTriggerObject(iEvent, ALL_TRIGGERS, e0->eta, e0->phi);
+            const trigger::TriggerObject* trig_obj_1 = GetBestMatchedTriggerObject(iEvent, ALL_TRIGGERS, e1->eta, e1->phi);
+
+            // If the electrons are good, set them as our trigger electrons
+            if (trig_obj_0 != NULL) {
+                ZFinderElectron* tmp_e0 = AddHLTElectron(*trig_obj_0);
+                set_e0_trig(e0);
+            }
+            if (trig_obj_1 != NULL) {
+                ZFinderElectron* tmp_e1 = AddHLTElectron(*trig_obj_1);
+                set_e1_trig(e1);
+            }
+        }
+    }
+
     ZFinderElectron* ZFinderEvent::AddRecoElectron(reco::GsfElectron electron) {
         ZFinderElectron* zf_electron = new ZFinderElectron(electron);
         reco_electrons_.push_back(zf_electron);
@@ -462,9 +480,15 @@ namespace zf {
         return zf_electron;
     }
 
+    ZFinderElectron* ZFinderEvent::AddHLTElectron(trigger::TriggerObject electron) {
+        ZFinderElectron* zf_electron = new ZFinderElectron(electron);
+        hlt_electrons_.push_back(zf_electron);
+        return zf_electron;
+    }
+
     double ZFinderEvent::ReturnPhistar(const double& eta0, const double& phi0, const double& eta1, const double& phi1) {
         /* Calculate phi star */
-        const double PI = 3.14159265358979323846;
+        static const double PI = 3.14159265358979323846;
         double dphi = phi0 - phi1;
 
         // Properly account for the fact that 2pi == 0.
@@ -497,15 +521,21 @@ namespace zf {
         }
     }
 
-    void ZFinderEvent::PrintElectrons(const bool USE_MC, const bool PRINT_CUTS) {
+    void ZFinderEvent::PrintElectrons(const int TYPE, const bool PRINT_CUTS) {
         using std::cout;
         using std::endl;
+
+        enum ETYPE {
+            RECO = 0,
+            TRUTH = 1,
+            TRIG = 2
+        };
         /*
          * Loops over the electrons, and prints out the information about them.
          */
         cout << "Run " << id.run_num;
         cout << " event " << id.event_num;
-        if (!USE_MC) {
+        if (TYPE == RECO) {
             cout << " Reco Z Mass " << reco_z.m << std::endl;
             for (std::vector<ZFinderElectron*>::const_iterator i_elec = reco_electrons_.begin(); i_elec != reco_electrons_.end(); ++i_elec) {
                 ZFinderElectron* elec = (*i_elec);
@@ -514,7 +544,7 @@ namespace zf {
                 cout << " phi: " << elec->phi << endl;
                 if (PRINT_CUTS) { PrintCuts(elec); }
             }
-        } else if (USE_MC && !is_real_data) {
+        } else if (TYPE == TRUTH && !is_real_data) {
             if (e0_truth != NULL && e1_truth != NULL) {
                 cout << " Truth Z Mass " << truth_z.m << endl;
                 cout << "\tpt: " << e0_truth->pt;
@@ -525,6 +555,22 @@ namespace zf {
                 cout << " eta: " << e1_truth->eta;
                 cout << " phi: " << e1_truth->phi << endl;
                 if (PRINT_CUTS) { PrintCuts(e1_truth); }
+            }
+        } else if (TYPE == TRIG) {
+            if (e0_trig != NULL || e1_trig != NULL) {
+                cout << " Trigger Electrons:" << std::endl;
+            }
+            if (e0_trig != NULL) {
+                cout << "\tpt: " << e0_trig->pt;
+                cout << " eta: " << e0_trig->eta;
+                cout << " phi: " << e0_trig->phi << endl;
+                if (PRINT_CUTS) { PrintCuts(e0_trig); }
+            }
+            if (e1_trig != NULL) {
+                cout << "\tpt: " << e1_trig->pt;
+                cout << " eta: " << e1_trig->eta;
+                cout << " phi: " << e1_trig->phi << endl;
+                if (PRINT_CUTS) { PrintCuts(e1_trig); }
             }
         }
     }
@@ -607,19 +653,20 @@ namespace zf {
         }
     }
 
-    const trigger::TriggerObject* ZFinderEvent::GetMatchedTriggerObject(
+    const trig_dr_vec* ZFinderEvent::GetMatchedTriggerObjects(
             const edm::Event& iEvent,
             const std::vector<std::string>& trig_names,
             const double ETA, const double PHI, const double DR_CUT
             ) {
+        /*
+         * Find all trigger objects that match a vector of trigger names and
+         * are within some minimum dR of a specified eta and phi. Return them
+         * as a vector of pairs of the object, and the dr.
+         */
         // If our vector is empty or the first item is blank
         if (trig_names.size() == 0 || trig_names[0].size() == 0) {
             return NULL;
         }
-
-        // Initial values
-        double dr = 1000;
-        const trigger::TriggerObject* trig_obj = NULL;
 
         // Load Trigger Objects
         edm::InputTag hltTrigInfoTag("hltTriggerSummaryAOD","","HLT");
@@ -630,28 +677,49 @@ namespace zf {
             std::cout << "No valid hltTriggerSummaryAOD." << std::endl;
             return NULL;
         }
+
+        trig_dr_vec* out_v = new trig_dr_vec();
         // Loop over triggers, filter the objects from these triggers, and then try to match
         for(std::vector<std::string>::const_iterator trig_name = trig_names.begin(); trig_name != trig_names.end(); ++trig_name) {
+            // Loop over triggers, filter the objects from these triggers, and then try to match
             // Grab objects that pass our filter
             edm::InputTag filter_tag((*trig_name), "", "HLT");
             trigger::size_type filter_index = trig_event->filterIndex(filter_tag);
-            // Test
-            //for (int iii=0; iii<trig_event->sizeFilters(); iii++) std::cout << trig_event->filterTag(iii) << "\n";
             if(filter_index < trig_event->sizeFilters()) { // Check that the filter is in triggerEvent
-                // Get the trigger keys that pass the filter
                 const trigger::Keys& trig_keys = trig_event->filterKeys(filter_index);
                 const trigger::TriggerObjectCollection& trig_obj_collection(trig_event->getObjects());
                 // Get the objects from the trigger keys
                 for(trigger::Keys::const_iterator i_key = trig_keys.begin(); i_key!=trig_keys.end(); ++i_key){
-                    const trigger::TriggerObject* new_trig_obj = &trig_obj_collection[*i_key];
-                    const double newdr = deltaR(ETA, PHI, new_trig_obj->eta(), new_trig_obj->phi());
+                    const trigger::TriggerObject* trig_obj = &trig_obj_collection[*i_key];
+                    const double DR = deltaR(ETA, PHI, trig_obj->eta(), trig_obj->phi());
                     // Do Delta R matching, and assign a new object if we have a
                     // better match
-                    if (newdr < DR_CUT && newdr < dr){
-                        dr = newdr;
-                        trig_obj = new_trig_obj;
+                    if (DR < DR_CUT) {
+                        out_v->push_back(std::make_pair(trig_obj, DR));
                     }
                 }
+            }
+        }
+        return out_v;
+    }
+
+    const trigger::TriggerObject* ZFinderEvent::GetBestMatchedTriggerObject(
+            const edm::Event& iEvent,
+            const std::vector<std::string>& trig_names,
+            const double ETA, const double PHI
+            ) {
+        /* Given the ETA and PHI of a particle, and a list of trigger paths,
+         * returns the trigger object from those paths that is closest to the
+         * given coordinates. */
+        const double MIN_DR = 0.3;
+        const trig_dr_vec* trig_vec = GetMatchedTriggerObjects(iEvent, trig_names, ETA, PHI, MIN_DR);
+
+        double best_dr = 1.;
+        const trigger::TriggerObject* trig_obj = NULL;
+        for (auto& i_obj : *trig_vec) {
+            if (i_obj.second < best_dr) {
+                best_dr = i_obj.second;
+                trig_obj = i_obj.first;
             }
         }
         return trig_obj;
@@ -662,7 +730,9 @@ namespace zf {
             const std::vector<std::string>& trig_names,
             const double ETA, const double PHI, const double DR_CUT
             ) {
-        if (GetMatchedTriggerObject(iEvent, trig_names, ETA, PHI, DR_CUT) != NULL) {
+        // Get the vector and see if there are objects
+        const trig_dr_vec* zev = GetMatchedTriggerObjects(iEvent, trig_names, ETA, PHI, DR_CUT);
+        if (zev != NULL && zev->size() >= 1) {
             return true;
         } else {
             return false;
