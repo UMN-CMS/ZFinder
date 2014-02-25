@@ -39,8 +39,6 @@ namespace zf {
             const double MZ_MAX_;
             bool pass_mz_cut_;
 
-            // ZDef Name
-
             // Comparison Cut Types
             enum ComparisonType {
                 CT_NONE,   // Not a comparison
@@ -56,12 +54,16 @@ namespace zf {
                 CV_NONE,   // Not a comparison
                 CV_PT,
                 CV_GPT,
+                CV_TPT,
                 CV_ETA,
                 CV_GETA,
+                CV_TETA,
                 CV_PHI,
                 CV_GPHI,
+                CV_TPHI,
                 CV_CHARGE,
-                CV_GCHARGE
+                CV_GCHARGE,
+                CV_TCHARGE
             };
 
             ComparisonType GetComparisonType(const std::string* cut);

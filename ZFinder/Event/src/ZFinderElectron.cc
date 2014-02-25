@@ -68,6 +68,19 @@ namespace zf {
         charge = 0;  // No charge because no tracker
     }
 
+    ZFinderElectron::ZFinderElectron(trigger::TriggerObject input_electron) {
+        /* Set type of candidate and assign */
+        candidate_type_ = RECO_TRIGGER;
+        AddCutResult("type_hlt", true, 1.);
+        trig_elec_ = input_electron;
+        candidate_ = NULL;
+        /* Extract the useful quantities from a GsfElectron */
+        pt = input_electron.pt();
+        eta = input_electron.eta();
+        phi = input_electron.phi();
+        charge = 0;  // No charge
+    }
+
     const CutResult* ZFinderElectron::GetCutResult(const std::string& cut_name) const {
         /* Return a CutResult based on the name */
         // Find the cut
