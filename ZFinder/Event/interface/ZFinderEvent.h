@@ -100,8 +100,9 @@ namespace zf {
 
             // Output
             void PrintElectrons(const int TYPE = 0, const bool PRINT_CUTS = false);  // 0 is reco, 1 is truth, 2 is trig
-            void PrintTruthElectrons(const bool PRINT_CUTS = false) { PrintElectrons(true, PRINT_CUTS); };
-            void PrintRecoElectrons(const bool PRINT_CUTS = false) { PrintElectrons(false, PRINT_CUTS); };
+            void PrintTruthElectrons(const bool PRINT_CUTS = false) { PrintElectrons(1, PRINT_CUTS); };
+            void PrintRecoElectrons(const bool PRINT_CUTS = false) { PrintElectrons(0, PRINT_CUTS); };
+            void PrintTrigElectrons(const bool PRINT_CUTS = false) { PrintElectrons(2, PRINT_CUTS); };
 
             // Access ZDefinition information
             void AddZDef(const std::string NAME, cutlevel_vector PASS_OBJ) { zdef_map_[NAME] = PASS_OBJ; };

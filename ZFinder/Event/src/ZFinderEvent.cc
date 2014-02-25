@@ -447,11 +447,11 @@ namespace zf {
             // If the electrons are good, set them as our trigger electrons
             if (trig_obj_0 != NULL) {
                 ZFinderElectron* tmp_e0 = AddHLTElectron(*trig_obj_0);
-                set_e0_trig(e0);
+                set_e0_trig(tmp_e0);
             }
             if (trig_obj_1 != NULL) {
                 ZFinderElectron* tmp_e1 = AddHLTElectron(*trig_obj_1);
-                set_e1_trig(e1);
+                set_e1_trig(tmp_e1);
             }
         }
     }
