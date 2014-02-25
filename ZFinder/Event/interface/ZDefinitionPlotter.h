@@ -27,8 +27,8 @@ namespace zf {
 
             // Add events
             void Fill(
-                    const ZFinderEvent& zf_event, 
-                    const int first_electron = 0, 
+                    const ZFinderEvent& zf_event,
+                    const int first_electron = 0,
                     const int second_electron = 1
                     );
 

@@ -102,9 +102,8 @@ namespace zf {
     }
 
     void ZDefinition::ResetCutlevelVector() {
-        cutlevel_vector::iterator i_cutlevel;
-        for (i_cutlevel = clv.begin(); i_cutlevel != clv.end(); ++i_cutlevel) {
-            i_cutlevel->second = false;
+        for (auto& i_cutlevel : clv) {
+            i_cutlevel.second = false;
         }
     }
 

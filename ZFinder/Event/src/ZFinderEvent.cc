@@ -514,10 +514,8 @@ namespace zf {
         using std::cout;
         using std::endl;
         // Print all the cuts of the given zf_elec
-        std::vector<const CutResult*>* cuts = zf_elec->GetAllCuts();
-        std::vector<const CutResult*>::const_iterator i_cut;
-        for (i_cut = cuts->begin(); i_cut != cuts->end(); ++i_cut) {
-            cout << "\t\t" << (*i_cut)->name << ": " << (*i_cut)->passed << endl;
+        for (auto& i_cut : *zf_elec->GetAllCuts()) {
+            cout << "\t\t" << i_cut->name << ": " << i_cut->passed << endl;
         }
     }
 
@@ -537,12 +535,11 @@ namespace zf {
         cout << " event " << id.event_num;
         if (TYPE == RECO) {
             cout << " Reco Z Mass " << reco_z.m << std::endl;
-            for (std::vector<ZFinderElectron*>::const_iterator i_elec = reco_electrons_.begin(); i_elec != reco_electrons_.end(); ++i_elec) {
-                ZFinderElectron* elec = (*i_elec);
-                cout << "\tpt: " << elec->pt;
-                cout << " eta: " << elec->eta;
-                cout << " phi: " << elec->phi << endl;
-                if (PRINT_CUTS) { PrintCuts(elec); }
+            for (auto& i_elec : reco_electrons_) {
+                cout << "\tpt: " << i_elec->pt;
+                cout << " eta: " << i_elec->eta;
+                cout << " phi: " << i_elec->phi << endl;
+                if (PRINT_CUTS) { PrintCuts(i_elec); }
             }
         } else if (TYPE == TRUTH && !is_real_data) {
             if (e0_truth != NULL && e1_truth != NULL) {
@@ -580,8 +577,8 @@ namespace zf {
          * Return all electrons
          */
         std::vector<ZFinderElectron*>* tmp_vec = new std::vector<ZFinderElectron*>();
-        for (std::vector<ZFinderElectron*>::iterator i_elec = reco_electrons_.begin(); i_elec != reco_electrons_.end(); ++i_elec) {
-            tmp_vec->push_back(*i_elec);
+        for (auto& i_elec : reco_electrons_) {
+            tmp_vec->push_back(i_elec);
         }
 
         return tmp_vec;
@@ -592,10 +589,9 @@ namespace zf {
          * Return all electrons that pass a specified cut
          */
         std::vector< ZFinderElectron*>* tmp_vec = new std::vector< ZFinderElectron*>();
-        for (std::vector<ZFinderElectron*>::iterator i_elec = reco_electrons_.begin(); i_elec != reco_electrons_.end(); ++i_elec) {
-            ZFinderElectron* zfe = (*i_elec);
-            if (zfe->CutPassed(cut_name)) {
-                tmp_vec->push_back(zfe);
+        for (auto& i_elec : reco_electrons_) {
+            if (i_elec->CutPassed(cut_name)) {
+                tmp_vec->push_back(i_elec);
             }
         }
 
@@ -610,10 +606,9 @@ namespace zf {
         std::map<std::string, cutlevel_vector>::const_iterator it = zdef_map_.find(NAME);
         if (it != zdef_map_.end()) {
             const cutlevel_vector* cuts_vec = &it->second;
-            cutlevel_vector::const_iterator v_it;
             bool has_passed = true;
-            for (v_it = cuts_vec->begin(); v_it != cuts_vec->end(); ++v_it) {
-                has_passed = v_it->second && has_passed;
+            for (auto& v_it : *cuts_vec) {
+                has_passed = v_it.second && has_passed;
             }
             return has_passed;
         } else {
@@ -628,17 +623,15 @@ namespace zf {
         using std::cout;
         using std::endl;
         cout << "ZDefinitions:" << endl;
-        std::map<std::string, cutlevel_vector>::const_iterator i_map;
-        for (i_map = zdef_map_.begin(); i_map != zdef_map_.end(); ++i_map) {
-            cout << "\t" << i_map->first << ": ";
-            cout << ZDefPassed(i_map->first) << endl;
+        for (auto& i_map : zdef_map_) {
+            cout << "\t" << i_map.first << ": ";
+            cout << ZDefPassed(i_map.first) << endl;
             // If VERBOSE, print out each cutlevel as well
             if (VERBOSE) {
-                const cutlevel_vector* clv = &i_map->second;
-                cutlevel_vector::const_iterator i_cutlevel;
+                const cutlevel_vector* clv = &i_map.second;
 
-                for (i_cutlevel = clv->begin(); i_cutlevel != clv->end(); ++i_cutlevel) {
-                    cout << "\t\t" << i_cutlevel->first << ": " << i_cutlevel->second << endl;
+                for (auto& i_cutlevel : *clv) {
+                    cout << "\t\t" << i_cutlevel.first << ": " << i_cutlevel.second << endl;
                 }
             }
         }
@@ -680,17 +673,17 @@ namespace zf {
 
         trig_dr_vec* out_v = new trig_dr_vec();
         // Loop over triggers, filter the objects from these triggers, and then try to match
-        for(std::vector<std::string>::const_iterator trig_name = trig_names.begin(); trig_name != trig_names.end(); ++trig_name) {
+        for (auto& trig_name : trig_names) {
             // Loop over triggers, filter the objects from these triggers, and then try to match
             // Grab objects that pass our filter
-            edm::InputTag filter_tag((*trig_name), "", "HLT");
+            edm::InputTag filter_tag(trig_name, "", "HLT");
             trigger::size_type filter_index = trig_event->filterIndex(filter_tag);
             if(filter_index < trig_event->sizeFilters()) { // Check that the filter is in triggerEvent
                 const trigger::Keys& trig_keys = trig_event->filterKeys(filter_index);
                 const trigger::TriggerObjectCollection& trig_obj_collection(trig_event->getObjects());
                 // Get the objects from the trigger keys
-                for(trigger::Keys::const_iterator i_key = trig_keys.begin(); i_key!=trig_keys.end(); ++i_key){
-                    const trigger::TriggerObject* trig_obj = &trig_obj_collection[*i_key];
+                for (auto& i_key : trig_keys) {
+                    const trigger::TriggerObject* trig_obj = &trig_obj_collection[i_key];
                     const double DR = deltaR(ETA, PHI, trig_obj->eta(), trig_obj->phi());
                     // Do Delta R matching, and assign a new object if we have a
                     // better match
