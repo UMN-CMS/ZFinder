@@ -10,6 +10,7 @@
 #include "DataFormats/Candidate/interface/Candidate.h"  // reco::Candidate
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // GsfElectron
 #include "DataFormats/EgammaCandidates/interface/Photon.h"  // reco::Photon
+#include "DataFormats/HLTReco/interface/TriggerObject.h"  // trigger::TriggerObject
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"  // reco::GenParticle
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidate.h"  // reco::RecoEcalCandidate
 
@@ -19,7 +20,8 @@ namespace zf {
         RECO_GSFELECTRON,
         RECO_GENPARTICLE,
         RECO_RECOECALCANDIDATE,
-        RECO_PHOTON
+        RECO_PHOTON,
+        RECO_TRIGGER
     };
 
     struct CutResult {
@@ -35,6 +37,7 @@ namespace zf {
             ZFinderElectron(reco::GenParticle input_electron);
             ZFinderElectron(reco::RecoEcalCandidate input_electron);
             ZFinderElectron(reco::Photon input_electron);
+            ZFinderElectron(trigger::TriggerObject input_electron);
 
             // Kinematics variables
             double pt;
@@ -71,6 +74,7 @@ namespace zf {
             reco::GenParticle gen_elec_;
             reco::RecoEcalCandidate recan_elec_;
             reco::Photon photon_elec_;
+            trigger::TriggerObject trig_elec_;
 
     };
 }  // namespace zfe
