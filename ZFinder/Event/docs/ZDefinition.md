@@ -36,6 +36,23 @@ of the detector.
 | acc(HF+) | 3.1 < eta < 4.6                |
 | acc(HF-) | -4.6 < eta < -3.1              |
 
+###### Trigger
+
+Trigger cuts are used to match electrons to specific legs of triggers. They are
+true if an electron from that leg of the trigger matches our reco electrons
+with dR < 0.3, they are false otherwise.
+
+| Cut Name          | Trigger Leg                                              | Trigger Filter                                                 |
+|-------------------|----------------------------------------------------------|----------------------------------------------------------------|
+| trig(hf_loose)    | Loose HF leg                                             | hltHFEMTightFilter                                             |
+| trig(hf_tight)    | Tight HF leg                                             | hltHFEMPt30TightFilter                                         |
+| trig(et_et_tight) | Tight leg of double ET trigger                           | hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoFilter       |
+| trig(et_et_loose) | Loose leg of double ET trigger                           | hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoDoubleFilter |
+| trig(et_et_dz)    | dz vertex match filter                                   | hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoDZ           |
+| trig(et_nt_etleg) | Tight ET leg of ET-NT trigger                            | hltEle27TightIdLooseIsoTrackIsoFilter                          |
+| trig(et_hf_tight) | Tight ET leg of ET-HF trigger (paired with loose HF leg) | hltEle27TightIdLooseIsoTrackIsoFilter                          |
+| trig(et_hf_loose) | Loose ET leg of ET-HF trigger (paired with tight HF leg) | hltEle23TightIdLooseIsoTrackIsoFilter                          |
+
 ###### Type
 
 Type cuts select electrons based on the objects which were used to create the
@@ -78,20 +95,22 @@ Quality cuts select electrons that have passed various quality criteria.
 The ZDefinition code allows some cuts to be made on basic kinematic variables
 in a semi-free-form string. These strings take the following form:
 
-```cpp
-// General Form
+```python
+# General Form
 "${Variable}${Opperator}${Value}"
 
-// Some examples
-"pt>20"      // Require pt > 20
-"!gtp<30"    // Reject truth pt > 30
-"charge=1"   // Require charge +1
-"eta>=0"     // Require eta greater than or equal to 0
-"phi=<3.14"  // Require phi less than or equal to 3.14
+# Some examples
+"pt>20"      # Require pt > 20
+"!gtp<30"    # Reject truth pt > 30
+"charge=1"   # Require charge +1
+"teta>=0"    # Require trigger eta greater than or equal to 0
+"phi=<3.14"  # Require phi less than or equal to 3.14
 ```
 
 Any string string with '!' inverts the result, where as a quantity that starts
-with 'g' makes the cut on the Truth Level info (and always fails for real data).
+with 'g' makes the cut on the Truth Level info (and always fails for real
+data), and a quantity that starts with 't' makes the cut on the Trigger Level
+info.
 
 ##### Allowed Values
 
@@ -110,5 +129,3 @@ are given in the following table:
 | gcharge       |                |                                              |
 
 Note that this is a menu; pick one from each column!
-
-
