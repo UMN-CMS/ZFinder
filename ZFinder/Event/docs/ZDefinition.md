@@ -64,6 +64,7 @@ ZFinderElectron.
 | type_gen           | From reco::GenParticle       |
 | type_ecalcandidate | From reco::RecoEcalCandidate |
 | type_photon        | From reco::Photon            |
+| type_hlt           | From trigger::TriggerObject  |
 
 ###### Quality
 
