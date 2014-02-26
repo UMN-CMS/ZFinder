@@ -22,6 +22,14 @@
 
 
 namespace zf {
+    /*
+     * These variables are hard coded here for easy access, instead of randomly
+     * scattering them throughout the code
+     */
+    // Electrons are considered matched to a trigger object if close than this
+    // value
+    const double ZFinderEvent::TRIG_DR_ = 0.3;
+
     ZFinderEvent::ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup, const edm::ParameterSet& iConfig) {
         /* Given an event, parses them for the information needed to make the
          * classe.
@@ -65,7 +73,6 @@ namespace zf {
     }
 
     void ZFinderEvent::InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
-
         /* Count Pile Up and store first vertex location*/
         edm::Handle<reco::VertexCollection> reco_vertices;
         iEvent.getByLabel(inputtags_.vertex, reco_vertices);
@@ -148,7 +155,7 @@ namespace zf {
         // cms.InputTag("kt6PFJetsForIsolation", "rho")
         edm::Handle<double> rho_iso_h;
         iEvent.getByLabel(inputtags_.rho_iso, rho_iso_h);
-        double RHO_ISO = *(rho_iso_h.product());
+        const double RHO_ISO = *(rho_iso_h.product());
 
         // loop on electrons
         for(unsigned int i = 0; i < els_h->size(); ++i) {
@@ -191,19 +198,19 @@ namespace zf {
             zf_electron->AddCutResult("eg_trigwp70", TRIGWP70, WEIGHT);
 
             // Check for trigger matching
-            const bool EE_TIGHT = TriggerMatch(iEvent, ET_ET_TIGHT, zf_electron->eta, zf_electron->phi, 0.3);
-            const bool EE_LOOSE = TriggerMatch(iEvent, ET_ET_LOOSE, zf_electron->eta, zf_electron->phi, 0.3);
-            const bool EE_DZ = TriggerMatch(iEvent, ET_ET_DZ, zf_electron->eta, zf_electron->phi, 0.3);
-            const bool EENT_TIGHT = TriggerMatch(iEvent, ET_NT_ET_TIGHT, zf_electron->eta, zf_electron->phi, 0.3);
+            const bool EE_TIGHT = TriggerMatch(iEvent, ET_ET_TIGHT, zf_electron->eta, zf_electron->phi, TRIG_DR_);
+            const bool EE_LOOSE = TriggerMatch(iEvent, ET_ET_LOOSE, zf_electron->eta, zf_electron->phi, TRIG_DR_);
+            const bool EE_DZ = TriggerMatch(iEvent, ET_ET_DZ, zf_electron->eta, zf_electron->phi, TRIG_DR_);
+            const bool EENT_TIGHT = TriggerMatch(iEvent, ET_NT_ET_TIGHT, zf_electron->eta, zf_electron->phi, TRIG_DR_);
             const bool EEHF_TIGHT = EENT_TIGHT;
-            const bool EEHF_LOOSE = TriggerMatch(iEvent, ET_HF_ET_LOOSE, zf_electron->eta, zf_electron->phi, 0.3);
+            const bool EEHF_LOOSE = TriggerMatch(iEvent, ET_HF_ET_LOOSE, zf_electron->eta, zf_electron->phi, TRIG_DR_);
 
-            zf_electron->AddCutResult("Trig(ET_ET_Tight)", EE_TIGHT, WEIGHT);
-            zf_electron->AddCutResult("Trig(ET_ET_Loose)", EE_LOOSE, WEIGHT);
-            zf_electron->AddCutResult("Trig(ET_ET_DZ)", EE_DZ, WEIGHT);
-            zf_electron->AddCutResult("Trig(ET_NT_ETLeg)", EE_DZ, WEIGHT);
-            zf_electron->AddCutResult("Trig(ET_HF_Tight)", EEHF_TIGHT, WEIGHT);
-            zf_electron->AddCutResult("Trig(ET_HF_Loose)", EEHF_LOOSE, WEIGHT);
+            zf_electron->AddCutResult("trig(et_et_tight)", EE_TIGHT, WEIGHT);
+            zf_electron->AddCutResult("trig(et_et_loose)", EE_LOOSE, WEIGHT);
+            zf_electron->AddCutResult("trig(et_et_dz)", EE_DZ, WEIGHT);
+            zf_electron->AddCutResult("trig(et_nt_etleg)", EENT_TIGHT, WEIGHT);
+            zf_electron->AddCutResult("trig(et_hf_tight)", EEHF_TIGHT, WEIGHT);
+            zf_electron->AddCutResult("trig(et_hf_loose)", EEHF_LOOSE, WEIGHT);
         }
     }
 
@@ -254,11 +261,11 @@ namespace zf {
             zf_electron->AddCutResult("hf_2dloose", HFLOOSE, WEIGHT);
 
             // Check for trigger matching
-            const bool HIGHLOW_03 = TriggerMatch(iEvent, ET_HF_HF_LOOSE, zf_electron->eta, zf_electron->phi, 0.3);
-            zf_electron->AddCutResult("Trig(HF_loose)", HIGHLOW_03, WEIGHT);
+            const bool HIGHLOW_03 = TriggerMatch(iEvent, ET_HF_HF_LOOSE, zf_electron->eta, zf_electron->phi, TRIG_DR_);
+            zf_electron->AddCutResult("trig(hf_loose)", HIGHLOW_03, WEIGHT);
 
-            const bool LOWHIGH_03 = TriggerMatch(iEvent, ET_HF_HF_TIGHT, zf_electron->eta, zf_electron->phi, 0.3);
-            zf_electron->AddCutResult("Trig(HF_Tight)", LOWHIGH_03, WEIGHT);
+            const bool LOWHIGH_03 = TriggerMatch(iEvent, ET_HF_HF_TIGHT, zf_electron->eta, zf_electron->phi, TRIG_DR_);
+            zf_electron->AddCutResult("trig(hf_tight)", LOWHIGH_03, WEIGHT);
         }
     }
 

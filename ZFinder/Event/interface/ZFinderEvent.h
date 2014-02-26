@@ -111,6 +111,10 @@ namespace zf {
             void PrintZDefs(const bool VERBOSE = false) const;
 
         protected:
+            // These variables are defined at the top of ZFinderEvent.cc to
+            // avoid compilation issues
+            static const double TRIG_DR_;
+
             // Called by the constructor to handle MC and Data separately
             void InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup);
             void InitTruth(const edm::Event& iEvent, const edm::EventSetup& iSetup);
