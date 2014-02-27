@@ -1,5 +1,8 @@
 #include "ZFinder/Event/interface/ZFinderFitter.h"
 
+// Standard Library
+#include <string>
+
 // Root
 #include <TCanvas.h>  // TCanvas
 #include <TDirectory.h>  // TDirectory
@@ -13,6 +16,19 @@
 
 
 namespace zf {
+
+    const std::vector<std::string> ALL_CUTS = {
+        "acc(ALL)", "acc(EB)", "acc(EB+)", "acc(EB-)", "acc(EE)", "acc(EE+)",
+        "acc(EE-)", "acc(ET)", "acc(ET+)", "acc(ET-)", "acc(NT)", "acc(NT+)",
+        "acc(NT-)", "acc(HF)", "acc(HF+)", "acc(HF-)", "trig(hf_loose)",
+        "trig(hf_tight)", "trig(et_et_tight)", "trig(et_et_loose)",
+        "trig(et_et_dz)", "trig(et_nt_etleg)", "trig(et_hf_tight)",
+        "trig(et_hf_loose)", "type_gsf", "type_gen", "type_ecalcandidate",
+        "type_photon", "type_hlt", "eg_veto", "eg_loose", "eg_medium",
+        "eg_tight", "eg_eop_cut", "eg_trigtight", "eg_trigwp70", "hf_e9e25",
+        "hf_2dloose", "hf_2dmedium", "hf_2dtight", "nt_loose"
+    };
+
     // Constructor
     ZFinderFitter::ZFinderFitter() {
         // Variables
@@ -46,6 +62,19 @@ namespace zf {
         zf_arg_set->add(*e1_eta);
         zf_arg_set->add(*e1_charge);
         zf_arg_set->add(*n_vert);
+
+        // Add all cuts
+        for (auto& i_cut : ALL_CUTS) {
+            std::string e0_cut = "e0_" + i_cut;
+            std::string e1_cut = "e1_" + i_cut;
+            RooRealVar* e0_rrv = new RooRealVar(e0_cut.c_str(), e0_cut.c_str(), -1, 2);
+            RooRealVar* e1_rrv = new RooRealVar(e1_cut.c_str(), e1_cut.c_str(), -1, 2);
+            rrv_cuts.push_back(e0_rrv);
+            rrv_cuts.push_back(e1_rrv);
+            zf_arg_set->add(*e0_rrv);
+            zf_arg_set->add(*e1_rrv);
+        }
+
         // Datasets
         mc_truth_dataset = new RooDataSet(
                 "mc_truth_dataset", "All events from the Truth Level MC",
@@ -80,6 +109,18 @@ namespace zf {
             zf_arg_set->setRealValue("e1_charge", zf_event.e1_truth->charge);
             zf_arg_set->setRealValue("n_vert", zf_event.truth_vert.num);
             mc_truth_dataset->add(*zf_arg_set);
+
+            // Set all cuts
+            for (auto& i_cut : ALL_CUTS) {
+                std::string e0_cut = "e0_" + i_cut;
+                std::string e1_cut = "e1_" + i_cut;
+                int e0_res = zf_event.e0_truth->CutPassed(i_cut);
+                int e1_res = zf_event.e1_truth->CutPassed(i_cut);
+                if (e0_res < 0) { e0_res = 0; }  // We return -1 if the cut wasn't set
+                if (e1_res < 0) { e1_res = 0; }
+                zf_arg_set->setRealValue(e0_cut.c_str(), e0_res);
+                zf_arg_set->setRealValue(e1_cut.c_str(), e1_res);
+            }
         }
     }
 
@@ -116,6 +157,19 @@ namespace zf {
         zf_arg_set->setRealValue("e1_eta", zf_event.e1->eta);
         zf_arg_set->setRealValue("e1_charge", zf_event.e1->charge);
         zf_arg_set->setRealValue("n_vert", zf_event.reco_vert.num);
+
+        // Set all cuts
+        for (auto& i_cut : ALL_CUTS) {
+            std::string e0_cut = "e0_" + i_cut;
+            std::string e1_cut = "e1_" + i_cut;
+            int e0_res = zf_event.e0->CutPassed(i_cut);
+            int e1_res = zf_event.e1->CutPassed(i_cut);
+            if (e0_res < 0) { e0_res = 0; }  // We return -1 if the cut wasn't set
+            if (e1_res < 0) { e1_res = 0; }
+            zf_arg_set->setRealValue(e0_cut.c_str(), e0_res);
+            zf_arg_set->setRealValue(e1_cut.c_str(), e1_res);
+        }
+
         if (zf_event.is_real_data) {
             data_reco_dataset->add(*zf_arg_set);
         } else {
@@ -134,5 +188,38 @@ namespace zf {
         w->import(*mc_reco_dataset);
         w->import(*data_reco_dataset);
         w->Write();
+        data_reco_dataset->Print("v");
+    }
+
+    ZFinderFitter::~ZFinderFitter() {
+        // First we clean up the RooRealVariables
+        delete z_mass;
+        delete z_eta ;
+        delete z_y;
+        delete z_pt;
+        delete phistar;
+        delete weight;
+        delete pass;
+        delete e0_pt;
+        delete e0_phi;
+        delete e0_eta;
+        delete e0_charge;
+        delete e1_pt;
+        delete e1_phi;
+        delete e1_eta;
+        delete e1_charge;
+        delete n_vert;
+
+        // Then we clean up all the RRVs made from the cut vector
+        for (auto& i_rrv : rrv_cuts) {
+            delete i_rrv;
+        }
+
+        // Finally we remove the argset and datasets, which are full of the
+        // above objects
+        delete zf_arg_set;
+        delete mc_truth_dataset;
+        delete mc_reco_dataset;
+        delete data_reco_dataset;
     }
 }
