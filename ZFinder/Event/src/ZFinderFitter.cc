@@ -188,7 +188,7 @@ namespace zf {
         w->import(*mc_reco_dataset);
         w->import(*data_reco_dataset);
         w->Write();
-        data_reco_dataset->Print("v");
+        //data_reco_dataset->Print("v")
     }
 
     ZFinderFitter::~ZFinderFitter() {
