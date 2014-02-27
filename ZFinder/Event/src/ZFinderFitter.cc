@@ -15,29 +15,71 @@
 namespace zf {
     // Constructor
     ZFinderFitter::ZFinderFitter() {
-        Zmass = new RooRealVar("Zmass", "Zmass", -10, 10000);
-        Zeta = new RooRealVar("Zeta", "Zeta", -20, 20);
-        Zy = new RooRealVar("Zy", "Zy", -1000, 1000);
-        Zpt = new RooRealVar("Zpt", "Zpt", 0, 10000);
-        Zphistar = new RooRealVar("Zphistar", "Zphistar", 0, 100);
-        Weight = new RooRealVar("Weight", "Weight", 0, 100);
-        Pass = new RooRealVar("Pass", "Pass", -2, 2);
-        ZEventArgSet = new RooArgSet(*Zmass,  *Zphistar,  *Zpt,  *Zeta,  *Zy,  *Weight,  *Pass);
-        MC_true_all = new RooDataSet("MC_true_all", "MC_true_all", *ZEventArgSet, RooFit::WeightVar("Weight"));
-        MC_reco = new RooDataSet("MC_reco", "MC_reco", *ZEventArgSet, RooFit::WeightVar("Weight"));
-        Data_reco = new RooDataSet("Data_reco", "Data_reco", *ZEventArgSet, RooFit::WeightVar("Weight"));
+        // Variables
+        // Z
+        z_mass = new RooRealVar("z_mass", "m_{ee}", -10, 10000, "GeV");
+        z_eta = new RooRealVar("z_eta", "Z_{#eta}", -20, 20);
+        z_y = new RooRealVar("z_y", "Z_{Y}", -1000, 1000);
+        z_pt = new RooRealVar("z_pt", "Z_{p_{T}}", 0, 10000, "GeV");
+        phistar = new RooRealVar("phistar", "#phi*", 0, 100);
+        // Electrons
+        e0_pt = new RooRealVar("e0_pt", "p_{T}^{e_{0}}", 0, 10000, "GeV");
+        e0_phi = new RooRealVar("e0_phi", "#phi_{e_{0}}", 0, 10000);
+        e0_eta = new RooRealVar("e0_eta", "#eta_{e_{0}}", 0, 10000);
+        e0_charge = new RooRealVar("e0_charge", "#q_{e_{0}}", 0, 10000);
+        e1_pt = new RooRealVar("e1_pt", "p_{T}^{e_{1}}", 0, 10000, "GeV");
+        e1_phi = new RooRealVar("e1_phi", "#phi_{e_{1}}", 0, 10000);
+        e1_eta = new RooRealVar("e1_eta", "#eta_{e_{1}}", 0, 10000);
+        e1_charge = new RooRealVar("e1_charge", "#q_{e_{1}}", 0, 10000);
+        // Event
+        n_vert = new RooRealVar("n_vert", "Number of Vertices", 0, 1000);
+        weight = new RooRealVar("weight", "Event weight", 0, 100);
+        pass = new RooRealVar("pass", "Pass", -2, 2);
+        // Argsets
+        zf_arg_set = new RooArgSet(*z_mass, *phistar, *z_pt, *z_eta, *z_y, *weight, *pass);
+        zf_arg_set->add(*e0_pt);
+        zf_arg_set->add(*e0_phi);
+        zf_arg_set->add(*e0_eta);
+        zf_arg_set->add(*e0_charge);
+        zf_arg_set->add(*e1_pt);
+        zf_arg_set->add(*e1_phi);
+        zf_arg_set->add(*e1_eta);
+        zf_arg_set->add(*e1_charge);
+        zf_arg_set->add(*n_vert);
+        // Datasets
+        mc_truth_dataset = new RooDataSet(
+                "mc_truth_dataset", "All events from the Truth Level MC",
+                *zf_arg_set, RooFit::WeightVar("weight")
+                );
+        mc_reco_dataset = new RooDataSet(
+                "mc_reco_dataset", "Events that pass our selection in Reco MC",
+                *zf_arg_set, RooFit::WeightVar("weight")
+                );
+        data_reco_dataset = new RooDataSet(
+                "data_reco_dataset", "Events that pass our selection in Reco Data",
+                *zf_arg_set, RooFit::WeightVar("weight")
+                );
     }
 
     void ZFinderFitter::FillAll(const ZFinderEvent& zf_event) {
         if (!zf_event.is_real_data) {
-            ZEventArgSet->setRealValue("Zmass", zf_event.truth_z.m);
-            ZEventArgSet->setRealValue("Zeta", zf_event.truth_z.eta);
-            ZEventArgSet->setRealValue("Zy", zf_event.truth_z.y);
-            ZEventArgSet->setRealValue("Zphistar", zf_event.truth_z.phistar);
-            ZEventArgSet->setRealValue("Zpt", zf_event.truth_z.pt);
-            ZEventArgSet->setRealValue("Weight", 1);
-            ZEventArgSet->setRealValue("Pass", -1);
-            MC_true_all->add(*ZEventArgSet);
+            zf_arg_set->setRealValue("z_mass", zf_event.truth_z.m);
+            zf_arg_set->setRealValue("z_eta", zf_event.truth_z.eta);
+            zf_arg_set->setRealValue("z_y", zf_event.truth_z.y);
+            zf_arg_set->setRealValue("z_pt", zf_event.truth_z.pt);
+            zf_arg_set->setRealValue("phistar", zf_event.truth_z.phistar);
+            zf_arg_set->setRealValue("weight", 1);
+            zf_arg_set->setRealValue("pass", -1);
+            zf_arg_set->setRealValue("e0_pt", zf_event.e0_truth->pt);
+            zf_arg_set->setRealValue("e0_phi", zf_event.e0_truth->phi);
+            zf_arg_set->setRealValue("e0_eta", zf_event.e0_truth->eta);
+            zf_arg_set->setRealValue("e0_charge", zf_event.e0_truth->charge);
+            zf_arg_set->setRealValue("e1_pt", zf_event.e1_truth->pt);
+            zf_arg_set->setRealValue("e1_phi", zf_event.e1_truth->phi);
+            zf_arg_set->setRealValue("e1_eta", zf_event.e1_truth->eta);
+            zf_arg_set->setRealValue("e1_charge", zf_event.e1_truth->charge);
+            zf_arg_set->setRealValue("n_vert", zf_event.truth_vert.num);
+            mc_truth_dataset->add(*zf_arg_set);
         }
     }
 
@@ -45,12 +87,12 @@ namespace zf {
         double weight0 = 1;
         double weight1 = 1;
         if (!zf_event.is_real_data){
-            int netasf = (sizeof(EfficiencyEtaBins)/sizeof(EfficiencyEtaBins[0]))-1;
-            int nptsf = (sizeof(EfficiencyETBins)/sizeof(EfficiencyETBins[0]))-1;
-            int bin0eta = BinInArray(fabs(zf_event.e0->eta), EfficiencyEtaBins, netasf);
-            int bin0pt  = BinInArray(zf_event.e0->pt       , EfficiencyETBins,  nptsf);
-            int bin1eta = BinInArray(fabs(zf_event.e1->eta), EfficiencyEtaBins, netasf);
-            int bin1pt  = BinInArray(zf_event.e1->pt       , EfficiencyETBins,  nptsf);
+            const int netasf = (sizeof(EfficiencyEtaBins)/sizeof(EfficiencyEtaBins[0]))-1;
+            const int nptsf = (sizeof(EfficiencyETBins)/sizeof(EfficiencyETBins[0]))-1;
+            const int bin0eta = BinInArray(fabs(zf_event.e0->eta), EfficiencyEtaBins, netasf);
+            const int bin0pt  = BinInArray(zf_event.e0->pt       , EfficiencyETBins,  nptsf);
+            const int bin1eta = BinInArray(fabs(zf_event.e1->eta), EfficiencyEtaBins, netasf);
+            const int bin1pt  = BinInArray(zf_event.e1->pt       , EfficiencyETBins,  nptsf);
             if (bin0eta >= 0 && bin0pt >= 0) {
                 weight0 = EfficiencySF[bin0eta][bin0pt][0];
             }
@@ -58,31 +100,39 @@ namespace zf {
                 weight1 = EfficiencySF[bin1eta][bin1pt][0];
             }
         }
-        ZEventArgSet->setRealValue("Zmass", zf_event.reco_z.m);
-        ZEventArgSet->setRealValue("Zeta", zf_event.reco_z.eta);
-        ZEventArgSet->setRealValue("Zy", zf_event.reco_z.y);
-        ZEventArgSet->setRealValue("Zphistar", zf_event.reco_z.phistar);
-        ZEventArgSet->setRealValue("Zpt", zf_event.reco_z.pt);
-        ZEventArgSet->setRealValue("Weight", weight0*weight1);
-        ZEventArgSet->setRealValue("Pass", 1);
+        zf_arg_set->setRealValue("z_mass", zf_event.reco_z.m);
+        zf_arg_set->setRealValue("z_eta", zf_event.reco_z.eta);
+        zf_arg_set->setRealValue("z_y", zf_event.reco_z.y);
+        zf_arg_set->setRealValue("phistar", zf_event.reco_z.phistar);
+        zf_arg_set->setRealValue("z_pt", zf_event.reco_z.pt);
+        zf_arg_set->setRealValue("weight", weight0*weight1);
+        zf_arg_set->setRealValue("pass", 1);
+        zf_arg_set->setRealValue("e0_pt", zf_event.e0->pt);
+        zf_arg_set->setRealValue("e0_phi", zf_event.e0->phi);
+        zf_arg_set->setRealValue("e0_eta", zf_event.e0->eta);
+        zf_arg_set->setRealValue("e0_charge", zf_event.e0->charge);
+        zf_arg_set->setRealValue("e1_pt", zf_event.e1->pt);
+        zf_arg_set->setRealValue("e1_phi", zf_event.e1->phi);
+        zf_arg_set->setRealValue("e1_eta", zf_event.e1->eta);
+        zf_arg_set->setRealValue("e1_charge", zf_event.e1->charge);
+        zf_arg_set->setRealValue("n_vert", zf_event.reco_vert.num);
         if (zf_event.is_real_data) {
-            Data_reco->add(*ZEventArgSet);
+            data_reco_dataset->add(*zf_arg_set);
         } else {
-            MC_reco->add(*ZEventArgSet);
+            mc_reco_dataset->add(*zf_arg_set);
         }
     }
 
     void ZFinderFitter::Write() {
         // Get a TDirectory from the TFileDirectory and cd to it for writing
- 
+
         edm::Service<TFileService> fs;
-	fs->cd();
+        fs->cd();
         // Make the workspace and save it
-	//RooWorkspace *w = fs->make<RooWorkspace>("w","workspace");
         RooWorkspace *w = new RooWorkspace("w", "workspace");
-        w->import(*MC_true_all);
-        w->import(*MC_reco);
-        w->import(*Data_reco);
+        w->import(*mc_truth_dataset);
+        w->import(*mc_reco_dataset);
+        w->import(*data_reco_dataset);
         w->Write();
     }
 }

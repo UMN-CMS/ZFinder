@@ -26,20 +26,30 @@ namespace zf {
             //calculates cross-section, print fits
             void Write();
 
-
         protected:
             // DataSets
-            RooArgSet* ZEventArgSet;
-            RooDataSet* MC_true_all;
-            RooDataSet* MC_reco;
-            RooDataSet* Data_reco;
-            RooRealVar* Zmass;
-            RooRealVar* Zeta ;
-            RooRealVar* Zy;
-            RooRealVar* Zpt;
-            RooRealVar* Zphistar;
-            RooRealVar* Weight;
-            RooRealVar* Pass;
+            RooArgSet* zf_arg_set;
+
+            RooDataSet* mc_truth_dataset;
+            RooDataSet* mc_reco_dataset;
+            RooDataSet* data_reco_dataset;
+
+            RooRealVar* z_mass;
+            RooRealVar* z_eta ;
+            RooRealVar* z_y;
+            RooRealVar* z_pt;
+            RooRealVar* phistar;
+            RooRealVar* weight;
+            RooRealVar* pass;
+            RooRealVar* e0_pt;
+            RooRealVar* e0_phi;
+            RooRealVar* e0_eta;
+            RooRealVar* e0_charge;
+            RooRealVar* e1_pt;
+            RooRealVar* e1_phi;
+            RooRealVar* e1_eta;
+            RooRealVar* e1_charge;
+            RooRealVar* n_vert;
     };
 }  // namespace zf
 #endif  // ZFINDER_ZFINDERFITTER_H_
