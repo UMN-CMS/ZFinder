@@ -1,6 +1,9 @@
 #ifndef ZFINDER_ZFINDERFITTER_H_
 #define ZFINDER_ZFINDERFITTER_H_
 
+// Standard Library
+#include <vector>
+
 // Root
 #include <RooArgSet.h>
 #include <RooDataSet.h>
@@ -15,10 +18,15 @@
 
 
 namespace zf {
+
+
     class ZFinderFitter{
         public:
             // Constructor
             ZFinderFitter();
+
+            // Destructor
+            ~ZFinderFitter();
 
             // Add events
             void FillAll(const ZFinderEvent& zf_event);
@@ -50,6 +58,8 @@ namespace zf {
             RooRealVar* e1_eta;
             RooRealVar* e1_charge;
             RooRealVar* n_vert;
+
+            std::vector<RooRealVar*> rrv_cuts;
     };
 }  // namespace zf
 #endif  // ZFINDER_ZFINDERFITTER_H_
