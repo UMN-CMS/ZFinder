@@ -31,5 +31,17 @@ namespace zf {
     static const std::vector<std::string> ET_HF_HF_LOOSE = {
         "hltHFEMTightFilter"  // ET-HF TightLoose HF Leg (15pt)
     };
+
+    // The giant combined list
+    static const std::vector<std::string> ALL_TRIGGERS = {
+        "hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoDZ",
+        "hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoDoubleFilter",
+        "hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoFilter",
+        "hltEle23TightIdLooseIsoTrackIsoFilter",
+        "hltEle27TightIdLooseIsoTrackIsoFilter",
+        "hltHFEMPt30TightFilter",
+        "hltHFEMTightFilter"
+    };
+
 }  // namespace zf
 #endif  // ZFINDER_TRIGGERLIST_H_

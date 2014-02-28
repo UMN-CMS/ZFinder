@@ -68,6 +68,19 @@ namespace zf {
         charge = 0;  // No charge because no tracker
     }
 
+    ZFinderElectron::ZFinderElectron(trigger::TriggerObject input_electron) {
+        /* Set type of candidate and assign */
+        candidate_type_ = RECO_TRIGGER;
+        AddCutResult("type_hlt", true, 1.);
+        trig_elec_ = input_electron;
+        candidate_ = NULL;
+        /* Extract the useful quantities from a GsfElectron */
+        pt = input_electron.pt();
+        eta = input_electron.eta();
+        phi = input_electron.phi();
+        charge = 0;  // No charge
+    }
+
     const CutResult* ZFinderElectron::GetCutResult(const std::string& cut_name) const {
         /* Return a CutResult based on the name */
         // Find the cut
@@ -118,9 +131,8 @@ namespace zf {
     std::vector<const CutResult*>* ZFinderElectron::GetAllCuts() {
         /* Return all cuts */
         std::vector<const CutResult*>* tmp_vec = new std::vector<const CutResult*>();
-        std::map<std::string, CutResult>::const_iterator i_cut;
-        for (i_cut = cutresults_.begin(); i_cut != cutresults_.end(); ++i_cut) {
-            tmp_vec->push_back(&(i_cut->second));
+        for (auto& i_cut : cutresults_) {
+            tmp_vec->push_back(&(i_cut.second));
         }
         return tmp_vec;
     }
@@ -128,10 +140,9 @@ namespace zf {
     std::vector<const CutResult*>* ZFinderElectron::GetCutsBool(const bool PASSED) {
         /* Finds all cuts that have passed matching PASSED */
         std::vector<const CutResult*>* tmp_vec = new std::vector<const CutResult*>();
-        std::map<std::string, CutResult>::const_iterator i_cut;
-        for (i_cut = cutresults_.begin(); i_cut != cutresults_.end(); ++i_cut) {
-            if (i_cut->second.passed == PASSED) {
-                tmp_vec->push_back(&(i_cut->second));
+        for (auto& i_cut : cutresults_) {
+            if (i_cut.second.passed == PASSED) {
+                tmp_vec->push_back(&(i_cut.second));
             }
         }
         return tmp_vec;

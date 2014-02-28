@@ -9,14 +9,13 @@
 
 namespace zf {
     void TruthMatchSetter::SetCuts(ZFinderEvent* zf_event) {
-        is_real_data = zf_event->is_real_data; 
+        is_real_data = zf_event->is_real_data;
         zf_event_ = zf_event;
 
         // Loop over all electrons and call SetCut_
         std::vector<ZFinderElectron*>* zf_electrons = zf_event->FilteredElectrons();
-        for (std::vector<ZFinderElectron*>::iterator i_elec = zf_electrons->begin(); i_elec != zf_electrons->end(); ++i_elec) {
-            ZFinderElectron* zf_elec = *i_elec;
-            SetCut_(zf_elec);
+        for (auto& i_elec : *zf_electrons) {
+            SetCut_(i_elec);
         }
     }
 
@@ -33,7 +32,7 @@ namespace zf {
     }
 
     bool TruthMatchSetter::MatchTruth(const ZFinderElectron& ZF_ELEC, const double DELTA_R) {
-        // Real data has no gen, so can't possibly match!    
+        // Real data has no gen, so can't possibly match!
         if (is_real_data) {
             return false;
         }
@@ -50,7 +49,7 @@ namespace zf {
         if (dr0 < DELTA_R || dr1 < DELTA_R) {
             return true;
         } else {
-            return false;        
+            return false;
         }
     }
 }  // namespace zf

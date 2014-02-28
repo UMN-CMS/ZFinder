@@ -23,7 +23,7 @@ int MakePlots(
     using std::vector;
 
     /* Colors */
-    static const int COLOR[6] = {kRed, kRed, kBlue, kGreen+2, kBlack, kBlack};
+    static const int COLOR[7] = {kRed, kRed, kBlue, kGreen+2, kCyan+1, kYellow+1, kMagenta+1};
 
     /* Pretty plots */
     gROOT->SetStyle("Plain");
@@ -47,10 +47,14 @@ int MakePlots(
 
     /* Loop over each region, and then each plot in the region */
     const string BASE_DIR_NAME = "/ZFinder/";
+    const string ENDING_NAME = " Reco/6 60 < M_{ee} < 120/";
     const string ALL_DIR = BASE_DIR_NAME + "All Electrons Reco/1 60 < M_{ee} < 120/";
-    const string COMB_DIR = BASE_DIR_NAME + "ET-ET No ID Combined Reco/5 60 < M_{ee} < 120/";
-    const string COMB_TIGHT_DIR = BASE_DIR_NAME + "ET-ET Tighter No ID Combined Reco/5 60 < M_{ee} < 120/";
-    const string COMB_LOSE_DIR = BASE_DIR_NAME + "ET-ET Looser No ID Combined Reco/5 60 < M_{ee} < 120/";
+    const string S20202124 = BASE_DIR_NAME + "S2020 2124" + ENDING_NAME;
+    const string S20202424 = BASE_DIR_NAME + "S2020 2424" + ENDING_NAME;
+    const string D30202124 = BASE_DIR_NAME + "D3020 2124" + ENDING_NAME;
+    const string D30202424 = BASE_DIR_NAME + "D3020 2424" + ENDING_NAME;
+    const string D30102124 = BASE_DIR_NAME + "D3010 2124" + ENDING_NAME;
+    const string D30102424 = BASE_DIR_NAME + "D3010 2424" + ENDING_NAME;
 
     vector<pair<string, string> > histo_to_name;
     histo_to_name.push_back(std::make_pair("Z0 Rapidity", "Z_{Y}"));
@@ -58,19 +62,22 @@ int MakePlots(
 
     for (vector<pair<string, string> >::const_iterator i_h2n = histo_to_name.begin(); i_h2n != histo_to_name.end(); ++i_h2n) {
         /* Extract the histograms */
-        const int HIST_LEN = 4;
+        const int HIST_LEN = 7;
         string hist_names[HIST_LEN];
         hist_names[0] = ALL_DIR + (*i_h2n).first;
-        hist_names[1] = COMB_DIR + (*i_h2n).first;
-        hist_names[2] = COMB_TIGHT_DIR + (*i_h2n).first;
-        hist_names[3] = COMB_LOSE_DIR + (*i_h2n).first;
+        hist_names[1] = S20202124 + (*i_h2n).first;
+        hist_names[2] = S20202424 + (*i_h2n).first;
+        hist_names[3] = D30202124 + (*i_h2n).first;
+        hist_names[4] = D30202424 + (*i_h2n).first;
+        hist_names[5] = D30102124 + (*i_h2n).first;
+        hist_names[6] = D30102424 + (*i_h2n).first;
         TH1D* in_hist[HIST_LEN];
 
         /* Try to load the histograms from the file */
         for (int i = 0; i <= HIST_LEN-1; ++i) {
             in_tfile->GetObject(hist_names[i].c_str(), in_hist[i]);
             if (!in_hist[i]){
-                std::cout << "Failed to get Histogram named: '" << hist_names[i] << "'" << std::endl;
+                std::cout << "Failed to get Histogram number " << i << " named: '" << hist_names[i] << "'" << std::endl;
                 return 1;
             }
         }
@@ -88,7 +95,7 @@ int MakePlots(
             in_hist[i]->GetYaxis()->SetTitle("Ratio");  // Change title
             in_hist[i]->SetLineColor(COLOR[i]);
             in_hist[i]->Sumw2();
-            in_hist[i]->SetMaximum(1.5);
+            in_hist[i]->SetMaximum(1.);
             in_hist[i]->SetMinimum(0.);
             if ((*i_h2n).second == "#phi*") {
                 in_hist[i]->Rebin(4);
@@ -110,12 +117,12 @@ int MakePlots(
         /* Make a legend */
         TLegend* leg = new TLegend(0.4, 0.87, 0.959, 0.959);
         leg->SetFillColor(kWhite);
-        //leg->AddEntry(in_hist[0], "gpt>15, gpt>8", "l");
-        //leg->AddEntry(in_hist[1], "p_{T}>20,20; |Eta|< 2.1,2.4 / All Z->ee", "p");
-        //leg->AddEntry(in_hist[2], "p_{T}>30,20 / All Z->ee", "p");
         leg->AddEntry(in_hist[1], "p_{T}>20,20; |Eta|< 2.1,2.4", "p");
-        leg->AddEntry(in_hist[2], "p_{T}>30,20; |Eta|< 2.1,2.4", "p");
-        leg->AddEntry(in_hist[3], "p_{T}>30,10; |Eta|< 2.1,2.4", "p");
+        leg->AddEntry(in_hist[2], "p_{T}>20,20; |Eta|< 2.4,2.4", "p");
+        leg->AddEntry(in_hist[3], "p_{T}>30,20; |Eta|< 2.1,2.4, Tight", "p");
+        leg->AddEntry(in_hist[4], "p_{T}>30,20; |Eta|< 2.4,2.4, Tight", "p");
+        leg->AddEntry(in_hist[5], "p_{T}>30,10; |Eta|< 2.1,2.4, Tight", "p");
+        leg->AddEntry(in_hist[6], "p_{T}>30,10; |Eta|< 2.4,2.4, Tight", "p");
 
         /* Add information about the ratio */
         TLatex *norm_label = new TLatex(.69, 0.83, "#splitline{Acceptance requirements compared to}{all Z->ee events with 60 < m_{ee} < 120}");
@@ -127,13 +134,14 @@ int MakePlots(
         norm_label->SetTextAngle(0);
 
         /* Save the plot as a png  */
-        in_hist[1]->Divide(in_hist[0]);
-        in_hist[2]->Divide(in_hist[0]);
-        in_hist[3]->Divide(in_hist[0]);
-        //in_hist[0]->Draw();
-        in_hist[1]->Draw();
-        in_hist[2]->Draw("SAME");
-        in_hist[3]->Draw("SAME");
+        for (int i = 1; i <= HIST_LEN-1; ++i) {
+            in_hist[i]->Divide(in_hist[0]);
+            if (i >= 2) {
+                in_hist[i]->Draw("SAME");
+            } else {
+                in_hist[i]->Draw();
+            }
+        }
         leg->Draw();
         plabel->Draw();
         norm_label->Draw();

@@ -118,13 +118,12 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
 
     // Set up ZDefinitions and plotters
     zdef_psets_ = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet> >("ZDefinitions");
-    std::vector<edm::ParameterSet>::const_iterator i_pset;
-    for (i_pset = zdef_psets_.begin(); i_pset != zdef_psets_.end(); ++i_pset) {
-        std::string name = i_pset->getUntrackedParameter<std::string>("name");
-        std::vector<std::string> cuts0 = i_pset->getUntrackedParameter<std::vector<std::string> >("cuts0");
-        std::vector<std::string> cuts1 = i_pset->getUntrackedParameter<std::vector<std::string> >("cuts1");
-        double min_mz = i_pset->getUntrackedParameter<double>("min_mz");
-        double max_mz = i_pset->getUntrackedParameter<double>("max_mz");
+    for (auto& i_pset : zdef_psets_) {
+        std::string name = i_pset.getUntrackedParameter<std::string>("name");
+        std::vector<std::string> cuts0 = i_pset.getUntrackedParameter<std::vector<std::string> >("cuts0");
+        std::vector<std::string> cuts1 = i_pset.getUntrackedParameter<std::vector<std::string> >("cuts1");
+        double min_mz = i_pset.getUntrackedParameter<double>("min_mz");
+        double max_mz = i_pset.getUntrackedParameter<double>("max_mz");
         // Make the ZDef
         zf::ZDefinition* zd = new zf::ZDefinition(name, cuts0, cuts1, min_mz, max_mz);
         zdefs_.push_back(zd);
@@ -158,23 +157,21 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     z_fitter->FillAll(zfe);
     if (zfe.reco_z.m > -1 && zfe.e0 != NULL && zfe.e1 != NULL) {  // We have a good Z
         // Set all cuts
-        std::vector<zf::SetterBase*>::const_iterator i_set;
-        for (i_set = setters_.begin(); i_set != setters_.end(); ++i_set) {
-            (*i_set)->SetCuts(&zfe);
+        for (auto& i_set : setters_) {
+            i_set->SetCuts(&zfe);
         }
         // Set all ZDefs
-        std::vector<zf::ZDefinition*>::const_iterator i_zdef;
-        for (i_zdef = zdefs_.begin(); i_zdef != zdefs_.end(); ++i_zdef) {
-            (*i_zdef)->ApplySelection(&zfe);
+        for (auto& i_zdef : zdefs_) {
+            i_zdef->ApplySelection(&zfe);
         }
         // Make all ZDef plots
-        std::vector<zf::ZDefinitionPlotter*>::const_iterator i_zdefp;
-        for (i_zdefp = zdef_plotters_.begin(); i_zdefp != zdef_plotters_.end(); ++i_zdefp) {
-            (*i_zdefp)->Fill(zfe);
+        for (auto& i_zdefp : zdef_plotters_) {
+            i_zdefp->Fill(zfe);
         }
 
         // Add event to a RooWorkspace
-        if (zfe.ZDefPassed("ET-ET")) {
+        if (zfe.ZDefPassed("All-All")) {
+            z_fitter->FillAll(zfe);
             z_fitter->FillSelected(zfe);
         }
     }

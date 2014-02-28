@@ -102,9 +102,8 @@ namespace zf {
     }
 
     void ZDefinition::ResetCutlevelVector() {
-        cutlevel_vector::iterator i_cutlevel;
-        for (i_cutlevel = clv.begin(); i_cutlevel != clv.end(); ++i_cutlevel) {
-            i_cutlevel->second = false;
+        for (auto& i_cutlevel : clv) {
+            i_cutlevel.second = false;
         }
     }
 
@@ -172,6 +171,13 @@ namespace zf {
     }
 
     bool ZDefinition::ComparisonCut(const CutInfo& CUTINFO, const int I_ELEC, ZFinderEvent* zf_event) {
+        // An enum to track what cut we're making
+        enum CUTTYPE {
+            RECO,
+            TRUTH,
+            TRIG
+        };
+
         // Read internal variables
         const bool INVERT = CUTINFO.invert;
         const std::string CUT = CUTINFO.cut;
@@ -180,19 +186,26 @@ namespace zf {
         const double COMP_VAL = CUTINFO.comp_val;
 
         // Check if the cut is on a generator quantity
-        bool use_truth;
-        if (   COMP_VAR == CV_GPT
+        int cut_type;
+        if (    COMP_VAR == CV_GPT
                 || COMP_VAR == CV_GETA
                 || COMP_VAR == CV_GPHI
                 || COMP_VAR == CV_GCHARGE
            ) {
-            use_truth = true;
+            cut_type = TRUTH;
+        } else if (
+                COMP_VAR == CV_TPT
+                || COMP_VAR == CV_TETA
+                || COMP_VAR == CV_TPHI
+                || COMP_VAR == CV_TCHARGE
+                ){
+            cut_type = TRIG;
         } else {
-            use_truth = false;
+            cut_type = RECO;
         }
 
         // If we're not MC, always fail Gen cuts
-        if (use_truth && zf_event->is_real_data) {
+        if (cut_type == TRUTH && zf_event->is_real_data) {
             std::cout << "MC CUT ON DATA" << std::endl;
             return false;
         }
@@ -200,14 +213,18 @@ namespace zf {
         // Get the electron we want
         ZFinderElectron* zf_elec = NULL;
         if (I_ELEC == 0) {
-            if (use_truth && zf_event->e0 != NULL && zf_event->e1 != NULL) {
+            if (cut_type == TRUTH && zf_event->e0 != NULL && zf_event->e1 != NULL) {
                 zf_elec = zf_event->e0_truth;
+            } else if (cut_type == TRIG && zf_event->e0 != NULL && zf_event->e1 != NULL) {
+                zf_elec = zf_event->e0_trig;
             } else {
                 zf_elec = zf_event->e0;
             }
         } else {
-            if (use_truth && zf_event->e0 != NULL && zf_event->e1 != NULL) {
+            if (cut_type == TRUTH && zf_event->e0 != NULL && zf_event->e1 != NULL) {
                 zf_elec = zf_event->e1_truth;
+            } else if (cut_type == TRIG && zf_event->e0 != NULL && zf_event->e1 != NULL) {
+                zf_elec = zf_event->e1_trig;
             } else {
                 zf_elec = zf_event->e1;
             }
@@ -223,21 +240,25 @@ namespace zf {
         switch(COMP_VAR) {
             case CV_PT:
             case CV_GPT:
+            case CV_TPT:
                 e_val = zf_elec->pt;
                 break;
             case CV_ETA:
             case CV_GETA:
+            case CV_TETA:
                 e_val = zf_elec->eta;
                 break;
             case CV_PHI:
             case CV_GPHI:
+            case CV_TPHI:
                 e_val = zf_elec->phi;
                 break;
             case CV_CHARGE:
             case CV_GCHARGE:
+            case CV_TCHARGE:
                 e_val = zf_elec->charge;
                 break;
-                // Cases where it makes no sense to continue
+            // Cases where it makes no sense to continue
             case CV_NONE:
             default:
                 return false;
@@ -261,7 +282,7 @@ namespace zf {
             case CT_LTE:
                 passed = (e_val <= COMP_VAL);
                 break;
-                // Cases where it makes no sense to continue
+            // Cases where it makes no sense to continue
             case CT_NONE:
             default:
                 return false;
@@ -317,11 +338,17 @@ namespace zf {
         else if (cut->compare(0, 3, "gpt") == 0 ) {
             return CV_GPT;
         }
+        else if (cut->compare(0, 3, "tpt") == 0 ) {
+            return CV_TPT;
+        }
         else if (cut->compare(0, 3, "eta") == 0 ) {
             return CV_ETA;
         }
         else if (cut->compare(0, 4, "geta") == 0 ) {
             return CV_GETA;
+        }
+        else if (cut->compare(0, 4, "teta") == 0 ) {
+            return CV_TETA;
         }
         else if (cut->compare(0, 3, "phi") == 0 ) {
             return CV_PHI;
@@ -329,11 +356,17 @@ namespace zf {
         else if (cut->compare(0, 4, "gphi") == 0 ) {
             return CV_GPHI;
         }
+        else if (cut->compare(0, 4, "tphi") == 0 ) {
+            return CV_TPHI;
+        }
         else if (cut->compare(0, 6, "charge") == 0 ) {
             return CV_CHARGE;
         }
         else if (cut->compare(0, 7, "gcharge") == 0 ) {
             return CV_GCHARGE;
+        }
+        else if (cut->compare(0, 7, "tcharge") == 0 ) {
+            return CV_TCHARGE;
         }
         return CV_NONE;
     }
