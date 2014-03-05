@@ -52,11 +52,11 @@ namespace zf {
             RooRealVar* e0_pt;
             RooRealVar* e0_phi;
             RooRealVar* e0_eta;
-            RooRealVar* e0_charge;
+            //RooRealVar* e0_charge;
             RooRealVar* e1_pt;
             RooRealVar* e1_phi;
             RooRealVar* e1_eta;
-            RooRealVar* e1_charge;
+            //RooRealVar* e1_charge;
             RooRealVar* n_vert;
 
             std::vector<RooRealVar*> rrv_cuts;
