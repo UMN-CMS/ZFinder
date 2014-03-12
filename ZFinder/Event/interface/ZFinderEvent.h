@@ -22,11 +22,21 @@
 
 namespace zf {
 
+    // Cut level struct
+    struct CutLevel{
+        bool pass;
+        bool t0p1_pass;
+        bool t1p0_pass;
+    };
+
+    // Used to match cut levels to names
+    typedef std::pair<std::string, CutLevel> cutlevel_pair;
     // Used to pass around cut levels
-    typedef std::vector<std::pair<std::string, bool> > cutlevel_vector;
+    typedef std::vector<cutlevel_pair> cutlevel_vector;
     // Used to pass around trigger objects for matching
     typedef std::pair<const trigger::TriggerObject*, double> trig_dr_pair;
     typedef std::vector<trig_dr_pair> trig_dr_vec;
+
 
     class ZFinderEvent{
         public:

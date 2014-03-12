@@ -5,6 +5,7 @@
 
 
 namespace zf {
+
     ZDefinition::ZDefinition(
             const std::string NAME,
             const std::vector<std::string>& CUTS0,
@@ -22,6 +23,7 @@ namespace zf {
             if (MZ_MIN_ > MZ_MAX_) {
                 throw "In ZDefinition, MZ_MIN > MZ_MAX!";
             }
+            // Copy the input vectors and store them
             std::vector<std::string> cuts[2];
             cuts[0] = std::vector<std::string>(CUTS0);
             cuts[1] = std::vector<std::string>(CUTS1);
@@ -79,7 +81,6 @@ namespace zf {
                 // Initialize pass_
                 pass_[j][0].push_back(false);
                 pass_[j][1].push_back(false);
-                // Now we got level by level and save the cut status
             }
         }
     }
@@ -88,7 +89,11 @@ namespace zf {
         // cutlevel_vector
         for (size_t i = 0; i < SIZE; ++i) {
             const std::string CUTLEVEL_NAME = cutinfo_[0].at(i).cut + " AND " + cutinfo_[1].at(i).cut;
-            std::pair<std::string, bool> cut_pair(CUTLEVEL_NAME, false);
+            CutLevel cl;
+            cl.pass = false;
+            cl.t0p1_pass = false;
+            cl.t1p0_pass = false;
+            cutlevel_pair cut_pair(CUTLEVEL_NAME, cl);
             clv.push_back(cut_pair);
         }
         // Finally we add the level for MZ cuts
@@ -97,13 +102,19 @@ namespace zf {
         std::ostringstream ss1;
         ss1 << MZ_MAX_;
         const std::string CUTLEVEL_NAME = ss0.str() + " < M_{ee} < " + ss1.str();
-        std::pair<std::string, bool> cut_pair(CUTLEVEL_NAME, false);
+        CutLevel cl;
+        cl.pass = false;
+        cl.t0p1_pass = false;
+        cl.t0p1_pass = false;
+        cutlevel_pair cut_pair(CUTLEVEL_NAME, cl);
         clv.push_back(cut_pair);
     }
 
     void ZDefinition::ResetCutlevelVector() {
         for (auto& i_cutlevel : clv) {
-            i_cutlevel.second = false;
+            i_cutlevel.second.pass = false;
+            i_cutlevel.second.t0p1_pass = false;
+            i_cutlevel.second.t0p1_pass = false;
         }
     }
 
@@ -399,35 +410,23 @@ namespace zf {
     }
 
     void ZDefinition::FillCutLevelVector() {
-        std::vector<bool>* set0 = NULL;
-        std::vector<bool>* set1 = NULL;
-
         // First we find the combination of cut path and electron that gets us
-        // the furthest
+        // the furthest. Remember that pass_ is indexed as
+        // pass_[probe/tag][electron].
         const size_t SIZE = pass_[0][0].size();
+        bool t0p1_pass = true;
+        bool t1p0_pass = true;
         for (size_t i = 0; i < SIZE; ++i) {
-            bool normal_pass = pass_[0][0].at(i) && pass_[1][1].at(i);
-            bool other_pass = pass_[1][0].at(i) && pass_[0][1].at(i);
-            if (normal_pass && !other_pass) {
-                set0 = &pass_[0][0];
-                set1 = &pass_[1][1];
-                break;
-            } else if (!normal_pass && other_pass) {
-                set0 = &pass_[0][1];
-                set1 = &pass_[1][0];
-                break;
-            } else {  // Both pass, so use normal and keep trying
-                set0 = &pass_[0][0];
-                set1 = &pass_[1][1];
-            }
-        }
-        // Now set the cut levels that pass
-        for (size_t i = 0; i < SIZE; ++i) {
-            std::pair<std::string, bool>* cut_pair = &clv.at(i);
-            cut_pair->second = set0->at(i) && set1->at(i);
+            t0p1_pass = t0p1_pass && pass_[0][0].at(i) && pass_[1][1].at(i);
+            t1p0_pass = t1p0_pass && pass_[0][1].at(i) && pass_[1][0].at(i);
+            // Now set the values in the vector
+            CutLevel* cl = &clv.at(i).second;
+            cl->t0p1_pass = t0p1_pass;
+            cl->t1p0_pass = t1p0_pass;
+            cl->pass = cl->t0p1_pass || cl->t1p0_pass;
         }
         // Finally, we add the Mass window cut, which is the very last one (and
         // not included in the above loop)
-        clv.back().second = pass_mz_cut_;
+        clv.back().second.pass = pass_mz_cut_;
     }
 }  // namespace zf

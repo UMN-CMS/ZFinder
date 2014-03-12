@@ -615,7 +615,7 @@ namespace zf {
             const cutlevel_vector* cuts_vec = &it->second;
             bool has_passed = true;
             for (auto& v_it : *cuts_vec) {
-                has_passed = v_it.second && has_passed;
+                has_passed = v_it.second.pass && has_passed;
             }
             return has_passed;
         } else {
@@ -638,7 +638,8 @@ namespace zf {
                 const cutlevel_vector* clv = &i_map.second;
 
                 for (auto& i_cutlevel : *clv) {
-                    cout << "\t\t" << i_cutlevel.first << ": " << i_cutlevel.second << endl;
+                    cout << "\t\t" << i_cutlevel.first << ": " << i_cutlevel.second.pass;
+                    cout << ' ' << i_cutlevel.second.t0p1_pass << ' ' << i_cutlevel.second.t1p0_pass << endl;
                 }
             }
         }

@@ -41,7 +41,7 @@ namespace zf {
             // Loop over cuts until one fails
             for (auto& i_cutlevel : *clv) {
                 const std::string CUT_NAME = i_cutlevel.first;
-                cont = i_cutlevel.second && cont;
+                cont = i_cutlevel.second.pass && cont;
                 // Check if cut fails, if it does break, otherwise fill the
                 // histogram associated with the cut
                 if (cont) {
