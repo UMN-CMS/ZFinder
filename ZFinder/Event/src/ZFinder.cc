@@ -54,9 +54,9 @@ Implementation:
 #include "ZFinder/Event/interface/TruthMatchSetter.h"  // TruthMatchSetter
 #include "ZFinder/Event/interface/ZDefinition.h"  // ZDefinition
 #include "ZFinder/Event/interface/ZDefinitionPlotter.h"  // ZDefinitionPlotter
+#include "ZFinder/Event/interface/ZDefinitionWorkspace.h"  // ZDefinitionWorkspace
 #include "ZFinder/Event/interface/ZFinderEvent.h"  // ZFinderEvent
 #include "ZFinder/Event/interface/ZFinderPlotter.h"  // ZFinderPlotter
-#include "ZFinder/Event/interface/ZFinderFitter.h"  // ZFinderPlotter
 
 //
 // class declaration
@@ -87,7 +87,7 @@ class ZFinder : public edm::EDAnalyzer {
         std::vector<edm::ParameterSet> zdef_psets_;
         std::vector<zf::ZDefinition*> zdefs_;
         std::vector<zf::ZDefinitionPlotter*> zdef_plotters_;
-        zf::ZFinderFitter* z_fitter;
+        std::vector<zf::ZDefinitionWorkspace*> zdef_workspaces_;
 
 };
 
@@ -114,8 +114,6 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     // Set up plotters
     edm::Service<TFileService> fs;
 
-    z_fitter= new zf::ZFinderFitter();
-
     // Set up ZDefinitions and plotters
     zdef_psets_ = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet> >("ZDefinitions");
     for (auto& i_pset : zdef_psets_) {
@@ -127,15 +125,19 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
         // Make the ZDef
         zf::ZDefinition* zd = new zf::ZDefinition(name, cuts0, cuts1, min_mz, max_mz);
         zdefs_.push_back(zd);
-        // Make the Plotter for the ZDef
+        // Make the Plotter for the ZDef, and the workstations
         // Reco
         TFileDirectory tdir_zd(fs->mkdir(name + " Reco"));
         zf::ZDefinitionPlotter* zdp_reco = new zf::ZDefinitionPlotter(*zd, tdir_zd, false);  // False = do not plot Truth
         zdef_plotters_.push_back(zdp_reco);
+        zf::ZDefinitionWorkspace* zdw_reco = new zf::ZDefinitionWorkspace(*zd, tdir_zd, false, true);  // False = do not use Truth
+        zdef_workspaces_.push_back(zdw_reco);
         // MC
         TFileDirectory tdir_zd_truth(fs->mkdir(name + " MC"));
         zf::ZDefinitionPlotter* zdp_truth = new zf::ZDefinitionPlotter(*zd, tdir_zd_truth, true);
         zdef_plotters_.push_back(zdp_truth);
+        zf::ZDefinitionWorkspace* zdw_truth = new zf::ZDefinitionWorkspace(*zd, tdir_zd_truth, true, true);
+        zdef_workspaces_.push_back(zdw_truth);
     }
 }
 
@@ -155,7 +157,6 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_);
     if (zfe.reco_z.m > -1 && zfe.e0 != NULL && zfe.e1 != NULL) {  // We have a good Z
-        z_fitter->FillAll(zfe);
         // Set all cuts
         for (auto& i_set : setters_) {
             i_set->SetCuts(&zfe);
@@ -168,10 +169,9 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         for (auto& i_zdefp : zdef_plotters_) {
             i_zdefp->Fill(zfe);
         }
-
-        // Add event to a RooWorkspace
-        if (zfe.ZDefPassed("All-All")) {
-            z_fitter->FillSelected(zfe);
+        // Make all ZDef workspaces
+        for (auto& i_zdefw : zdef_workspaces_) {
+            i_zdefw->Fill(zfe);
         }
     }
 }
@@ -182,7 +182,10 @@ void ZFinder::beginJob() {
 
 // ------------ method called once each job just after ending the event loop  ------------
 void ZFinder::endJob() {
-    z_fitter->Write();
+    // Write all ZDef workspaces
+    for (auto& i_zdefw : zdef_workspaces_) {
+        i_zdefw->Write();
+    }
 }
 
 // ------------ method called when starting to processes a run  ------------
