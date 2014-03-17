@@ -153,8 +153,8 @@ ZFinder::~ZFinder() {
 void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     using namespace edm;
 
+        z_fitter->FillAll(zfe);
     zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_);
-    z_fitter->FillAll(zfe);
     if (zfe.reco_z.m > -1 && zfe.e0 != NULL && zfe.e1 != NULL) {  // We have a good Z
         // Set all cuts
         for (auto& i_set : setters_) {

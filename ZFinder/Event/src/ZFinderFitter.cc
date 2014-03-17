@@ -18,15 +18,11 @@
 namespace zf {
 
     const std::vector<std::string> ALL_CUTS = {
-        "acc(ALL)", "acc(EB)", "acc(EB+)", "acc(EB-)", "acc(EE)", "acc(EE+)",
-        "acc(EE-)", "acc(ET)", "acc(ET+)", "acc(ET-)", "acc(NT)", "acc(NT+)",
-        "acc(NT-)", "acc(HF)", "acc(HF+)", "acc(HF-)", "trig(hf_loose)",
-        "trig(hf_tight)", "trig(et_et_tight)", "trig(et_et_loose)",
-        "trig(et_et_dz)", "trig(et_nt_etleg)", "trig(et_hf_tight)",
-        "trig(et_hf_loose)", "type_gsf", "type_gen", "type_ecalcandidate",
-        "type_photon", "type_hlt", "eg_veto", "eg_loose", "eg_medium",
-        "eg_tight", "eg_eop_cut", "eg_trigtight", "eg_trigwp70", "hf_e9e25",
-        "hf_2dloose", "hf_2dmedium", "hf_2dtight", "nt_loose"
+        "trig(hf_loose)", "trig(hf_tight)", "trig(et_et_tight)",
+        "trig(et_et_loose)", "trig(et_et_dz)", "trig(et_nt_etleg)",
+        "trig(et_hf_tight)", "trig(et_hf_loose)", "eg_loose", "eg_medium",
+        "eg_tight", "hf_e9e25", "hf_2dloose", "hf_2dmedium", "hf_2dtight",
+        "nt_loose"
     };
 
     // Constructor
@@ -42,11 +38,11 @@ namespace zf {
         e0_pt = new RooRealVar("e0_pt", "p_{T}^{e_{0}}", 0, 10000, "GeV");
         e0_phi = new RooRealVar("e0_phi", "#phi_{e_{0}}", 0, 10000);
         e0_eta = new RooRealVar("e0_eta", "#eta_{e_{0}}", 0, 10000);
-        e0_charge = new RooRealVar("e0_charge", "#q_{e_{0}}", 0, 10000);
+        //e0_charge = new RooRealVar("e0_charge", "#q_{e_{0}}", 0, 10000);
         e1_pt = new RooRealVar("e1_pt", "p_{T}^{e_{1}}", 0, 10000, "GeV");
         e1_phi = new RooRealVar("e1_phi", "#phi_{e_{1}}", 0, 10000);
         e1_eta = new RooRealVar("e1_eta", "#eta_{e_{1}}", 0, 10000);
-        e1_charge = new RooRealVar("e1_charge", "#q_{e_{1}}", 0, 10000);
+        //e1_charge = new RooRealVar("e1_charge", "#q_{e_{1}}", 0, 10000);
         // Event
         n_vert = new RooRealVar("n_vert", "Number of Vertices", 0, 1000);
         weight = new RooRealVar("weight", "Event weight", 0, 100);
@@ -56,11 +52,11 @@ namespace zf {
         zf_arg_set->add(*e0_pt);
         zf_arg_set->add(*e0_phi);
         zf_arg_set->add(*e0_eta);
-        zf_arg_set->add(*e0_charge);
+        //zf_arg_set->add(*e0_charge);
         zf_arg_set->add(*e1_pt);
         zf_arg_set->add(*e1_phi);
         zf_arg_set->add(*e1_eta);
-        zf_arg_set->add(*e1_charge);
+        //zf_arg_set->add(*e1_charge);
         zf_arg_set->add(*n_vert);
 
         // Add all cuts
@@ -102,11 +98,11 @@ namespace zf {
             zf_arg_set->setRealValue("e0_pt", zf_event.e0_truth->pt);
             zf_arg_set->setRealValue("e0_phi", zf_event.e0_truth->phi);
             zf_arg_set->setRealValue("e0_eta", zf_event.e0_truth->eta);
-            zf_arg_set->setRealValue("e0_charge", zf_event.e0_truth->charge);
+            //zf_arg_set->setRealValue("e0_charge", zf_event.e0_truth->charge);
             zf_arg_set->setRealValue("e1_pt", zf_event.e1_truth->pt);
             zf_arg_set->setRealValue("e1_phi", zf_event.e1_truth->phi);
             zf_arg_set->setRealValue("e1_eta", zf_event.e1_truth->eta);
-            zf_arg_set->setRealValue("e1_charge", zf_event.e1_truth->charge);
+            //zf_arg_set->setRealValue("e1_charge", zf_event.e1_truth->charge);
             zf_arg_set->setRealValue("n_vert", zf_event.truth_vert.num);
 
             // Set all cuts
@@ -120,7 +116,7 @@ namespace zf {
                 zf_arg_set->setRealValue(e0_cut.c_str(), e0_res);
                 zf_arg_set->setRealValue(e1_cut.c_str(), e1_res);
             }
-            mc_truth_dataset->add(*zf_arg_set);
+	    //           mc_truth_dataset->add(*zf_arg_set);
         }
     }
 
@@ -151,11 +147,11 @@ namespace zf {
         zf_arg_set->setRealValue("e0_pt", zf_event.e0->pt);
         zf_arg_set->setRealValue("e0_phi", zf_event.e0->phi);
         zf_arg_set->setRealValue("e0_eta", zf_event.e0->eta);
-        zf_arg_set->setRealValue("e0_charge", zf_event.e0->charge);
+        //zf_arg_set->setRealValue("e0_charge", zf_event.e0->charge);
         zf_arg_set->setRealValue("e1_pt", zf_event.e1->pt);
         zf_arg_set->setRealValue("e1_phi", zf_event.e1->phi);
         zf_arg_set->setRealValue("e1_eta", zf_event.e1->eta);
-        zf_arg_set->setRealValue("e1_charge", zf_event.e1->charge);
+        //zf_arg_set->setRealValue("e1_charge", zf_event.e1->charge);
         zf_arg_set->setRealValue("n_vert", zf_event.reco_vert.num);
 
         // Set all cuts
@@ -188,7 +184,7 @@ namespace zf {
         w->import(*mc_reco_dataset);
         w->import(*data_reco_dataset);
         w->Write();
-        //data_reco_dataset->Print("v")
+        //data_reco_dataset->Print("v");
     }
 
     ZFinderFitter::~ZFinderFitter() {
@@ -203,11 +199,11 @@ namespace zf {
         delete e0_pt;
         delete e0_phi;
         delete e0_eta;
-        delete e0_charge;
+        //delete e0_charge;
         delete e1_pt;
         delete e1_phi;
         delete e1_eta;
-        delete e1_charge;
+        //delete e1_charge;
         delete n_vert;
 
         // Then we clean up all the RRVs made from the cut vector
