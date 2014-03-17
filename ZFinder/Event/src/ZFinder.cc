@@ -171,8 +171,7 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
         // Add event to a RooWorkspace
         if (zfe.ZDefPassed("All-All")) {
-            z_fitter->FillAll(zfe);
-            z_fitter->FillSelected(zfe);
+	  z_fitter->FillSelected(zfe);
         }
     }
 }

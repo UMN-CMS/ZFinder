@@ -108,7 +108,6 @@ namespace zf {
             zf_arg_set->setRealValue("e1_eta", zf_event.e1_truth->eta);
             zf_arg_set->setRealValue("e1_charge", zf_event.e1_truth->charge);
             zf_arg_set->setRealValue("n_vert", zf_event.truth_vert.num);
-            mc_truth_dataset->add(*zf_arg_set);
 
             // Set all cuts
             for (auto& i_cut : ALL_CUTS) {
@@ -121,6 +120,7 @@ namespace zf {
                 zf_arg_set->setRealValue(e0_cut.c_str(), e0_res);
                 zf_arg_set->setRealValue(e1_cut.c_str(), e1_res);
             }
+            mc_truth_dataset->add(*zf_arg_set);
         }
     }
 
