@@ -116,9 +116,7 @@ namespace zf {
                 zf_arg_set->setRealValue(e0_cut.c_str(), e0_res);
                 zf_arg_set->setRealValue(e1_cut.c_str(), e1_res);
             }
-
-            // Add the argset to the dataset
-            mc_truth_dataset->add(*zf_arg_set);
+	    //           mc_truth_dataset->add(*zf_arg_set);
         }
     }
 

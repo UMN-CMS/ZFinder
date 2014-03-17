@@ -31,7 +31,7 @@ using namespace RooFit;
 const double phistarBins[] = {0.0,0.1,0.2,0.5,0.7,2.0};
 const double etaBins[] = {-5.0,-2.5,-2.0,-1.5,-1.0,-0.5,0.0,0.5,1.0,1.5,2.0,2.5,5.0};
 
-void RooFitFitter(const char* dataname, const char*mcname){
+void RooFitFitter(const char* dataname, const char* mcname, std::string outputstring = "" ){
   RooRealVar Zmass("Zmass","Zmass",40,150);
   Zmass.setBins(110);
   RooRealVar Zeta("Zeta","Zeta",-20,20);
@@ -54,18 +54,23 @@ void RooFitFitter(const char* dataname, const char*mcname){
   int neta=(sizeof(etaBins)/sizeof(etaBins[0]))-1;
   int nphistar=(sizeof(phistarBins)/sizeof(phistarBins[0]))-1;
 
-  RooRealVar x("x","x",40,150);
+//   RooRealVar x("x","x",40,150);
   RooRealVar alpha("alpha","alpha",60.,0.1,100000.);
   RooRealVar gamma("gamma","gamma",0.01,0.0001,0.3);
   RooRealVar delta("delta","delta",10.,3.,80.);
-  RooFormulaVar var1("var1","(alpha-x)/delta",RooArgSet(alpha,x,delta));
-  RooFormulaVar var2("var2","-1.0*gamma*x",RooArgSet(gamma,x));
+  RooFormulaVar var1("var1","(alpha-Zmass)/delta",RooArgSet(alpha,Zmass,delta));
+  RooFormulaVar var2("var2","-1.0*gamma*Zmass",RooArgSet(gamma,Zmass));
   RooGenericPdf MyBackgroundPdf("MyBackgroundPdf","ROOT::Math::erfc(var1)*exp(var2)",RooArgSet(var1, var2));
-//   alpha.setRange(60,60);
+//   Alpha.setRange(60,60);
 //   gamma.setRange(0.01,0.01);
 //   delta.setRange(10,10);
   double acceptance[neta*nphistar];
   double nsignal[neta*nphistar];
+  double fitratio[neta*nphistar];
+  double crosssection[neta*nphistar];
+  TH2D h_Acceptance("h_Acceptance","h_Acceptance",neta,etaBins,nphistar,phistarBins);
+  TH2D h_Nsignal("h_Nsignal","h_Nsignal",neta,etaBins,nphistar,phistarBins);
+  TH2D h_XS("h_XS","h_XS",neta,etaBins,nphistar,phistarBins);
 
   int bin=0;
 
@@ -97,7 +102,7 @@ void RooFitFitter(const char* dataname, const char*mcname){
       cout<<"Pdf done"<<endl;
       RooRealVar sigratio("sigratio","sigratio",0.5,0.0,1.0);
 //       sigratio.setRange(0.5,0.5);
-      RooAddPdf fitpdf("fitpdf","fitpdf",RooArgList(MyBackgroundPdf,signalpdf),RooArgList(sigratio));
+      RooAddPdf fitpdf("fitpdf","fitpdf",RooArgList(signalpdf,MyBackgroundPdf),RooArgList(sigratio));
 
       fitpdf.fitTo(h_data);
       cout<<acceptance[bin]<<endl;
@@ -106,7 +111,7 @@ void RooFitFitter(const char* dataname, const char*mcname){
       name+=double(etaBins[ieta]);
       name+="<eta<";
       name+=double(etaBins[ieta+1]);
-      name+=", ";
+      name+="_";
       name+=double(phistarBins[iphistar]);
       name+="<phistar<";
       name+=double(phistarBins[iphistar+1]);
@@ -115,20 +120,52 @@ void RooFitFitter(const char* dataname, const char*mcname){
       c->cd();
       RooPlot* fitFrame = Zmass.frame(Title(name));
       h_data.plotOn(fitFrame);
-      //      fitpdf.plotOn(fitFrame);
+      fitpdf.plotOn(fitFrame);
       fitpdf.plotOn(fitFrame,Components(MyBackgroundPdf),LineColor(kRed));
-      fitpdf.plotOn(fitFrame,Components(signalpdf),LineColor(kBlue));
+      fitpdf.plotOn(fitFrame,Components(signalpdf),LineColor(kGreen));
+      h_data.plotOn(fitFrame);
       fitFrame->Draw();
+      stringstream ss;
+      ss<<bin;
+      std::string num = ss.str();
+      c->Print((outputstring+"FitBin"+num+".png").c_str());
 
-
-
-
-
+      int Nentries=Data_reco_phistarbin->numEntries();
+      fitratio[bin]=sigratio.getVal();
+      nsignal[bin]=fitratio[bin]*Nentries;
+      crosssection[bin]=acceptance[bin]*nsignal[bin];
+      h_Acceptance.SetBinContent(ieta+1,iphistar+1,acceptance[bin]);
+      h_Nsignal.SetBinContent(ieta+1,iphistar+1,nsignal[bin]);
+      h_XS.SetBinContent(ieta+1,iphistar+1,crosssection[bin]);
       bin++;
-      break;
+
     }
-    break;
   }
+  for (int i=0; i<bin;i++){
+    cout<<"Acceptance:"<<acceptance[i]<<" FitRatio:"<<fitratio[i]<<" Nsignal:"<<nsignal[i]<<" XS:"<<crosssection[i]<<endl; 
+  }
+  TCanvas* Acc=new TCanvas();
+  Acc->cd();
+  h_Acceptance.GetXaxis()->SetTitle("#eta");
+  h_Acceptance.GetYaxis()->SetTitle("#phi^{*}");
+  h_Acceptance.Draw("COLZ");
+  Acc->Print("Acceptance.png");
+      
+  TCanvas* XS=new TCanvas();
+  XS->cd();
+  h_XS.GetXaxis()->SetTitle("#eta");
+  h_XS.GetYaxis()->SetTitle("#phi^{*}");
+  h_XS.Draw("COLZ");
+  XS->Print("Cross_Section.png");
+      
+  TCanvas* NS=new TCanvas();
+  NS->cd();
+  h_Nsignal.GetXaxis()->SetTitle("#eta");
+  h_Nsignal.GetYaxis()->SetTitle("#phi^{*}");
+  h_Nsignal.Draw("COLZ");
+  NS->Print("NSignal.png");
+      
+
 }
 
 

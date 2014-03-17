@@ -35,12 +35,12 @@ void RooMerger(const std::string dirname, int njobs, const char* outputfile){
   const char *fzero=filename.c_str();
   TFile * f= new TFile(fzero, "READ");
   RooWorkspace* w =(RooWorkspace*) f->Get("ZFinder/w");
-  RooDataSet& MC_reco_merged = *((RooDataSet*) w->data("MC_reco") );
-  RooDataSet& Data_reco_merged = *((RooDataSet*) w->data("Data_reco") );
-  RooDataSet& MC_true_all_merged = *((RooDataSet*) w->data("MC_true_all") );
+  RooDataSet& mc_reco_merged = *((RooDataSet*) w->data("mc_reco_dataset") );
+  RooDataSet& data_reco_merged = *((RooDataSet*) w->data("data_reco_dataset") );
+  RooDataSet& mc_truth_merged = *((RooDataSet*) w->data("mc_truth_dataset") );
   f->Close();
   for (int i=1; i<njobs;i++){
-    if (i==56)continue;
+    //    if (i==56)continue;
     stringstream ssnum;
     ssnum<<i;
     num = ssnum.str();
@@ -52,17 +52,17 @@ void RooMerger(const std::string dirname, int njobs, const char* outputfile){
     const char *fnum=filename.c_str();
     f= new TFile(fnum, "READ");
     w =(RooWorkspace*) f->Get("ZFinder/w");
-    RooDataSet& MC_reco = *((RooDataSet*) w->data("MC_reco") );
-    RooDataSet& Data_reco = *((RooDataSet*) w->data("Data_reco") );
-    RooDataSet& MC_true_all = *((RooDataSet*) w->data("MC_true_all") );
-    MC_reco_merged.append(MC_reco);
-    Data_reco_merged.append(Data_reco);
-    MC_true_all_merged.append(MC_true_all);
+    RooDataSet& MC_reco = *((RooDataSet*) w->data("mc_reco_dataset") );
+    RooDataSet& Data_reco = *((RooDataSet*) w->data("data_reco_dataset") );
+    RooDataSet& MC_true_all = *((RooDataSet*) w->data("mc_truth_dataset") );
+    mc_reco_merged.append(MC_reco);
+    data_reco_merged.append(Data_reco);
+    mc_truth_merged.append(MC_true_all);
     f->Close();
   }
   RooWorkspace* w_merged =new RooWorkspace("w_merged","workspace");
-  w_merged->import(MC_reco_merged);
-  w_merged->import(Data_reco_merged);
-  w_merged->import(MC_true_all_merged);
+  w_merged->import(mc_reco_merged);
+  w_merged->import(data_reco_merged);
+  w_merged->import(mc_truth_merged);
   w_merged->writeToFile(outputfile);
 }
