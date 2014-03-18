@@ -18,7 +18,7 @@
 
 // ZFinder
 #include "ZFinder/Event/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
-#include "ZFinder/Event/interface/TriggerList.h"  // ET_ET_TIGHT, ET_ET_DZ, ET_ET_LOOSE, ET_NT_ET_TIGHT, ET_HF_ET_TIGHT, ET_HF_ET_LOOSE, ET_HF_HF_TIGHT, ET_HF_HF_LOOSE, ALL_TRIGGERS
+#include "ZFinder/Event/interface/TriggerList.h"  // ET_ET_TIGHT, ET_ET_DZ, ET_ET_LOOSE, ET_NT_ET_TIGHT, ET_HF_ET_TIGHT, ET_HF_ET_LOOSE, ET_HF_HF_TIGHT, ET_HF_HF_LOOSE, SINGLE_ELECTRON_TRIGGER, ALL_TRIGGERS
 
 
 namespace zf {
@@ -204,6 +204,7 @@ namespace zf {
             const bool EENT_TIGHT = TriggerMatch(iEvent, ET_NT_ET_TIGHT, zf_electron->eta, zf_electron->phi, TRIG_DR_);
             const bool EEHF_TIGHT = EENT_TIGHT;
             const bool EEHF_LOOSE = TriggerMatch(iEvent, ET_HF_ET_LOOSE, zf_electron->eta, zf_electron->phi, TRIG_DR_);
+            const bool SINGLE_E = TriggerMatch(iEvent, SINGLE_ELECTRON_TRIGGER, zf_electron->eta, zf_electron->phi, TRIG_DR_);
 
             zf_electron->AddCutResult("trig(et_et_tight)", EE_TIGHT, WEIGHT);
             zf_electron->AddCutResult("trig(et_et_loose)", EE_LOOSE, WEIGHT);
@@ -211,6 +212,7 @@ namespace zf {
             zf_electron->AddCutResult("trig(et_nt_etleg)", EENT_TIGHT, WEIGHT);
             zf_electron->AddCutResult("trig(et_hf_tight)", EEHF_TIGHT, WEIGHT);
             zf_electron->AddCutResult("trig(et_hf_loose)", EEHF_LOOSE, WEIGHT);
+            zf_electron->AddCutResult("trig(single_ele)", SINGLE_E, WEIGHT);
         }
     }
 

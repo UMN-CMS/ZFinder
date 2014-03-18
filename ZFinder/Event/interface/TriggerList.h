@@ -32,6 +32,10 @@ namespace zf {
         "hltHFEMTightFilter"  // ET-HF TightLoose HF Leg (15pt)
     };
 
+    static const std::vector<std::string> SINGLE_ELECTRON_TRIGGER = {
+        "hltEle27WP80TrackIsoFilter"  // Single Electron Trigger
+    };
+
     // The giant combined list
     static const std::vector<std::string> ALL_TRIGGERS = {
         "hltEle17TightIdLooseIsoEle8TightIdLooseIsoTrackIsoDZ",
@@ -40,7 +44,8 @@ namespace zf {
         "hltEle23TightIdLooseIsoTrackIsoFilter",
         "hltEle27TightIdLooseIsoTrackIsoFilter",
         "hltHFEMPt30TightFilter",
-        "hltHFEMTightFilter"
+        "hltHFEMTightFilter",
+        "hltEle27WP80TrackIsoFilter"
     };
 
 }  // namespace zf

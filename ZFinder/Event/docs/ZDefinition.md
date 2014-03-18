@@ -52,6 +52,7 @@ with dR < 0.3, they are false otherwise.
 | trig(et_nt_etleg) | Tight ET leg of ET-NT trigger                            | hltEle27TightIdLooseIsoTrackIsoFilter                          |
 | trig(et_hf_tight) | Tight ET leg of ET-HF trigger (paired with loose HF leg) | hltEle27TightIdLooseIsoTrackIsoFilter                          |
 | trig(et_hf_loose) | Loose ET leg of ET-HF trigger (paired with tight HF leg) | hltEle23TightIdLooseIsoTrackIsoFilter                          |
+| trig(single_ele)  | The Single Electron trigger (HLT_Ele27_WP80)             | hltEle27WP80TrackIsoFilter                                     |
 
 ###### Type
 
