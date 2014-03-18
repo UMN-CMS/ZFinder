@@ -15,15 +15,15 @@ zdefs = cms.untracked.VPSet(
     # trigger (and hence use eg_tight) on one leg
     cms.untracked.PSet(
         name = cms.untracked.string("ET-ET Combined Double"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>20", "eta<2.4", "eta>-2.4", "eg_medium"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>20", "eta<2.4", "eta>-2.4", "eg_medium"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "trig(et_et_tight)", "pt>20", "eta<2.4", "eta>-2.4", "eg_medium"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "trig(et_et_loose)", "pt>20", "eta<2.4", "eta>-2.4", "eg_medium"),
         min_mz = cms.untracked.double(MIN_MZ),
         max_mz = cms.untracked.double(MAX_MZ),
         ),
     cms.untracked.PSet(
         name = cms.untracked.string("ET-ET Combined Single"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>30", "eta<2.4", "eta>-2.4", "eg_tight"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>10", "eta<2.4", "eta>-2.4", "eg_medium"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "trig(single_ele)", "pt>30", "eta<2.4", "eta>-2.4", "eg_tight"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "acc(ET)",          "pt>10", "eta<2.4", "eta>-2.4", "eg_medium"),
         min_mz = cms.untracked.double(MIN_MZ),
         max_mz = cms.untracked.double(MAX_MZ),
         ),
@@ -32,22 +32,22 @@ zdefs = cms.untracked.VPSet(
     # required to have pt>20.
     cms.untracked.PSet(
         name = cms.untracked.string("ET-ET Rapidity"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>30", "eg_medium"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>20", "eg_loose"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "trig(et_et_tight)", "pt>30", "eg_medium"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "trig(et_et_loose)", "pt>20", "eg_loose"),
         min_mz = cms.untracked.double(MIN_MZ),
         max_mz = cms.untracked.double(MAX_MZ),
         ),
     cms.untracked.PSet(
         name = cms.untracked.string("ET-NT Rapidity"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>30", "eg_medium"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(NT)", "pt>20", "nt_loose"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "trig(et_nt_etleg)", "pt>30", "eg_medium"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(NT)", "acc(NT)",           "pt>20", "nt_loose"),
         min_mz = cms.untracked.double(MIN_MZ),
         max_mz = cms.untracked.double(MAX_MZ),
         ),
     cms.untracked.PSet(
         name = cms.untracked.string("ET-HF Rapidity"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>30", "eg_medium"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(HF)", "pt>20", "hf_2dloose"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "trig(et_hf_tight)", "pt>30", "eg_medium"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(HF)", "trig(hf_loose)", "pt>20", "hf_2dloose"),
         min_mz = cms.untracked.double(MIN_MZ),
         max_mz = cms.untracked.double(MAX_MZ),
         ),
