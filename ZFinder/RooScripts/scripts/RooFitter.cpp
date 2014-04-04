@@ -1,47 +1,99 @@
-//#ifndef __CINT__ // Used if running in root
-//#include "RooGlobalFunc.h"
-//#endif
-
-#include "RooRealVar.h"
-#include "RooCategory.h"
-#include "RooFormulaVar.h"
-#include "RooGenericPdf.h"
-#include "RooDataSet.h"
-#include "RooAbsData.h"
-#include "RooArgSet.h"
-#include "RooBinning.h"
-#include "RooRealVar.h"
-#include "RooWorkspace.h"
-#include "RooDataHist.h"
-#include "RooPlot.h"
-#include "RooAddPdf.h"
-#include "RooKeysPdf.h"
-#include "RooHistPdf.h"
-
-#include <TH2D.h>
-#include <TH1D.h>
-#include <TFile.h>
-#include <TCanvas.h>
-
+// Standard Library
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <string>
-#include <vector>
+
+// ROOT
+#include <TCanvas.h>
+
+// RooFit
+#include "RooAddPdf.h"
+#include "RooArgSet.h"
+#include "RooBinning.h"
+#include "RooCategory.h"
+#include "RooDataSet.h"
+#include "RooFormulaVar.h"
+#include "RooGenericPdf.h"
+#include "RooKeysPdf.h"
+#include "RooPlot.h"
+#include "RooRealVar.h"
+#include "RooWorkspace.h"
+
+// RooFitter
+#include "RooFitter.h"
+
 
 using namespace RooFit;
-//using namespace RooStats;
-const int PHI_SIZE = 5;
-double PB[PHI_SIZE] = {0, 0.1, 0.2, 0.5, 1};
-const std::vector<double> PHISTAR_BINS(&PB[0], &PB[0]+PHI_SIZE);
-const int ETA_SIZE = 3;
-double EB[ETA_SIZE] = {0, 2.5, 5};
-const std::vector<double> ETA_BINS(&EB[0], &EB[0]+ETA_SIZE);
+
+
+RooBinning* get_roobinning(const Z_TYPES& Z_TYPE) {
+    // Set bounds of the plot and signal region
+    const int LEFT_EDGE = 0;     // Left edge of the plot
+    const int LEFT_SIG = 80;     // Left edge of the signal region
+    const int RIGHT_SIG = 100;   // Right edge of the signal region
+    const int RIGHT_EDGE = 200;  // Right edge of the plot
+
+    // Set up a roobinning to return based on the type of Z
+    RooBinning* roobinning = new RooBinning(0, 200);
+    switch(Z_TYPE) {
+        case ETET:
+            roobinning->addUniform(8, LEFT_EDGE, LEFT_SIG);
+            roobinning->addUniform(20, LEFT_SIG, RIGHT_SIG);
+            roobinning->addUniform(10, RIGHT_SIG, RIGHT_EDGE);
+            return roobinning;
+        case ETNT:
+        case ETHF:
+            roobinning->addUniform(4, LEFT_EDGE, LEFT_SIG);
+            roobinning->addUniform(6, LEFT_SIG, RIGHT_SIG);
+            roobinning->addUniform(5, RIGHT_SIG, RIGHT_EDGE);
+            return roobinning;
+        default:
+            std::cout << "Invalid Z_TYPE" << std::endl;
+            delete roobinning;  // Clean up our pointer
+            return NULL;
+    }
+}
+
+TCanvas* get_tcanvas(const int X_DIM, const int Y_DIM) {
+    TCanvas* tcan = new TCanvas("canvas", "canvas", X_DIM, Y_DIM);
+    tcan->Divide(2);  // Split in two side-by-side areas
+    return tcan;
+}
 
 int RooFitter(
         const std::string& DATA_FILE,
         const std::string& DATA_WS,
         const std::string& MC_FILE,
+        const std::string& MC_WS,
+        const std::string& OUT_DIR
+        ) {
+    // Open the data file
+    TFile* f_data = new TFile(DATA_FILE.c_str(), "READ");
+    if (f_data == NULL) {
+        std::cout << "Data file is invalid" << std::endl;
+        return 1;
+    }
+    // Open the MC file
+    TFile* f_mc = new TFile(MC_FILE.c_str(), "READ");
+    if (f_mc == NULL) {
+        std::cout << "MC file is invalid" << std::endl;
+        return 1;
+    }
+
+    // Pass the open files to the main RooFitter
+    const int RET_CODE = RooFitter(f_data, DATA_WS, f_mc, MC_WS, OUT_DIR);
+
+    // Clean up and return the exit code
+    delete f_data;
+    delete f_mc;
+
+    return RET_CODE;
+}
+
+int RooFitter(
+        TFile* const DATA_FILE,
+        const std::string& DATA_WS,
+        TFile* const MC_FILE,
         const std::string& MC_WS,
         const std::string& OUT_DIR
         ) {
@@ -91,22 +143,10 @@ int RooFitter(
     argset.add(numerator);
     argset.add(degenerate);
 
-    // Open the data file
-    TFile* f_data= new TFile(DATA_FILE.c_str(), "READ");
-    if (f_data == NULL) {
-        std::cout << "Data file is invalid" << std::endl;
-        return 1;
-    }
-    RooWorkspace* w_data = static_cast<RooWorkspace*>(f_data->Get(DATA_WS.c_str()));
+    // Load the workspaces from the already open TFiles
+    RooWorkspace* w_data = static_cast<RooWorkspace*>(DATA_FILE->Get(DATA_WS.c_str()));
     RooDataSet* data_reco = static_cast<RooDataSet*>(w_data->data("roo_dataset"));
-
-    // Open the mc file
-    TFile* f_mc= new TFile(MC_FILE.c_str(), "READ");
-    if (f_mc == NULL) {
-        std::cout << "MC file is invalid" << std::endl;
-        return 1;
-    }
-    RooWorkspace* w_mc = static_cast<RooWorkspace*>(f_mc->Get(MC_WS.c_str()));
+    RooWorkspace* w_mc = static_cast<RooWorkspace*>(MC_FILE->Get(MC_WS.c_str()));
     RooDataSet* mc_reco = static_cast<RooDataSet*>(w_mc->data("roo_dataset"));
 
     RooKeysPdf signalpdf("signalpdf", "signalpdf", z_mass, *mc_reco);
@@ -122,24 +162,17 @@ int RooFitter(
     RooRealVar sigratio("sigratio", "sigratio", 0.1, 0.0, 1.0);
     RooAddPdf fitpdf("fitpdf", "fitpdf", RooArgList(MyBackgroundPdf, signalpdf), RooArgList(sigratio));
 
-    RooDataHist h_data("h_data", "h_data", RooArgSet(z_mass), *data_reco);
-    //fitpdf.fitTo(h_data);
     fitpdf.fitTo(*data_reco);
 
-    // Binning
-    RooBinning b(0, 200);
-    b.addUniform(8, 0, 80);
-    b.addUniform(20, 80, 100);
-    b.addUniform(10, 100, 200);
-
-    TCanvas* c=new TCanvas();
-    c->cd();
+    TCanvas* const c = get_tcanvas();
+    const RooBinning* const binning = get_roobinning(ETET);
+    // Plot the left side
+    c->cd(1);
     RooPlot* fitFrame = z_mass.frame(50, 150); ///, Title(name));
-    //h_data.plotOn(fitFrame, Binning(b));
-    data_reco->plotOn(fitFrame, Binning(b));
+    data_reco->plotOn(fitFrame, Binning(*binning));
     fitpdf.plotOn(fitFrame, Components(MyBackgroundPdf), LineColor(kRed), LineStyle(kDashed));
-    //fitpdf.plotOn(fitFrame, Components(signalpdf), LineColor(kBlue));
     fitpdf.plotOn(fitFrame, LineColor(kBlue));
+
     fitFrame->Draw();
 
     /*
