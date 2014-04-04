@@ -91,8 +91,6 @@ int RooFitter(
     argset.add(numerator);
     argset.add(degenerate);
 
-    z_mass.setBins(200);
-
     // Open the data file
     TFile* f_data= new TFile(DATA_FILE.c_str(), "READ");
     if (f_data == NULL) {
@@ -111,24 +109,9 @@ int RooFitter(
     RooWorkspace* w_mc = static_cast<RooWorkspace*>(f_mc->Get(MC_WS.c_str()));
     RooDataSet* mc_reco = static_cast<RooDataSet*>(w_mc->data("roo_dataset"));
 
-    // // Plot
-    // TCanvas* c=new TCanvas();
-    // c->cd();
-    // RooPlot* xframe = z_mass.frame(0, 200, 2000);
-    // // Binning
-    // RooBinning b(0, 200);
-    // b.addUniform(8, 0, 80);
-    // b.addUniform(10, 80, 100);
-    // b.addUniform(10, 100, 200);
-    // data_reco->plotOn(xframe, Binning(b));
-    RooDataHist h_mc("h_mc", "h_mc", RooArgSet(z_mass), *mc_reco);
-    RooHistPdf signalpdf("signalpdf", "signalpdf", z_mass, h_mc);
-    //signalpdf.plotOn(xframe, LineColor(kRed));
-
-    //xframe->Draw();
+    RooKeysPdf signalpdf("signalpdf", "signalpdf", z_mass, *mc_reco);
 
     // Variables for the fit
-    //RooRealVar x("x", "x", 40, 150);
     RooRealVar alpha("alpha", "alpha", 60., 0.1, 1000.);
     RooRealVar gamma("gamma", "gamma", 0.01, 0.0001, 0.3);
     RooRealVar delta("delta", "delta", 10., 3., 80.);
@@ -140,14 +123,23 @@ int RooFitter(
     RooAddPdf fitpdf("fitpdf", "fitpdf", RooArgList(MyBackgroundPdf, signalpdf), RooArgList(sigratio));
 
     RooDataHist h_data("h_data", "h_data", RooArgSet(z_mass), *data_reco);
-    fitpdf.fitTo(h_data);
+    //fitpdf.fitTo(h_data);
+    fitpdf.fitTo(*data_reco);
+
+    // Binning
+    RooBinning b(0, 200);
+    b.addUniform(8, 0, 80);
+    b.addUniform(20, 80, 100);
+    b.addUniform(10, 100, 200);
 
     TCanvas* c=new TCanvas();
     c->cd();
     RooPlot* fitFrame = z_mass.frame(50, 150); ///, Title(name));
-    h_data.plotOn(fitFrame);
-    fitpdf.plotOn(fitFrame, Components(MyBackgroundPdf), LineColor(kRed));
-    fitpdf.plotOn(fitFrame, Components(signalpdf), LineColor(kBlue));
+    //h_data.plotOn(fitFrame, Binning(b));
+    data_reco->plotOn(fitFrame, Binning(b));
+    fitpdf.plotOn(fitFrame, Components(MyBackgroundPdf), LineColor(kRed), LineStyle(kDashed));
+    //fitpdf.plotOn(fitFrame, Components(signalpdf), LineColor(kBlue));
+    fitpdf.plotOn(fitFrame, LineColor(kBlue));
     fitFrame->Draw();
 
     /*
@@ -215,7 +207,7 @@ int RooFitter(
     //break;
     }
     //break;
-    } 
+    }
     */
     return 0;
 }
