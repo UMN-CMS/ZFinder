@@ -62,9 +62,14 @@ namespace zf {
         numerator = new RooCategory("numerator", "Is the event in the efficiency numerator?");
         numerator->defineType("True", 1);
         numerator->defineType("False", 0);
+        // Note that because we set t0p1_pass with an && of the previous value,
+        // once one level of cuts fails, all others will fail. This means that
+        // while it is possible to have a degenerate numerator events without
+        // having a degenerate denominator
         degenerate = new RooCategory("degenerate", "Could either event be the tag, and the other the probe?");
-        degenerate->defineType("True", 1);
         degenerate->defineType("False", 0);
+        degenerate->defineType("Degenerate Denominator", 1);
+        degenerate->defineType("Degenerate Denominator and Numerator", 2);
 
         // Argsets
         argset = new RooArgSet(*z_mass, *phistar, *z_pt, *z_eta, *z_y);
@@ -97,13 +102,17 @@ namespace zf {
         if (clv == NULL) {
             return;
         }
+        // If our vector doesn't have enough cuts, we skip it
+        if (clv->size() <= 2) {
+            return;
+        }
         // We skip the very last cut because it is the mass cut, and we'll
         // apply that later. Therefore, "last" starts at 1 from the end.
         const CutLevel last_cutlevel = clv->rbegin()[1].second;  // Last element
         const CutLevel penult_cutlevel = clv->rbegin()[2].second;  // Penultimate element
 
         // Reject events that do not belong in the sample
-        if ( !penult_cutlevel.pass ) {
+        if (!penult_cutlevel.pass) {
             return;
         }
 
@@ -116,18 +125,39 @@ namespace zf {
             argset->setCatLabel("data_type", "Reco MC");
         }
 
-        // Check if we have a degenerate tag and assign the tag and probe
-        int tag = 0;
+        // Check if we have a degenerate tag
+        // Check denominator level first
+        if (penult_cutlevel.t0p1_pass && penult_cutlevel.t1p0_pass) {
+            // Then check numerator level
+            if (last_cutlevel.t0p1_pass && last_cutlevel.t1p0_pass) {
+                argset->setCatLabel("degenerate", "Degenerate Denominator and Numerator");
+            } else {
+                argset->setCatLabel("degenerate", "Degenerate Denominator");
+            }
+        } else {
+            argset->setCatLabel("degenerate", "False");
+        }
+
+        // Now we set the tag If it is degenerate in the numerator, we pick
+        // a random number, otherwise we pick the only possible tag. If the
+        // event is a denominator only event, we select the in the same manner.
+        int tag = -1;
         if (last_cutlevel.t0p1_pass && last_cutlevel.t1p0_pass) {
-            argset->setCatLabel("degenerate", "True");
             tag = zf_event.id.event_num % 2;  // Assign a reproducible random tag
         } else if (last_cutlevel.t0p1_pass && !last_cutlevel.t1p0_pass) {
-            argset->setCatLabel("degenerate", "False");
             tag = 0;
         } else if (!last_cutlevel.t0p1_pass && last_cutlevel.t1p0_pass) {
-            argset->setCatLabel("degenerate", "False");
             tag = 1;
-        } else {  // We should really not be here...
+        } else if (penult_cutlevel.t0p1_pass && penult_cutlevel.t1p0_pass) {
+            tag = zf_event.id.event_num % 2;  // Assign a reproducible random tag
+        } else if (penult_cutlevel.t0p1_pass && !penult_cutlevel.t1p0_pass) {
+            tag = 0;
+        } else if (!penult_cutlevel.t0p1_pass && penult_cutlevel.t1p0_pass) {
+            tag = 1;
+        } else {
+            // Events that get this far should not be in our dataset! They've
+            // failed all requirements.
+            std::cout << "FAILED TAG STATE" << std::endl;
             return;
         }
 
@@ -169,7 +199,7 @@ namespace zf {
         if (     e_tag == NULL
                 || e_probe == NULL
                 || z_data == NULL
-                || verts == -1
+                || verts >= -1
            ) {
             return;
         }

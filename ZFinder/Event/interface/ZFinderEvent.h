@@ -24,10 +24,17 @@ namespace zf {
 
     // Cut level struct
     struct CutLevel{
+        // Constructor sets all values to false
+        CutLevel() {
+            pass = false;
+            t0p1_pass = false;
+            t1p0_pass = false;
+        }
         bool pass;
         bool t0p1_pass;
         bool t1p0_pass;
     };
+
 
     // Used to match cut levels to names
     typedef std::pair<std::string, CutLevel> cutlevel_pair;
@@ -42,7 +49,7 @@ namespace zf {
         public:
             // Constructor. Although iEvent, iSetup, and iConfig violate our naming
             // convention, they are almost ubiquitous in CMSSW code
-            ZFinderEvent() {};
+            ZFinderEvent() {}
             ZFinderEvent(
                     const edm::Event& iEvent,
                     const edm::EventSetup& iSetup,
@@ -102,7 +109,7 @@ namespace zf {
 
             // Access pruned lists of the internal electrons
             std::vector<ZFinderElectron*>* FilteredElectrons();
-            std::vector<ZFinderElectron*>* AllElectrons() { return FilteredElectrons(); };
+            std::vector<ZFinderElectron*>* AllElectrons() { return FilteredElectrons(); }
             std::vector<ZFinderElectron*>* FilteredElectrons(const std::string& cut_name);
 
             // Number of Electrons
@@ -110,12 +117,12 @@ namespace zf {
 
             // Output
             void PrintElectrons(const int TYPE = 0, const bool PRINT_CUTS = false);  // 0 is reco, 1 is truth, 2 is trig
-            void PrintTruthElectrons(const bool PRINT_CUTS = false) { PrintElectrons(1, PRINT_CUTS); };
-            void PrintRecoElectrons(const bool PRINT_CUTS = false) { PrintElectrons(0, PRINT_CUTS); };
-            void PrintTrigElectrons(const bool PRINT_CUTS = false) { PrintElectrons(2, PRINT_CUTS); };
+            void PrintTruthElectrons(const bool PRINT_CUTS = false) { PrintElectrons(1, PRINT_CUTS); }
+            void PrintRecoElectrons(const bool PRINT_CUTS = false) { PrintElectrons(0, PRINT_CUTS); }
+            void PrintTrigElectrons(const bool PRINT_CUTS = false) { PrintElectrons(2, PRINT_CUTS); }
 
             // Access ZDefinition information
-            void AddZDef(const std::string NAME, cutlevel_vector PASS_OBJ) { zdef_map_[NAME] = PASS_OBJ; };
+            void AddZDef(const std::string NAME, cutlevel_vector PASS_OBJ) { zdef_map_[NAME] = PASS_OBJ; }
             const cutlevel_vector* GetZDef(const std::string& NAME) const;
             bool ZDefPassed(const std::string& NAME) const;
             void PrintZDefs(const bool VERBOSE = false) const;
