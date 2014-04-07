@@ -149,31 +149,48 @@ int RooFitter(
     RooWorkspace* w_mc = static_cast<RooWorkspace*>(MC_FILE->Get(MC_WS.c_str()));
     RooDataSet* mc_reco = static_cast<RooDataSet*>(w_mc->data("roo_dataset"));
 
-    RooKeysPdf signalpdf("signalpdf", "signalpdf", z_mass, *mc_reco);
+    // Select events from before and after the last cut
+    RooDataSet* precut_mc_reco = mc_reco;
+    RooDataSet* postcut_mc_reco = static_cast<RooDataSet*>(mc_reco->reduce("numerator==1"));
+    RooKeysPdf precut_signalpdf("precut_signalpdf", "Signal PDF from MC before apply the last cut", z_mass, *precut_mc_reco);
+    RooKeysPdf postcut_signalpdf("postcut_signalpdf", "Signal PDF from MC after applying all cuts", z_mass, *postcut_mc_reco);
 
-    // Variables for the fit
+    RooDataSet* postcut_data_reco = static_cast<RooDataSet*>(data_reco->reduce("numerator==1"));
+
+    // Set up the background
     RooRealVar alpha("alpha", "alpha", 60., 0.1, 1000.);
     RooRealVar gamma("gamma", "gamma", 0.01, 0.0001, 0.3);
     RooRealVar delta("delta", "delta", 10., 3., 80.);
     RooFormulaVar var1("var1", "(alpha-z_mass)/delta", RooArgSet(alpha, z_mass, delta));
     RooFormulaVar var2("var2", "-1.0*gamma*z_mass", RooArgSet(gamma, z_mass));
-    RooGenericPdf MyBackgroundPdf("MyBackgroundPdf", "ROOT::Math::erfc(var1)*exp(var2)", RooArgSet(var1, var2));
-
+    RooGenericPdf bg_pdf("MyBackgroundPdf", "ROOT::Math::erfc(var1)*exp(var2)", RooArgSet(var1, var2));
     RooRealVar sigratio("sigratio", "sigratio", 0.1, 0.0, 1.0);
-    RooAddPdf fitpdf("fitpdf", "fitpdf", RooArgList(MyBackgroundPdf, signalpdf), RooArgList(sigratio));
 
-    fitpdf.fitTo(*data_reco);
+    RooAddPdf precut_fitpdf("precut_fitpdf", "precut_fitpdf", RooArgList(bg_pdf, precut_signalpdf), RooArgList(sigratio));
+    RooAddPdf postcut_fitpdf("postcut_fitpdf", "postcut_fitpdf", RooArgList(bg_pdf, postcut_signalpdf), RooArgList(sigratio));
+
+    precut_fitpdf.fitTo(*data_reco);
+    postcut_fitpdf.fitTo(*postcut_data_reco);
 
     TCanvas* const c = get_tcanvas();
     const RooBinning* const binning = get_roobinning(ETET);
     // Plot the left side
     c->cd(1);
-    RooPlot* fitFrame = z_mass.frame(50, 150); ///, Title(name));
-    data_reco->plotOn(fitFrame, Binning(*binning));
-    fitpdf.plotOn(fitFrame, Components(MyBackgroundPdf), LineColor(kRed), LineStyle(kDashed));
-    fitpdf.plotOn(fitFrame, LineColor(kBlue));
+    RooPlot* precut_fitframe = z_mass.frame(50, 150); ///, Title(name));
+    data_reco->plotOn(precut_fitframe, Binning(*binning));
+    precut_fitpdf.plotOn(precut_fitframe, Components(bg_pdf), LineColor(kRed), LineStyle(kDashed));
+    precut_fitpdf.plotOn(precut_fitframe, LineColor(kBlue));
 
-    fitFrame->Draw();
+    precut_fitframe->Draw();
+
+    // Plot the right side
+    c->cd(2);
+    RooPlot* postcut_fitframe = z_mass.frame(50, 150); ///, Title(name));
+    postcut_data_reco->plotOn(postcut_fitframe, Binning(*binning));
+    postcut_fitpdf.plotOn(postcut_fitframe, Components(bg_pdf), LineColor(kRed), LineStyle(kDashed));
+    postcut_fitpdf.plotOn(postcut_fitframe, LineColor(kBlue));
+
+    postcut_fitframe->Draw();
 
     /*
        double acceptance[ETA_BINS.size()][PHISTAR_BINS.size()];
@@ -217,7 +234,7 @@ int RooFitter(
     //cout<<"Pdf done"<<endl;
     //RooRealVar sigratio("sigratio", "sigratio", 0.5, 0.0, 1.0);
     ////    sigratio.setRange(0.5, 0.5);
-    //RooAddPdf fitpdf("fitpdf", "fitpdf", RooArgList(MyBackgroundPdf, signalpdf), RooArgList(sigratio));
+    //RooAddPdf fitpdf("fitpdf", "fitpdf", RooArgList(bg_pdf, signalpdf), RooArgList(sigratio));
 
     //fitpdf.fitTo(h_data);
 
@@ -234,7 +251,7 @@ int RooFitter(
     //c->cd();
     //RooPlot* fitFrame = z_mass.frame(0, 200); ///, Title(name));
     //h_data.plotOn(fitFrame);
-    //fitpdf.plotOn(fitFrame, Components(MyBackgroundPdf), LineColor(kRed));
+    //fitpdf.plotOn(fitFrame, Components(bg_pdf), LineColor(kRed));
     //fitpdf.plotOn(fitFrame, Components(signalpdf), LineColor(kBlue));
     //fitFrame->Draw();
     //break;
