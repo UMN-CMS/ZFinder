@@ -110,8 +110,8 @@ class CrossCheckPlotter{
         config_map conf_map_;
 
         // Hardcoded variables
-        static const int X_VAL_ = 800;
-        static const int Y_VAL_ = 800;
+        static const int X_VAL_ = 1000;
+        static const int Y_VAL_ = 1000;
         // These are measured from 0, 0 in the bottom left
         static const double RIGHT_EDGE_ = 0.96;
         static const double LEFT_EDGE_ = 0.10;

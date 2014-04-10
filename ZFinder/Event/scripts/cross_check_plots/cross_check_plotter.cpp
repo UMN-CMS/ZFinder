@@ -117,17 +117,21 @@ void CrossCheckPlotter::plot(
     mc_histo->SetTitle(0);
     // Axis labels
     data_histo->GetXaxis()->SetTitle(plot_config.x_label.c_str());
-    mc_histo->GetXaxis()->SetTitle(0);
+    mc_histo->GetXaxis()->SetTitle(plot_config.x_label.c_str());
     data_histo->GetYaxis()->SetTitle(plot_config.y_label.c_str());
-    mc_histo->GetYaxis()->SetTitle(0);
+    mc_histo->GetYaxis()->SetTitle(plot_config.y_label.c_str());
     // Position of axis labels
     data_histo->GetYaxis()->SetTitleOffset(1.4);
     data_histo->GetXaxis()->SetTitleOffset(1.2);
-    // Marker and line style
+    // Marker, line, and fill style
     data_histo->SetMarkerStyle(kFullCircle);
     data_histo->SetMarkerColor(kBlack);
     data_histo->SetLineColor(kBlack);
     mc_histo->SetLineColor(kBlue);
+    mc_histo->SetFillColor(kBlue);
+    const int FORWARD_HATCH = 3004;
+    //const int BACK_HATCH = 3005;
+    mc_histo->SetFillStyle(FORWARD_HATCH);
 
     // Set the plot range maximum based on the highest peak in either histo
     const double NEW_MAX = 1.05 * get_maximum(data_histo, mc_histo);
@@ -139,7 +143,7 @@ void CrossCheckPlotter::plot(
     TLegend legend(RIGHT_EDGE_ - LEG_LENGTH, TOP_EDGE_ - LEG_HEIGHT, RIGHT_EDGE_, TOP_EDGE_);
     legend.SetFillColor(kWhite);
     legend.AddEntry(data_histo, "Data", "p");
-    legend.AddEntry(mc_histo, "MC", "l");
+    legend.AddEntry(mc_histo, "MC", "f");
     legend.SetBorderSize(1);  // Remove drop shadow
 
     // Add title
@@ -156,8 +160,8 @@ void CrossCheckPlotter::plot(
     }
 
     // Draw the histograms
-    data_histo->Draw("E");
-    mc_histo->Draw("HIST SAME");
+    mc_histo->Draw("HIST");
+    data_histo->Draw("E SAME");
     legend.Draw();
     if (plot_title != NULL) { plot_title->Draw(); }
 
