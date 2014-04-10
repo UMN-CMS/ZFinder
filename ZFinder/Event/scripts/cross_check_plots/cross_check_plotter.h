@@ -34,15 +34,17 @@ enum PlotType{
 struct PlotConfig{
     // Constructor
     PlotConfig(
-        std::string x_l,
-        std::string y_l,
-        std::string t,
-        std::string h_name
+        std::string x_label,
+        std::string y_label,
+        std::string title,
+        std::string histo_name,
+        bool logy
             ) :
-        x_label(x_l),
-        y_label(y_l),
-        title(t),
-        histo_name(h_name)
+        x_label(x_label),
+        y_label(y_label),
+        title(title),
+        histo_name(histo_name),
+        logy(logy)
     { // Everything needed is done by the initializer list
     }
 
@@ -51,6 +53,7 @@ struct PlotConfig{
     std::string y_label;
     std::string title;
     std::string histo_name;
+    bool logy;
 };
 
 // Typedefs of our custom types

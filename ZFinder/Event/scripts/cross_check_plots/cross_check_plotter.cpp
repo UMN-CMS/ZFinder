@@ -132,6 +132,9 @@ void CrossCheckPlotter::plot(
     const int FORWARD_HATCH = 3004;
     //const int BACK_HATCH = 3005;
     mc_histo->SetFillStyle(FORWARD_HATCH);
+    // Log
+    canvas.SetLogy(plot_config.logy);
+
 
     // Set the plot range maximum based on the highest peak in either histo
     const double NEW_MAX = 1.05 * get_maximum(data_histo, mc_histo);
@@ -287,10 +290,11 @@ void CrossCheckPlotter::init_config_map() {
             config_pair(
                 Z_MASS_ALL,
                 PlotConfig(
-                    "m_{ee} [GeV]",
-                    "Events",
-                    "",
-                    "Z0 Mass: All"
+                    "m_{ee} [GeV]",  // x_label
+                    "Events",        // y_label
+                    "",              // title
+                    "Z0 Mass: All",  // histogram name (for reading in)
+                    true            // log Y axis
                     )
                 )
             );
@@ -301,7 +305,8 @@ void CrossCheckPlotter::init_config_map() {
                     "m_{ee} [GeV]",
                     "Events",
                     "",
-                    "Z0 Mass: Coarse"
+                    "Z0 Mass: Coarse",
+                    true
                     )
                 )
             );
@@ -312,7 +317,8 @@ void CrossCheckPlotter::init_config_map() {
                     "m_{ee} [GeV]",
                     "Events",
                     "",
-                    "Z0 Mass: Fine"
+                    "Z0 Mass: Fine",
+                    true
                     )
                 )
             );
@@ -324,7 +330,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Y_{Z}",
                     "Events",
                     "",
-                    "Z0 Rapidity"
+                    "Z0 Rapidity",
+                    true
                     )
                 )
             );
@@ -336,7 +343,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Z p_{T} [GeV]",
                     "Events",
                     "",
-                    "Z0 p_{T}"
+                    "Z0 p_{T}",
+                    true
                     )
                 )
             );
@@ -347,7 +355,8 @@ void CrossCheckPlotter::init_config_map() {
                     "e_{0} p_{T} [GeV]",
                     "Events",
                     "",
-                    "p_{T,e_{0}}"
+                    "p_{T,e_{0}}",
+                    true
                     )
                 )
             );
@@ -358,7 +367,8 @@ void CrossCheckPlotter::init_config_map() {
                     "e_{1} p_{T} [GeV]",
                     "Events",
                     "",
-                    "p_{T,e_{1}}"
+                    "p_{T,e_{1}}",
+                    true
                     )
                 )
             );
@@ -370,7 +380,8 @@ void CrossCheckPlotter::init_config_map() {
                     "#eta_{e_{0}}",
                     "Events",
                     "",
-                    "#eta_{e_{0}}"
+                    "#eta_{e_{0}}",
+                    true
                     )
                 )
             );
@@ -381,7 +392,8 @@ void CrossCheckPlotter::init_config_map() {
                     "#eta_{e_{1}}",
                     "Events",
                     "",
-                    "#eta_{e_{1}}"
+                    "#eta_{e_{1}}",
+                    true
                     )
                 )
             );
@@ -393,7 +405,8 @@ void CrossCheckPlotter::init_config_map() {
                     "#phi_{e_{0}}",
                     "Events",
                     "",
-                    "#phi_{e_{0}}"
+                    "#phi_{e_{0}}",
+                    false
                     )
                 )
             );
@@ -404,7 +417,8 @@ void CrossCheckPlotter::init_config_map() {
                     "#phi_{e_{1}}",
                     "Events",
                     "",
-                    "#phi_{e_{1}}"
+                    "#phi_{e_{1}}",
+                    false
                     )
                 )
             );
@@ -416,7 +430,8 @@ void CrossCheckPlotter::init_config_map() {
                     "q_{e_{0}}",
                     "Events",
                     "",
-                    "charge_{e_{0}}"
+                    "charge_{e_{0}}",
+                    false
                     )
                 )
             );
@@ -427,7 +442,8 @@ void CrossCheckPlotter::init_config_map() {
                     "q_{e_{1}}",
                     "Events",
                     "",
-                    "charge_{e_{1}}"
+                    "charge_{e_{1}}",
+                    false
                     )
                 )
             );
@@ -439,7 +455,8 @@ void CrossCheckPlotter::init_config_map() {
                     "#phi*",
                     "Events",
                     "",
-                    "#phi*"
+                    "#phi*",
+                    true
                     )
                 )
             );
@@ -451,7 +468,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Number of Vertexes",
                     "Events",
                     "",
-                    "N_{Vertices}"
+                    "N_{Vertices}",
+                    true
                     )
                 )
             );
@@ -463,14 +481,9 @@ void CrossCheckPlotter::init_config_map() {
                     "Number of Electrons",
                     "Events",
                     "",
-                    "N_{e}"
+                    "N_{e}",
+                    true
                     )
                 )
             );
 }
-
-//
-//     //plabel->Draw();
-//     //norm_label->Draw();
-// }
-
