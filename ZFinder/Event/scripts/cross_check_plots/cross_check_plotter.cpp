@@ -214,8 +214,8 @@ void CrossCheckPlotter::plot(
     data_histo->GetYaxis()->SetTitle(plot_config.y_label.c_str());
     mc_histo->GetYaxis()->SetTitle(plot_config.y_label.c_str());
     // Position of axis labels
-    data_histo->GetYaxis()->SetTitleOffset(1.4);
-    data_histo->GetXaxis()->SetTitleOffset(1.2);
+    mc_histo->GetYaxis()->SetTitleOffset(1.25);
+    mc_histo->GetXaxis()->SetTitleOffset(1.1);
     // Marker, line, and fill style
     data_histo->SetMarkerStyle(kFullCircle);
     data_histo->SetMarkerColor(kBlack);
