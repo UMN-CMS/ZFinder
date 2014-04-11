@@ -241,6 +241,7 @@ void CrossCheckPlotter::plot(
     legend.AddEntry(data_histo, "Data", "p");
     legend.AddEntry(mc_histo, "MC", "f");
     legend.SetBorderSize(1);  // Remove drop shadow
+    legend.SetFillStyle(0);  // Transparent
 
     // Add title
     TLatex *plot_title = NULL;
