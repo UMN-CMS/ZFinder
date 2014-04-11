@@ -64,7 +64,22 @@ int main(int argc, char* argv[]) {
         }
 
         // Make a plot
-        plotter->plot(Z_MASS_COARSE, "TEST.png");
+        plotter->plot(Z_MASS_ALL, "z_mass_all.png");
+        plotter->plot(Z_MASS_COARSE, "z_mass_coarse.png");
+        plotter->plot(Z_MASS_FINE, "z_mass_fine.png");
+        plotter->plot(Z_RAPIDITY, "z_rapidity.png");
+        plotter->plot(Z_PT, "z_pt.png");
+        plotter->plot(E0_PT, "e0_pt.png");
+        plotter->plot(E0_ETA, "e0_eta.png");
+        plotter->plot(E0_PHI, "e0_phi.png");
+        plotter->plot(E0_CHARGE, "e0_charge.png");
+        plotter->plot(E1_PT, "e1_pt.png");
+        plotter->plot(E1_ETA, "e1_eta.png");
+        plotter->plot(E1_PHI, "e1_phi.png");
+        plotter->plot(E1_CHARGE, "e1_charge.png");
+        plotter->plot(PHISTAR, "phistar.png");
+        plotter->plot(N_VERTS, "n_verts.png");
+        plotter->plot(N_E, "n_e.png");
 
         // Clean up
         delete plotter;
