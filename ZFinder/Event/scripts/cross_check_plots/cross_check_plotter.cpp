@@ -228,7 +228,6 @@ void CrossCheckPlotter::plot(
     // Log
     canvas.SetLogy(plot_config.logy);
 
-
     // Set the plot range maximum based on the highest peak in either histo
     const double NEW_MAX = 1.05 * get_maximum(data_histo, mc_histo);
     data_histo->SetMaximum(NEW_MAX);
@@ -240,7 +239,7 @@ void CrossCheckPlotter::plot(
     legend.SetFillColor(kWhite);
     legend.AddEntry(data_histo, "Data", "p");
     legend.AddEntry(mc_histo, "MC", "f");
-    legend.SetBorderSize(1);  // Remove drop shadow
+    legend.SetBorderSize(0);  // Remove drop shadow and border
     legend.SetFillStyle(0);  // Transparent
 
     // Add title
