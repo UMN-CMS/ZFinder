@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include <utility>  // std::pair
+#include <vector>
 
 // Root
 #include <TFile.h>
@@ -38,13 +39,15 @@ struct PlotConfig{
         std::string y_label,
         std::string title,
         std::string histo_name,
-        bool logy
+        bool logy,
+        std::vector<double> binning
             ) :
         x_label(x_label),
         y_label(y_label),
         title(title),
         histo_name(histo_name),
-        logy(logy)
+        logy(logy),
+        binning(binning)
     { // Everything needed is done by the initializer list
     }
 
@@ -54,6 +57,7 @@ struct PlotConfig{
     std::string title;
     std::string histo_name;
     bool logy;
+    std::vector<double> binning;
 };
 
 // Typedefs of our custom types
@@ -102,7 +106,7 @@ class CrossCheckPlotter{
         TFile* mc_tfile_;
 
         // Various helper functions
-        double get_maximum(const TH1* const data_histo, const TH1* const mc_histo);
+        double get_maximum(const TH1* const DATA_HISTO, const TH1* const MC_HISTO);
 
         // Target directories
         std::string data_dir_name_;
@@ -111,6 +115,12 @@ class CrossCheckPlotter{
         // Functions and variables related to the config_map
         void init_config_map();
         config_map conf_map_;
+
+        // Calculate rebinning
+        std::vector<double> get_rebinning(
+                std::vector<double> desired_bins,
+                const TH1* const HISTO
+                );
 
         // Hardcoded variables
         static constexpr int X_VAL_ = 1000;

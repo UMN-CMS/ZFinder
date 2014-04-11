@@ -1,3 +1,6 @@
+// Standard Library
+#include <algorithm>  //std::equal_range, std::sort, std::unique
+#include <cmath>  // std::abs
 #include <iostream>
 #include <string>
 
@@ -55,17 +58,80 @@ void CrossCheckPlotter::setup(
 }
 
 double CrossCheckPlotter::get_maximum(
-        const TH1* const data_histo,
-        const TH1* const mc_histo
+        const TH1* const DATA_HISTO,
+        const TH1* const MC_HISTO
         ) {
     /* Figure out the largest Y value */
-    const double DATA_MAX = data_histo->GetMaximum();
-    const double MC_MAX = mc_histo->GetMaximum();
+    const double DATA_MAX = DATA_HISTO->GetMaximum();
+    const double MC_MAX = MC_HISTO->GetMaximum();
     if (MC_MAX > DATA_MAX) {
         return MC_MAX;
     } else {
         return DATA_MAX;
     }
+}
+
+std::vector<double> CrossCheckPlotter::get_rebinning(
+        std::vector<double> desired_bins,
+        const TH1* const HISTO
+        ) {
+    /* Given a desired set of bin edges, and a histogram, finds the bin edges
+     * in the histogram that most closely approximate the desired edges. This
+     * is done by, for each desired edge, choosing the bin edge from the
+     * histogram gram that is closest in terms of linear distance.
+     */
+    std::vector<double> out_vec;
+    // Fill the old bins
+    std::vector<double> old_bins;
+    const int N_BINS = HISTO->GetXaxis()->GetNbins();
+    for (int i_bin = 1; i_bin <= N_BINS; ++i_bin) {
+        double bin_edge = HISTO->GetXaxis()->GetBinLowEdge(i_bin);
+        old_bins.push_back(bin_edge);
+    }
+    // Add the high edge, which isn't included but is needed
+    old_bins.push_back(HISTO->GetXaxis()->GetBinUpEdge(N_BINS));
+    std::sort(old_bins.begin(), old_bins.end());
+
+    // Loop through the desired bins.
+    //
+    // We use a binary search to find the actual
+    // bins on either side of the desired bin, we then compare the distance and
+    // pick the closest. At the end we remove duplicate entries. equal_range
+    // will return a pointer to the first entry that is not less than our
+    // desired bin, and one that is strictly greater than our test bin. This
+    // means we might need to move one of the pointers back, and of course we
+    // need to check that they don't run off the edge of the vector.
+    std::sort(desired_bins.begin(), desired_bins.end());
+    for (auto& i : desired_bins) {
+        const double DESIRED_BIN = i;
+        auto bounds = std::equal_range(old_bins.begin(), old_bins.end(), DESIRED_BIN);
+        // Move the first pointer back if needed
+        if (       bounds.first == bounds.second
+                && bounds.first != old_bins.begin()
+                && *bounds.first != DESIRED_BIN
+           ) {
+            --bounds.first;
+        }
+        // Check distance, pick the closest (or the first for a tie)
+        const double FIRST_BIN = *bounds.first;
+        const double SECOND_BIN = *bounds.second;
+        const double FIRST_DIST = std::abs(FIRST_BIN - DESIRED_BIN);
+        const double SECOND_DIST = std::abs(SECOND_BIN - DESIRED_BIN);
+        if (SECOND_DIST >= FIRST_DIST) {
+            out_vec.push_back(FIRST_BIN);
+        } else {
+            out_vec.push_back(SECOND_BIN);
+        }
+    }
+
+    // Remove the non-unique entries. Unique moves the non-uniques to the end
+    // and returns a pointer to the first non-unique item, erase then removes
+    // them.
+    std::sort(out_vec.begin(), out_vec.end());
+    out_vec.erase(std::unique(out_vec.begin(), out_vec.end()), out_vec.end());
+
+    // Return our vector
+    return out_vec;
 }
 
 void CrossCheckPlotter::plot(
@@ -96,6 +162,33 @@ void CrossCheckPlotter::plot(
     if (!mc_histo) {
         std::cout << "Can not open the MC Histogram!" << std::endl;
         return;
+    }
+
+    // Rebin if the binning is greater than 0 in size. If it is size one assume
+    // we want a simple rebinning (where N bins are combined to 1), otherwise
+    // the vector is the edges of the bins.
+    if (plot_config.binning.size() == 1) {
+        mc_histo->Rebin(static_cast<int>(plot_config.binning[0]));
+        data_histo->Rebin(static_cast<int>(plot_config.binning[0]));
+    } else if (plot_config.binning.size() > 1) {
+        std::vector<double> new_binning = get_rebinning(
+                plot_config.binning,
+                data_histo
+                );
+        mc_histo = dynamic_cast<TH1D*>(
+                mc_histo->Rebin(
+                    new_binning.size() - 1,
+                    "mc_rebinned_histo",
+                    &new_binning[0]  // double*
+                    )
+                );
+        data_histo = dynamic_cast<TH1D*>(
+                data_histo->Rebin(
+                    new_binning.size() - 1,
+                    "data_rebinned_histo",
+                    &new_binning[0]  // double*
+                    )
+                );
     }
 
     // Normalize areas
@@ -294,7 +387,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",        // y_label
                     "",              // title
                     "Z0 Mass: All",  // histogram name (for reading in)
-                    true            // log Y axis
+                    true,            // log Y axis
+                    {}               // Desired new binning
                     )
                 )
             );
@@ -306,7 +400,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "Z0 Mass: Coarse",
-                    true
+                    true,
+                    {}
                     )
                 )
             );
@@ -318,7 +413,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "Z0 Mass: Fine",
-                    true
+                    true,
+                    {}
                     )
                 )
             );
@@ -331,7 +427,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "Z0 Rapidity",
-                    true
+                    true,
+                    {}
                     )
                 )
             );
@@ -344,7 +441,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "Z0 p_{T}",
-                    true
+                    true,
+                    {5}  // with one entry, just calls histo->Rebin(5);
                     )
                 )
             );
@@ -356,7 +454,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "p_{T,e_{0}}",
-                    true
+                    true,
+                    {5}
                     )
                 )
             );
@@ -368,7 +467,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "p_{T,e_{1}}",
-                    true
+                    true,
+                    {5}
                     )
                 )
             );
@@ -381,7 +481,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "#eta_{e_{0}}",
-                    true
+                    true,
+                    {}
                     )
                 )
             );
@@ -393,7 +494,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "#eta_{e_{1}}",
-                    true
+                    true,
+                    {}
                     )
                 )
             );
@@ -406,7 +508,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "#phi_{e_{0}}",
-                    false
+                    false,
+                    {}
                     )
                 )
             );
@@ -418,7 +521,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "#phi_{e_{1}}",
-                    false
+                    false,
+                    {}
                     )
                 )
             );
@@ -431,7 +535,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "charge_{e_{0}}",
-                    false
+                    false,
+                    {}
                     )
                 )
             );
@@ -443,7 +548,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "charge_{e_{1}}",
-                    false
+                    false,
+                    {}
                     )
                 )
             );
@@ -456,7 +562,9 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "#phi*",
-                    true
+                    true,
+                    // multiple entries means these are new bin edges
+                    {0.0, 0.05, 0.1, 0.2, 0.3, 0.4, 0.6, 1.0}
                     )
                 )
             );
@@ -469,7 +577,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "N_{Vertices}",
-                    true
+                    true,
+                    {}
                     )
                 )
             );
@@ -482,7 +591,8 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "N_{e}",
-                    true
+                    true,
+                    {}
                     )
                 )
             );
