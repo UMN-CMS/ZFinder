@@ -125,6 +125,24 @@ struct DataConfig{
     DataType datatype;
 };
 
+struct HistoStore{
+    HistoStore(
+        TH1D* data_histo,
+        TH1D* mc_histo,
+        std::vector<std::pair<std::string, TH1D*>> bg_histos
+            ) :
+        data_histo(data_histo),
+        mc_histo(mc_histo),
+        bg_histos(bg_histos)
+    { // Everything needed is done by the initializer list
+    }
+
+    // Variables
+    TH1D* data_histo;
+    TH1D* mc_histo;
+    std::vector<std::pair<std::string, TH1D*>> bg_histos;
+};
+
 // Typedefs of our custom types
 typedef std::map<PlotType, PlotConfig> config_map;
 typedef std::pair<PlotType, PlotConfig> config_pair;
@@ -161,6 +179,12 @@ class CrossCheckPlotter{
         DataConfig mc_config_;  // Signal MC
         data_config_map bg_configs_;  // Background MC
 
+        // Open the histograms
+        HistoStore open_histos(
+                const PlotType PLOT_TYPE,
+                const std::string HISTO_NAME
+                );
+
         // Set the plotting style
         void set_plot_style();
         TStyle* style_;
@@ -169,7 +193,7 @@ class CrossCheckPlotter{
         TFile* data_tfile_;
         TFile* mc_tfile_;
 
-        // Various helper functions
+        // Histogram rescaling
         double get_rescaling(const DataConfig& DATA, const DataConfig& MC);
 
         // Target directories

@@ -131,26 +131,20 @@ std::vector<double> CrossCheckPlotter::get_rebinning(
     return out_vec;
 }
 
-void CrossCheckPlotter::plot(
+HistoStore CrossCheckPlotter::open_histos(
         const PlotType PLOT_TYPE,
-        const std::string FILE_NAME
+        const std::string HISTO_NAME
         ) {
-    // Get our config_pair and some of the values from it
-    config_map::iterator i_config_pair = conf_map_.find(PLOT_TYPE);
-    if (i_config_pair == conf_map_.end()) {
-        std::cout << "Missing PLOT_TYPE in conf_map_!" << std::endl;
-        return;
-    }
-    PlotConfig plot_config = i_config_pair->second;
-    const std::string HISTO_NAME = plot_config.histo_name;
-
-    // Open the histograms
+    /*
+     * Open the histograms for a given PlotType and return them in a HistoStore
+     * object.
+     */
     TH1D* tmp_histo;
     const std::string DATA_HISTO_NAME = data_config_.tdir_name + "/" + HISTO_NAME;
     data_config_.tfile->GetObject(DATA_HISTO_NAME.c_str(), tmp_histo);
     if (!tmp_histo) {
         std::cout << "Can not open the Data Histogram!" << std::endl;
-        return;
+        return HistoStore(NULL, NULL, {});
     }
     TH1D* data_histo = dynamic_cast<TH1D*>(tmp_histo->Clone());
 
@@ -158,7 +152,7 @@ void CrossCheckPlotter::plot(
     mc_config_.tfile->GetObject(MC_HISTO_NAME.c_str(), tmp_histo);
     if (!tmp_histo) {
         std::cout << "Can not open the MC Histogram!" << std::endl;
-        return;
+        return HistoStore(NULL, NULL, {});
     }
     TH1D* mc_histo = dynamic_cast<TH1D*>(tmp_histo->Clone());
 
@@ -173,13 +167,40 @@ void CrossCheckPlotter::plot(
                 std::cout << "Can not open the BG Histogram for ";
                 std::cout << i_pair.first;
                 std::cout << "!" << std::endl;
-                return;
+                return HistoStore(NULL, NULL, {});
             }
             // Clone incase, for some unknown reason (perhaps testing) we want
             // to use the same histogram twice
             TH1D* bg_clone = dynamic_cast<TH1D*>(bg_histo->Clone());
             bg_histos.push_back(std::make_pair(i_pair.first, bg_clone));
         }
+    }
+
+    // Set up and return HistoStore
+    return HistoStore(data_histo, mc_histo, bg_histos);
+}
+
+void CrossCheckPlotter::plot(
+        const PlotType PLOT_TYPE,
+        const std::string FILE_NAME
+        ) {
+    // Get our config_pair and some of the values from it
+    config_map::iterator i_config_pair = conf_map_.find(PLOT_TYPE);
+    if (i_config_pair == conf_map_.end()) {
+        std::cout << "Missing PLOT_TYPE in conf_map_!" << std::endl;
+        return;
+    }
+    PlotConfig plot_config = i_config_pair->second;
+    const std::string HISTO_NAME = plot_config.histo_name;
+
+    // Open the histograms
+    HistoStore histo_store = open_histos(PLOT_TYPE, HISTO_NAME);
+    TH1D* data_histo = histo_store.data_histo;
+    TH1D* mc_histo = histo_store.mc_histo;
+    std::vector<std::pair<std::string, TH1D*>> bg_histos = histo_store.bg_histos;
+    // Check that open_histos exited successfully, otherwise end
+    if (data_histo == NULL || mc_histo == NULL) {
+        return;
     }
 
     // Rebin if the binning is greater than 0 in size. If it is size one assume
