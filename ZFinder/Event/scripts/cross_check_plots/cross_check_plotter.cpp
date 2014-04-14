@@ -377,15 +377,27 @@ void CrossCheckPlotter::plot(
     }
     histo_stack->Add(mc_histo);
 
-    // Set the plot range maximum based on the highest peak in either histo
+    // Set the plot range maximum and minimum based on the highest peak in
+    // either histo
+    // Set the maximum
     const double DATA_MAX = data_histo->GetMaximum();
     const double STACK_MAX = histo_stack->GetMaximum();
+
+    const double MAX_CONST = 1.2;
     if (DATA_MAX > STACK_MAX) {
-        data_histo->SetMaximum(DATA_MAX * 1.1);
+        data_histo->SetMaximum(DATA_MAX * MAX_CONST);
     } else {
-        data_histo->SetMaximum(STACK_MAX * 1.1);
+        data_histo->SetMaximum(STACK_MAX * MAX_CONST);
     }
-    //data_histo->SetMinimum(0.00001);
+    // Set the minimum
+    double bg_min_max = -1;  // The smallest maximum
+    for (auto& i_pair : bg_histos) {
+        const double BG_MAX = i_pair.second->GetMaximum();
+        if (BG_MAX < bg_min_max || bg_min_max < 0) {
+            bg_min_max = BG_MAX;
+        }
+    };
+    data_histo->SetMinimum(bg_min_max * 0.1);
 
     // Add title
     TLatex *plot_title = NULL;
