@@ -339,8 +339,8 @@ void CrossCheckPlotter::plot(
     const double LEG_LENGTH = 0.15;
     TLegend legend(RIGHT_EDGE_ - LEG_LENGTH, TOP_EDGE_ - LEG_HEIGHT, RIGHT_EDGE_, TOP_EDGE_);
     legend.SetFillColor(kWhite);
-    legend.AddEntry(data_histo, "Data", "p");
-    legend.AddEntry(mc_histo, "MC", "f");
+    legend.AddEntry(data_histo, data_config_.name.c_str(), "p");
+    legend.AddEntry(mc_histo, mc_config_.name.c_str(), "f");
     legend.SetBorderSize(0);  // Remove drop shadow and border
     legend.SetFillStyle(0);  // Transparent
 
