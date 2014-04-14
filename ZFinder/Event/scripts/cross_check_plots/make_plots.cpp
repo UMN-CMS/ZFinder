@@ -1,6 +1,7 @@
 // Standard Library
 #include <iostream>
 #include <string>
+#include <map>
 
 // ROOT
 #include <TFile.h>
@@ -9,83 +10,68 @@
 #include "cross_check_plotter.h"
 
 
-int main(int argc, char* argv[]) {
-    const int argcLow = 4;
-    const int argcHigh = 7;
+int main() {
+    // Data
+    TFile* data_tfile = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140318_DoubleElectron_2012B/20140318_DoubleElectron_2012B_hadded.root", "READ");
+    DataConfig data_config(
+            data_tfile,
+            "ZFinder/ET-ET Combined Double Reco/7 60 < M_{ee} < 120",
+            "Data",
+            1.,
+            DATA
+            );
+    // Signal MC
+    TFile* mc_tfile = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140318_Summer12_DR53X_DYToEE_M-20_CT10_TuneZ2star_8TeV-powheg-pythia6/20140318_Summer12_DR53X_DYToEE_M-20_CT10_TuneZ2star_8TeV-powheg-pythia6_hadded.root ", "READ");
+    DataConfig mc_config(
+            mc_tfile,
+            "ZFinder/ET-ET Combined Double Reco/7 60 < M_{ee} < 120",
+            "Signal MC",
+            .3,
+            SIGNAL_MC
+            );
+    // BG
+    TFile* bg_tfile = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140326_TTBar/20140326_TTBar_summed.root", "READ");
+    DataConfig bg_config(
+            bg_tfile,
+            "ZFinder/ET-ET Combined Double Reco/6 60 < M_{ee} < 120",
+            "T-TBar",
+            .3,
+            BG_MC
+            );
+    // BG Map
+    data_config_map bg_map;
+    bg_map["T-TBar"] = bg_config;
 
-    if (argc <= argcLow) {
-        std::cout << "Not enough arguments.";
-        return 1;
-    } else if (argc >= argcHigh) {
-        std::cout << "Too many arguments.";
-        return 1;
-    } else {
-        /* Read in arguments */
-        std::string input_data_file(argv[1]);
-        std::string input_mc_file(argv[2]);
-        std::string first_tdir(argv[3]);
-        std::string second_tdir;
-        std::string output_dir;
-        if (argc == 5) {
-            second_tdir = "";
-            output_dir = argv[4];
-        } else {
-            second_tdir = argv[4];
-            output_dir = argv[5];
-        }
+    // Setup the plotter
+    CrossCheckPlotter* plotter = new CrossCheckPlotter(
+            data_config,
+            mc_config,
+            bg_map
+            );
 
-        // Open the TFiles
-        TFile* data_tfile = new TFile(input_data_file.c_str(), "READ");
-        if (!data_tfile) {
-            std::cout << "Failed to open the Data File!" << std::endl;
-            return 1;
-        }
-        TFile* mc_tfile = new TFile(input_mc_file.c_str(), "READ");
-        if (!mc_tfile) {
-            std::cout << "Failed to open the MC File!" << std::endl;
-            return 1;
-        }
-        
-        // Make the plotter
-        CrossCheckPlotter* plotter;
-        if (argc == 5) {
-            plotter = new CrossCheckPlotter(
-                    data_tfile, 
-                    mc_tfile, 
-                    first_tdir
-                    );
-        } else {
-            plotter = new CrossCheckPlotter(
-                    data_tfile, 
-                    mc_tfile, 
-                    first_tdir,
-                    second_tdir
-                    );
-        }
+    // Make a plot
+    plotter->plot(Z_MASS_ALL, "z_mass_all.png");
+    plotter->plot(Z_MASS_COARSE, "z_mass_coarse.png");
+    plotter->plot(Z_MASS_FINE, "z_mass_fine.png");
+    plotter->plot(Z_RAPIDITY, "z_rapidity.png");
+    plotter->plot(Z_PT, "z_pt.png");
+    plotter->plot(E0_PT, "e0_pt.png");
+    plotter->plot(E0_ETA, "e0_eta.png");
+    plotter->plot(E0_PHI, "e0_phi.png");
+    plotter->plot(E0_CHARGE, "e0_charge.png");
+    plotter->plot(E1_PT, "e1_pt.png");
+    plotter->plot(E1_ETA, "e1_eta.png");
+    plotter->plot(E1_PHI, "e1_phi.png");
+    plotter->plot(E1_CHARGE, "e1_charge.png");
+    plotter->plot(PHISTAR, "phistar.png");
+    plotter->plot(N_VERTS, "n_verts.png");
+    plotter->plot(N_E, "n_e.png");
 
-        // Make a plot
-        plotter->plot(Z_MASS_ALL, "z_mass_all.png");
-        plotter->plot(Z_MASS_COARSE, "z_mass_coarse.png");
-        plotter->plot(Z_MASS_FINE, "z_mass_fine.png");
-        plotter->plot(Z_RAPIDITY, "z_rapidity.png");
-        plotter->plot(Z_PT, "z_pt.png");
-        plotter->plot(E0_PT, "e0_pt.png");
-        plotter->plot(E0_ETA, "e0_eta.png");
-        plotter->plot(E0_PHI, "e0_phi.png");
-        plotter->plot(E0_CHARGE, "e0_charge.png");
-        plotter->plot(E1_PT, "e1_pt.png");
-        plotter->plot(E1_ETA, "e1_eta.png");
-        plotter->plot(E1_PHI, "e1_phi.png");
-        plotter->plot(E1_CHARGE, "e1_charge.png");
-        plotter->plot(PHISTAR, "phistar.png");
-        plotter->plot(N_VERTS, "n_verts.png");
-        plotter->plot(N_E, "n_e.png");
+    // Clean up
+    delete plotter;
+    delete data_tfile;
+    delete mc_tfile;
+    delete bg_tfile;
 
-        // Clean up
-        delete plotter;
-        delete data_tfile;
-        delete mc_tfile;
-
-        return 0;
-    }
+    return 0;
 }

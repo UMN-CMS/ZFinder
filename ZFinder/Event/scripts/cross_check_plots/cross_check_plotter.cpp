@@ -7,6 +7,7 @@
 // ROOT
 #include <TCanvas.h>
 #include <TH1D.h>
+#include <THStack.h>
 #include <TLatex.h>
 #include <TLegend.h>
 
@@ -14,21 +15,30 @@
 #include "cross_check_plotter.h"
 
 CrossCheckPlotter::CrossCheckPlotter(
-        TFile* data_tfile,
-        TFile* mc_tfile,
-        std::string dir
+        DataConfig data_config,
+        DataConfig mc_config
         ) {
-    // Use the same directory name for both MC and data
-    setup(data_tfile, mc_tfile, dir, dir);
+    // Save DataConfigs
+    data_config_ = data_config;
+    mc_config_ = mc_config;
+    bg_configs_ = {};
+
+    // General Setup
+    setup();
 }
 
 CrossCheckPlotter::CrossCheckPlotter(
-        TFile* data_tfile,
-        TFile* mc_tfile,
-        std::string data_dir,
-        std::string mc_dir
+        DataConfig data_config,
+        DataConfig mc_config,
+        data_config_map bg_configs
         ) {
-    setup(data_tfile, mc_tfile, data_dir, mc_dir);
+    // Save DataConfigs
+    data_config_ = data_config;
+    mc_config_ = mc_config;
+    bg_configs_ = bg_configs;
+
+    // General Setup
+    setup();
 }
 
 CrossCheckPlotter::~CrossCheckPlotter() {
@@ -36,39 +46,26 @@ CrossCheckPlotter::~CrossCheckPlotter() {
     delete style_;
 }
 
-void CrossCheckPlotter::setup(
-        TFile* data_tfile,
-        TFile* mc_tfile,
-        std::string data_dir,
-        std::string mc_dir
-        ) {
-    // Save the pointers to the files
-    data_tfile_ = data_tfile;
-    mc_tfile_ = mc_tfile;
-
-    // Save the directories
-    data_dir_name_ = data_dir;
-    mc_dir_name_ = mc_dir;
-
+void CrossCheckPlotter::setup() {
     // Set up the config map
     init_config_map();
 
     // Set up the style
     set_plot_style();
+
+    // Set up colors and hatching
+    init_color_styles();
 }
 
-double CrossCheckPlotter::get_maximum(
-        const TH1* const DATA_HISTO,
-        const TH1* const MC_HISTO
+double CrossCheckPlotter::get_rescaling(
+        const DataConfig& DATA,
+        const DataConfig& MC
         ) {
-    /* Figure out the largest Y value */
-    const double DATA_MAX = DATA_HISTO->GetMaximum();
-    const double MC_MAX = MC_HISTO->GetMaximum();
-    if (MC_MAX > DATA_MAX) {
-        return MC_MAX;
-    } else {
-        return DATA_MAX;
-    }
+    /*
+     * Given two luminosities in inverse picobarns, calculates the correct
+     * scaling so that the two distributions have the same amount of data.
+     */
+    return DATA.luminosity / MC.luminosity;
 }
 
 std::vector<double> CrossCheckPlotter::get_rebinning(
@@ -148,20 +145,41 @@ void CrossCheckPlotter::plot(
     const std::string HISTO_NAME = plot_config.histo_name;
 
     // Open the histograms
-    const std::string DATA_HISTO_NAME = data_dir_name_ + "/" + HISTO_NAME;
-    TH1D* data_histo;
-    data_tfile_->GetObject(DATA_HISTO_NAME.c_str(), data_histo);
-    if (!data_histo) {
+    TH1D* tmp_histo;
+    const std::string DATA_HISTO_NAME = data_config_.tdir_name + "/" + HISTO_NAME;
+    data_config_.tfile->GetObject(DATA_HISTO_NAME.c_str(), tmp_histo);
+    if (!tmp_histo) {
         std::cout << "Can not open the Data Histogram!" << std::endl;
         return;
     }
+    TH1D* data_histo = dynamic_cast<TH1D*>(tmp_histo->Clone());
 
-    const std::string MC_HISTO_NAME = mc_dir_name_ + "/" + HISTO_NAME;
-    TH1D* mc_histo;
-    mc_tfile_->GetObject(MC_HISTO_NAME.c_str(), mc_histo);
-    if (!mc_histo) {
+    const std::string MC_HISTO_NAME = mc_config_.tdir_name + "/" + HISTO_NAME;
+    mc_config_.tfile->GetObject(MC_HISTO_NAME.c_str(), tmp_histo);
+    if (!tmp_histo) {
         std::cout << "Can not open the MC Histogram!" << std::endl;
         return;
+    }
+    TH1D* mc_histo = dynamic_cast<TH1D*>(tmp_histo->Clone());
+
+    std::vector<std::pair<std::string, TH1D*>> bg_histos = {};
+    if (bg_configs_.size() != 0) {
+        // Open each BG and save to a vector with its name
+        for (auto& i_pair : bg_configs_) {
+            const std::string BG_HISTO_NAME = i_pair.second.tdir_name + "/" + HISTO_NAME;
+            TH1D* bg_histo;
+            i_pair.second.tfile->GetObject(BG_HISTO_NAME.c_str(), bg_histo);
+            if (!bg_histo) {
+                std::cout << "Can not open the BG Histogram for ";
+                std::cout << i_pair.first;
+                std::cout << "!" << std::endl;
+                return;
+            }
+            // Clone incase, for some unknown reason (perhaps testing) we want
+            // to use the same histogram twice
+            TH1D* bg_clone = dynamic_cast<TH1D*>(bg_histo->Clone());
+            bg_histos.push_back(std::make_pair(i_pair.first, bg_clone));
+        }
     }
 
     // Rebin if the binning is greater than 0 in size. If it is size one assume
@@ -170,6 +188,9 @@ void CrossCheckPlotter::plot(
     if (plot_config.binning.size() == 1) {
         mc_histo->Rebin(static_cast<int>(plot_config.binning[0]));
         data_histo->Rebin(static_cast<int>(plot_config.binning[0]));
+        for (auto& i_pair : bg_histos) {
+            i_pair.second->Rebin(static_cast<int>(plot_config.binning[0]));
+        }
     } else if (plot_config.binning.size() > 1) {
         std::vector<double> new_binning = get_rebinning(
                 plot_config.binning,
@@ -189,48 +210,52 @@ void CrossCheckPlotter::plot(
                     &new_binning[0]  // double*
                     )
                 );
+        for (auto& i_pair : bg_histos) {
+            std::string new_name = i_pair.first + "_rebinned_histo";
+            i_pair.second = dynamic_cast<TH1D*>(
+                    i_pair.second->Rebin(
+                        new_binning.size() - 1,
+                        new_name.c_str(),
+                        &new_binning[0]  // double*
+                        )
+                    );
+        }
     }
 
     // Normalize areas
-    const double MC_AREA = mc_histo->Integral();
-    const double DATA_AREA = data_histo->Integral();
-    mc_histo->Scale(DATA_AREA / MC_AREA);
+    mc_histo->Scale(get_rescaling(data_config_, mc_config_));
+    for (auto& i_pair : bg_histos) {
+        // Locate the DataConfig by name
+        auto it = bg_configs_.find(i_pair.first);
+        if (it != bg_configs_.end()){
+            const double RESCALING = get_rescaling(data_config_, it->second);
+            i_pair.second->Scale(RESCALING);
+        } else {
+            std::cout << "Failed to normalize " << i_pair.first;
+            std::cout << ". Scaling to 0!!" << std::endl;
+            i_pair.second->Scale(0);
+        }
+    }
+
     // Update uncertainties after rescaling
     data_histo->Sumw2();
     mc_histo->Sumw2();
+    for (auto& i_pair : bg_histos) {
+        i_pair.second->Sumw2();
+    }
 
-    // Make a canvas to hold it
-    TCanvas canvas("canvas", "canvas", X_VAL_, Y_VAL_);
-    canvas.cd();
 
-    // Set up the styles of the histograms
-    style_->cd();
+    // Make a stack to store the MC
+    THStack* histo_stack = new THStack("hs", "Monte Carlo histrogram stack");
+
     // Title
     data_histo->SetTitle(0);  // Remove the title, we'll place it by hand
-    mc_histo->SetTitle(0);
+    //histo_stack->SetTitle(0);
     // Axis labels
     data_histo->GetXaxis()->SetTitle(plot_config.x_label.c_str());
-    mc_histo->GetXaxis()->SetTitle(plot_config.x_label.c_str());
+    //histo_stack->GetXaxis()->SetTitle(plot_config.x_label.c_str());
     data_histo->GetYaxis()->SetTitle(plot_config.y_label.c_str());
-    mc_histo->GetYaxis()->SetTitle(plot_config.y_label.c_str());
-    // Position of axis labels
-    mc_histo->GetYaxis()->SetTitleOffset(1.25);
-    mc_histo->GetXaxis()->SetTitleOffset(1.1);
-    // Marker, line, and fill style
-    data_histo->SetMarkerStyle(kFullCircle);
-    data_histo->SetMarkerColor(kBlack);
-    data_histo->SetLineColor(kBlack);
-    mc_histo->SetLineColor(kBlue);
-    mc_histo->SetFillColor(kBlue);
-    const int FORWARD_HATCH = 3004;
-    //const int BACK_HATCH = 3005;
-    mc_histo->SetFillStyle(FORWARD_HATCH);
-    // Log
-    canvas.SetLogy(plot_config.logy);
-
-    // Set the plot range maximum based on the highest peak in either histo
-    const double NEW_MAX = 1.05 * get_maximum(data_histo, mc_histo);
-    data_histo->SetMaximum(NEW_MAX);
+    //histo_stack->GetYaxis()->SetTitle(plot_config.y_label.c_str());
 
     // Set up the legend using the plot edges to set its location
     const double LEG_HEIGHT = 0.15;
@@ -241,6 +266,49 @@ void CrossCheckPlotter::plot(
     legend.AddEntry(mc_histo, "MC", "f");
     legend.SetBorderSize(0);  // Remove drop shadow and border
     legend.SetFillStyle(0);  // Transparent
+
+    // Set up the styles of the histograms
+    style_->cd();
+    // Position of axis labels
+    mc_histo->GetYaxis()->SetTitleOffset(1.25);
+    mc_histo->GetXaxis()->SetTitleOffset(1.1);
+    // Marker, line, and fill style
+    data_histo->SetMarkerStyle(kFullCircle);
+    data_histo->SetMarkerColor(kBlack);
+    data_histo->SetLineColor(kBlack);
+    mc_histo->SetLineColor(kBlue);
+    mc_histo->SetFillColor(kBlue);
+    mc_histo->SetFillStyle(SPARSEDOT_FILL);
+
+    // Set up the background histograms' style, coloring, and legend entry. We
+    // have to do this almost at the end because we need the legend to exist.
+    unsigned int i_style = 0;
+    for (auto& i_pair : bg_histos) {
+        // Reset if we run beyond the array
+        if (i_style >=  color_styles_.size()) {
+            i_style = 0;
+        }
+        std::pair<RootFill, int> style_pair = color_styles_[i_style];
+        ++i_style;
+        // Set the color and fill
+        i_pair.second->SetFillStyle(style_pair.first);
+        i_pair.second->SetLineColor(style_pair.second);
+        i_pair.second->SetFillColor(style_pair.second);
+        // Add to the stack and legend
+        histo_stack->Add(i_pair.second);
+        legend.AddEntry(i_pair.second, i_pair.first.c_str() ,"f");
+    }
+    histo_stack->Add(mc_histo);
+
+    // Set the plot range maximum based on the highest peak in either histo
+    const double DATA_MAX = data_histo->GetMaximum();
+    const double STACK_MAX = histo_stack->GetMaximum();
+    if (DATA_MAX > STACK_MAX) {
+        data_histo->SetMaximum(DATA_MAX * 1.1);
+    } else {
+        data_histo->SetMaximum(STACK_MAX * 1.1);
+    }
+    //data_histo->SetMinimum(0.00001);
 
     // Add title
     TLatex *plot_title = NULL;
@@ -255,8 +323,14 @@ void CrossCheckPlotter::plot(
         plot_title->SetTextAngle(0);
     }
 
+    // Make a canvas to hold the plot
+    TCanvas canvas("canvas", "canvas", X_VAL_, Y_VAL_);
+    canvas.cd();
+    canvas.SetLogy(plot_config.logy);
+
     // Draw the histograms
-    mc_histo->Draw("HIST");
+    data_histo->Draw("E");  // Set axis titles
+    histo_stack->Draw("HIST SAME");
     data_histo->Draw("E SAME");
     legend.Draw();
     if (plot_title != NULL) { plot_title->Draw(); }
@@ -266,6 +340,7 @@ void CrossCheckPlotter::plot(
 
     // Clean up
     delete plot_title;
+    delete histo_stack;
 }
 
 void CrossCheckPlotter::set_plot_style() {
@@ -371,6 +446,19 @@ void CrossCheckPlotter::set_plot_style() {
 
     // Set the style
     style_->cd();
+}
+
+void CrossCheckPlotter::init_color_styles() {
+    /*
+     * Set up the color and hatching pairs used for backgrounds
+     */
+    color_styles_ = {
+        {FORWARD_HATCH, kRed},
+        {BACKWARD_HATCH, kGreen+2},
+        {VERT_HATCH, kMagenta+2},
+        {HOR_HATCH, kOrange},
+        {CROSS_HATCH, kOrange+7}
+    };
 }
 
 void CrossCheckPlotter::init_config_map() {

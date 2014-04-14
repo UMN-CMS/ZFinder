@@ -1,7 +1,6 @@
 #ifndef ZFINDER_CROSS_CHECK_PLOTTER_H_
 #define ZFINDER_CROSS_CHECK_PLOTTER_H_
 
-
 // Standard Library
 #include <map>
 #include <string>
@@ -12,6 +11,19 @@
 #include <TFile.h>
 #include <TH1.h>
 #include <TStyle.h>
+
+
+// Various hatching paterns
+enum RootFill{
+    PACKEDDOT_FILL = 3001,
+    DOT_FILL = 3002,
+    SPARSEDOT_FILL = 3003,
+    FORWARD_HATCH = 3004,
+    BACKWARD_HATCH = 3005,
+    VERT_HATCH = 3006,
+    HOR_HATCH = 3007,
+    CROSS_HATCH = 3013
+};
 
 enum PlotType{
     Z_MASS_ALL,
@@ -60,24 +72,76 @@ struct PlotConfig{
     std::vector<double> binning;
 };
 
+enum DataType{
+    DATA,
+    SIGNAL_MC,
+    BG_MC
+};
+
+struct DataConfig{
+    /*
+     * Cross sections should be given in picobarns, and luminosities should be
+     * in 1/pb.
+     */
+    // Empty constructor
+    DataConfig() {}
+    // Constructor for data
+    DataConfig(
+            TFile* tfile,
+            std::string tdir_name,
+            std::string name,
+            double luminosity,
+            DataType datatype
+            ) :
+        tfile(tfile),
+        tdir_name(tdir_name),
+        name(name),
+        luminosity(luminosity),
+        datatype(datatype)
+    { // Everything needed is done by the initializer list
+    }
+    // Constructor for MC
+    DataConfig(
+            TFile* tfile,
+            std::string tdir_name,
+            std::string name,
+            int events,
+            double cross_section,
+            DataType datatype
+            ) :
+        tfile(tfile),
+        tdir_name(tdir_name),
+        name(name),
+        datatype(datatype)
+    {
+        luminosity = static_cast<double>(events) / cross_section;
+    }
+
+    // Variables for data and MC
+    TFile* tfile;
+    std::string tdir_name;
+    std::string name;
+    double luminosity;
+    DataType datatype;
+};
+
 // Typedefs of our custom types
 typedef std::map<PlotType, PlotConfig> config_map;
 typedef std::pair<PlotType, PlotConfig> config_pair;
+typedef std::map<std::string, DataConfig> data_config_map;
 
 class CrossCheckPlotter{
     public:
         // Constructors
         CrossCheckPlotter() {}
         CrossCheckPlotter(
-                TFile* data_tfile,
-                TFile* mc_tfile,
-                std::string data_dir,
-                std::string mc_dir
+                DataConfig data_config,
+                DataConfig mc_config
                 );
         CrossCheckPlotter(
-                TFile* data_tfile,
-                TFile* mc_tfile,
-                std::string dir
+                DataConfig data_config,
+                DataConfig mc_config,
+                data_config_map bg_configs
                 );
         // Destructor
         ~CrossCheckPlotter();
@@ -90,12 +154,12 @@ class CrossCheckPlotter{
 
     private:
         // Used to set up the class from the multiple constructors
-        void setup(
-                TFile* data_tfile,
-                TFile* mc_tfile,
-                std::string data_dir,
-                std::string mc_dir
-             );
+        void setup();
+
+        // Store all the Data and MC information
+        DataConfig data_config_;  // Data
+        DataConfig mc_config_;  // Signal MC
+        data_config_map bg_configs_;  // Background MC
 
         // Set the plotting style
         void set_plot_style();
@@ -106,7 +170,7 @@ class CrossCheckPlotter{
         TFile* mc_tfile_;
 
         // Various helper functions
-        double get_maximum(const TH1* const DATA_HISTO, const TH1* const MC_HISTO);
+        double get_rescaling(const DataConfig& DATA, const DataConfig& MC);
 
         // Target directories
         std::string data_dir_name_;
@@ -130,6 +194,8 @@ class CrossCheckPlotter{
         static constexpr double LEFT_EDGE_ = 0.10;
         static constexpr double TOP_EDGE_ = 0.95;
         static constexpr double BOTTOM_EDGE_ = 0.10;
-
+        // Colors and styles for backgrounds
+        void init_color_styles();
+        std::vector<std::pair<RootFill, int>> color_styles_;
 };
 #endif  // ZFINDER_CROSS_CHECK_PLOTTER_H_
