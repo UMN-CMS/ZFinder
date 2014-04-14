@@ -180,10 +180,7 @@ class CrossCheckPlotter{
         data_config_map bg_configs_;  // Background MC
 
         // Open the histograms
-        HistoStore open_histos(
-                const PlotType PLOT_TYPE,
-                const std::string HISTO_NAME
-                );
+        HistoStore open_histos(const std::string HISTO_NAME);
 
         // Set the plotting style
         void set_plot_style();
@@ -195,6 +192,8 @@ class CrossCheckPlotter{
 
         // Histogram rescaling
         double get_rescaling(const DataConfig& DATA, const DataConfig& MC);
+        double set_area_rescale_factor();
+        double area_rescale_factor_;
 
         // Target directories
         std::string data_dir_name_;

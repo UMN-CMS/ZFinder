@@ -55,6 +55,14 @@ void CrossCheckPlotter::setup() {
 
     // Set up colors and hatching
     init_color_styles();
+
+    // Rescaling
+    if (data_config_.luminosity <= 0) {
+        area_rescale_factor_ = set_area_rescale_factor();
+        data_config_.luminosity = 1;
+    } else {
+        area_rescale_factor_ = -1;
+    }
 }
 
 double CrossCheckPlotter::get_rescaling(
@@ -66,6 +74,43 @@ double CrossCheckPlotter::get_rescaling(
      * scaling so that the two distributions have the same amount of data.
      */
     return DATA.luminosity / MC.luminosity;
+}
+
+double CrossCheckPlotter::set_area_rescale_factor() {
+    /*
+     * If the data config has a lumi of 0, then we scale the sum of the MC such
+     * that the area from 60 to 120 GeV (the area under the Z peak) is the same
+     * as in data. We store the information in the luminosity key of the
+     * config.
+     */
+    const double LOWER = 60.;
+    const double UPPER = 120.;
+    // Open the histograms
+    HistoStore histo_store = open_histos("Z0 Mass: All");
+    TH1D* data_histo = histo_store.data_histo;
+    TH1D* mc_histo = histo_store.mc_histo;
+    std::vector<std::pair<std::string, TH1D*>> bg_histos = histo_store.bg_histos;
+    // Check that open_histos exited successfully, otherwise end
+    if (data_histo == NULL || mc_histo == NULL) {
+        return -1;
+    }
+
+    // Copy the MC histogram and add all the bg histos
+    TH1D* tmp_histo = dynamic_cast<TH1D*>(mc_histo->Clone());
+    for (auto& i_pair : bg_histos) {
+        tmp_histo->Add(i_pair.second);
+    }
+
+    // Calculate the area
+    const int DATA_LOW = data_histo->FindBin(LOWER);
+    const int DATA_HIGH = data_histo->FindBin(UPPER);
+    const double DATA_AREA = data_histo->Integral(DATA_LOW, DATA_HIGH);
+
+    const int MC_LOW = tmp_histo->FindBin(LOWER);
+    const int MC_HIGH = tmp_histo->FindBin(UPPER);
+    const double MC_AREA = tmp_histo->Integral(MC_LOW, MC_HIGH);
+
+    return DATA_AREA / MC_AREA;
 }
 
 std::vector<double> CrossCheckPlotter::get_rebinning(
@@ -131,10 +176,7 @@ std::vector<double> CrossCheckPlotter::get_rebinning(
     return out_vec;
 }
 
-HistoStore CrossCheckPlotter::open_histos(
-        const PlotType PLOT_TYPE,
-        const std::string HISTO_NAME
-        ) {
+HistoStore CrossCheckPlotter::open_histos(const std::string HISTO_NAME) {
     /*
      * Open the histograms for a given PlotType and return them in a HistoStore
      * object.
@@ -194,7 +236,7 @@ void CrossCheckPlotter::plot(
     const std::string HISTO_NAME = plot_config.histo_name;
 
     // Open the histograms
-    HistoStore histo_store = open_histos(PLOT_TYPE, HISTO_NAME);
+    HistoStore histo_store = open_histos(HISTO_NAME);
     TH1D* data_histo = histo_store.data_histo;
     TH1D* mc_histo = histo_store.mc_histo;
     std::vector<std::pair<std::string, TH1D*>> bg_histos = histo_store.bg_histos;
@@ -243,14 +285,28 @@ void CrossCheckPlotter::plot(
         }
     }
 
-    // Normalize areas
-    mc_histo->Scale(get_rescaling(data_config_, mc_config_));
+    // Normalize the plots
+    // Signal MC
+    if (area_rescale_factor_ > 0) {
+        // Normalize by area
+        mc_histo->Scale(area_rescale_factor_);
+    } else {
+        // Normalize by luminosity
+        mc_histo->Scale(get_rescaling(data_config_, mc_config_));
+    }
+    // BG MC
     for (auto& i_pair : bg_histos) {
         // Locate the DataConfig by name
         auto it = bg_configs_.find(i_pair.first);
         if (it != bg_configs_.end()){
-            const double RESCALING = get_rescaling(data_config_, it->second);
-            i_pair.second->Scale(RESCALING);
+            if (area_rescale_factor_ > 0) {
+                // Normalize by area
+                i_pair.second->Scale(area_rescale_factor_);
+            } else {
+                // Normalize by luminosity
+                const double RESCALING = get_rescaling(data_config_, it->second);
+                i_pair.second->Scale(RESCALING);
+            }
         } else {
             std::cout << "Failed to normalize " << i_pair.first;
             std::cout << ". Scaling to 0!!" << std::endl;
