@@ -397,7 +397,10 @@ void CrossCheckPlotter::plot(
             bg_min_max = BG_MAX;
         }
     };
-    data_histo->SetMinimum(bg_min_max * 0.1);
+    // Set the minimum if sane, otherwise trust root to do it
+    if (bg_min_max > 0) {
+        data_histo->SetMinimum(bg_min_max * 0.1);
+    }
 
     // Add title
     TLatex *plot_title = NULL;
