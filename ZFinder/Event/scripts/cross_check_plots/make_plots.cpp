@@ -17,7 +17,7 @@ int main() {
             data_tfile,
             "ZFinder/ET-ET Combined Double Reco/7 60 < M_{ee} < 120",
             "Data",
-            1.,
+            -1.,  // -1 means area normalize all MC to match under the signal peak
             DATA
             );
     // Signal MC
@@ -30,10 +30,10 @@ int main() {
             SIGNAL_MC
             );
     // BG
-    TFile* bg_tfile = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140326_TTBar/20140326_TTBar_summed.root", "READ");
+    TFile* bg_tfile = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140414_TTBar/20140414_TTBar_hadded.root", "READ");
     DataConfig bg_config(
             bg_tfile,
-            "ZFinder/ET-ET Combined Double Reco/6 60 < M_{ee} < 120",
+            "ZFinder/ET-ET Combined Double Reco/7 60 < M_{ee} < 120",
             "T-TBar",
             .3,
             BG_MC
