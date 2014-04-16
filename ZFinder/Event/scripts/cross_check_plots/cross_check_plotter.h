@@ -6,6 +6,7 @@
 #include <string>
 #include <utility>  // std::pair
 #include <vector>
+#include <stdlib.h>  // std::exit, EXIT_FAILURE
 
 // Root
 #include <TFile.h>
@@ -105,8 +106,8 @@ struct DataConfig{
             TFile* tfile,
             std::string tdir_name,
             std::string name,
-            int events,
             double cross_section,
+            std::string tdir_uncut,
             DataType datatype
             ) :
         tfile(tfile),
@@ -114,7 +115,20 @@ struct DataConfig{
         name(name),
         datatype(datatype)
     {
-        luminosity = static_cast<double>(events) / cross_section;
+        // We need to open the tfile and pull out the number of events
+        TH1D* tmp_histo;
+        const std::string TARGET_HISTO = tdir_uncut + "/Z0 Mass: All";
+        tfile->GetObject(TARGET_HISTO.c_str(), tmp_histo);
+        if (!tmp_histo) {
+            std::cout << "Can not open the " << name;
+            std::cout << " histogram to count events!" << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+        const int N_BINS = tmp_histo->GetNbinsX();
+        // Integrate from the underflow bin (0) to the overflow (N+1)
+        const double EVENTS = tmp_histo->Integral(0, N_BINS + 1);
+        // Compute the luminosity
+        luminosity = EVENTS / cross_section;
     }
 
     // Variables for data and MC

@@ -26,7 +26,8 @@ int main() {
             mc_tfile,
             "ZFinder/ET-ET Combined Double Reco/7 60 < M_{ee} < 120",
             "Signal MC",
-            .3,
+            500.,  // cross section in pb
+            "ZFinder/All Electrons Reco/0 acc(ALL) AND acc(ALL)",  // TDir from before any cut
             SIGNAL_MC
             );
     // BG
@@ -35,7 +36,8 @@ int main() {
             bg_tfile,
             "ZFinder/ET-ET Combined Double Reco/7 60 < M_{ee} < 120",
             "T-TBar",
-            .3,
+            500.,
+            "ZFinder/All Electrons Reco/0 acc(ALL) AND acc(ALL)",
             BG_MC
             );
     // BG Map
