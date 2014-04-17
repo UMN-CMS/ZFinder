@@ -81,7 +81,6 @@ void CrossCheckPlotter::set_mc_scale_factors() {
     for (auto& i_pair : bg_configs_) {
         double new_scale = SIG_LUMI / i_pair.second.luminosity;
         i_pair.second.scale_factor = new_scale;
-        std::cout << i_pair.second.scale_factor << std::endl;
     }
 }
 
