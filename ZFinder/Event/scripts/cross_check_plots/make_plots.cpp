@@ -26,7 +26,7 @@ int main() {
             mc_tfile,
             "ZFinder/ET-ET Combined Double Reco/7 60 < M_{ee} < 120",
             "Signal MC",
-            500.,  // cross section in pb
+            12234.4,  // cross section in pb, from https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV
             "ZFinder/All Electrons Reco/0 acc(ALL) AND acc(ALL)",  // TDir from before any cut
             SIGNAL_MC
             );
@@ -36,7 +36,7 @@ int main() {
             bg_tfile,
             "ZFinder/ET-ET Combined Double Reco/7 60 < M_{ee} < 120",
             "T-TBar",
-            500.,
+            24.,  // TTBar Inclusive is 245.8 Pb, T->Wq is 0.9621, W->lnu is 0.3257
             "ZFinder/All Electrons Reco/0 acc(ALL) AND acc(ALL)",
             BG_MC
             );

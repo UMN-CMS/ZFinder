@@ -98,7 +98,8 @@ struct DataConfig{
         tdir_name(tdir_name),
         name(name),
         luminosity(luminosity),
-        datatype(datatype)
+        datatype(datatype),
+        scale_factor(-1)
     { // Everything needed is done by the initializer list
     }
     // Constructor for MC
@@ -113,7 +114,8 @@ struct DataConfig{
         tfile(tfile),
         tdir_name(tdir_name),
         name(name),
-        datatype(datatype)
+        datatype(datatype),
+        scale_factor(-1)
     {
         // We need to open the tfile and pull out the number of events
         TH1D* tmp_histo;
@@ -137,6 +139,7 @@ struct DataConfig{
     std::string name;
     double luminosity;
     DataType datatype;
+    double scale_factor;
 };
 
 struct HistoStore{
@@ -194,7 +197,10 @@ class CrossCheckPlotter{
         data_config_map bg_configs_;  // Background MC
 
         // Open the histograms
-        HistoStore open_histos(const std::string HISTO_NAME);
+        HistoStore open_histos(
+                const std::string HISTO_NAME,
+                const bool DO_RESCALE = false
+                );
 
         // Set the plotting style
         void set_plot_style();
@@ -205,6 +211,7 @@ class CrossCheckPlotter{
         TFile* mc_tfile_;
 
         // Histogram rescaling
+        void set_mc_scale_factors();
         double get_rescaling(const DataConfig& DATA, const DataConfig& MC);
         double set_area_rescale_factor();
         double area_rescale_factor_;

@@ -57,11 +57,31 @@ void CrossCheckPlotter::setup() {
     init_color_styles();
 
     // Rescaling
+    set_mc_scale_factors();
     if (data_config_.luminosity <= 0) {
         area_rescale_factor_ = set_area_rescale_factor();
         data_config_.luminosity = 1;
     } else {
         area_rescale_factor_ = -1;
+    }
+}
+
+void CrossCheckPlotter::set_mc_scale_factors() {
+    /*
+     * Set the "scale_factor" in the DataConfig for each MC sample. The
+     * scale_factor is used to rescale the MC as compared to the signal MC
+     * (which has a scale factor of 1).
+     *
+     * For a BG MC sample, it is:
+     *     scale_factor = bg_lumi / signal_lumi
+     */
+    const double SIG_LUMI = mc_config_.luminosity;
+    mc_config_.scale_factor = 1.;
+
+    for (auto& i_pair : bg_configs_) {
+        double new_scale = SIG_LUMI / i_pair.second.luminosity;
+        i_pair.second.scale_factor = new_scale;
+        std::cout << i_pair.second.scale_factor << std::endl;
     }
 }
 
@@ -81,12 +101,14 @@ double CrossCheckPlotter::set_area_rescale_factor() {
      * If the data config has a lumi of 0, then we scale the sum of the MC such
      * that the area from 60 to 120 GeV (the area under the Z peak) is the same
      * as in data. We store the information in the luminosity key of the
-     * config.
+     * config. We scale the MC to their relative luminosity before calculating
+     * this number.
      */
     const double LOWER = 60.;
     const double UPPER = 120.;
     // Open the histograms
-    HistoStore histo_store = open_histos("Z0 Mass: All");
+    const bool DO_RESCALING = true;
+    HistoStore histo_store = open_histos("Z0 Mass: All", DO_RESCALING);
     TH1D* data_histo = histo_store.data_histo;
     TH1D* mc_histo = histo_store.mc_histo;
     std::vector<std::pair<std::string, TH1D*>> bg_histos = histo_store.bg_histos;
@@ -176,10 +198,15 @@ std::vector<double> CrossCheckPlotter::get_rebinning(
     return out_vec;
 }
 
-HistoStore CrossCheckPlotter::open_histos(const std::string HISTO_NAME) {
+HistoStore CrossCheckPlotter::open_histos(
+        const std::string HISTO_NAME,
+        const bool DO_RESCALE
+        ) {
     /*
      * Open the histograms for a given PlotType and return them in a HistoStore
-     * object.
+     * object. If DO_RESCALE is true, then use the DataConfig.scale_factor to
+     * rescale the histogram. The Data is NEVER rescaled, only the signal MC
+     * and BG MC are
      */
     TH1D* tmp_histo;
     const std::string DATA_HISTO_NAME = data_config_.tdir_name + "/" + HISTO_NAME;
@@ -197,6 +224,9 @@ HistoStore CrossCheckPlotter::open_histos(const std::string HISTO_NAME) {
         return HistoStore(NULL, NULL, {});
     }
     TH1D* mc_histo = dynamic_cast<TH1D*>(tmp_histo->Clone());
+    if (DO_RESCALE) {
+        mc_histo->Scale(mc_config_.scale_factor);
+    }
 
     std::vector<std::pair<std::string, TH1D*>> bg_histos = {};
     if (bg_configs_.size() != 0) {
@@ -214,6 +244,9 @@ HistoStore CrossCheckPlotter::open_histos(const std::string HISTO_NAME) {
             // Clone incase, for some unknown reason (perhaps testing) we want
             // to use the same histogram twice
             TH1D* bg_clone = dynamic_cast<TH1D*>(bg_histo->Clone());
+            if (DO_RESCALE) {
+                bg_clone->Scale(i_pair.second.scale_factor);
+            }
             bg_histos.push_back(std::make_pair(i_pair.first, bg_clone));
         }
     }
@@ -236,7 +269,8 @@ void CrossCheckPlotter::plot(
     const std::string HISTO_NAME = plot_config.histo_name;
 
     // Open the histograms
-    HistoStore histo_store = open_histos(HISTO_NAME);
+    const bool DO_RESCALING = true;
+    HistoStore histo_store = open_histos(HISTO_NAME, DO_RESCALING);
     TH1D* data_histo = histo_store.data_histo;
     TH1D* mc_histo = histo_store.mc_histo;
     std::vector<std::pair<std::string, TH1D*>> bg_histos = histo_store.bg_histos;
