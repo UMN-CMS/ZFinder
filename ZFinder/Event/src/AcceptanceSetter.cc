@@ -26,7 +26,7 @@ namespace zf {
         const double ETA = zf_elec->eta;
         const double FETA = fabs(zf_elec->eta);
         // All the bools
-        bool all = false;
+        bool detector = false;
         bool eb = false;
         bool ebm = false;
         bool ebp = false;
@@ -44,7 +44,7 @@ namespace zf {
         bool ntp = false;
         // EB
         if (EB_MIN_ < ETA && ETA < EB_MAX_) {  // In EB
-            all = true;
+            detector = true;
             et = true;
             eb = true;
             if (EB_CENT_ < ETA && ETA < EB_MAX_) {  // In EB+
@@ -57,7 +57,7 @@ namespace zf {
         }
         // EE and NT
         else if (EEP_MIN_ < FETA && FETA < EEP_MAX_) {  // In EE
-            all = true;
+            detector = true;
             et = true;
             ee = true;
             if (EEP_MIN_ < ETA && ETA < EEP_MAX_) {  // In EE+
@@ -78,7 +78,7 @@ namespace zf {
         }
         // HF
         else if (HFP_MIN_ < FETA && FETA < HFP_MAX_) {  // In HF
-            all = true;
+            detector = true;
             hf = true;
             if (HFP_MIN_ < ETA && ETA < HFP_MAX_) {  // In HF+
                 hfp = true;
@@ -87,8 +87,14 @@ namespace zf {
             }
         }
 
-        // Now set all cuts
-        zf_elec->AddCutResult("acc(ALL)", all, WEIGHT);
+        // A special cut to start: ALL is now used to track all events in the
+        // sample, which is useful for MC normalization based on the number of
+        // events and cross section. The former definition of ALL (that is, an
+        // electron that is anywhere in the detector region) has now taken over
+        // by DETECTOR.
+        zf_elec->AddCutResult("acc(ALL)", true, WEIGHT);
+        // Set the cuts based on detector acceptance
+        zf_elec->AddCutResult("acc(DETECTOR)", detector, WEIGHT);
         zf_elec->AddCutResult("acc(EB)", eb, WEIGHT);
         zf_elec->AddCutResult("acc(EB+)", ebp, WEIGHT);
         zf_elec->AddCutResult("acc(EB-)", ebm, WEIGHT);
