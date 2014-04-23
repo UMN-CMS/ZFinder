@@ -55,6 +55,7 @@ Implementation:
 #include "ZFinder/Event/interface/ZDefinition.h"  // ZDefinition
 #include "ZFinder/Event/interface/ZDefinitionPlotter.h"  // ZDefinitionPlotter
 #include "ZFinder/Event/interface/ZDefinitionWorkspace.h"  // ZDefinitionWorkspace
+#include "ZFinder/Event/interface/ZEfficiencies.h" // ZEfficiencies
 #include "ZFinder/Event/interface/ZFinderEvent.h"  // ZFinderEvent
 #include "ZFinder/Event/interface/ZFinderPlotter.h"  // ZFinderPlotter
 
@@ -88,6 +89,7 @@ class ZFinder : public edm::EDAnalyzer {
         std::vector<zf::ZDefinition*> zdefs_;
         std::vector<zf::ZDefinitionPlotter*> zdef_plotters_;
         std::vector<zf::ZDefinitionWorkspace*> zdef_workspaces_;
+        zf::ZEfficiencies zeffs_;
 
 };
 
@@ -105,16 +107,16 @@ class ZFinder : public edm::EDAnalyzer {
 ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     //now do what ever initialization is needed
 
-    // Set up Cut Setters
+    // Setup Cut Setters
     zf::AcceptanceSetter* accset = new zf::AcceptanceSetter();
     setters_.push_back(accset);
     zf::TruthMatchSetter* tmset = new zf::TruthMatchSetter();
     setters_.push_back(tmset);
 
-    // Set up plotters
+    // Setup plotters
     edm::Service<TFileService> fs;
 
-    // Set up ZDefinitions and plotters
+    // Setup ZDefinitions and plotters
     zdef_psets_ = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet> >("ZDefinitions");
     for (auto& i_pset : zdef_psets_) {
         std::string name = i_pset.getUntrackedParameter<std::string>("name");
@@ -164,6 +166,11 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         // Set all ZDefs
         for (auto& i_zdef : zdefs_) {
             i_zdef->ApplySelection(&zfe);
+        }
+        // Set the weights
+        if (!zfe.is_real_data) {
+            // We set weights only for MC currently
+            zeffs_.SetWeights(&zfe);
         }
         // Make all ZDef plots
         for (auto& i_zdefp : zdef_plotters_) {
