@@ -130,11 +130,9 @@ namespace zf {
 
     int ZFinderElectron::SetCutWeight(const std::string& cut_name, const double WEIGHT) {
         /* Given the name of a cut and a weight, sets the weight of the cut to
-         * the new value. If the cut doesn't exist, returns 1, otherwise 0.
+         * the new value. On success it returns 0, otherwise 1 is returned.
          */
-        /* Return the weight of a cut based on the name */
         const CutResult* cr = GetCutResult(cut_name);
-        // If the CutResult exists, return the weight, otherwise return 0.
         if (cr != NULL) {
             AddCutResult(cr->name, cr->passed, WEIGHT);
             return 0;

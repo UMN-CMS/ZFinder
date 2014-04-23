@@ -1,8 +1,5 @@
 #include "ZFinder/Event/interface/ZEfficiencies.h"
 
-// Standard Library
-
-
 namespace zf {
 
     ZEfficiencies::ZEfficiencies() {

@@ -4,7 +4,6 @@
 // Standard Library
 #include <map>  // std::map
 #include <string>  // std::string
-#include <utility>  // std::pair
 #include <vector>  // std::vector
 
 // ZFinder
