@@ -128,6 +128,22 @@ namespace zf {
         cutresults_[cut_name] = cr;  // This will overwrite
     }
 
+    int ZFinderElectron::SetCutWeight(const std::string& cut_name, const double WEIGHT) {
+        /* Given the name of a cut and a weight, sets the weight of the cut to
+         * the new value. If the cut doesn't exist, returns 1, otherwise 0.
+         */
+        /* Return the weight of a cut based on the name */
+        const CutResult* cr = GetCutResult(cut_name);
+        // If the CutResult exists, return the weight, otherwise return 0.
+        if (cr != NULL) {
+            AddCutResult(cr->name, cr->passed, WEIGHT);
+            return 0;
+        } else {
+            // Failure
+            return 1.;
+        }
+    }
+
     std::vector<const CutResult*>* ZFinderElectron::GetAllCuts() {
         /* Return all cuts */
         std::vector<const CutResult*>* tmp_vec = new std::vector<const CutResult*>();
