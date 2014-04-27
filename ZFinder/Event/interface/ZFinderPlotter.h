@@ -18,7 +18,12 @@ namespace zf {
             ZFinderPlotter(TFileDirectory& tdir, const bool USE_MC = false);
 
             // Add events
-            void Fill(const ZFinderEvent& zf_event, const int first_electron = 0, const int second_electron = 1);
+            void Fill(
+                    const ZFinderEvent& zf_event,
+                    const int first_electron = 0,
+                    const int second_electron = 1,
+                    const double EVENT_WEIGHT = 1.
+                    );
             // Make PNGs
             void Print(const std::string& basename);
 
