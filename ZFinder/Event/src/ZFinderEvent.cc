@@ -524,7 +524,7 @@ namespace zf {
         using std::endl;
         // Print all the cuts of the given zf_elec
         for (auto& i_cut : *zf_elec->GetAllCuts()) {
-            cout << "\t\t" << i_cut->name << ": " << i_cut->passed << endl;
+            cout << "\t\t" << i_cut->name << ": pass " << i_cut->passed << " weight " << i_cut->weight << endl;
         }
     }
 
@@ -641,7 +641,8 @@ namespace zf {
 
                 for (auto& i_cutlevel : *clv) {
                     cout << "\t\t" << i_cutlevel.first << ": " << i_cutlevel.second.pass;
-                    cout << ' ' << i_cutlevel.second.t0p1_pass << ' ' << i_cutlevel.second.t1p0_pass << endl;
+                    cout << "t0p1 " << i_cutlevel.second.t0p1_pass << ' ' << i_cutlevel.second.t0p1_eff;
+                    cout << "t1p0 " << i_cutlevel.second.t1p0_pass << ' ' << i_cutlevel.second.t1p0_eff << endl;
                 }
             }
         }

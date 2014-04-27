@@ -28,11 +28,15 @@ namespace zf {
         CutLevel() {
             pass = false;
             t0p1_pass = false;
+            t0p1_eff = 1.;
             t1p0_pass = false;
+            t1p0_eff = 1.;
         }
         bool pass;
         bool t0p1_pass;
         bool t1p0_pass;
+        double t0p1_eff;
+        double t1p0_eff;
     };
 
 
