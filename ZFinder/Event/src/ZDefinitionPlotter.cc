@@ -47,7 +47,13 @@ namespace zf {
                 if (cont) {
                     std::map<std::string, ZFinderPlotter>::iterator i_map = zf_plotters.find(CUT_NAME);
                     if (i_map != zf_plotters.end()) {
-                       i_map->second.Fill(zf_event, electron_0, electron_1);
+                        double weight = 1.;
+                        if (i_cutlevel.second.t0p1_pass) {
+                            weight = i_cutlevel.second.t0p1_eff;
+                        } else if (i_cutlevel.second.t1p0_pass) {
+                            weight = i_cutlevel.second.t1p0_eff;
+                        }
+                        i_map->second.Fill(zf_event, electron_0, electron_1, weight);
                     }
                 } else {  // We stop at the first failed cut
                     break;
