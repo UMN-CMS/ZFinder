@@ -81,6 +81,9 @@ namespace zf {
                 // Initialize pass_
                 pass_[j][0].push_back(false);
                 pass_[j][1].push_back(false);
+                // Initialize eff_
+                eff_[j][0].push_back(1.);
+                eff_[j][1].push_back(1.);
             }
         }
     }
@@ -90,9 +93,6 @@ namespace zf {
         for (size_t i = 0; i < SIZE; ++i) {
             const std::string CUTLEVEL_NAME = cutinfo_[0].at(i).cut + " AND " + cutinfo_[1].at(i).cut;
             CutLevel cl;
-            cl.pass = false;
-            cl.t0p1_pass = false;
-            cl.t1p0_pass = false;
             cutlevel_pair cut_pair(CUTLEVEL_NAME, cl);
             clv.push_back(cut_pair);
         }
@@ -103,9 +103,6 @@ namespace zf {
         ss1 << MZ_MAX_;
         const std::string CUTLEVEL_NAME = ss0.str() + " < M_{ee} < " + ss1.str();
         CutLevel cl;
-        cl.pass = false;
-        cl.t0p1_pass = false;
-        cl.t0p1_pass = false;
         cutlevel_pair cut_pair(CUTLEVEL_NAME, cl);
         clv.push_back(cut_pair);
     }
@@ -115,6 +112,8 @@ namespace zf {
             i_cutlevel.second.pass = false;
             i_cutlevel.second.t0p1_pass = false;
             i_cutlevel.second.t0p1_pass = false;
+            i_cutlevel.second.t0p1_eff = 1.;
+            i_cutlevel.second.t1p0_eff = 1.;
         }
     }
 
@@ -139,6 +138,9 @@ namespace zf {
             for (int i_elec = 0; i_elec < 2; ++i_elec) {
                 for (unsigned int i_cutinfo = 0; i_cutinfo < cutinfo_vec->size(); ++i_cutinfo) {
                     CutInfo* cutinfo = &(cutinfo_vec->at(i_cutinfo));
+                    // Set the efficiency
+                    eff_[i_cutset][i_elec][i_cutinfo] = Efficiency(*cutinfo, i_elec, zf_event);
+                    // Check the cuts
                     if (cutinfo->comp_type != CT_NONE) {
                         pass_[i_cutset][i_elec][i_cutinfo] = ComparisonCut(*cutinfo, i_elec, zf_event);
                     } else {
@@ -153,6 +155,36 @@ namespace zf {
          */
         FillCutLevelVector();
         zf_event->AddZDef(NAME, clv);
+    }
+
+    double ZDefinition::Efficiency(const CutInfo& CUTINFO, const int I_ELEC, ZFinderEvent const * const zf_event) {
+        /*
+         * Returns the efficiency for a given cut type.
+         */
+        // Read internal variables
+        const bool INVERT = CUTINFO.invert;
+        const std::string CUT = CUTINFO.cut;
+
+        // Get the value for the efficiency
+        double efficiency = 1.;
+        if (I_ELEC == 0) {
+            efficiency = zf_event->e0->CutWeight(CUT);
+        } else {
+            efficiency = zf_event->e1->CutWeight(CUT);
+        }
+        // Check if the cut failed to get a result, if so we assume it is 1 and
+        // return, because it makes no sense to invert at this point since we
+        // don't know the efficiency in either case.
+        if (efficiency < 0.) {
+            return 1.;
+        }
+
+        // Invert means we should take 1 - eff
+        if (INVERT) {
+            efficiency = 1 - efficiency;
+        }
+
+        return efficiency;
     }
 
     bool ZDefinition::NormalCut(const CutInfo& CUTINFO, const int I_ELEC, ZFinderEvent* zf_event) {
@@ -416,14 +448,20 @@ namespace zf {
         const size_t SIZE = pass_[0][0].size();
         bool t0p1_pass = true;
         bool t1p0_pass = true;
+        double t0p1_eff = 1.;
+        double t1p0_eff = 1.;
         for (size_t i = 0; i < SIZE; ++i) {
             t0p1_pass = t0p1_pass && pass_[0][0].at(i) && pass_[1][1].at(i);
             t1p0_pass = t1p0_pass && pass_[0][1].at(i) && pass_[1][0].at(i);
+            t0p1_eff = t0p1_eff * eff_[0][0].at(i) * eff_[1][1].at(i);
+            t1p0_eff = t1p0_eff * eff_[0][1].at(i) * eff_[1][0].at(i);
             // Now set the values in the vector
             CutLevel* cl = &clv.at(i).second;
             cl->t0p1_pass = t0p1_pass;
             cl->t1p0_pass = t1p0_pass;
             cl->pass = cl->t0p1_pass || cl->t1p0_pass;
+            cl->t0p1_eff = t0p1_eff;
+            cl->t1p0_eff = t1p0_eff;
         }
         // Finally, we add the Mass window cut, which is the very last one (and
         // not included in the above loop)

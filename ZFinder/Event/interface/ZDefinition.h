@@ -83,8 +83,18 @@ namespace zf {
              *
              * We use two sets: pass_[0][0] is for cut set 0 with zf_event->e0,
              *pass_[0][1] is for cut set 0 with zf_event->e1, etc.
+             *
+             * We use the name notation for an efficiency number.
              */
             std::vector<bool> pass_[2][2];
+            std::vector<double> eff_[2][2];
+
+            // Efficiency Handling
+            double Efficiency(
+                    const CutInfo& CUTINFO,
+                    const int I_ELEC,
+                    ZFinderEvent const * const zf_event
+                    );
 
             // Handle Cut Checking
             bool ComparisonCut(const CutInfo& CUTINFO, const int I_ELEC, ZFinderEvent* zf_event);
