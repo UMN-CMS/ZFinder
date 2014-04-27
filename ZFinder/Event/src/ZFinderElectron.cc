@@ -107,11 +107,13 @@ namespace zf {
     double ZFinderElectron::CutWeight(const std::string& cut_name) const {
         /* Return the weight of a cut based on the name */
         const CutResult* cr = GetCutResult(cut_name);
-        // If the CutResult exists, return the weight, otherwise return 0.
+        // If the CutResult exists, return the weight, otherwise return -1.
+        // This way calling code can decide what to do when no result exists.
+        // Using either 0 or 1 might be appropriate depending on the case.
         if (cr != NULL) {
             return cr->weight;
         } else {
-            return 0.;
+            return -1.;
         }
     }
 
