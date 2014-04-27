@@ -163,14 +163,15 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         for (auto& i_set : setters_) {
             i_set->SetCuts(&zfe);
         }
+        // Set the weights; must be before setting the ZDefs, but after setting
+        // the cuts
+        if (!zfe.is_real_data) {
+            // We set weights for MC only, as we don't want to change the data
+            zeffs_.SetWeights(&zfe);
+        }
         // Set all ZDefs
         for (auto& i_zdef : zdefs_) {
             i_zdef->ApplySelection(&zfe);
-        }
-        // Set the weights
-        if (!zfe.is_real_data) {
-            // We set weights only for MC currently
-            zeffs_.SetWeights(&zfe);
         }
         // Make all ZDef plots
         for (auto& i_zdefp : zdef_plotters_) {
