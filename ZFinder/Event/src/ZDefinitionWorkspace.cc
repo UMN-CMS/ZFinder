@@ -26,7 +26,7 @@ namespace zf {
         InitVariables();
 
         // Set up the directory
-        write_dir_ = tdir.getBareDirectory(); // <-- FUCK THIS LINE
+        write_dir_ = tdir.getBareDirectory();
     }
 
     void ZDefinitionWorkspace::InitVariables() {
