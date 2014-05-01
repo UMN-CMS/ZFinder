@@ -11,11 +11,13 @@ namespace zf {
             const std::vector<std::string>& CUTS0,
             const std::vector<std::string>& CUTS1,
             const double MZ_MIN,
-            const double MZ_MAX
+            const double MZ_MAX,
+            const bool USE_MC_MASS
             ) :
         NAME(NAME),
         MZ_MIN_(MZ_MIN),
-        MZ_MAX_(MZ_MAX)
+        MZ_MAX_(MZ_MAX),
+        USE_MC_MASS_(USE_MC_MASS)
     {
         /*
          * Save the cut values, and check that they are sane.
@@ -105,9 +107,14 @@ namespace zf {
         ss0 << MZ_MIN_;
         std::ostringstream ss1;
         ss1 << MZ_MAX_;
-        const std::string CUTLEVEL_NAME = ss0.str() + " < M_{ee} < " + ss1.str();
+        std::string cutlevel_name;
+        if (USE_MC_MASS_) {
+            cutlevel_name = ss0.str() + " < GEN M_{ee} < " + ss1.str();
+        } else {
+            cutlevel_name = ss0.str() + " < M_{ee} < " + ss1.str();
+        }
         CutLevel cl;
-        cutlevel_pair cut_pair(CUTLEVEL_NAME, cl);
+        cutlevel_pair cut_pair(cutlevel_name, cl);
         clv.push_back(cut_pair);
     }
 
@@ -131,10 +138,18 @@ namespace zf {
         // Clear our vector
         ResetCutlevelVector();
 
-        if (zf_event->reco_z.m > MZ_MAX_ || zf_event->reco_z.m < MZ_MIN_) {
-            pass_mz_cut_ = false;
+        if (USE_MC_MASS_) {
+            if (zf_event->truth_z.m > MZ_MAX_ || zf_event->truth_z.m < MZ_MIN_) {
+                pass_mz_cut_ = false;
+            } else {
+                pass_mz_cut_ = true;
+            }
         } else {
-            pass_mz_cut_ = true;
+            if (zf_event->reco_z.m > MZ_MAX_ || zf_event->reco_z.m < MZ_MIN_) {
+                pass_mz_cut_ = false;
+            } else {
+                pass_mz_cut_ = true;
+            }
         }
 
         for (int i_cutset = 0; i_cutset < 2; ++i_cutset) {
@@ -253,7 +268,7 @@ namespace zf {
 
         // If we're not MC, always fail Gen cuts
         if (cut_type == TRUTH && zf_event->is_real_data) {
-            std::cout << "MC CUT ON DATA" << std::endl;
+            //std::cout << "MC CUT ON DATA" << std::endl;
             return false;
         }
 

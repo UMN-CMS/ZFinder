@@ -20,7 +20,8 @@ namespace zf {
                     const std::vector<std::string>& CUTS0,
                     const std::vector<std::string>& CUTS1,
                     const double MZ_MIN,
-                    const double MZ_MAX
+                    const double MZ_MAX,
+                    const bool USE_MC_MASS
                     );
 
             void ApplySelection(ZFinderEvent* zf_event);
@@ -37,6 +38,7 @@ namespace zf {
             // MZ cuts
             const double MZ_MIN_;
             const double MZ_MAX_;
+            const bool USE_MC_MASS_;
             bool pass_mz_cut_;
 
             // Comparison Cut Types
