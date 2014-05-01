@@ -17,11 +17,18 @@ process.maxEvents = cms.untracked.PSet(
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring( 
-#        'file:/local/cms/phedex/store/mc/Summer12_DR53X/DYToEE_M-20_CT10_TuneZ2star_8TeV-powheg-pythia6/AODSIM/PU_S10_START53_V7A-v1/0000/AC6646E7-36F0-E111-B2F8-00259073E3FC.root'
+#    'file:/local/cms/phedex/store/mc/Summer12_DR53X/DYToEE_M-20_CT10_TuneZ2star_8TeV-powheg-pythia6/AODSIM/PU_S10_START53_V7A-v1/0000/AC6646E7-36F0-E111-B2F8-00259073E3FC.root'
     'file:/local/cms/phedex/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/003EC246-5E67-E211-B103-00259059642E.root'
     )
 )
 
+# Run only on lumis specified in the lumi file
+from ZFinder.Event.Run_2012abcd_good_lumis_cfi import all_lumis
+
+process.source.lumisToProcess = cms.untracked.VLuminosityBlockRange(all_lumis)
+
+
+# Output file
 process.TFileService = cms.Service("TFileService",
         fileName = cms.string("test.root")
         )
