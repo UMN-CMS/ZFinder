@@ -10,59 +10,63 @@ namespace zf {
             const std::string NAME,
             const std::vector<std::string>& CUTS0,
             const std::vector<std::string>& CUTS1,
-            const double MZ_MIN, const double MZ_MAX
-            )
-        : NAME(NAME), MZ_MIN_(MZ_MIN), MZ_MAX_(MZ_MAX) {
-            /*
-             * Save the cut values, and check that they are sane.
-             */
-            if (CUTS0.size() != CUTS1.size()) {
-                throw "In ZDefinition, CUTS0 and CUTS1 have different length!";
-            }
+            const double MZ_MIN,
+            const double MZ_MAX
+            ) :
+        NAME(NAME),
+        MZ_MIN_(MZ_MIN),
+        MZ_MAX_(MZ_MAX)
+    {
+        /*
+         * Save the cut values, and check that they are sane.
+         */
+        if (CUTS0.size() != CUTS1.size()) {
+            throw "In ZDefinition, CUTS0 and CUTS1 have different length!";
+        }
 
-            if (MZ_MIN_ > MZ_MAX_) {
-                throw "In ZDefinition, MZ_MIN > MZ_MAX!";
-            }
-            // Copy the input vectors and store them
-            std::vector<std::string> cuts[2];
-            cuts[0] = std::vector<std::string>(CUTS0);
-            cuts[1] = std::vector<std::string>(CUTS1);
+        if (MZ_MIN_ > MZ_MAX_) {
+            throw "In ZDefinition, MZ_MIN > MZ_MAX!";
+        }
+        // Copy the input vectors and store them
+        std::vector<std::string> cuts[2];
+        cuts[0] = std::vector<std::string>(CUTS0);
+        cuts[1] = std::vector<std::string>(CUTS1);
 
-            // Fill in our cutinfo_ vector
-            InitVariables(cuts[0].size());
+        // Fill in our cutinfo_ vector
+        InitVariables(cuts[0].size());
 
-            // Loop over all cut stages and file an object with relevant info.
-            for (int i_cutset = 0; i_cutset < 2; ++i_cutset) {
-                const std::vector<std::string>* CUT_VEC = &cuts[i_cutset];
-                for (unsigned int i_cut = 0; i_cut < CUT_VEC->size(); ++i_cut) {
-                    CutInfo* cutinfo = &cutinfo_[i_cutset].at(i_cut);
-                    cutinfo->cut = CUT_VEC->at(i_cut);
+        // Loop over all cut stages and file an object with relevant info.
+        for (int i_cutset = 0; i_cutset < 2; ++i_cutset) {
+            const std::vector<std::string>* CUT_VEC = &cuts[i_cutset];
+            for (unsigned int i_cut = 0; i_cut < CUT_VEC->size(); ++i_cut) {
+                CutInfo* cutinfo = &cutinfo_[i_cutset].at(i_cut);
+                cutinfo->cut = CUT_VEC->at(i_cut);
 
-                    // We use a ! flag in the [0] slot to invert the cut
-                    if (cutinfo->cut[0] == '!') {
-                        cutinfo->invert = true;
-                        cutinfo->cut.erase(0, 1);
-                    } else {
-                        cutinfo->invert = false;
-                    }
+                // We use a ! flag in the [0] slot to invert the cut
+                if (cutinfo->cut[0] == '!') {
+                    cutinfo->invert = true;
+                    cutinfo->cut.erase(0, 1);
+                } else {
+                    cutinfo->invert = false;
+                }
 
-                    // If there is an =, >, < in the string we use it to cut on a value
-                    // from the ZElectron, otherwise we assume it is a cut and pass it
-                    // through. We also pull out the variable being compared.
-                    cutinfo->comp_type = GetComparisonType(&cutinfo->cut);
-                    if (cutinfo->comp_type != CT_NONE) {  // Is a comparison
-                        cutinfo->comp_var = GetComparisonVariable(&cutinfo->cut);
-                        cutinfo->comp_val = GetComparisonValue(&cutinfo->cut);
-                    } else {
-                        cutinfo->comp_var = CV_NONE;
-                        cutinfo->comp_val = -1;
-                    }
+                // If there is an =, >, < in the string we use it to cut on a value
+                // from the ZElectron, otherwise we assume it is a cut and pass it
+                // through. We also pull out the variable being compared.
+                cutinfo->comp_type = GetComparisonType(&cutinfo->cut);
+                if (cutinfo->comp_type != CT_NONE) {  // Is a comparison
+                    cutinfo->comp_var = GetComparisonVariable(&cutinfo->cut);
+                    cutinfo->comp_val = GetComparisonValue(&cutinfo->cut);
+                } else {
+                    cutinfo->comp_var = CV_NONE;
+                    cutinfo->comp_val = -1;
                 }
             }
-
-            // Initialize the cutlevel_vector
-            InitCutlevelVector(cuts[0].size());
         }
+
+        // Initialize the cutlevel_vector
+        InitCutlevelVector(cuts[0].size());
+    }
 
     void ZDefinition::InitVariables(const size_t SIZE) {
         /*
@@ -301,7 +305,7 @@ namespace zf {
             case CV_TCHARGE:
                 e_val = zf_elec->charge;
                 break;
-            // Cases where it makes no sense to continue
+                // Cases where it makes no sense to continue
             case CV_NONE:
             default:
                 return false;
@@ -325,7 +329,7 @@ namespace zf {
             case CT_LTE:
                 passed = (e_val <= COMP_VAL);
                 break;
-            // Cases where it makes no sense to continue
+                // Cases where it makes no sense to continue
             case CT_NONE:
             default:
                 return false;
