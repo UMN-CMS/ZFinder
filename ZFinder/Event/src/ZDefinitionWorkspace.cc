@@ -217,7 +217,15 @@ namespace zf {
         argset->setRealValue("e1_eta", e_probe->eta);
         argset->setCatIndex("e1_charge", e_probe->charge);
         argset->setRealValue("n_vert", verts);
-        argset->setRealValue("weight", 1);
+
+        // We set the weight to be equal to the weight of the last cut level.
+        double weight = 1.;
+        if (tag == 0) {
+            weight = last_cutlevel.t0p1_eff;
+        } else  {
+            weight = last_cutlevel.t1p0_eff;
+        }
+        argset->setRealValue("weight", weight);
 
         // Save the argset
         roodataset->add(*argset);
