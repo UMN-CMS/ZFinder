@@ -199,7 +199,7 @@ namespace zf {
         if (     e_tag == NULL
                 || e_probe == NULL
                 || z_data == NULL
-                || verts >= -1
+                || verts == -1
            ) {
             return;
         }
