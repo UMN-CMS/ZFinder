@@ -125,6 +125,7 @@ namespace zf {
             i_cutlevel.second.t0p1_pass = false;
             i_cutlevel.second.t0p1_eff = 1.;
             i_cutlevel.second.t1p0_eff = 1.;
+            i_cutlevel.second.event_weight = 1.;
         }
     }
 
@@ -137,6 +138,9 @@ namespace zf {
 
         // Clear our vector
         ResetCutlevelVector();
+
+        // Get the base efficiency for the event
+        base_event_weight_ = zf_event->event_weight;
 
         if (USE_MC_MASS_) {
             if (zf_event->truth_z.m > MZ_MAX_ || zf_event->truth_z.m < MZ_MIN_) {
@@ -467,8 +471,10 @@ namespace zf {
         const size_t SIZE = pass_[0][0].size();
         bool t0p1_pass = true;
         bool t1p0_pass = true;
-        double t0p1_eff = 1.;
-        double t1p0_eff = 1.;
+        // We set the base efficiency to be the base weight (which is used for
+        // things like pileup reweighting)
+        double t0p1_eff = base_event_weight_;
+        double t1p0_eff = base_event_weight_;
         for (size_t i = 0; i < SIZE; ++i) {
             t0p1_pass = t0p1_pass && pass_[0][0].at(i) && pass_[1][1].at(i);
             t1p0_pass = t1p0_pass && pass_[0][1].at(i) && pass_[1][0].at(i);

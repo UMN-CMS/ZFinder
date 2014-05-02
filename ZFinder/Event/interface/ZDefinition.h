@@ -97,6 +97,7 @@ namespace zf {
                     const int I_ELEC,
                     ZFinderEvent const * const zf_event
                     );
+           double base_event_weight_;
 
             // Handle Cut Checking
             bool ComparisonCut(const CutInfo& CUTINFO, const int I_ELEC, ZFinderEvent* zf_event);

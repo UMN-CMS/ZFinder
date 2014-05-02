@@ -10,12 +10,13 @@
 // CMSSW
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // reco::GsfElectron
 #include "DataFormats/EgammaCandidates/interface/Photon.h"  // reco::Photon
+#include "DataFormats/HLTReco/interface/TriggerObject.h"  // trigger::TriggerObject
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"  // reco::GenParticle
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidate.h"  // reco::RecoEcalCandidate
 #include "FWCore/Framework/interface/Event.h"  // edm::Event, edm::EventSetup
 #include "FWCore/ParameterSet/interface/ParameterSet.h"  // edm::ParameterSet
 #include "FWCore/Utilities/interface/InputTag.h"  // edm::InputTag
-#include "DataFormats/HLTReco/interface/TriggerObject.h"  // trigger::TriggerObject
+#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"  // edm::LumiReWeighting
 
 // ZFinder
 #include "ZFinder/Event/interface/ZFinderElectron.h"  // ZFinderElectron, ZFinderElectron
@@ -31,12 +32,14 @@ namespace zf {
             t0p1_eff = 1.;
             t1p0_pass = false;
             t1p0_eff = 1.;
+            event_weight = 1.;
         }
         bool pass;
         bool t0p1_pass;
         bool t1p0_pass;
         double t0p1_eff;
         double t1p0_eff;
+        double event_weight;
     };
 
 
@@ -93,6 +96,12 @@ namespace zf {
                 double phistar;
                 double eta;
             } reco_z, truth_z;
+
+            // Event weight, used for things like pileup reweighting. Most
+            // other weights are cut dependent (efficiencies for example) and
+            // so are store with the cuts in each electron, with a combined
+            // efficiency calculated in ZDefinition.
+            double event_weight;
 
             // These are the special, selected electrons used to make the Z
             ZFinderElectron* e0;
@@ -207,6 +216,8 @@ namespace zf {
             // Store ZDefinition Information
             std::map<std::string, cutlevel_vector> zdef_map_;
 
+            // Pileup reweighting
+            static edm::LumiReWeighting* lumi_weights_;
     };
 }  // namespace zf
 #endif  // ZFINDER_ZFINDEREVENT_H_

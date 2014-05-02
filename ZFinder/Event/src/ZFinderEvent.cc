@@ -19,6 +19,7 @@
 // ZFinder
 #include "ZFinder/Event/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
 #include "ZFinder/Event/interface/TriggerList.h"  // ET_ET_TIGHT, ET_ET_DZ, ET_ET_LOOSE, ET_NT_ET_TIGHT, ET_HF_ET_TIGHT, ET_HF_ET_LOOSE, ET_HF_HF_TIGHT, ET_HF_HF_LOOSE, SINGLE_ELECTRON_TRIGGER, ALL_TRIGGERS
+#include "ZFinder/Event/interface/PileupReweighting.h"  // RUN_2012_ABCD_TRUE_PILEUP, SUMMER12_53X_MC_TRUE_PILEUP
 
 
 namespace zf {
@@ -29,6 +30,13 @@ namespace zf {
     // Electrons are considered matched to a trigger object if close than this
     // value
     const double ZFinderEvent::TRIG_DR_ = 0.3;
+
+    /*
+     * The edm::LumiReWeighting constructor spams std::cout like mad, and it
+     * can't be turned off. We get around this be constructing one static
+     * instance and sharing it with all instances of the class.
+     */
+    edm::LumiReWeighting* ZFinderEvent::lumi_weights_ = NULL;
 
     ZFinderEvent::ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup, const edm::ParameterSet& iConfig) {
         /* Given an event, parses them for the information needed to make the
@@ -46,6 +54,15 @@ namespace zf {
 
         // Set local is_real_data
         is_real_data = iEvent.isRealData();
+        // Set up the lumi reweighting, but only if it is MC. Also set event
+        // weight to be 1 by default.
+        event_weight = 1.;
+        if (!is_real_data && lumi_weights_ == NULL) {
+            lumi_weights_ = new edm::LumiReWeighting(
+                    SUMMER12_53X_MC_TRUE_PILEUP,  // MC distribution
+                    RUN_2012_ABCD_TRUE_PILEUP     // Data distribution
+                    );
+        }
 
         // Get InputTags
         // Reco
@@ -94,6 +111,12 @@ namespace zf {
                     reco_vert.z = (*reco_vertices)[vertex].z();
                 }
             }
+        }
+
+        /* Reweight the event to correct for pileup (but only MC) */
+        if (!is_real_data && lumi_weights_ != NULL) {
+            const edm::EventBase* iEventB = dynamic_cast<const edm::EventBase*>(&iEvent);
+            event_weight = lumi_weights_->weight((*iEventB));
         }
 
         /* Beamspot */
