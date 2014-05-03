@@ -113,6 +113,18 @@ namespace zf {
         nelectrons_ = tdir.make<TH1D>(nelectrons_name.c_str(), nelectrons_name.c_str(), 10, 0., 10.);
         nelectrons_->GetXaxis()->SetTitle("N_{e}");
         nelectrons_->GetYaxis()->SetTitle("Events");
+
+        // baseweights
+        const std::string baseweights_name = "Base Weight";
+        baseweights_ = tdir.make<TH1D>(baseweights_name.c_str(), baseweights_name.c_str(), 500, 0., 5.);
+        baseweights_->GetXaxis()->SetTitle("Weight");
+        baseweights_->GetYaxis()->SetTitle("Events");
+
+        // baseweights
+        const std::string fullweights_name = "Full Weight";
+        fullweights_ = tdir.make<TH1D>(fullweights_name.c_str(), fullweights_name.c_str(), 500, 0., 5.);
+        fullweights_->GetXaxis()->SetTitle("Weight");
+        fullweights_->GetYaxis()->SetTitle("Events");
     }
 
     void ZFinderPlotter::Fill(
@@ -192,6 +204,9 @@ namespace zf {
             pileup_->Fill(zf_event.truth_vert.num, EVENT_WEIGHT);
             nelectrons_->Fill(2, EVENT_WEIGHT);  // We only ever grab the two electrons from the Z
         }
+        // Event weights, they are of course, unweighted
+        baseweights_->Fill(zf_event.event_weight);
+        fullweights_->Fill(EVENT_WEIGHT);
     }
 
     void ZFinderPlotter::Print(const std::string& basename) {
@@ -275,5 +290,15 @@ namespace zf {
         TCanvas* nelectronsC = new TCanvas(nelectronsStr.c_str(), nelectronsStr.c_str(), X_SIZE, Y_SIZE);
         nelectrons_->Draw();
         nelectronsC->Print((nelectronsStr+".png").c_str());
+
+        std::string baseweightsStr = basename + "_baseweights";
+        TCanvas* baseweightsC = new TCanvas(baseweightsStr.c_str(), baseweightsStr.c_str(), X_SIZE, Y_SIZE);
+        baseweights_->Draw();
+        baseweightsC->Print((baseweightsStr+".png").c_str());
+
+        std::string fullweightsStr = basename + "_fullweights";
+        TCanvas* fullweightsC = new TCanvas(fullweightsStr.c_str(), fullweightsStr.c_str(), X_SIZE, Y_SIZE);
+        fullweights_->Draw();
+        fullweightsC->Print((fullweightsStr+".png").c_str());
     }
 }  // namespace zf
