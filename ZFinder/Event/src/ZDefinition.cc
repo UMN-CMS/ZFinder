@@ -490,6 +490,12 @@ namespace zf {
         }
         // Finally, we add the Mass window cut, which is the very last one (and
         // not included in the above loop)
-        clv.back().second.pass = pass_mz_cut_;
+        t0p1_pass = t0p1_pass && pass_mz_cut_;
+        t1p0_pass = t1p0_pass && pass_mz_cut_;
+        clv.back().second.t0p1_pass = t0p1_pass;
+        clv.back().second.t1p0_pass = t1p0_pass;
+        clv.back().second.pass = t0p1_pass || t1p0_pass;
+        clv.back().second.t0p1_eff = t0p1_eff;
+        clv.back().second.t0p1_eff = t0p1_eff;
     }
 }  // namespace zf
