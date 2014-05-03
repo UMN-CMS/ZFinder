@@ -19,7 +19,7 @@
 // ZFinder
 #include "ZFinder/Event/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
 #include "ZFinder/Event/interface/TriggerList.h"  // ET_ET_TIGHT, ET_ET_DZ, ET_ET_LOOSE, ET_NT_ET_TIGHT, ET_HF_ET_TIGHT, ET_HF_ET_LOOSE, ET_HF_HF_TIGHT, ET_HF_HF_LOOSE, SINGLE_ELECTRON_TRIGGER, ALL_TRIGGERS
-#include "ZFinder/Event/interface/PileupReweighting.h"  // RUN_2012_ABCD_TRUE_PILEUP, SUMMER12_53X_MC_TRUE_PILEUP
+#include "ZFinder/Event/interface/PileupReweighting.h"  // RUN_2012_ABCD_TRUE_PILEUP, RUN_2012_AB_TRUE_PILEUP, SUMMER12_53X_MC_TRUE_PILEUP
 
 
 namespace zf {
@@ -60,7 +60,7 @@ namespace zf {
         if (!is_real_data && lumi_weights_ == NULL) {
             lumi_weights_ = new edm::LumiReWeighting(
                     SUMMER12_53X_MC_TRUE_PILEUP,  // MC distribution
-                    RUN_2012_ABCD_TRUE_PILEUP     // Data distribution
+                    RUN_2012_AB_TRUE_PILEUP     // Data distribution
                     );
         }
 
