@@ -54,15 +54,6 @@ namespace zf {
 
         // Set local is_real_data
         is_real_data = iEvent.isRealData();
-        // Set up the lumi reweighting, but only if it is MC. Also set event
-        // weight to be 1 by default.
-        event_weight = 1.;
-        if (!is_real_data && lumi_weights_ == NULL) {
-            lumi_weights_ = new edm::LumiReWeighting(
-                    SUMMER12_53X_MC_TRUE_PILEUP,  // MC distribution
-                    RUN_2012_B_TRUE_PILEUP        // Data distribution
-                    );
-        }
 
         // Get InputTags
         // Reco
@@ -80,6 +71,20 @@ namespace zf {
         inputtags_.pileup = iConfig.getParameter<edm::InputTag>("pileupInputTag");
         inputtags_.generator = iConfig.getParameter<edm::InputTag>("generatorInputTag");
 
+        // Set up the lumi reweighting, but only if it is MC.
+        if (!is_real_data && lumi_weights_ == NULL) {
+            lumi_weights_ = new edm::LumiReWeighting(
+                    SUMMER12_53X_MC_TRUE_PILEUP,  // MC distribution
+                    RUN_2012_B_TRUE_PILEUP        // Data distribution
+                    );
+        }
+        // Use the lumi reweighting to set the event weight. It is 1. for data,
+        // and dependent on the pileup reweighting for MC.
+        event_weight = 1.;
+        if (!is_real_data && lumi_weights_ != NULL) {
+            SetEventWeight(iEvent);
+        }
+
         // Finish initialization of electrons
         InitReco(iEvent, iSetup);  // Data
         if (!is_real_data) {
@@ -87,6 +92,27 @@ namespace zf {
         } else {
             InitTrigger(iEvent, iSetup);  // Trigger Matching
         }
+    }
+
+    void ZFinderEvent::SetEventWeight(const edm::Event& iEvent) {
+        /* Reweight the event to correct for pileup (but only MC). This recipe
+         * is give on the Twiki:
+         * https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupMCReweightingUtilities
+         */
+        edm::Handle<std::vector<PileupSummaryInfo> > pileup_info;
+        iEvent.getByLabel(inputtags_.pileup, pileup_info);
+
+        // Must be a float because weight() below takes float or int
+        float true_number_of_pileup = -1.;
+        std::vector<PileupSummaryInfo>::const_iterator PILEUP_ELEMENT;
+        for(PILEUP_ELEMENT = pileup_info->begin(); PILEUP_ELEMENT != pileup_info->end(); ++PILEUP_ELEMENT) {
+            const int BUNCH_CROSSING = PILEUP_ELEMENT->getBunchCrossing();
+            if (BUNCH_CROSSING == 0) {
+                true_number_of_pileup = PILEUP_ELEMENT->getTrueNumInteractions();
+            }
+        }
+
+        event_weight = lumi_weights_->weight(true_number_of_pileup);
     }
 
     void ZFinderEvent::InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -113,11 +139,6 @@ namespace zf {
             }
         }
 
-        /* Reweight the event to correct for pileup (but only MC) */
-        if (!is_real_data && lumi_weights_ != NULL) {
-            const edm::EventBase* iEventB = dynamic_cast<const edm::EventBase*>(&iEvent);
-            event_weight = lumi_weights_->weight((*iEventB));
-        }
 
         /* Beamspot */
         edm::Handle<reco::BeamSpot> beam_spot;
