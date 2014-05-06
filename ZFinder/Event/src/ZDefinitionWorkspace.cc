@@ -54,7 +54,6 @@ namespace zf {
         e1_charge_->defineType("Negative", -1);
         // Event
         n_vert_ = new RooRealVar("n_vert", "Number of Vertices", 0, 100);
-        weight_ = new RooRealVar("weight", "Event weight", 0, 100);
         data_type_ = new RooCategory("data_type", "Is the event from Data, or MC?");
         data_type_->defineType("Truth MC");
         data_type_->defineType("Reco MC");
@@ -79,13 +78,13 @@ namespace zf {
         argset_->add(*e1_pt_);
         argset_->add(*e1_eta_);
         argset_->add(*e1_charge_);
-        argset_->add(*weight_);
         argset_->add(*n_vert_);
         argset_->add(*data_type_);
         argset_->add(*numerator_);
         argset_->add(*degenerate_);
 
         // Dataset
+        weight_ = new RooRealVar("weight", "Event weight", 0, 100);
         roodataset_ = new RooDataSet(
                 "roo_dataset",
                 "All events selected by the ZDefinition",
@@ -225,10 +224,10 @@ namespace zf {
         } else  {
             weight = last_cutlevel.t1p0_eff;
         }
-        argset_->setRealValue("weight", weight);
 
         // Save the argset
-        roodataset_->add(*argset_);
+        const double WEIGHT_ERROR = 0.;
+        roodataset_->add(*argset_, weight, WEIGHT_ERROR);
     }
 
     void ZDefinitionWorkspace::Write() {
