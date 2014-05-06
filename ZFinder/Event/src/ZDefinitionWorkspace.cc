@@ -70,6 +70,9 @@ namespace zf {
         degenerate_->defineType("Degenerate Denominator", 1);
         degenerate_->defineType("Degenerate Denominator and numerator", 2);
 
+        // Add the weight variable
+        weight_ = new RooRealVar("weight", "Event weight", 0, 100);
+
         // Argsets
         argset_ = new RooArgSet(*z_mass_, *phistar_, *z_pt_, *z_eta_, *z_y_);
         argset_->add(*e0_pt_);
@@ -82,9 +85,9 @@ namespace zf {
         argset_->add(*data_type_);
         argset_->add(*numerator_);
         argset_->add(*degenerate_);
+        argset_->add(*weight_);
 
         // Dataset
-        weight_ = new RooRealVar("weight", "Event weight", 0, 100);
         roodataset_ = new RooDataSet(
                 "roo_dataset",
                 "All events selected by the ZDefinition",
@@ -117,11 +120,11 @@ namespace zf {
 
         // MC or Reco
         if (zf_event.is_real_data) {
-            argset_->setCatLabel("data_type_", "Data");
+            argset_->setCatLabel("data_type", "Data");
         } else if (USE_TRUTH_) {
-            argset_->setCatLabel("data_type_", "Truth MC");
+            argset_->setCatLabel("data_type", "Truth MC");
         } else {
-            argset_->setCatLabel("data_type_", "Reco MC");
+            argset_->setCatLabel("data_type", "Reco MC");
         }
 
         // Check if we have a degenerate tag
@@ -129,12 +132,12 @@ namespace zf {
         if (penult_cutlevel.t0p1_pass && penult_cutlevel.t1p0_pass) {
             // Then check numerator level
             if (last_cutlevel.t0p1_pass && last_cutlevel.t1p0_pass) {
-                argset_->setCatLabel("degenerate_", "Degenerate Denominator and numerator");
+                argset_->setCatLabel("degenerate", "Degenerate Denominator and numerator");
             } else {
-                argset_->setCatLabel("degenerate_", "Degenerate Denominator");
+                argset_->setCatLabel("degenerate", "Degenerate Denominator");
             }
         } else {
-            argset_->setCatLabel("degenerate_", "False");
+            argset_->setCatLabel("degenerate", "False");
         }
 
         // Now we set the tag If it is degenerate in the numerator, we pick
@@ -163,9 +166,9 @@ namespace zf {
         // Check if our event is in the numerator of the efficiency, or just
         // the denominator
         if (!last_cutlevel.pass && penult_cutlevel.pass) {
-            argset_->setCatLabel("numerator_", "False");
+            argset_->setCatLabel("numerator", "False");
         } else {
-            argset_->setCatLabel("numerator_", "True");
+            argset_->setCatLabel("numerator", "True");
         }
 
         // Assign the correct electrons
@@ -204,18 +207,18 @@ namespace zf {
         }
 
         // Assign the variables
-        argset_->setRealValue("z_mass_", z_data->m);
-        argset_->setRealValue("z_eta_", z_data->eta);
-        argset_->setRealValue("z_y_", z_data->y);
-        argset_->setRealValue("z_pt_", z_data->pt);
-        argset_->setRealValue("phistar_", z_data->phistar);
-        argset_->setRealValue("e0_pt_", e_tag->pt);
-        argset_->setRealValue("e0_eta_", e_tag->eta);
-        argset_->setCatIndex("e0_charge_", e_tag->charge);
-        argset_->setRealValue("e1_pt_", e_probe->pt);
-        argset_->setRealValue("e1_eta_", e_probe->eta);
-        argset_->setCatIndex("e1_charge_", e_probe->charge);
-        argset_->setRealValue("n_vert_", verts);
+        argset_->setRealValue("z_mass", z_data->m);
+        argset_->setRealValue("z_eta", z_data->eta);
+        argset_->setRealValue("z_y", z_data->y);
+        argset_->setRealValue("z_pt", z_data->pt);
+        argset_->setRealValue("phistar", z_data->phistar);
+        argset_->setRealValue("e0_pt", e_tag->pt);
+        argset_->setRealValue("e0_eta", e_tag->eta);
+        argset_->setCatIndex("e0_charge", e_tag->charge);
+        argset_->setRealValue("e1_pt", e_probe->pt);
+        argset_->setRealValue("e1_eta", e_probe->eta);
+        argset_->setCatIndex("e1_charge", e_probe->charge);
+        argset_->setRealValue("n_vert", verts);
 
         // We set the weight to be equal to the weight of the last cut level.
         double weight = 1.;
