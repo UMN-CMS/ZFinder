@@ -68,8 +68,8 @@ namespace zf {
         // having a degenerate denominator
         degenerate_ = new RooCategory("degenerate", "Could either event be the tag, and the other the probe?");
         degenerate_->defineType("False", 0);
-        degenerate_->defineType("degenerate Denominator", 1);
-        degenerate_->defineType("degenerate Denominator and numerator", 2);
+        degenerate_->defineType("Degenerate Denominator", 1);
+        degenerate_->defineType("Degenerate Denominator and numerator", 2);
 
         // Argsets
         argset_ = new RooArgSet(*z_mass_, *phistar_, *z_pt_, *z_eta_, *z_y_);
@@ -130,9 +130,9 @@ namespace zf {
         if (penult_cutlevel.t0p1_pass && penult_cutlevel.t1p0_pass) {
             // Then check numerator level
             if (last_cutlevel.t0p1_pass && last_cutlevel.t1p0_pass) {
-                argset_->setCatLabel("degenerate_", "degenerate Denominator and numerator");
+                argset_->setCatLabel("degenerate_", "Degenerate Denominator and numerator");
             } else {
-                argset_->setCatLabel("degenerate_", "degenerate Denominator");
+                argset_->setCatLabel("degenerate_", "Degenerate Denominator");
             }
         } else {
             argset_->setCatLabel("degenerate_", "False");
