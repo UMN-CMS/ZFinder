@@ -54,7 +54,7 @@ namespace zf {
         e1_charge->defineType("Negative", -1);
         // Event
         n_vert = new RooRealVar("n_vert", "Number of Vertices", 0, 100);
-        weight = new RooRealVar("weight", "Event weight", 0, 1);
+        weight = new RooRealVar("weight", "Event weight", 0, 100);
         data_type = new RooCategory("data_type", "Is the event from Data, or MC?");
         data_type->defineType("Truth MC");
         data_type->defineType("Reco MC");
