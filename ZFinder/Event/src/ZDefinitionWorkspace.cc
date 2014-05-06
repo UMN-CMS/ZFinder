@@ -34,62 +34,62 @@ namespace zf {
          * Set up all the Variables
          */
         // Set up the variables
-        z_mass = new RooRealVar("z_mass", "m_{ee}", -1, 1000, "GeV");
-        z_eta = new RooRealVar("z_eta", "Z_{#eta}", -6, 6);
-        z_y = new RooRealVar("z_y", "Z_{Y}", -6, 6);
-        z_pt = new RooRealVar("z_pt", "Z_{p_{T}}", 0, 1000, "GeV");
-        phistar = new RooRealVar("phistar", "#phi*", -0.1, 2);
+        z_mass_ = new RooRealVar("z_mass", "m_{ee}", -1, 1000, "GeV");
+        z_eta_ = new RooRealVar("z_eta", "Z_{#eta}", -6, 6);
+        z_y_ = new RooRealVar("z_y", "Z_{Y}", -6, 6);
+        z_pt_ = new RooRealVar("z_pt", "Z_{p_{T}}", 0, 1000, "GeV");
+        phistar_ = new RooRealVar("phistar", "#phi*", -0.1, 2);
         // Electrons
-        e0_pt = new RooRealVar("e0_pt", "p_{T}^{e_{0}}", 0, 1000, "GeV");
-        e0_eta = new RooRealVar("e0_eta", "#eta_{e_{0}}", -6, 6);
-        e0_charge = new RooCategory("e0_charge", "q_{e_{0}}");
-        e0_charge->defineType("Unmeasured", 0);
-        e0_charge->defineType("Positive", 1);
-        e0_charge->defineType("Negative", -1);
-        e1_pt = new RooRealVar("e1_pt", "p_{T}^{e_{1}}", 0, 1000, "GeV");
-        e1_eta = new RooRealVar("e1_eta", "#eta_{e_{1}}", -6, 6);
-        e1_charge = new RooCategory("e1_charge", "q_{e_{1}}");
-        e1_charge->defineType("Unmeasured", 0);
-        e1_charge->defineType("Positive", 1);
-        e1_charge->defineType("Negative", -1);
+        e0_pt_ = new RooRealVar("e0_pt", "p_{T}^{e_{0}}", 0, 1000, "GeV");
+        e0_eta_ = new RooRealVar("e0_eta", "#eta_{e_{0}}", -6, 6);
+        e0_charge_ = new RooCategory("e0_charge", "q_{e_{0}}");
+        e0_charge_->defineType("Unmeasured", 0);
+        e0_charge_->defineType("Positive", 1);
+        e0_charge_->defineType("Negative", -1);
+        e1_pt_ = new RooRealVar("e1_pt", "p_{T}^{e_{1}}", 0, 1000, "GeV");
+        e1_eta_ = new RooRealVar("e1_eta", "#eta_{e_{1}}", -6, 6);
+        e1_charge_ = new RooCategory("e1_charge", "q_{e_{1}}");
+        e1_charge_->defineType("Unmeasured", 0);
+        e1_charge_->defineType("Positive", 1);
+        e1_charge_->defineType("Negative", -1);
         // Event
-        n_vert = new RooRealVar("n_vert", "Number of Vertices", 0, 100);
-        weight = new RooRealVar("weight", "Event weight", 0, 100);
-        data_type = new RooCategory("data_type", "Is the event from Data, or MC?");
-        data_type->defineType("Truth MC");
-        data_type->defineType("Reco MC");
-        data_type->defineType("Data");
-        numerator = new RooCategory("numerator", "Is the event in the efficiency numerator?");
-        numerator->defineType("True", 1);
-        numerator->defineType("False", 0);
+        n_vert_ = new RooRealVar("n_vert", "Number of Vertices", 0, 100);
+        weight_ = new RooRealVar("weight", "Event weight", 0, 100);
+        data_type_ = new RooCategory("data_type", "Is the event from Data, or MC?");
+        data_type_->defineType("Truth MC");
+        data_type_->defineType("Reco MC");
+        data_type_->defineType("Data");
+        numerator_ = new RooCategory("numerator", "Is the event in the efficiency numerator?");
+        numerator_->defineType("True", 1);
+        numerator_->defineType("False", 0);
         // Note that because we set t0p1_pass with an && of the previous value,
         // once one level of cuts fails, all others will fail. This means that
         // while it is possible to have a degenerate numerator events without
         // having a degenerate denominator
-        degenerate = new RooCategory("degenerate", "Could either event be the tag, and the other the probe?");
-        degenerate->defineType("False", 0);
-        degenerate->defineType("Degenerate Denominator", 1);
-        degenerate->defineType("Degenerate Denominator and Numerator", 2);
+        degenerate_ = new RooCategory("degenerate", "Could either event be the tag, and the other the probe?");
+        degenerate_->defineType("False", 0);
+        degenerate_->defineType("degenerate Denominator", 1);
+        degenerate_->defineType("degenerate Denominator and numerator", 2);
 
         // Argsets
-        argset = new RooArgSet(*z_mass, *phistar, *z_pt, *z_eta, *z_y);
-        argset->add(*e0_pt);
-        argset->add(*e0_eta);
-        argset->add(*e0_charge);
-        argset->add(*e1_pt);
-        argset->add(*e1_eta);
-        argset->add(*e1_charge);
-        argset->add(*weight);
-        argset->add(*n_vert);
-        argset->add(*data_type);
-        argset->add(*numerator);
-        argset->add(*degenerate);
+        argset_ = new RooArgSet(*z_mass_, *phistar_, *z_pt_, *z_eta_, *z_y_);
+        argset_->add(*e0_pt_);
+        argset_->add(*e0_eta_);
+        argset_->add(*e0_charge_);
+        argset_->add(*e1_pt_);
+        argset_->add(*e1_eta_);
+        argset_->add(*e1_charge_);
+        argset_->add(*weight_);
+        argset_->add(*n_vert_);
+        argset_->add(*data_type_);
+        argset_->add(*numerator_);
+        argset_->add(*degenerate_);
 
         // Dataset
-        roodataset = new RooDataSet(
+        roodataset_ = new RooDataSet(
                 "roo_dataset",
                 "All events selected by the ZDefinition",
-                *argset,
+                *argset_,
                 RooFit::WeightVar("weight")
                 );
     }
@@ -118,11 +118,11 @@ namespace zf {
 
         // MC or Reco
         if (zf_event.is_real_data) {
-            argset->setCatLabel("data_type", "Data");
+            argset_->setCatLabel("data_type_", "Data");
         } else if (USE_TRUTH_) {
-            argset->setCatLabel("data_type", "Truth MC");
+            argset_->setCatLabel("data_type_", "Truth MC");
         } else {
-            argset->setCatLabel("data_type", "Reco MC");
+            argset_->setCatLabel("data_type_", "Reco MC");
         }
 
         // Check if we have a degenerate tag
@@ -130,12 +130,12 @@ namespace zf {
         if (penult_cutlevel.t0p1_pass && penult_cutlevel.t1p0_pass) {
             // Then check numerator level
             if (last_cutlevel.t0p1_pass && last_cutlevel.t1p0_pass) {
-                argset->setCatLabel("degenerate", "Degenerate Denominator and Numerator");
+                argset_->setCatLabel("degenerate_", "degenerate Denominator and numerator");
             } else {
-                argset->setCatLabel("degenerate", "Degenerate Denominator");
+                argset_->setCatLabel("degenerate_", "degenerate Denominator");
             }
         } else {
-            argset->setCatLabel("degenerate", "False");
+            argset_->setCatLabel("degenerate_", "False");
         }
 
         // Now we set the tag If it is degenerate in the numerator, we pick
@@ -164,9 +164,9 @@ namespace zf {
         // Check if our event is in the numerator of the efficiency, or just
         // the denominator
         if (!last_cutlevel.pass && penult_cutlevel.pass) {
-            argset->setCatLabel("numerator", "False");
+            argset_->setCatLabel("numerator_", "False");
         } else {
-            argset->setCatLabel("numerator", "True");
+            argset_->setCatLabel("numerator_", "True");
         }
 
         // Assign the correct electrons
@@ -205,18 +205,18 @@ namespace zf {
         }
 
         // Assign the variables
-        argset->setRealValue("z_mass", z_data->m);
-        argset->setRealValue("z_eta", z_data->eta);
-        argset->setRealValue("z_y", z_data->y);
-        argset->setRealValue("z_pt", z_data->pt);
-        argset->setRealValue("phistar", z_data->phistar);
-        argset->setRealValue("e0_pt", e_tag->pt);
-        argset->setRealValue("e0_eta", e_tag->eta);
-        argset->setCatIndex("e0_charge", e_tag->charge);
-        argset->setRealValue("e1_pt", e_probe->pt);
-        argset->setRealValue("e1_eta", e_probe->eta);
-        argset->setCatIndex("e1_charge", e_probe->charge);
-        argset->setRealValue("n_vert", verts);
+        argset_->setRealValue("z_mass_", z_data->m);
+        argset_->setRealValue("z_eta_", z_data->eta);
+        argset_->setRealValue("z_y_", z_data->y);
+        argset_->setRealValue("z_pt_", z_data->pt);
+        argset_->setRealValue("phistar_", z_data->phistar);
+        argset_->setRealValue("e0_pt_", e_tag->pt);
+        argset_->setRealValue("e0_eta_", e_tag->eta);
+        argset_->setCatIndex("e0_charge_", e_tag->charge);
+        argset_->setRealValue("e1_pt_", e_probe->pt);
+        argset_->setRealValue("e1_eta_", e_probe->eta);
+        argset_->setCatIndex("e1_charge_", e_probe->charge);
+        argset_->setRealValue("n_vert_", verts);
 
         // We set the weight to be equal to the weight of the last cut level.
         double weight = 1.;
@@ -225,10 +225,10 @@ namespace zf {
         } else  {
             weight = last_cutlevel.t1p0_eff;
         }
-        argset->setRealValue("weight", weight);
+        argset_->setRealValue("weight", weight);
 
         // Save the argset
-        roodataset->add(*argset);
+        roodataset_->add(*argset_);
     }
 
     void ZDefinitionWorkspace::Write() {
@@ -236,7 +236,7 @@ namespace zf {
         write_dir_->cd();
         // Make the workspace and save it
         RooWorkspace *w = new RooWorkspace("workspace", "RooWorkspace");
-        w->import(*roodataset);
+        w->import(*roodataset_);
         w->Write();
         // Clean up, we're done!
         delete w;
@@ -244,22 +244,23 @@ namespace zf {
 
     ZDefinitionWorkspace::~ZDefinitionWorkspace() {
         // Clean up the heap
-        delete z_mass;
-        delete z_eta;
-        delete z_y;
-        delete z_pt;
-        delete phistar;
-        delete e0_pt;
-        delete e0_eta;
-        delete e1_pt;
-        delete e1_eta;
-        delete e0_charge;
-        delete e1_charge;
-        delete n_vert;
-        delete weight;
-        delete data_type;
-        delete numerator;
-        delete argset;
-        delete roodataset;
+        delete z_mass_;
+        delete z_eta_;
+        delete z_y_;
+        delete z_pt_;
+        delete phistar_;
+        delete e0_pt_;
+        delete e0_eta_;
+        delete e1_pt_;
+        delete e1_eta_;
+        delete e0_charge_;
+        delete e1_charge_;
+        delete n_vert_;
+        delete weight_;
+        delete data_type_;
+        delete numerator_;
+        delete argset_;
+        delete degenerate_;
+        delete roodataset_;
     }
 }  // namespace zf

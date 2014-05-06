@@ -45,28 +45,28 @@ namespace zf {
 
         protected:
             // The Roo Variables
-            RooArgSet* argset;
+            RooArgSet* argset_;
             // Dataset
-            RooDataSet* roodataset;
+            RooDataSet* roodataset_;
             // Z
-            RooRealVar* z_mass;
-            RooRealVar* z_eta;
-            RooRealVar* z_y;
-            RooRealVar* z_pt;
-            RooRealVar* phistar;
+            RooRealVar* z_mass_;
+            RooRealVar* z_eta_;
+            RooRealVar* z_y_;
+            RooRealVar* z_pt_;
+            RooRealVar* phistar_;
             // Electrons
-            RooRealVar* e0_pt;
-            RooRealVar* e0_eta;
-            RooRealVar* e1_pt;
-            RooRealVar* e1_eta;
-            RooCategory* e0_charge;
-            RooCategory* e1_charge;
+            RooRealVar* e0_pt_;
+            RooRealVar* e0_eta_;
+            RooRealVar* e1_pt_;
+            RooRealVar* e1_eta_;
+            RooCategory* e0_charge_;
+            RooCategory* e1_charge_;
             // Event
-            RooRealVar* n_vert;
-            RooRealVar* weight;
-            RooCategory* data_type;
-            RooCategory* numerator;
-            RooCategory* degenerate;
+            RooRealVar* n_vert_;
+            RooRealVar* weight_;
+            RooCategory* data_type_;
+            RooCategory* numerator_;
+            RooCategory* degenerate_;
 
             void InitVariables();
 
