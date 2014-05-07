@@ -238,6 +238,8 @@ class CrossCheckPlotter{
         static constexpr double LEFT_EDGE_ = 0.10;
         static constexpr double TOP_EDGE_ = 0.95;
         static constexpr double BOTTOM_EDGE_ = 0.10;
+        // Size of the ratio plot (0-1, as a fraction of the total height)
+        static constexpr double RATIO_HEIGHT = 0.25;
         // Colors and styles for backgrounds
         void init_color_styles();
         std::vector<std::pair<RootFill, int>> color_styles_;

@@ -6,6 +6,7 @@
 
 // ROOT
 #include <TCanvas.h>
+#include <TF1.h>
 #include <TH1D.h>
 #include <THStack.h>
 #include <TLatex.h>
@@ -355,17 +356,25 @@ void CrossCheckPlotter::plot(
     }
 
 
-    // Make a stack to store the MC
+    // Make a stack to store the MC and a ratio histogram for the ratio plot
     THStack* histo_stack = new THStack("hs", "Monte Carlo histrogram stack");
+    TH1D* ratio_histo = dynamic_cast<TH1D*>(data_histo->Clone());
 
     // Title
     data_histo->SetTitle(0);  // Remove the title, we'll place it by hand
-    //histo_stack->SetTitle(0);
     // Axis labels
-    data_histo->GetXaxis()->SetTitle(plot_config.x_label.c_str());
-    //histo_stack->GetXaxis()->SetTitle(plot_config.x_label.c_str());
+    ratio_histo->GetXaxis()->SetTitle(plot_config.x_label.c_str());
+    ratio_histo->GetXaxis()->SetLabelSize(0.1);
+    ratio_histo->GetXaxis()->SetTitleSize(0.2);
+    ratio_histo->GetXaxis()->SetTitleOffset(0.7);
+    ratio_histo->GetYaxis()->SetTitle("Data/MC");
+    ratio_histo->GetYaxis()->SetLabelSize(0.1);
+    ratio_histo->GetYaxis()->SetTitleSize(0.1);
+    ratio_histo->GetYaxis()->SetNdivisions(14, 0, 0);  // Set 10 major ticks, 0 minor
+    ratio_histo->GetYaxis()->SetTickLength(0.01);  // Make the ticks smaller
+    data_histo->GetXaxis()->SetTitle(0);  // We use the ratio_histo to draw these
+    data_histo->GetXaxis()->SetLabelSize(0);  // Remove numbers
     data_histo->GetYaxis()->SetTitle(plot_config.y_label.c_str());
-    //histo_stack->GetYaxis()->SetTitle(plot_config.y_label.c_str());
 
     // Set up the legend using the plot edges to set its location
     const double LEG_HEIGHT = 0.15;
@@ -383,6 +392,9 @@ void CrossCheckPlotter::plot(
     mc_histo->GetYaxis()->SetTitleOffset(1.25);
     mc_histo->GetXaxis()->SetTitleOffset(1.1);
     // Marker, line, and fill style
+    ratio_histo->SetMarkerStyle(kFullCircle);
+    ratio_histo->SetMarkerColor(kBlack);
+    ratio_histo->SetLineColor(kBlack);
     data_histo->SetMarkerStyle(kFullCircle);
     data_histo->SetMarkerColor(kBlack);
     data_histo->SetLineColor(kBlack);
@@ -450,20 +462,48 @@ void CrossCheckPlotter::plot(
 
     // Make a canvas to hold the plot
     TCanvas canvas("canvas", "canvas", X_VAL_, Y_VAL_);
-    canvas.cd();
-    canvas.SetLogy(plot_config.logy);
+    canvas.Divide(1, 2); // Make two stacked plots
+    canvas.cd(1);
+    gPad->SetPad(0, RATIO_HEIGHT, 1., 1.);
+    gPad->SetLogy(plot_config.logy);
+    gPad->SetBottomMargin(0.01);  // Remove the margin, we'll put it under the ratio
 
     // Draw the histograms
     data_histo->Draw("E");  // Set axis titles
     histo_stack->Draw("HIST SAME");
     data_histo->Draw("E SAME");
     legend.Draw();
-    if (plot_title != NULL) { plot_title->Draw(); }
+    if (plot_title != NULL) {
+        plot_title->Draw();
+    }
+
+    // Make the ratio plot
+    canvas.cd(2);
+    gPad->SetPad(0, 0.05, 1., RATIO_HEIGHT);
+    gPad->SetTopMargin(0);  // Move pad flush with plot above it
+    // Sum all the MC histos
+    TH1D* histo_sum = dynamic_cast<TH1D*>(mc_histo->Clone());
+    for (auto& i_pair : bg_histos) {
+        histo_sum->Add(i_pair.second);
+    }
+    // Make a red line at 1
+    TF1 ratio_line("line", "pol0", ratio_histo->GetBinLowEdge(1), ratio_histo->GetBinLowEdge(ratio_histo->GetNbinsX()) + ratio_histo->GetBinWidth(ratio_histo->GetNbinsX()));
+    ratio_line.SetParameter(0, 1);
+    ratio_line.SetLineColor(kRed);
+    // Make the ratio
+    ratio_histo->Divide(data_histo, histo_sum);
+    ratio_histo->SetMaximum(2.1);
+    ratio_histo->SetMinimum(-0.1);
+
+    ratio_histo->Draw("E");  // Draw first for Axis labels
+    ratio_line.Draw("SAME");
+    ratio_histo->Draw("E SAME");
 
     // Save the plot as a png
     canvas.Print(FILE_NAME.c_str(), "png");
 
     // Clean up
+    delete ratio_histo;
     delete plot_title;
     delete histo_stack;
 }
@@ -560,7 +600,7 @@ void CrossCheckPlotter::set_plot_style() {
     style_->SetAxisColor(kBlack, "XYZ");
     style_->SetStripDecimals(true);
     style_->SetTickLength(0.03, "XYZ");
-    //style_->SetNdivisions(510, "XYZ");
+    style_->SetNdivisions(510, "XYZ");
     style_->SetPadTickX(true);  // To get tick marks on the opposite side of the frame
     style_->SetPadTickY(true);
 

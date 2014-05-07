@@ -36,7 +36,7 @@ int main() {
             bg_tfile,
             "ZFinder/ET-ET Combined Double Reco/6 60 < M_{ee} < 120",
             "T-TBar",
-            24.,  // TTBar Inclusive is 245.8 Pb, T->Wq is 0.9621, W->lnu is 0.3257
+            24.,  // TTBar Inclusive is 245.8 Pb, T->Wq is 0.9621, W->lnu is 0.3257, might be off by a factor of 3!!!!!
             "ZFinder/All Electrons Reco/0 acc(ALL) AND acc(ALL)",
             BG_MC
             );
