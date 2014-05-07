@@ -257,6 +257,7 @@ namespace zf {
                 || COMP_VAR == CV_GETA
                 || COMP_VAR == CV_GPHI
                 || COMP_VAR == CV_GCHARGE
+                || COMP_VAR == CV_GAETA
            ) {
             cut_type = TRUTH;
         } else if (
@@ -264,6 +265,7 @@ namespace zf {
                 || COMP_VAR == CV_TETA
                 || COMP_VAR == CV_TPHI
                 || COMP_VAR == CV_TCHARGE
+                || COMP_VAR == CV_TAETA
                 ){
             cut_type = TRIG;
         } else {
@@ -323,6 +325,11 @@ namespace zf {
             case CV_GCHARGE:
             case CV_TCHARGE:
                 e_val = zf_elec->charge;
+                break;
+            case CV_AETA:
+            case CV_GAETA:
+            case CV_TAETA:
+                e_val = fabs(zf_elec->eta);
                 break;
                 // Cases where it makes no sense to continue
             case CV_NONE:
@@ -433,6 +440,15 @@ namespace zf {
         }
         else if (cut->compare(0, 7, "tcharge") == 0 ) {
             return CV_TCHARGE;
+        }
+        else if (cut->compare(0, 4, "aeta") == 0 ) {
+            return CV_AETA;
+        }
+        else if (cut->compare(0, 5, "gaeta") == 0 ) {
+            return CV_GAETA;
+        }
+        else if (cut->compare(0, 5, "taeta") == 0 ) {
+            return CV_TAETA;
         }
         return CV_NONE;
     }

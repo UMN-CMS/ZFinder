@@ -121,6 +121,9 @@ with 'g' makes the cut on the Truth Level info (and always fails for real
 data), and a quantity that starts with 't' makes the cut on the Trigger Level
 info.
 
+There is also the variable 'aeta' which, instead of using normal eta, uses
+|eta|. Like all variables it can have 'g' or 't' prefixed.
+
 ##### Allowed Values
 
 A list of all allowed strings for `${Variable}`, `${Opperator}`, and `${Value}`
@@ -132,9 +135,16 @@ are given in the following table:
 | eta           | >              |                                              |
 | phi           | <              |                                              |
 | charge        | >=             |                                              |
-| gpt           | <=             |                                              |
+| aeta          | <=             |                                              |
+| gpt           |                |                                              |
 | geta          |                |                                              |
 | gphi          |                |                                              |
 | gcharge       |                |                                              |
+| gaeta         |                |                                              |
+| tpt           |                |                                              |
+| teta          |                |                                              |
+| tphi          |                |                                              |
+| tcharge       |                |                                              |
+| taeta         |                |                                              |
 
 Note that this is a menu; pick one from each column!

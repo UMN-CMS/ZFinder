@@ -15,8 +15,8 @@ zdefs = cms.untracked.VPSet(
     # ID cuts
     cms.untracked.PSet(
         name = cms.untracked.string("Combined Gen Cuts"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "gpt>30", "geta<2.1", "geta>-2.1"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "gpt>20", "geta<2.4", "geta>-2.4"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "gpt>30", "gaeta<2.1"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "gpt>20", "gaeta<2.4"),
         min_mz = cms.untracked.double(MIN_MZ),
         max_mz = cms.untracked.double(MAX_MZ),
         use_truth_mass = cms.untracked.bool(True)
@@ -90,8 +90,8 @@ zdefs_no_trigger = cms.untracked.VPSet(
     # ID cuts
     cms.untracked.PSet(
         name = cms.untracked.string("Combined Gen Cuts"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "gpt>30", "geta<2.1", "geta>-2.1"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "gpt>20", "geta<2.4", "geta>-2.4"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "gpt>30", "gaeta<2.1"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "gpt>20", "gaeta<2.4"),
         min_mz = cms.untracked.double(MIN_MZ),
         max_mz = cms.untracked.double(MAX_MZ),
         use_truth_mass = cms.untracked.bool(True)
