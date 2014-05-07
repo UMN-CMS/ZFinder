@@ -27,7 +27,7 @@ namespace zf {
             static constexpr double EB_MAX_ = 1.4442;
             static constexpr double EB_MIN_ = -EB_MAX_;
             static constexpr double EB_CENT_ = 0;
-            static constexpr double EEP_MIN_ = 1.566;
+            static constexpr double EEP_MIN_ = 1.56;
             static constexpr double EEP_MAX_ = 2.850;
             static constexpr double EEM_MIN_ = -EEP_MAX_;
             static constexpr double EEM_MAX_ = -EEP_MIN_;
@@ -39,6 +39,10 @@ namespace zf {
             static constexpr double HFP_MAX_ = 4.6;
             static constexpr double HFM_MIN_ = -HFP_MAX_;
             static constexpr double HFM_MAX_ = -HFP_MIN_;
+            static constexpr double MUON_TIGHT_MAX_ = 2.1;
+            static constexpr double MUON_TIGHT_MIN_ = -MUON_TIGHT_MAX_;
+            static constexpr double MUON_LOOSE_MAX_ = 2.4;
+            static constexpr double MUON_LOOSE_MIN_ = -MUON_LOOSE_MAX_;
     };
 }  // namespace zf
 #endif  // ZFINDER_ACCEPTANCESETTER_H_

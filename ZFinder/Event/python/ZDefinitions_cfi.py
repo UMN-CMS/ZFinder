@@ -15,16 +15,16 @@ zdefs = cms.untracked.VPSet(
     # ID cuts
     cms.untracked.PSet(
         name = cms.untracked.string("Combined Gen Cuts"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "gpt>30", "geta<2.1", "geta>-2.1"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "gpt>20", "geta<2.4", "geta>-2.4"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "gpt>30", "geta<2.1", "geta>-2.1"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "gpt>20", "geta<2.4", "geta>-2.4"),
         min_mz = cms.untracked.double(MIN_MZ),
         max_mz = cms.untracked.double(MAX_MZ),
         use_truth_mass = cms.untracked.bool(True)
         ),
     cms.untracked.PSet(
         name = cms.untracked.string("Combined Reco Cuts"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>30", "eta<2.1", "eta>-2.1"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>20", "eta<2.4", "eta>-2.4"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(MUON_TIGHT)", "pt>30"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(MUON_LOOSE)", "pt>20"),
         min_mz = cms.untracked.double(MIN_MZ),
         max_mz = cms.untracked.double(MAX_MZ),
         use_truth_mass = cms.untracked.bool(False)
@@ -34,16 +34,16 @@ zdefs = cms.untracked.VPSet(
     # trigger (and hence use eg_tight) on one leg
     cms.untracked.PSet(
         name = cms.untracked.string("Combined Double"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "trig(et_et_tight)", "pt>30", "eta<2.1", "eta>-2.1", "eg_medium"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "trig(et_et_loose)", "pt>20", "eta<2.4", "eta>-2.4", "eg_medium"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(MUON_TIGHT)", "trig(et_et_tight)", "pt>30", "eg_medium"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(MUON_LOOSE)", "trig(et_et_loose)", "pt>20", "eg_medium"),
         min_mz = cms.untracked.double(MIN_MZ),
         max_mz = cms.untracked.double(MAX_MZ),
         use_truth_mass = cms.untracked.bool(False)
         ),
     cms.untracked.PSet(
         name = cms.untracked.string("Combined Single"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "trig(single_ele)", "pt>30", "eta<2.1", "eta>-2.1", "eg_tight"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "acc(ET)",          "pt>20", "eta<2.4", "eta>-2.4", "eg_medium"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(MUON_TIGHT)", "trig(single_ele)", "pt>30", "eg_tight"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(MUON_LOOSE)", "acc(MUON_LOOSE)",  "pt>20", "eg_medium"),
         min_mz = cms.untracked.double(MIN_MZ),
         max_mz = cms.untracked.double(MAX_MZ),
         use_truth_mass = cms.untracked.bool(False)
@@ -90,16 +90,16 @@ zdefs_no_trigger = cms.untracked.VPSet(
     # ID cuts
     cms.untracked.PSet(
         name = cms.untracked.string("Combined Gen Cuts"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "gpt>30", "geta<2.1", "geta>-2.1"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "gpt>20", "geta<2.4", "geta>-2.4"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "gpt>30", "geta<2.1", "geta>-2.1"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "gpt>20", "geta<2.4", "geta>-2.4"),
         min_mz = cms.untracked.double(MIN_MZ),
         max_mz = cms.untracked.double(MAX_MZ),
         use_truth_mass = cms.untracked.bool(True)
         ),
     cms.untracked.PSet(
         name = cms.untracked.string("Combined Reco Cuts"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>30", "eta<2.1", "eta>-2.1"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>20", "eta<2.4", "eta>-2.4"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(MUON_TIGHT)", "pt>30"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(MUON_LOOSE)", "pt>20"),
         min_mz = cms.untracked.double(MIN_MZ),
         max_mz = cms.untracked.double(MAX_MZ),
         use_truth_mass = cms.untracked.bool(False)
@@ -109,16 +109,16 @@ zdefs_no_trigger = cms.untracked.VPSet(
     # trigger (and hence use eg_tight) on one leg
     cms.untracked.PSet(
         name = cms.untracked.string("Combined Double"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>30", "eta<2.1", "eta>-2.1", "eg_medium"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>20", "eta<2.4", "eta>-2.4", "eg_medium"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(MUON_TIGHT)", "pt>30", "eg_medium"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(MUON_LOOSE)", "pt>20", "eg_medium"),
         min_mz = cms.untracked.double(MIN_MZ),
         max_mz = cms.untracked.double(MAX_MZ),
         use_truth_mass = cms.untracked.bool(False)
         ),
     cms.untracked.PSet(
         name = cms.untracked.string("Combined Single"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>30", "eta<2.1", "eta>-2.1", "eg_tight"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>20", "eta<2.4", "eta>-2.4", "eg_medium"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(MUON_TIGHT)", "pt>30", "eg_tight"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(MUON_LOOSE)", "pt>20", "eg_medium"),
         min_mz = cms.untracked.double(MIN_MZ),
         max_mz = cms.untracked.double(MAX_MZ),
         use_truth_mass = cms.untracked.bool(False)

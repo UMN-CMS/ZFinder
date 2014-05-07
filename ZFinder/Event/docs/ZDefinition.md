@@ -17,25 +17,31 @@ ZFinderElectron.CutPassed method.
 Acceptance cuts make selections of electrons based on the geometric acceptance
 of the detector.
 
-| Cut Name      | Explanation                                                 |
-|---------------|-------------------------------------------------------------|
-| acc(ALL)      | Always true (used for counting total events, mainly in MC). |
-| acc(DETECTOR) | In any of the regions defined below, not including ALL.     |
-| acc(EB)       | -1.4442 < eta < 1.4442                                      |
-| acc(EB+)      | 0 < eta < 1.4442                                            |
-| acc(EB-)      | -1.4442 < eta < 0                                           |
-| acc(EE)       | 1.566 < abs(eta) < 2.850                                    |
-| acc(EE+)      | 1.566 < eta < 2.850                                         |
-| acc(EE-)      | -2.850 < eta < -1.566                                       |
-| acc(ET)       | In acc(EB) or acc(EE)                                       |
-| acc(ET+)      | In acc(EB+) or acc(EE+)                                     |
-| acc(ET-)      | In acc(EB-) or acc(EE-)                                     |
-| acc(NT)       | 2.5 < abs(eta) < 2.850                                      |
-| acc(NT+)      | 2.5 < eta < 2.850                                           |
-| acc(NT-)      | -2.850 < eta < -2.5                                         |
-| acc(HF)       | 3.1 < abs(eta) < 4.6                                        |
-| acc(HF+)      | 3.1 < eta < 4.6                                             |
-| acc(HF-)      | -4.6 < eta < -3.1                                           |
+| Cut Name         | Explanation                                                 |
+|------------------|-------------------------------------------------------------|
+| acc(ALL)         | Always true (used for counting total events, mainly in MC). |
+| acc(DETECTOR)    | In any of the regions defined below, not including ALL.     |
+| acc(EB)          | -1.4442 < eta < 1.4442                                      |
+| acc(EB+)         | 0 < eta < 1.4442                                            |
+| acc(EB-)         | -1.4442 < eta < 0                                           |
+| acc(EE)          | 1.566 < abs(eta) < 2.850                                    |
+| acc(EE+)         | 1.566 < eta < 2.850                                         |
+| acc(EE-)         | -2.850 < eta < -1.566                                       |
+| acc(ET)          | In acc(EB) or acc(EE)                                       |
+| acc(ET+)         | In acc(EB+) or acc(EE+)                                     |
+| acc(ET-)         | In acc(EB-) or acc(EE-)                                     |
+| acc(NT)          | 2.5 < abs(eta) < 2.850                                      |
+| acc(NT+)         | 2.5 < eta < 2.850                                           |
+| acc(NT-)         | -2.850 < eta < -2.5                                         |
+| acc(HF)          | 3.1 < abs(eta) < 4.6                                        |
+| acc(HF+)         | 3.1 < eta < 4.6                                             |
+| acc(HF-)         | -4.6 < eta < -3.1                                           |
+| acc(MUON_TIGHT)  | -2.1 < eta < 2.1                                            |
+| acc(MUON_TIGHT+) | 0 < eta < 2.1                                               |
+| acc(MUON_TIGHT-) | -2.1 < eta < 0                                              |
+| acc(MUON_LOOSE)  | -2.4 < eta < 2.4                                            |
+| acc(MUON_LOOSE+) | 0 < eta < 2.4                                               |
+| acc(MUON_LOOSE-) | -2.4 < eta < 0                                              |
 
 ###### Trigger
 

@@ -42,6 +42,12 @@ namespace zf {
         bool nt = false;
         bool ntm = false;
         bool ntp = false;
+        bool muon_tight = false;
+        bool muon_tight_plus = false;
+        bool muon_tight_minus = false;
+        bool muon_loose = false;
+        bool muon_loose_plus = false;
+        bool muon_loose_minus = false;
         // EB
         if (EB_MIN_ < ETA && ETA < EB_MAX_) {  // In EB
             detector = true;
@@ -86,6 +92,25 @@ namespace zf {
                 hfm = true;
             }
         }
+        // Selection for combination with the muon group, we want to reject in
+        // the gap between EB and EE, so we also require either eb or ee
+        if (FETA < MUON_LOOSE_MAX_ && (eb || ee)) {  // In ML
+            detector = true;
+            muon_loose = true;
+            if (EB_CENT_ < ETA && ETA < MUON_LOOSE_MAX_) {  // In ML+
+                muon_loose_plus = true;
+            } else if (MUON_LOOSE_MIN_ < ETA && ETA < EB_CENT_) {  // In ML-
+                muon_loose_minus = true;
+            }
+            if (FETA < MUON_TIGHT_MAX_) {  // In MT
+                muon_tight = true;
+                if (EB_CENT_ < ETA && ETA < MUON_TIGHT_MAX_) {  // In MT+
+                    muon_tight_plus = true;
+                } else if (MUON_TIGHT_MIN_ < ETA && ETA < EB_CENT_) {  // In MT-
+                    muon_tight_minus = true;
+                }
+            }
+        }
 
         // A special cut to start: ALL is now used to track all events in the
         // sample, which is useful for MC normalization based on the number of
@@ -110,5 +135,12 @@ namespace zf {
         zf_elec->AddCutResult("acc(NT)", nt, WEIGHT);
         zf_elec->AddCutResult("acc(NT+)", ntp, WEIGHT);
         zf_elec->AddCutResult("acc(NT-)", ntm, WEIGHT);
+        zf_elec->AddCutResult("acc(MUON_TIGHT)", muon_tight, WEIGHT);
+        zf_elec->AddCutResult("acc(MUON_TIGHT+)", muon_tight_plus, WEIGHT);
+        zf_elec->AddCutResult("acc(MUON_TIGHT-)", muon_tight_minus, WEIGHT);
+        zf_elec->AddCutResult("acc(MUON_LOOSE)", muon_loose, WEIGHT);
+        zf_elec->AddCutResult("acc(MUON_LOOSE+)", muon_loose_plus, WEIGHT);
+        zf_elec->AddCutResult("acc(MUON_LOOSE-)", muon_loose_minus, WEIGHT);
+
     }
 }  // namespace zf
