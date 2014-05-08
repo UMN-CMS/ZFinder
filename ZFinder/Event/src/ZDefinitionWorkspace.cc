@@ -38,7 +38,7 @@ namespace zf {
         z_eta_ = new RooRealVar("z_eta", "Z_{#eta}", -6, 6);
         z_y_ = new RooRealVar("z_y", "Z_{Y}", -6, 6);
         z_pt_ = new RooRealVar("z_pt", "Z_{p_{T}}", 0, 1000, "GeV");
-        phistar_ = new RooRealVar("phistar", "#phi*", -0.1, 2);
+        phistar_ = new RooRealVar("phistar", "#phi*", -0.1, 10);
         // Electrons
         e0_pt_ = new RooRealVar("e0_pt", "p_{T}^{e_{0}}", 0, 1000, "GeV");
         e0_eta_ = new RooRealVar("e0_eta", "#eta_{e_{0}}", -6, 6);
