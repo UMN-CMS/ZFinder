@@ -39,7 +39,8 @@ process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIs
 from ZFinder.Event.zdefinitions_cfi import zdefs_mc
 from ZFinder.Event.zfinder_cfi import ZFinder
 process.ZFinder = ZFinder.clone(
-        ZDefinitions = zdefs_mc
+        ZDefinitions = zdefs_mc,
+        is_mc = cms.bool(True),
         )
 
 # RUN

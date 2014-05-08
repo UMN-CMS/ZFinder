@@ -86,14 +86,11 @@ class ZFinder : public edm::EDAnalyzer {
         std::map<std::string, zf::ZFinderPlotter*> z_plotter_map_;
         std::vector<zf::SetterBase*> setters_;
         std::vector<edm::ParameterSet> zdef_psets_;
-        std::vector<zf::ZDefinition*> zdefs_reco_;
-        std::vector<zf::ZDefinition*> zdefs_truth_;
-        std::vector<zf::ZDefinitionPlotter*> zdef_plotters_reco_;
-        std::vector<zf::ZDefinitionPlotter*> zdef_plotters_truth_;
-        std::vector<zf::ZDefinitionWorkspace*> zdef_workspaces_reco_;
-        std::vector<zf::ZDefinitionWorkspace*> zdef_workspaces_truth_;
+        std::vector<zf::ZDefinition*> zdefs_;
+        std::vector<zf::ZDefinitionPlotter*> zdef_plotters_;
+        std::vector<zf::ZDefinitionWorkspace*> zdef_workspaces_;
         zf::ZEfficiencies zeffs_;
-
+        bool is_mc_;
 };
 
 //
@@ -110,11 +107,16 @@ class ZFinder : public edm::EDAnalyzer {
 ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     //now do what ever initialization is needed
 
+    // is_mc_ is used to determine if we should make truth objects
+    is_mc_ = iConfig.getParameter<bool>("is_mc");
+
     // Setup Cut Setters
     zf::AcceptanceSetter* accset = new zf::AcceptanceSetter();
     setters_.push_back(accset);
-    zf::TruthMatchSetter* tmset = new zf::TruthMatchSetter();
-    setters_.push_back(tmset);
+    if (is_mc_) {
+        zf::TruthMatchSetter* tmset = new zf::TruthMatchSetter();
+        setters_.push_back(tmset);
+    }
 
     // Setup plotters
     edm::Service<TFileService> fs;
@@ -125,7 +127,6 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
         // Unpack each of the zdef_psets and set up the variables to make both
         // a reco and a truth set
         std::string name_reco = i_pset.getUntrackedParameter<std::string>("name") + " Reco";
-        std::string name_truth = i_pset.getUntrackedParameter<std::string>("name") + " MC";
         std::vector<std::string> cuts0 = i_pset.getUntrackedParameter<std::vector<std::string> >("cuts0");
         std::vector<std::string> cuts1 = i_pset.getUntrackedParameter<std::vector<std::string> >("cuts1");
         double min_mz = i_pset.getUntrackedParameter<double>("min_mz");
@@ -136,23 +137,26 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
         // plotters.
         // Reco
         zf::ZDefinition* zd_reco = new zf::ZDefinition(name_reco, cuts0, cuts1, min_mz, max_mz, use_truth_mass);
-        zdefs_reco_.push_back(zd_reco);
+        zdefs_.push_back(zd_reco);
         TFileDirectory tdir_zd(fs->mkdir(name_reco));
         bool use_truth = false;
         zf::ZDefinitionPlotter* zdp_reco = new zf::ZDefinitionPlotter(*zd_reco, tdir_zd, use_truth);
-        zdef_plotters_reco_.push_back(zdp_reco);
+        zdef_plotters_.push_back(zdp_reco);
         zf::ZDefinitionWorkspace* zdw_reco = new zf::ZDefinitionWorkspace(*zd_reco, tdir_zd, use_truth, true);
-        zdef_workspaces_reco_.push_back(zdw_reco);
+        zdef_workspaces_.push_back(zdw_reco);
 
-        // Truth
-        zf::ZDefinition* zd_truth = new zf::ZDefinition(name_truth, cuts0, cuts1, min_mz, max_mz, use_truth_mass);
-        zdefs_truth_.push_back(zd_truth);
-        TFileDirectory tdir_zd_truth(fs->mkdir(name_truth));
-        use_truth = true;
-        zf::ZDefinitionPlotter* zdp_truth = new zf::ZDefinitionPlotter(*zd_truth, tdir_zd_truth, use_truth);
-        zdef_plotters_truth_.push_back(zdp_truth);
-        zf::ZDefinitionWorkspace* zdw_truth = new zf::ZDefinitionWorkspace(*zd_truth, tdir_zd_truth, use_truth, true);
-        zdef_workspaces_truth_.push_back(zdw_truth);
+        if (is_mc_) {
+            std::string name_truth = i_pset.getUntrackedParameter<std::string>("name") + " MC";
+            // Truth
+            zf::ZDefinition* zd_truth = new zf::ZDefinition(name_truth, cuts0, cuts1, min_mz, max_mz, use_truth_mass);
+            zdefs_.push_back(zd_truth);
+            TFileDirectory tdir_zd_truth(fs->mkdir(name_truth));
+            use_truth = true;
+            zf::ZDefinitionPlotter* zdp_truth = new zf::ZDefinitionPlotter(*zd_truth, tdir_zd_truth, use_truth);
+            zdef_plotters_.push_back(zdp_truth);
+            zf::ZDefinitionWorkspace* zdw_truth = new zf::ZDefinitionWorkspace(*zd_truth, tdir_zd_truth, use_truth, true);
+            zdef_workspaces_.push_back(zdw_truth);
+        }
     }
 }
 
@@ -183,34 +187,16 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
             zeffs_.SetWeights(&zfe);
         }
         // Set all ZDefs
-        for (auto& i_zdef : zdefs_reco_) {
+        for (auto& i_zdef : zdefs_) {
             i_zdef->ApplySelection(&zfe);
         }
-        // Set Truth ZDefs only for MC
-        if (!zfe.is_real_data) {
-            for (auto& i_zdef : zdefs_truth_) {
-                i_zdef->ApplySelection(&zfe);
-            }
-        }
         // Make all ZDef plots
-        for (auto& i_zdefp : zdef_plotters_reco_) {
+        for (auto& i_zdefp : zdef_plotters_) {
             i_zdefp->Fill(zfe);
         }
-        // Only make truth plots for MC
-        if (!zfe.is_real_data) {
-            for (auto& i_zdefp : zdef_plotters_truth_) {
-                i_zdefp->Fill(zfe);
-            }
-        }
         // Make all ZDef workspaces for reco (data and reco MC)
-        for (auto& i_zdefw : zdef_workspaces_reco_) {
+        for (auto& i_zdefw : zdef_workspaces_) {
             i_zdefw->Fill(zfe);
-        }
-        // Only fill with truth quantities for MC
-        if (!zfe.is_real_data) {
-            for (auto& i_zdefw : zdef_workspaces_truth_) {
-                i_zdefw->Fill(zfe);
-            }
         }
     }
 }
@@ -222,10 +208,7 @@ void ZFinder::beginJob() {
 // ------------ method called once each job just after ending the event loop  ------------
 void ZFinder::endJob() {
     // Write all ZDef workspaces
-    for (auto& i_zdefw : zdef_workspaces_reco_) {
-        i_zdefw->Write();
-    }
-    for (auto& i_zdefw : zdef_workspaces_truth_) {
+    for (auto& i_zdefw : zdef_workspaces_) {
         i_zdefw->Write();
     }
 }

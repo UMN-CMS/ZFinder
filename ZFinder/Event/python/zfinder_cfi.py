@@ -19,9 +19,13 @@ ZFinder = cms.EDAnalyzer('ZFinder',
             cms.InputTag('elPFIsoValueGamma03PFIdPFIso'),
             cms.InputTag('elPFIsoValueNeutral03PFIdPFIso')
             ),
-        # MC, but still required to be something for data
+        # Used in MC, but still required to be something for data
         pileupInputTag = cms.InputTag("addPileupInfo"),
         generatorInputTag = cms.InputTag("genParticles"),
-        # ZDefinitions from ZFinder.ZFinder.ZDefinitions_cfi
-        ZDefinitions = zdefs
+        # ZDefinitions from ZFinder.ZFinder.zdefinitions_cfi
+        ZDefinitions = zdefs,
+        # Run on MC or not. If true, every ZDefinition is included twice: once
+        # plotting reco quantities, and once plotting generator quantities. If
+        # false, only the reco quantities are plotted.
+        is_mc = cms.bool(False),
         )
