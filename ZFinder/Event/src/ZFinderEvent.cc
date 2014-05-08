@@ -786,4 +786,17 @@ namespace zf {
             return false;
         }
     }
+
+    ZFinderEvent::~ZFinderEvent() {
+        // Clean up all the heap variables we have declared
+        for (auto& i_elec : reco_electrons_) {
+            delete i_elec;
+        }
+        for (auto& i_elec : hlt_electrons_) {
+            delete i_elec;
+        }
+        for (auto& i_elec : truth_electrons_) {
+            delete i_elec;
+        }
+    }
 }  // namespace zf

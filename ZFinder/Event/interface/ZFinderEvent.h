@@ -62,6 +62,8 @@ namespace zf {
                     const edm::EventSetup& iSetup,
                     const edm::ParameterSet& iConfig
                     );
+            // Destructor
+            ~ZFinderEvent();
 
             // Data or MC
             bool is_real_data;

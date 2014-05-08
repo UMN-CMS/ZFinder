@@ -163,6 +163,20 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
 ZFinder::~ZFinder() {
     // do anything here that needs to be done at destruction time
     // (e.g. close files, deallocate resources etc.)
+
+    // Delete our heap variables
+    for (auto& i_set : setters_) {
+        delete i_set;
+    }
+    for (auto& i_zdef : zdefs_) {
+        delete i_zdef;
+    }
+    for (auto& i_zdefp : zdef_plotters_) {
+        delete i_zdefp;
+    }
+    for (auto& i_zdefw : zdef_workspaces_) {
+        delete i_zdefw;
+    }
 }
 
 
