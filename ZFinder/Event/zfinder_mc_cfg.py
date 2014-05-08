@@ -36,10 +36,10 @@ process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
 process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIsoSequence)
 
 # ZFinder
-from ZFinder.Event.zdefinitions_cfi import zdefs_no_trigger
+from ZFinder.Event.zdefinitions_cfi import zdefs_mc
 from ZFinder.Event.zfinder_cfi import ZFinder
 process.ZFinder = ZFinder.clone(
-        ZDefinitions = zdefs_no_trigger
+        ZDefinitions = zdefs_mc
         )
 
 # RUN
