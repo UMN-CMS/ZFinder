@@ -12,29 +12,29 @@
 
 int main() {
     // Data
-    TFile* data_tfile = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140501_DoubleElectron_2012B/20140501_DoubleElectron_2012B_hadded.root", "READ");
+    TFile* data_tfile = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140506_DoubleElectron_2012B/20140506_DoubleElectron_2012B_hadded.root", "READ");
     DataConfig data_config(
             data_tfile,
-            "ZFinder/ET-ET Combined Double Reco/7 60 < M_{ee} < 120",
+            "ZFinder/Combined Double Reco/7 60 < M_{ee} < 120",
             "Data",
             -1.,  // -1 means area normalize all MC to match under the signal peak
             DATA
             );
     // Signal MC
-    TFile* mc_tfile = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140504_2012B_reweight_Summer12_DR53X_DYToEE_M-20_CT10_TuneZ2star_8TeV-powheg-pythia6/20140504_2012B_reweight_Summer12_DR53X_DYToEE_M-20_CT10_TuneZ2star_8TeV-powheg-pythia6_hadded.root", "READ");
+    TFile* mc_tfile = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140506_2012B_reweight_Summer12_DR53X_DYToEE_M-20_CT10_TuneZ2star_8TeV-powheg-pythia6/20140506_2012B_reweight_Summer12_DR53X_DYToEE_M-20_CT10_TuneZ2star_8TeV-powheg-pythia6_hadded.root", "READ");
     DataConfig mc_config(
             mc_tfile,
-            "ZFinder/ET-ET Combined Double Reco/6 60 < M_{ee} < 120",
+            "ZFinder/Combined Double Reco/6 60 < M_{ee} < 120",
             "Signal MC",
             12234.4,  // cross section in pb, from https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV
             "ZFinder/All Electrons Reco/0 acc(ALL) AND acc(ALL)",  // TDir from before any cut
             SIGNAL_MC
             );
     // BG
-    TFile* bg_tfile = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140504_TTBar/20140504_TTBar_hadded.root", "READ");
+    TFile* bg_tfile = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140506_TTBar/20140506_TTBar_hadded.root", "READ");
     DataConfig bg_config(
             bg_tfile,
-            "ZFinder/ET-ET Combined Double Reco/6 60 < M_{ee} < 120",
+            "ZFinder/Combined Double Reco/6 60 < M_{ee} < 120",
             "T-TBar",
             24.,  // TTBar Inclusive is 245.8 Pb, T->Wq is 0.9621, W->lnu is 0.3257, might be off by a factor of 3!!!!!
             "ZFinder/All Electrons Reco/0 acc(ALL) AND acc(ALL)",
