@@ -205,6 +205,10 @@ namespace zf {
         for(unsigned int i = 0; i < els_h->size(); ++i) {
             // Get the electron and set put it into the electrons vector
             reco::GsfElectron electron = els_h->at(i);
+            // We enforce a minimum quality cut
+            if (electron.pt() < 20) {
+                continue;
+            }
             ZFinderElectron* zf_electron = AddRecoElectron(electron);
 
             // get reference to electron and the electron
@@ -274,6 +278,10 @@ namespace zf {
         for(unsigned int i = 0; i < els_h->size(); ++i) {
             // Get the electron and set put it into the electrons vector
             reco::RecoEcalCandidate electron = els_h->at(i);
+            // We enforce a minimum quality cut
+            if (electron.pt() < 20) {
+                continue;
+            }
             ZFinderElectron* zf_electron = AddRecoElectron(electron);
 
             reco::SuperClusterRef cluster_ref = electron.superCluster();
@@ -323,6 +331,10 @@ namespace zf {
         // Loop over all electrons
         for(unsigned int i = 0; i < els_h->size(); ++i) {
             reco::Photon electron = els_h->at(i);
+            // We enforce a minimum quality cut
+            if (electron.pt() < 20) {
+                continue;
+            }
             // Because the photon collect is NOT filtered for electrons, we
             // reject all electrons outside of the NT region of ECAL.
             if (2.5 < fabs(electron.eta()) && fabs(electron.eta()) < 2.850) {
