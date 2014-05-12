@@ -54,6 +54,9 @@ namespace zf {
         e1_charge_->defineType("Negative", -1);
         // Event
         n_vert_ = new RooRealVar("n_vert", "Number of Vertices", 0, 100);
+        // We use an unsigned int in ZFinderEvent, so event number must be
+        // within these bounds
+        event_num_ = new RooRealVar("event_num", "Event Number", 0, 4294967295);
         data_type_ = new RooCategory("data_type", "Is the event from Data, or MC?");
         data_type_->defineType("Truth MC");
         data_type_->defineType("Reco MC");
@@ -86,6 +89,7 @@ namespace zf {
         argset_->add(*numerator_);
         argset_->add(*degenerate_);
         argset_->add(*weight_);
+        argset_->add(*event_num_);
 
         // Dataset
         roodataset_ = new RooDataSet(
@@ -219,6 +223,7 @@ namespace zf {
         argset_->setRealValue("e1_eta", e_probe->eta);
         argset_->setCatIndex("e1_charge", e_probe->charge);
         argset_->setRealValue("n_vert", verts);
+        argset_->setRealValue("event_num", zf_event.id.event_num);
 
         // We set the weight to be equal to the weight of the last cut level.
         double weight = 1.;
@@ -261,6 +266,7 @@ namespace zf {
         delete weight_;
         delete data_type_;
         delete numerator_;
+        delete event_num_;
         delete argset_;
         delete degenerate_;
         delete roodataset_;

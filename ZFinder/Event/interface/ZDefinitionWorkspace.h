@@ -63,6 +63,7 @@ namespace zf {
             RooCategory* e1_charge_;
             // Event
             RooRealVar* n_vert_;
+            RooRealVar* event_num_;
             RooRealVar* weight_;
             RooCategory* data_type_;
             RooCategory* numerator_;
