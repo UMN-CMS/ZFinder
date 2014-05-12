@@ -120,7 +120,7 @@ namespace zf {
         baseweights_->GetXaxis()->SetTitle("Weight");
         baseweights_->GetYaxis()->SetTitle("Events");
 
-        // baseweights
+        // fullweights
         const std::string fullweights_name = "Full Weight";
         fullweights_ = tdir.make<TH1D>(fullweights_name.c_str(), fullweights_name.c_str(), 500, 0., 5.);
         fullweights_->GetXaxis()->SetTitle("Weight");
