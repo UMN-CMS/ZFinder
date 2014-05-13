@@ -18,7 +18,7 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 // ZFinder Code
-#include "ZFinderEvent.h"  // ZFinderEvent, CutLevel, ZData
+#include "ZFinderEvent.h"  // ZFinderEvent, ZData
 #include "ZDefinition.h"  // ZDefinition
 
 

@@ -20,37 +20,13 @@
 
 // ZFinder
 #include "ZFinder/Event/interface/ZFinderElectron.h"  // ZFinderElectron, ZFinderElectron
+#include "ZFinder/Event/interface/CutLevel.h"  // CutLevel, cutlevel_pair, cutlevel_vector
 
 namespace zf {
 
-    // Cut level struct
-    struct CutLevel{
-        // Constructor sets all values to false
-        CutLevel() {
-            pass = false;
-            t0p1_pass = false;
-            t0p1_eff = 1.;
-            t1p0_pass = false;
-            t1p0_eff = 1.;
-            event_weight = 1.;
-        }
-        bool pass;
-        bool t0p1_pass;
-        bool t1p0_pass;
-        double t0p1_eff;
-        double t1p0_eff;
-        double event_weight;
-    };
-
-
-    // Used to match cut levels to names
-    typedef std::pair<std::string, CutLevel> cutlevel_pair;
-    // Used to pass around cut levels
-    typedef std::vector<cutlevel_pair> cutlevel_vector;
     // Used to pass around trigger objects for matching
     typedef std::pair<const trigger::TriggerObject*, double> trig_dr_pair;
     typedef std::vector<trig_dr_pair> trig_dr_vec;
-
 
     class ZFinderEvent{
         public:

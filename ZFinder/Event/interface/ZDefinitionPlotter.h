@@ -10,7 +10,7 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 // ZFinder Code
-#include "ZFinderEvent.h"  // ZFinderEvent, cutlevel_vector
+#include "ZFinderEvent.h"  // ZFinderEvent
 #include "ZFinderPlotter.h"  // ZFinderPlotter
 #include "ZDefinition.h"  // ZDefinition
 

@@ -5,6 +5,7 @@
 #include <sstream>  // std::ostringstream
 
 // ZFinder Code
+#include "ZFinder/Event/interface/CutLevel.h"  // CutLevel, cutlevel_vector
 #include "ZFinder/Event/interface/ZFinderElectron.h"  // ZFinderElectron
 
 

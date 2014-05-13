@@ -7,7 +7,8 @@
 #include <utility>  // std::pair
 
 // ZFinder
-#include "ZFinder/Event/interface/ZFinderEvent.h"  // ZFinderEvent, cutlevel_vector
+#include "ZFinder/Event/interface/CutLevel.h"  // CutLevel, cutlevel_vector
+#include "ZFinder/Event/interface/ZFinderEvent.h"  // ZFinderEvent
 #include "ZFinder/Event/interface/ZFinderElectron.h"  // ZFinderElectron
 
 

@@ -4,6 +4,9 @@
 #include <utility>      // std::make_pair
 #include <sstream>  // std::ostringstream
 
+// ZFinder Code
+#include "ZFinder/Event/interface/CutLevel.h"  // cutlevel_vector
+
 
 namespace zf {
     // Constructor
