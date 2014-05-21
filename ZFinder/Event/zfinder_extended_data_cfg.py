@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("ZFinderMC")
+process = cms.Process("ZFinderData")
 
 # Set up message output and logging
 from FWCore.MessageService.MessageLogger_cfi import MessageLogger
@@ -18,13 +18,22 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input file
 process.source = cms.Source("PoolSource",
-        fileNames = cms.untracked.vstring('file:/local/cms/phedex/store/mc/Summer12_DR53X/DYToEE_M-20_CT10_TuneZ2star_8TeV-powheg-pythia6/AODSIM/PU_S10_START53_V7A-v1/0000/AC6646E7-36F0-E111-B2F8-00259073E3FC.root')
+        fileNames = cms.untracked.vstring('file:/local/cms/phedex/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/003EC246-5E67-E211-B103-00259059642E.root')
         )
 
 # Output file
 process.TFileService = cms.Service("TFileService",
-        fileName = cms.string("test_mc.root")
+        fileName = cms.string("test_extended_data.root")
         )
+
+# Run only on lumis specified in the lumi file
+# Recipe from:
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePythonTips#Use_a_JSON_file_of_good_lumi_sec
+from FWCore.ParameterSet.Types import untracked, VLuminosityBlockRange
+from FWCore.PythonUtilities.LumiList import LumiList
+json_file = "../../Metadata/lumi_json/Run2012ABCD.json"  # File location
+run_2012abcd_lumis = LumiList(filename = json_file).getCMSSWString().split(',')
+process.source.lumisToProcess = untracked(VLuminosityBlockRange(run_2012abcd_lumis))
 
 # Import rho value for isolation correction
 from ZFinder.Event.kt6_pfjets_cfi import kt6PFJetsForIsolation
@@ -36,12 +45,8 @@ process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
 process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIsoSequence)
 
 # ZFinder
-from ZFinder.Event.zdefinitions_cfi import zdefs_mc
 from ZFinder.Event.zfinder_cfi import ZFinder
-process.ZFinder = ZFinder.clone(
-        ZDefinitions = zdefs_mc,
-        is_mc = cms.bool(True),
-        )
+process.ZFinder = ZFinder.clone()
 
 # RUN
 process.p = cms.Path(

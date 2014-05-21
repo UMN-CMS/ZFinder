@@ -109,25 +109,35 @@ ecal_hf_no_trigger = ecal_hf.clone(
         cuts1 = cms.untracked.vstring("acc(ALL)", "acc(HF)", "pt>20", "hf_2dloose"),
         )
 
-# The ZDefinition for data
-zdefs = cms.untracked.VPSet(
+# The ZDefinition for use on data for the extended electron result
+zdefs_extended_data = cms.untracked.VPSet(
         all_electrons,
-        combined_reco_cuts,
-        combined_double,
-        combined_single,
         ecal_ecal,
         ecal_nt,
         ecal_hf,
         )
 
-# The ZDefinition for MC
-zdefs_mc = cms.untracked.VPSet(
+# The ZDefinition for use on MC for the extended electron result
+zdefs_extended_mc = cms.untracked.VPSet(
+        all_electrons,
+        ecal_ecal_no_trigger,
+        ecal_nt_no_trigger,
+        ecal_hf_no_trigger,
+        )
+
+# The ZDefinition for use on data for the combined result
+zdefs_combined_data = cms.untracked.VPSet(
+        all_electrons,
+        combined_reco_cuts,
+        combined_double,
+        combined_single,
+        )
+
+# The ZDefinition for use on MC for the combined result
+zdefs_combined_mc = cms.untracked.VPSet(
         all_electrons,
         combined_gen_cuts,
         combined_reco_cuts,
         combined_double_no_trigger,
         combined_single_no_trigger,
-        ecal_ecal_no_trigger,
-        ecal_nt_no_trigger,
-        ecal_hf_no_trigger,
         )
