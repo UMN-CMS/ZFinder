@@ -49,6 +49,7 @@ from ZFinder.Event.zdefinitions_cfi import zdefs_combined_data
 from ZFinder.Event.zfinder_cfi import ZFinder
 process.ZFinder = ZFinder.clone(
         ZDefinitions = zdefs_combined_data,
+        use_muon_acceptance = cms.bool(True),
         )
 
 # RUN

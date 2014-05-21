@@ -71,6 +71,10 @@ namespace zf {
         inputtags_.pileup = iConfig.getParameter<edm::InputTag>("pileupInputTag");
         inputtags_.generator = iConfig.getParameter<edm::InputTag>("generatorInputTag");
 
+        // Use the muon acceptance requirements to select electrons before
+        // making Zs
+        use_muon_acceptance_ = iConfig.getParameter<bool>("use_muon_acceptance");
+
         // Set up the lumi reweighting, but only if it is MC.
         if (!is_real_data && lumi_weights_ == NULL) {
             lumi_weights_ = new edm::LumiReWeighting(
@@ -209,6 +213,9 @@ namespace zf {
             if (electron.pt() < 20) {
                 continue;
             }
+            if (use_muon_acceptance_ && fabs(electron.eta()) > 2.4) {
+                continue;
+            }
             ZFinderElectron* zf_electron = AddRecoElectron(electron);
 
             // get reference to electron and the electron
@@ -282,6 +289,9 @@ namespace zf {
             if (electron.pt() < 20) {
                 continue;
             }
+            if (use_muon_acceptance_ && fabs(electron.eta()) > 2.4) {
+                continue;
+            }
             ZFinderElectron* zf_electron = AddRecoElectron(electron);
 
             reco::SuperClusterRef cluster_ref = electron.superCluster();
@@ -335,6 +345,9 @@ namespace zf {
             if (electron.pt() < 20) {
                 continue;
             }
+            if (use_muon_acceptance_ && fabs(electron.eta()) > 2.4) {
+                continue;
+            }
             // Because the photon collect is NOT filtered for electrons, we
             // reject all electrons outside of the NT region of ECAL.
             if (2.5 < fabs(electron.eta()) && fabs(electron.eta()) < 2.850) {
@@ -363,6 +376,23 @@ namespace zf {
 
     void ZFinderEvent::InitZ() {
         if (e0 != NULL && e1 != NULL) {
+            // Sometimes we want to preselect our electrons using the muon acceptance
+            if (use_muon_acceptance_) {
+                const double FETA0 = fabs(e0->eta);
+                const double FETA1 = fabs(e1->eta);
+                // Both electrons have already passed the looser pt>20 and
+                // |eta|<2.4 selection, so we just need one that passes the
+                // tighter pt>30 and |eta|<2.1 selection
+                if (
+                    !(
+                        (FETA0 < 2.1 && e0->pt > 30)
+                        || (FETA1 < 2.1 && e1->pt > 30)
+                    )
+                ) {
+                    return;
+                }
+            }
+
             // Set Z properties
             const double ELECTRON_MASS = 5.109989e-4;
             math::PtEtaPhiMLorentzVector e0lv(e0->pt, e0->eta, e0->phi, ELECTRON_MASS);

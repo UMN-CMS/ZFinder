@@ -28,4 +28,8 @@ ZFinder = cms.EDAnalyzer('ZFinder',
         # plotting reco quantities, and once plotting generator quantities. If
         # false, only the reco quantities are plotted.
         is_mc = cms.bool(False),
+        # Use the muon acceptance (pt>30 & |eta| < 2.1 + pt>20 & |eta|<2.4) to
+        # select electrons to make into ZFinderElectrons. This means that only
+        # these electrons will be considered to make Zs.
+        use_muon_acceptance = cms.bool(False)
         )

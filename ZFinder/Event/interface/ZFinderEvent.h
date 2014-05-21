@@ -198,6 +198,9 @@ namespace zf {
 
             // Pileup reweighting
             static edm::LumiReWeighting* lumi_weights_;
+
+            // Use the muon acceptance requirements to select electrons
+            bool use_muon_acceptance_;
     };
 }  // namespace zf
 #endif  // ZFINDER_ZFINDEREVENT_H_
