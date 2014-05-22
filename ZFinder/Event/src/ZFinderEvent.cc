@@ -153,8 +153,11 @@ namespace zf {
 
         /* Find electrons */
         InitGSFElectrons(iEvent, iSetup);
-        InitHFElectrons(iEvent, iSetup);
-        InitNTElectrons(iEvent, iSetup);
+        if (!use_muon_acceptance_) {
+            // HF and NT electrons are NEVER in the muon acceptance
+            InitHFElectrons(iEvent, iSetup);
+            InitNTElectrons(iEvent, iSetup);
+        }
 
         // Sort our electrons and set e0, e1 as the two with the highest pt
         std::sort(reco_electrons_.begin(), reco_electrons_.end(), SortByPTHighLow);
@@ -289,9 +292,6 @@ namespace zf {
             if (electron.pt() < 20) {
                 continue;
             }
-            if (use_muon_acceptance_ && fabs(electron.eta()) > 2.4) {
-                continue;
-            }
             ZFinderElectron* zf_electron = AddRecoElectron(electron);
 
             reco::SuperClusterRef cluster_ref = electron.superCluster();
@@ -343,9 +343,6 @@ namespace zf {
             reco::Photon electron = els_h->at(i);
             // We enforce a minimum quality cut
             if (electron.pt() < 20) {
-                continue;
-            }
-            if (use_muon_acceptance_ && fabs(electron.eta()) > 2.4) {
                 continue;
             }
             // Because the photon collect is NOT filtered for electrons, we
