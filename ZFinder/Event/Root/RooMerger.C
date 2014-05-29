@@ -24,45 +24,57 @@
 using namespace RooFit;
 //using namespace RooStats;
 
-void RooMerger(const std::string dirname, int njobs, const char* outputfile){
+void RooMerger(const std::string dirname, int njobs, std::string baseoutputfile, const std::string selectionname = ""){
+  int start=0;
+  int entriesmax=600000;
   stringstream ss;
   ss<<0;
   std::string num = ss.str();
   std::string zero = ss.str();
-  
-  std::string filename= dirname+zero+zero+num+".root";
-  std::cout<<filename<<std::endl;
-  const char *fzero=filename.c_str();
-  TFile * f= new TFile(fzero, "READ");
-  RooWorkspace* w =(RooWorkspace*) f->Get("ZFinder/w");
-  RooDataSet& mc_reco_merged = *((RooDataSet*) w->data("mc_reco_dataset") );
-  RooDataSet& data_reco_merged = *((RooDataSet*) w->data("data_reco_dataset") );
-  RooDataSet& mc_truth_merged = *((RooDataSet*) w->data("mc_truth_dataset") );
-  f->Close();
-  for (int i=1; i<njobs;i++){
-    //    if (i==56)continue;
-    stringstream ssnum;
-    ssnum<<i;
-    num = ssnum.str();
-    filename=dirname;
-    if (i<100){filename=filename+zero;}
-    if (i<10){filename=filename+zero;}
-    filename=filename+num+".root";
+
+  while (start<njobs-1){
+
+    std::string filename="";
+    stringstream sstemp;
+    sstemp<<start;
+    if (start<10){filename= dirname+zero+zero+sstemp.str()+".root";}
+    else if (start<100){filename= dirname+zero+sstemp.str()+".root";}
+    else {filename= dirname+sstemp.str()+".root";}
+
     std::cout<<filename<<std::endl;
-    const char *fnum=filename.c_str();
-    f= new TFile(fnum, "READ");
-    w =(RooWorkspace*) f->Get("ZFinder/w");
-    RooDataSet& MC_reco = *((RooDataSet*) w->data("mc_reco_dataset") );
-    RooDataSet& Data_reco = *((RooDataSet*) w->data("data_reco_dataset") );
-    RooDataSet& MC_true_all = *((RooDataSet*) w->data("mc_truth_dataset") );
-    mc_reco_merged.append(MC_reco);
-    data_reco_merged.append(Data_reco);
-    mc_truth_merged.append(MC_true_all);
+    const char *fzero=filename.c_str();
+    TFile * f= new TFile(fzero, "READ");
+    std::string workspacedirname="ZFinder/"+selectionname+"/workspace";
+    const char *workspacedir=workspacedirname.c_str();
+
+    RooWorkspace* w =(RooWorkspace*) f->Get(workspacedir);
+
+    RooDataSet&  roo_dataset= *((RooDataSet*) w->data("roo_dataset") );
     f->Close();
+    for (int i=start+1; i<njobs && roo_dataset.numEntries()<entriesmax;i++){
+      stringstream ssnum;
+      ssnum<<i;
+      num = ssnum.str();
+      filename=dirname;
+      if (i<100){filename=filename+zero;}
+      if (i<10){filename=filename+zero;}
+      filename=filename+num+".root";
+      std::cout<<filename<<std::endl;
+      const char *fnum=filename.c_str();
+      f= new TFile(fnum, "READ");
+      w =(RooWorkspace*) f->Get(workspacedir);
+      RooDataSet&  roo_dataset_temp= *((RooDataSet*) w->data("roo_dataset") );
+      roo_dataset.append(roo_dataset_temp);
+      cout<<roo_dataset.numEntries()<<endl;
+      f->Close();
+      start=i;
+    }
+    std::string outputfile=baseoutputfile;
+    outputfile+="_";
+    outputfile+=sstemp.str();
+    outputfile+=".root";
+    RooWorkspace* w_merged =new RooWorkspace("w_merged","workspace");
+    w_merged->import(roo_dataset);
+    w_merged->writeToFile(outputfile.c_str());
   }
-  RooWorkspace* w_merged =new RooWorkspace("w_merged","workspace");
-  w_merged->import(mc_reco_merged);
-  w_merged->import(data_reco_merged);
-  w_merged->import(mc_truth_merged);
-  w_merged->writeToFile(outputfile);
 }
