@@ -44,6 +44,11 @@ void RooMerger(const std::string dirname, int njobs, std::string baseoutputfile,
     std::cout<<filename<<std::endl;
     const char *fzero=filename.c_str();
     TFile * f= new TFile(fzero, "READ");
+    // Check that the file opened OK
+    if (f->IsZombie()) {
+      continue;
+    }
+
     std::string workspacedirname="ZFinder/"+selectionname+"/workspace";
     const char *workspacedir=workspacedirname.c_str();
 
@@ -62,6 +67,11 @@ void RooMerger(const std::string dirname, int njobs, std::string baseoutputfile,
       std::cout<<filename<<std::endl;
       const char *fnum=filename.c_str();
       f= new TFile(fnum, "READ");
+      // Check that the file opened OK
+      if (f->IsZombie()) {
+          continue;
+      }
+
       w =(RooWorkspace*) f->Get(workspacedir);
       RooDataSet&  roo_dataset_temp= *((RooDataSet*) w->data("roo_dataset") );
       roo_dataset.append(roo_dataset_temp);
