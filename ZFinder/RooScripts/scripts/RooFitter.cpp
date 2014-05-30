@@ -172,10 +172,10 @@ int RooFitter(
     precut_fitpdf.fitTo(*data_reco);
     postcut_fitpdf.fitTo(*postcut_data_reco);
 
-    TCanvas* const c = get_tcanvas();
+    TCanvas* const canvas = get_tcanvas();
     const RooBinning* const binning = get_roobinning(ETET);
     // Plot the left side
-    c->cd(1);
+    canvas->cd(1);
     RooPlot* precut_fitframe = z_mass.frame(50, 150); ///, Title(name));
     data_reco->plotOn(precut_fitframe, Binning(*binning));
     precut_fitpdf.plotOn(precut_fitframe, Components(bg_pdf), LineColor(kRed), LineStyle(kDashed));
@@ -184,13 +184,15 @@ int RooFitter(
     precut_fitframe->Draw();
 
     // Plot the right side
-    c->cd(2);
+    canvas->cd(2);
     RooPlot* postcut_fitframe = z_mass.frame(50, 150); ///, Title(name));
     postcut_data_reco->plotOn(postcut_fitframe, Binning(*binning));
     postcut_fitpdf.plotOn(postcut_fitframe, Components(bg_pdf), LineColor(kRed), LineStyle(kDashed));
     postcut_fitpdf.plotOn(postcut_fitframe, LineColor(kBlue));
 
     postcut_fitframe->Draw();
+
+    canvas->Print("Test.png", "png");
 
     /*
        double acceptance[ETA_BINS.size()][PHISTAR_BINS.size()];
