@@ -23,8 +23,6 @@ enum Z_TYPES{
     ETHF
 };
 
-RooBinning* get_roobinning(const Z_TYPES& Z_TYPE);
-
 // Set up the TCanvas
 TCanvas* get_tcanvas(const int X_DIM = 1280, const int Y_DIM = 640);
 

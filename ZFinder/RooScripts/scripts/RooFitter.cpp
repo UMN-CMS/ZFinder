@@ -11,48 +11,18 @@
 #include "RooArgSet.h"
 #include "RooBinning.h"
 #include "RooCategory.h"
+#include "RooDataHist.h"
 #include "RooDataSet.h"
+#include "RooFitter.h"
 #include "RooFormulaVar.h"
 #include "RooGenericPdf.h"
-#include "RooKeysPdf.h"
+#include "RooHistPdf.h"
 #include "RooPlot.h"
 #include "RooRealVar.h"
 #include "RooWorkspace.h"
 
-// RooFitter
-#include "RooFitter.h"
-
-
 using namespace RooFit;
 
-
-RooBinning* get_roobinning(const Z_TYPES& Z_TYPE) {
-    // Set bounds of the plot and signal region
-    const int LEFT_EDGE = 0;     // Left edge of the plot
-    const int LEFT_SIG = 80;     // Left edge of the signal region
-    const int RIGHT_SIG = 100;   // Right edge of the signal region
-    const int RIGHT_EDGE = 200;  // Right edge of the plot
-
-    // Set up a roobinning to return based on the type of Z
-    RooBinning* roobinning = new RooBinning(0, 200);
-    switch(Z_TYPE) {
-        case ETET:
-            roobinning->addUniform(8, LEFT_EDGE, LEFT_SIG);
-            roobinning->addUniform(20, LEFT_SIG, RIGHT_SIG);
-            roobinning->addUniform(10, RIGHT_SIG, RIGHT_EDGE);
-            return roobinning;
-        case ETNT:
-        case ETHF:
-            roobinning->addUniform(4, LEFT_EDGE, LEFT_SIG);
-            roobinning->addUniform(6, LEFT_SIG, RIGHT_SIG);
-            roobinning->addUniform(5, RIGHT_SIG, RIGHT_EDGE);
-            return roobinning;
-        default:
-            std::cout << "Invalid Z_TYPE" << std::endl;
-            delete roobinning;  // Clean up our pointer
-            return NULL;
-    }
-}
 
 TCanvas* get_tcanvas(const int X_DIM, const int Y_DIM) {
     TCanvas* tcan = new TCanvas("canvas", "canvas", X_DIM, Y_DIM);
@@ -143,19 +113,30 @@ int RooFitter(
     argset.add(numerator);
     argset.add(degenerate);
 
+    // Try to set binning
+    RooBinning* binning = new RooBinning(0, 1000);
+    binning->addUniform(500, 0, 1000);
+    z_mass.setBinning(*binning);
+    z_mass.setRange("signal", 80, 100);
+    z_mass.setRange("analysis", 60, 120);
+
     // Load the workspaces from the already open TFiles
     RooWorkspace* w_data = static_cast<RooWorkspace*>(DATA_FILE->Get(DATA_WS.c_str()));
     RooDataSet* data_reco = static_cast<RooDataSet*>(w_data->data("roo_dataset"));
     RooWorkspace* w_mc = static_cast<RooWorkspace*>(MC_FILE->Get(MC_WS.c_str()));
     RooDataSet* mc_reco = static_cast<RooDataSet*>(w_mc->data("roo_dataset"));
+    RooDataHist precut_data_hist("precut_data_hist", "Data before applying cuts", z_mass, *data_reco);
 
     // Select events from before and after the last cut
     RooDataSet* precut_mc_reco = mc_reco;
     RooDataSet* postcut_mc_reco = static_cast<RooDataSet*>(mc_reco->reduce("numerator==1"));
-    RooKeysPdf precut_signalpdf("precut_signalpdf", "Signal PDF from MC before apply the last cut", z_mass, *precut_mc_reco);
-    RooKeysPdf postcut_signalpdf("postcut_signalpdf", "Signal PDF from MC after applying all cuts", z_mass, *postcut_mc_reco);
+    RooDataHist precut_mc_histo("precut_mc_histo", "precut_mc_histo", RooArgSet(z_mass), *precut_mc_reco);
+    RooDataHist postcut_mc_histo("postcut_mc_histo", "postcut_mc_histo", RooArgSet(z_mass), *postcut_mc_reco);
+    RooHistPdf precut_signalpdf("precut_signalpdf", "Signal PDF from MC before apply the last cut", z_mass, precut_mc_histo);
+    RooHistPdf postcut_signalpdf("postcut_signalpdf", "Signal PDF from MC after applying all cuts", z_mass, postcut_mc_histo);
 
     RooDataSet* postcut_data_reco = static_cast<RooDataSet*>(data_reco->reduce("numerator==1"));
+    RooDataHist postcut_data_hist("postcut_data_hist", "Data after applying cuts", z_mass, *postcut_data_reco);
 
     // Set up the background
     RooRealVar alpha("alpha", "alpha", 60., 0.1, 1000.);
@@ -169,98 +150,32 @@ int RooFitter(
     RooAddPdf precut_fitpdf("precut_fitpdf", "precut_fitpdf", RooArgList(bg_pdf, precut_signalpdf), RooArgList(sigratio));
     RooAddPdf postcut_fitpdf("postcut_fitpdf", "postcut_fitpdf", RooArgList(bg_pdf, postcut_signalpdf), RooArgList(sigratio));
 
-    precut_fitpdf.fitTo(*data_reco);
-    postcut_fitpdf.fitTo(*postcut_data_reco);
+    precut_fitpdf.fitTo(precut_data_hist, Range(50, 150), NumCPU(8), Verbose(false));
+    postcut_fitpdf.fitTo(postcut_data_hist, Range(50, 150), NumCPU(8), Verbose(false));
 
-    TCanvas* const canvas = get_tcanvas();
-    const RooBinning* const binning = get_roobinning(ETET);
+    TCanvas* const canvas = get_tcanvas(1200, 1000);
     // Plot the left side
     canvas->cd(1);
-    RooPlot* precut_fitframe = z_mass.frame(50, 150); ///, Title(name));
-    data_reco->plotOn(precut_fitframe, Binning(*binning));
-    precut_fitpdf.plotOn(precut_fitframe, Components(bg_pdf), LineColor(kRed), LineStyle(kDashed));
-    precut_fitpdf.plotOn(precut_fitframe, LineColor(kBlue));
+    canvas->SetLogy();
+    RooPlot* precut_fitframe = z_mass.frame(50, 150);
+    precut_data_hist.plotOn(precut_fitframe, NumCPU(8));
+    precut_fitpdf.plotOn(precut_fitframe, Components(bg_pdf), LineColor(kRed), LineStyle(kDashed), NumCPU(8));
+    precut_fitpdf.plotOn(precut_fitframe, LineColor(kBlue), NumCPU(8));
 
     precut_fitframe->Draw();
 
     // Plot the right side
     canvas->cd(2);
-    RooPlot* postcut_fitframe = z_mass.frame(50, 150); ///, Title(name));
-    postcut_data_reco->plotOn(postcut_fitframe, Binning(*binning));
-    postcut_fitpdf.plotOn(postcut_fitframe, Components(bg_pdf), LineColor(kRed), LineStyle(kDashed));
-    postcut_fitpdf.plotOn(postcut_fitframe, LineColor(kBlue));
+    canvas->SetLogy();
+    RooPlot* postcut_fitframe = z_mass.frame(50, 150);
+    postcut_data_hist.plotOn(postcut_fitframe, NumCPU(8));
+    postcut_fitpdf.plotOn(postcut_fitframe, Components(bg_pdf), LineColor(kRed), LineStyle(kDashed), NumCPU(8));
+    postcut_fitpdf.plotOn(postcut_fitframe, LineColor(kBlue), NumCPU(8));
 
     postcut_fitframe->Draw();
 
     canvas->Print("Test.png", "png");
 
-    /*
-       double acceptance[ETA_BINS.size()][PHISTAR_BINS.size()];
-
-       for (unsigned int i_eta = 0; i_eta < ETA_BINS.size(); ++i_eta){
-    // Initialize the eta cut
-    TString eta_cut = "abs(z_eta) >";
-    eta_cut += double(ETA_BINS[i_eta]);
-    eta_cut +="&& abs(z_eta) <";
-    eta_cut += double(ETA_BINS[i_eta+1]);
-
-    RooDataSet* mc_reco_etabin = static_cast<RooDataSet*>(mc_reco->reduce(argset, eta_cut));
-    RooDataSet* data_reco_etabin = static_cast<RooDataSet*>(data_reco->reduce(argset, eta_cut));
-    for (unsigned int i_phistar = 0; i_phistar < PHISTAR_BINS.size(); ++i_phistar){
-    // Initialize the phistar cut
-    TString phistar_cut = "phistar > ";
-    phistar_cut += double(PHISTAR_BINS[i_phistar]);
-    phistar_cut +="&& phistar < ";
-    phistar_cut += double(PHISTAR_BINS[i_phistar+1]);
-
-    RooDataSet* mc_reco_phistarbin = static_cast<RooDataSet*>(mc_reco_etabin->reduce(argset, phistar_cut));
-    RooDataSet* data_reco_phistarbin = static_cast<RooDataSet*>(data_reco_etabin->reduce(argset, phistar_cut));
-
-    // Plot
-    // TCanvas* c=new TCanvas();
-    // c->cd();
-    // RooPlot* xframe = z_mass.frame(0, 200);
-    // data_reco_phistarbin->plotOn(xframe);
-    // xframe->Draw();
-    //if (mc_true_all_phistarbin->sumEntries() > 0) {
-    //  acceptance[i_eta][i_phistar] = mc_reco_phistarbin->sumEntries() / mc_true_all_phistarbin->sumEntries();
-    //} else {
-    //  acceptance[i_eta][i_phistar] = 0;
-    //}
-
-    //RooDataHist h_data("h_data", "h_data", RooArgSet(z_mass), *data_reco_phistarbin);
-    //RooDataHist h_mc("h_mc", "h_mc", RooArgSet(z_mass), *mc_reco_phistarbin);
-    //cout<<"going to make keyspdf"<<endl;
-    //RooHistPdf signalpdf("signalpdf", "signalpdf", z_mass, h_mc);
-    ////   RooKeysPdf signalpdf("signalpdf", "signalpdf", z_mass, *mc_reco_phistarbin);
-    //cout<<"Pdf done"<<endl;
-    //RooRealVar sigratio("sigratio", "sigratio", 0.5, 0.0, 1.0);
-    ////    sigratio.setRange(0.5, 0.5);
-    //RooAddPdf fitpdf("fitpdf", "fitpdf", RooArgList(bg_pdf, signalpdf), RooArgList(sigratio));
-
-    //fitpdf.fitTo(h_data);
-
-    //TString name="";
-    //name+=double(ETA_BINS[i_eta]);
-    //name+="<eta<";
-    //name+=double(ETA_BINS[i_eta+1]);
-    //name+=", ";
-    //name+=double(PHISTAR_BINS[i_phistar]);
-    //name+="<phistar<";
-    //name+=double(PHISTAR_BINS[i_phistar+1]);
-
-    //TCanvas* c=new TCanvas();
-    //c->cd();
-    //RooPlot* fitFrame = z_mass.frame(0, 200); ///, Title(name));
-    //h_data.plotOn(fitFrame);
-    //fitpdf.plotOn(fitFrame, Components(bg_pdf), LineColor(kRed));
-    //fitpdf.plotOn(fitFrame, Components(signalpdf), LineColor(kBlue));
-    //fitFrame->Draw();
-    //break;
-    }
-    //break;
-    }
-    */
     return 0;
 }
 
