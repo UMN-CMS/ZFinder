@@ -119,6 +119,7 @@ int RooFitter(
     z_mass.setBinning(*binning);
     z_mass.setRange("signal", 80, 100);
     z_mass.setRange("analysis", 60, 120);
+    z_mass.setRange("plot range", 50, 150);
 
     // Load the workspaces from the already open TFiles
     RooWorkspace* w_data = static_cast<RooWorkspace*>(DATA_FILE->Get(DATA_WS.c_str()));
@@ -150,26 +151,28 @@ int RooFitter(
     RooAddPdf precut_fitpdf("precut_fitpdf", "precut_fitpdf", RooArgList(bg_pdf, precut_signalpdf), RooArgList(sigratio));
     RooAddPdf postcut_fitpdf("postcut_fitpdf", "postcut_fitpdf", RooArgList(bg_pdf, postcut_signalpdf), RooArgList(sigratio));
 
-    precut_fitpdf.fitTo(precut_data_hist, Range(50, 150), NumCPU(8), Verbose(false));
-    postcut_fitpdf.fitTo(postcut_data_hist, Range(50, 150), NumCPU(8), Verbose(false));
-
     TCanvas* const canvas = get_tcanvas(1200, 1000);
+
     // Plot the left side
+    precut_fitpdf.fitTo(precut_data_hist, Range("plot range"), NumCPU(8), Verbose(false));
     canvas->cd(1);
     gPad->SetLogy();
     RooPlot* precut_fitframe = z_mass.frame(50, 150);
     precut_data_hist.plotOn(precut_fitframe, NumCPU(8));
     precut_fitpdf.plotOn(precut_fitframe, Components(bg_pdf), LineColor(kRed), LineStyle(kDashed), NumCPU(8));
+    precut_fitpdf.plotOn(precut_fitframe, Components(precut_signalpdf), LineColor(kBlue), LineStyle(kDashed), NumCPU(8));
     precut_fitpdf.plotOn(precut_fitframe, LineColor(kBlue), NumCPU(8));
 
     precut_fitframe->Draw();
 
     // Plot the right side
+    postcut_fitpdf.fitTo(postcut_data_hist, Range("plot range"), NumCPU(8), Verbose(false));
     canvas->cd(2);
     gPad->SetLogy();
     RooPlot* postcut_fitframe = z_mass.frame(50, 150);
     postcut_data_hist.plotOn(postcut_fitframe, NumCPU(8));
     postcut_fitpdf.plotOn(postcut_fitframe, Components(bg_pdf), LineColor(kRed), LineStyle(kDashed), NumCPU(8));
+    postcut_fitpdf.plotOn(postcut_fitframe, Components(postcut_signalpdf), LineColor(kBlue), LineStyle(kDashed), NumCPU(8));
     postcut_fitpdf.plotOn(postcut_fitframe, LineColor(kBlue), NumCPU(8));
 
     postcut_fitframe->Draw();
