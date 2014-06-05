@@ -156,7 +156,7 @@ int RooFitter(
     TCanvas* const canvas = get_tcanvas(1200, 1000);
     // Plot the left side
     canvas->cd(1);
-    canvas->SetLogy();
+    gPad->SetLogy();
     RooPlot* precut_fitframe = z_mass.frame(50, 150);
     precut_data_hist.plotOn(precut_fitframe, NumCPU(8));
     precut_fitpdf.plotOn(precut_fitframe, Components(bg_pdf), LineColor(kRed), LineStyle(kDashed), NumCPU(8));
@@ -166,7 +166,7 @@ int RooFitter(
 
     // Plot the right side
     canvas->cd(2);
-    canvas->SetLogy();
+    gPad->SetLogy();
     RooPlot* postcut_fitframe = z_mass.frame(50, 150);
     postcut_data_hist.plotOn(postcut_fitframe, NumCPU(8));
     postcut_fitpdf.plotOn(postcut_fitframe, Components(bg_pdf), LineColor(kRed), LineStyle(kDashed), NumCPU(8));
