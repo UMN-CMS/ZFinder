@@ -13,8 +13,11 @@
 #include "RooCategory.h"
 #include "RooDataHist.h"
 #include "RooDataSet.h"
+#include "RooFFTConvPdf.h"
 #include "RooFitter.h"
 #include "RooFormulaVar.h"
+#include "RooGaussian.h"
+#include "RooKeysPdf.h"
 #include "RooGenericPdf.h"
 #include "RooHistPdf.h"
 #include "RooPlot.h"
@@ -67,6 +70,9 @@ int RooFitter(
         const std::string& MC_WS,
         const std::string& OUT_DIR
         ) {
+    // Constants
+    const int N_CPU = 12;
+
     // Set up the variables we're going to read in from the files
     RooRealVar z_mass("z_mass", "m_{ee}", -1, 1000, "GeV");
     RooRealVar z_eta("z_eta", "Z_{#eta}", -6, 6);
@@ -133,47 +139,61 @@ int RooFitter(
     RooDataSet* postcut_mc_reco = static_cast<RooDataSet*>(mc_reco->reduce("numerator==1"));
     RooDataHist precut_mc_histo("precut_mc_histo", "precut_mc_histo", RooArgSet(z_mass), *precut_mc_reco);
     RooDataHist postcut_mc_histo("postcut_mc_histo", "postcut_mc_histo", RooArgSet(z_mass), *postcut_mc_reco);
-    RooHistPdf precut_signalpdf("precut_signalpdf", "Signal PDF from MC before apply the last cut", z_mass, precut_mc_histo);
-    RooHistPdf postcut_signalpdf("postcut_signalpdf", "Signal PDF from MC after applying all cuts", z_mass, postcut_mc_histo);
+    //RooHistPdf precut_signalpdf("precut_signalpdf", "Signal PDF from MC before apply the last cut", z_mass, precut_mc_histo);
+    //RooHistPdf postcut_signalpdf("postcut_signalpdf", "Signal PDF from MC after applying all cuts", z_mass, postcut_mc_histo);
+    RooKeysPdf precut_signalpdf("precut_signalpdf", "Signal PDF from MC before apply the last cut", z_mass, *precut_mc_reco);
+    RooKeysPdf postcut_signalpdf("postcut_signalpdf", "Signal PDF from MC after applying all cuts", z_mass, *postcut_mc_reco);
 
     RooDataSet* postcut_data_reco = static_cast<RooDataSet*>(data_reco->reduce("numerator==1"));
     RooDataHist postcut_data_hist("postcut_data_hist", "Data after applying cuts", z_mass, *postcut_data_reco);
 
+    // Set up a Gaussian to smear the Z Peak
+    RooRealVar gaussmean("gaussmean", "Mean of the smearing Gaussian", 2., 0., 3.);
+    RooRealVar gausssigma("gausssigma", "Width of the smearing Gaussian", 1., 0.1, 3.);
+    RooGaussian smear_gauss("smear_gauss", "Gaussian used to smear the Z Peak", z_mass, gaussmean, gausssigma);
+
+    RooFFTConvPdf smeared_precut_signalpdf("smeared_precut_signalpdf", "Smeared Signal Before Cuts", z_mass, precut_signalpdf, smear_gauss);
+    RooFFTConvPdf smeared_postcut_signalpdf("smeared_postcut_signalpdf", "Smeared Signal Before Cuts", z_mass, postcut_signalpdf, smear_gauss);
+
     // Set up the background
     RooRealVar alpha("alpha", "alpha", 60., 0.1, 1000.);
-    RooRealVar gamma("gamma", "gamma", 0.01, 0.0001, 0.3);
-    RooRealVar delta("delta", "delta", 10., 3., 80.);
+    RooRealVar gamma("gamma", "gamma", 0.01, 0.00001, 0.3);
+    RooRealVar delta("delta", "delta", 10., 1., 100.);
     RooFormulaVar var1("var1", "(alpha-z_mass)/delta", RooArgSet(alpha, z_mass, delta));
     RooFormulaVar var2("var2", "-1.0*gamma*z_mass", RooArgSet(gamma, z_mass));
     RooGenericPdf bg_pdf("MyBackgroundPdf", "ROOT::Math::erfc(var1)*exp(var2)", RooArgSet(var1, var2));
     RooRealVar sigratio("sigratio", "sigratio", 0.1, 0.0, 1.0);
 
-    RooAddPdf precut_fitpdf("precut_fitpdf", "precut_fitpdf", RooArgList(bg_pdf, precut_signalpdf), RooArgList(sigratio));
-    RooAddPdf postcut_fitpdf("postcut_fitpdf", "postcut_fitpdf", RooArgList(bg_pdf, postcut_signalpdf), RooArgList(sigratio));
+    RooAddPdf precut_fitpdf("precut_fitpdf", "precut_fitpdf", RooArgList(bg_pdf, smeared_precut_signalpdf), RooArgList(sigratio));
+    RooAddPdf postcut_fitpdf("postcut_fitpdf", "postcut_fitpdf", RooArgList(bg_pdf, smeared_postcut_signalpdf), RooArgList(sigratio));
 
-    TCanvas* const canvas = get_tcanvas(1200, 1000);
+    TCanvas* const canvas = get_tcanvas(1500, 750);
 
     // Plot the left side
-    precut_fitpdf.fitTo(precut_data_hist, Range("plot range"), NumCPU(8), Verbose(false));
+    precut_fitpdf.fitTo(precut_data_hist, Range(50, 150), NumCPU(N_CPU), Verbose(false));
     canvas->cd(1);
     gPad->SetLogy();
-    RooPlot* precut_fitframe = z_mass.frame(50, 150);
-    precut_data_hist.plotOn(precut_fitframe, NumCPU(8));
-    precut_fitpdf.plotOn(precut_fitframe, Components(bg_pdf), LineColor(kRed), LineStyle(kDashed), NumCPU(8));
-    precut_fitpdf.plotOn(precut_fitframe, Components(precut_signalpdf), LineColor(kBlue), LineStyle(kDashed), NumCPU(8));
-    precut_fitpdf.plotOn(precut_fitframe, LineColor(kBlue), NumCPU(8));
+    RooPlot* precut_fitframe = z_mass.frame(40, 160);
+    precut_fitframe->SetName(0);  // Unset title
+    precut_data_hist.plotOn(precut_fitframe, NumCPU(N_CPU));
+    precut_fitpdf.plotOn(precut_fitframe, Components(bg_pdf), LineColor(kRed), NumCPU(N_CPU));
+    precut_fitpdf.plotOn(precut_fitframe, Components(smeared_precut_signalpdf), LineColor(kGreen), NumCPU(N_CPU));
+    precut_fitpdf.plotOn(precut_fitframe, LineColor(kBlue), NumCPU(N_CPU));
+    precut_data_hist.plotOn(precut_fitframe, NumCPU(N_CPU));
 
     precut_fitframe->Draw();
 
     // Plot the right side
-    postcut_fitpdf.fitTo(postcut_data_hist, Range("plot range"), NumCPU(8), Verbose(false));
+    postcut_fitpdf.fitTo(postcut_data_hist, Range(50, 150), NumCPU(N_CPU), Verbose(false));
     canvas->cd(2);
     gPad->SetLogy();
-    RooPlot* postcut_fitframe = z_mass.frame(50, 150);
-    postcut_data_hist.plotOn(postcut_fitframe, NumCPU(8));
-    postcut_fitpdf.plotOn(postcut_fitframe, Components(bg_pdf), LineColor(kRed), LineStyle(kDashed), NumCPU(8));
-    postcut_fitpdf.plotOn(postcut_fitframe, Components(postcut_signalpdf), LineColor(kBlue), LineStyle(kDashed), NumCPU(8));
-    postcut_fitpdf.plotOn(postcut_fitframe, LineColor(kBlue), NumCPU(8));
+    RooPlot* postcut_fitframe = z_mass.frame(40, 160);
+    postcut_fitframe->SetName(0);  // Unset title
+    postcut_data_hist.plotOn(postcut_fitframe, NumCPU(N_CPU));
+    postcut_fitpdf.plotOn(postcut_fitframe, Components(bg_pdf), LineColor(kRed), NumCPU(N_CPU));
+    postcut_fitpdf.plotOn(postcut_fitframe, Components(smeared_postcut_signalpdf), LineColor(kGreen), NumCPU(N_CPU));
+    postcut_fitpdf.plotOn(postcut_fitframe, LineColor(kBlue), NumCPU(N_CPU));
+    postcut_data_hist.plotOn(postcut_fitframe, NumCPU(N_CPU));
 
     postcut_fitframe->Draw();
 
