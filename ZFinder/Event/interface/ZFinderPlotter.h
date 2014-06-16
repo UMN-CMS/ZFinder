@@ -3,6 +3,7 @@
 
 // Root
 #include <TH1D.h>  // TH1D
+#include <TH2D.h>  // TH2D
 
 // CMSSW
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
@@ -12,16 +13,16 @@
 
 
 namespace zf {
-    class ZFinderPlotter{
+    class ZFinderPlotter {
         public:
             // Constructor
             ZFinderPlotter(TFileDirectory& tdir, const bool USE_MC = false);
 
             // Add events
             void Fill(
-                    const ZFinderEvent& zf_event,
-                    const int first_electron = 0,
-                    const int second_electron = 1,
+                    const ZFinderEvent& ZF_EVENT,
+                    const int FIRST_ELECTRON = 0,
+                    const int SECOND_ELECTRON = 1,
                     const double EVENT_WEIGHT = 1.
                     );
             // Make PNGs
@@ -47,6 +48,8 @@ namespace zf {
             TH1D* nelectrons_;
             TH1D* baseweights_;
             TH1D* fullweights_;
+            TH2D* e0_pt_vs_trig_;
+            TH2D* e1_pt_vs_trig_;
 
             // Use the MC or reco data
             const bool USE_MC_;

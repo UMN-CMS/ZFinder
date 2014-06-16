@@ -125,87 +125,133 @@ namespace zf {
         fullweights_ = tdir.make<TH1D>(fullweights_name.c_str(), fullweights_name.c_str(), 500, 0., 5.);
         fullweights_->GetXaxis()->SetTitle("Weight");
         fullweights_->GetYaxis()->SetTitle("Events");
+
+        // e0_pt_vs_trig
+        const std::string e0_pt_vs_trig_name = "p_{T,e_{0}} Vs. Trigger";
+        e0_pt_vs_trig_ = tdir.make<TH2D>(
+                e0_pt_vs_trig_name.c_str(),
+                e0_pt_vs_trig_name.c_str(),
+                200, 0., 200.,
+                200, 0., 200.
+            );
+        e0_pt_vs_trig_->GetXaxis()->SetTitle("p_{T,e_{0}}");
+        e0_pt_vs_trig_->GetYaxis()->SetTitle("p_{T,e_{Trig}}");
+
+        // e1_pt_vs_trig
+        const std::string e1_pt_vs_trig_name = "p_{T,e_{1}} Vs. Trigger";
+        e1_pt_vs_trig_ = tdir.make<TH2D>(
+                e1_pt_vs_trig_name.c_str(),
+                e1_pt_vs_trig_name.c_str(),
+                200, 0., 200.,
+                200, 0., 200.
+            );
+        e1_pt_vs_trig_->GetXaxis()->SetTitle("p_{T,e_{1}}");
+        e1_pt_vs_trig_->GetYaxis()->SetTitle("p_{T,e_{Trig}}");
     }
 
     void ZFinderPlotter::Fill(
-            const ZFinderEvent& zf_event,
-            const int electron_0,
-            const int electron_1,
+            const ZFinderEvent& ZF_EVENT,
+            const int ELECTRON_0,
+            const int ELECTRON_1,
             const double EVENT_WEIGHT
             ) {
         /*
          * Given a zf_event, fills all the histograms.
          *
-         * electron_0 and electron_1 can be used to assign zf_event.eN to the given
-         * number in the histogram. For example, assigning electron_0 = 1 will fill
+         * ELECTRON_0 and ELECTRON_1 can be used to assign zf_event.eN to the given
+         * number in the histogram. For example, assigning ELECTRON_0 = 1 will fill
          * the e0 histograms with data from zf_event.e1.
          */
         // Z Info
         if (!USE_MC_) {
-            z0_mass_all_->Fill(zf_event.reco_z.m, EVENT_WEIGHT);
-            z0_mass_coarse_->Fill(zf_event.reco_z.m, EVENT_WEIGHT);
-            z0_mass_fine_->Fill(zf_event.reco_z.m, EVENT_WEIGHT);
-            z0_rapidity_->Fill(zf_event.reco_z.y, EVENT_WEIGHT);
-            z0_pt_->Fill(zf_event.reco_z.pt, EVENT_WEIGHT);
-            phistar_->Fill(zf_event.reco_z.phistar, EVENT_WEIGHT);
+            z0_mass_all_->Fill(ZF_EVENT.reco_z.m, EVENT_WEIGHT);
+            z0_mass_coarse_->Fill(ZF_EVENT.reco_z.m, EVENT_WEIGHT);
+            z0_mass_fine_->Fill(ZF_EVENT.reco_z.m, EVENT_WEIGHT);
+            z0_rapidity_->Fill(ZF_EVENT.reco_z.y, EVENT_WEIGHT);
+            z0_pt_->Fill(ZF_EVENT.reco_z.pt, EVENT_WEIGHT);
+            phistar_->Fill(ZF_EVENT.reco_z.phistar, EVENT_WEIGHT);
 
             // Fill the histograms with the information from the approriate electron
-            if (zf_event.e0 != NULL && zf_event.e1 != NULL){
-                if (electron_0 == 0 && electron_1 == 1) {
-                    e0_pt_->Fill(zf_event.e0->pt, EVENT_WEIGHT);
-                    e0_eta_->Fill(zf_event.e0->eta, EVENT_WEIGHT);
-                    e0_phi_->Fill(zf_event.e0->phi, EVENT_WEIGHT);
-                    e0_charge_->Fill(zf_event.e0->charge, EVENT_WEIGHT);
-                    e1_pt_->Fill(zf_event.e1->pt, EVENT_WEIGHT);
-                    e1_eta_->Fill(zf_event.e1->eta, EVENT_WEIGHT);
-                    e1_phi_->Fill(zf_event.e1->phi, EVENT_WEIGHT);
-                    e1_charge_->Fill(zf_event.e1->charge, EVENT_WEIGHT);
-                } else if (electron_0 == 1 && electron_1 == 0) {
-                    e0_pt_->Fill(zf_event.e1->pt, EVENT_WEIGHT);
-                    e0_eta_->Fill(zf_event.e1->eta, EVENT_WEIGHT);
-                    e0_phi_->Fill(zf_event.e1->phi, EVENT_WEIGHT);
-                    e0_charge_->Fill(zf_event.e1->charge, EVENT_WEIGHT);
-                    e1_pt_->Fill(zf_event.e0->pt, EVENT_WEIGHT);
-                    e1_eta_->Fill(zf_event.e0->eta, EVENT_WEIGHT);
-                    e1_phi_->Fill(zf_event.e0->phi, EVENT_WEIGHT);
-                    e1_charge_->Fill(zf_event.e0->charge, EVENT_WEIGHT);
+            if (ZF_EVENT.e0 != NULL && ZF_EVENT.e1 != NULL){
+                if (ELECTRON_0 == 0 && ELECTRON_1 == 1) {
+                    e0_pt_->Fill(ZF_EVENT.e0->pt, EVENT_WEIGHT);
+                    e0_eta_->Fill(ZF_EVENT.e0->eta, EVENT_WEIGHT);
+                    e0_phi_->Fill(ZF_EVENT.e0->phi, EVENT_WEIGHT);
+                    e0_charge_->Fill(ZF_EVENT.e0->charge, EVENT_WEIGHT);
+                    e1_pt_->Fill(ZF_EVENT.e1->pt, EVENT_WEIGHT);
+                    e1_eta_->Fill(ZF_EVENT.e1->eta, EVENT_WEIGHT);
+                    e1_phi_->Fill(ZF_EVENT.e1->phi, EVENT_WEIGHT);
+                    e1_charge_->Fill(ZF_EVENT.e1->charge, EVENT_WEIGHT);
+                    if (ZF_EVENT.e0_trig != NULL && ZF_EVENT.e1_trig != NULL) {
+                        e0_pt_vs_trig_->Fill(
+                                ZF_EVENT.e0->pt,
+                                ZF_EVENT.e0_trig->pt,
+                                EVENT_WEIGHT
+                            );
+                        e1_pt_vs_trig_->Fill(
+                                ZF_EVENT.e1->pt,
+                                ZF_EVENT.e1_trig->pt,
+                                EVENT_WEIGHT
+                            );
+                    }
+                } else if (ELECTRON_0 == 1 && ELECTRON_1 == 0) {
+                    e0_pt_->Fill(ZF_EVENT.e1->pt, EVENT_WEIGHT);
+                    e0_eta_->Fill(ZF_EVENT.e1->eta, EVENT_WEIGHT);
+                    e0_phi_->Fill(ZF_EVENT.e1->phi, EVENT_WEIGHT);
+                    e0_charge_->Fill(ZF_EVENT.e1->charge, EVENT_WEIGHT);
+                    e1_pt_->Fill(ZF_EVENT.e0->pt, EVENT_WEIGHT);
+                    e1_eta_->Fill(ZF_EVENT.e0->eta, EVENT_WEIGHT);
+                    e1_phi_->Fill(ZF_EVENT.e0->phi, EVENT_WEIGHT);
+                    e1_charge_->Fill(ZF_EVENT.e0->charge, EVENT_WEIGHT);
+                    if (ZF_EVENT.e0_trig != NULL && ZF_EVENT.e1_trig != NULL) {
+                        e0_pt_vs_trig_->Fill(
+                                ZF_EVENT.e1->pt,
+                                ZF_EVENT.e1_trig->pt,
+                                EVENT_WEIGHT
+                            );
+                        e1_pt_vs_trig_->Fill(
+                                ZF_EVENT.e0->pt,
+                                ZF_EVENT.e0_trig->pt,
+                                EVENT_WEIGHT
+                            );
+                    }
                 }
             }
             // Event Info
-            pileup_->Fill(zf_event.reco_vert.num, EVENT_WEIGHT);
-            nelectrons_->Fill(zf_event.n_reco_electrons, EVENT_WEIGHT);
-        } else if (USE_MC_ && !zf_event.is_real_data) {
-            z0_mass_all_->Fill(zf_event.truth_z.m, EVENT_WEIGHT);
-            z0_mass_coarse_->Fill(zf_event.truth_z.m, EVENT_WEIGHT);
-            z0_mass_fine_->Fill(zf_event.truth_z.m, EVENT_WEIGHT);
-            z0_rapidity_->Fill(zf_event.truth_z.y, EVENT_WEIGHT);
-            z0_pt_->Fill(zf_event.truth_z.pt, EVENT_WEIGHT);
-            phistar_->Fill(zf_event.truth_z.phistar, EVENT_WEIGHT);
+            pileup_->Fill(ZF_EVENT.reco_vert.num, EVENT_WEIGHT);
+            nelectrons_->Fill(ZF_EVENT.n_reco_electrons, EVENT_WEIGHT);
+        } else if (USE_MC_ && !ZF_EVENT.is_real_data) {
+            z0_mass_all_->Fill(ZF_EVENT.truth_z.m, EVENT_WEIGHT);
+            z0_mass_coarse_->Fill(ZF_EVENT.truth_z.m, EVENT_WEIGHT);
+            z0_mass_fine_->Fill(ZF_EVENT.truth_z.m, EVENT_WEIGHT);
+            z0_rapidity_->Fill(ZF_EVENT.truth_z.y, EVENT_WEIGHT);
+            z0_pt_->Fill(ZF_EVENT.truth_z.pt, EVENT_WEIGHT);
+            phistar_->Fill(ZF_EVENT.truth_z.phistar, EVENT_WEIGHT);
 
             // Fill the histograms with the information from the approriate electron
-            if (zf_event.e0_truth != NULL && zf_event.e1_truth != NULL){
-                if (electron_0 == 0 && electron_1 == 1) {
-                    e0_pt_->Fill(zf_event.e0_truth->pt, EVENT_WEIGHT);
-                    e0_eta_->Fill(zf_event.e0_truth->eta, EVENT_WEIGHT);
-                    e0_phi_->Fill(zf_event.e0_truth->phi, EVENT_WEIGHT);
-                    e1_pt_->Fill(zf_event.e1_truth->pt, EVENT_WEIGHT);
-                    e1_eta_->Fill(zf_event.e1_truth->eta, EVENT_WEIGHT);
-                    e1_phi_->Fill(zf_event.e1_truth->phi, EVENT_WEIGHT);
-                } else if (electron_0 == 1 && electron_1 == 0) {
-                    e0_pt_->Fill(zf_event.e1_truth->pt, EVENT_WEIGHT);
-                    e0_eta_->Fill(zf_event.e1_truth->eta, EVENT_WEIGHT);
-                    e0_phi_->Fill(zf_event.e1_truth->phi, EVENT_WEIGHT);
-                    e1_pt_->Fill(zf_event.e0_truth->pt, EVENT_WEIGHT);
-                    e1_eta_->Fill(zf_event.e0_truth->eta, EVENT_WEIGHT);
-                    e1_phi_->Fill(zf_event.e0_truth->phi, EVENT_WEIGHT);
+            if (ZF_EVENT.e0_truth != NULL && ZF_EVENT.e1_truth != NULL){
+                if (ELECTRON_0 == 0 && ELECTRON_1 == 1) {
+                    e0_pt_->Fill(ZF_EVENT.e0_truth->pt, EVENT_WEIGHT);
+                    e0_eta_->Fill(ZF_EVENT.e0_truth->eta, EVENT_WEIGHT);
+                    e0_phi_->Fill(ZF_EVENT.e0_truth->phi, EVENT_WEIGHT);
+                    e1_pt_->Fill(ZF_EVENT.e1_truth->pt, EVENT_WEIGHT);
+                    e1_eta_->Fill(ZF_EVENT.e1_truth->eta, EVENT_WEIGHT);
+                    e1_phi_->Fill(ZF_EVENT.e1_truth->phi, EVENT_WEIGHT);
+                } else if (ELECTRON_0 == 1 && ELECTRON_1 == 0) {
+                    e0_pt_->Fill(ZF_EVENT.e1_truth->pt, EVENT_WEIGHT);
+                    e0_eta_->Fill(ZF_EVENT.e1_truth->eta, EVENT_WEIGHT);
+                    e0_phi_->Fill(ZF_EVENT.e1_truth->phi, EVENT_WEIGHT);
+                    e1_pt_->Fill(ZF_EVENT.e0_truth->pt, EVENT_WEIGHT);
+                    e1_eta_->Fill(ZF_EVENT.e0_truth->eta, EVENT_WEIGHT);
+                    e1_phi_->Fill(ZF_EVENT.e0_truth->phi, EVENT_WEIGHT);
                 }
             }
             // Event Info
-            pileup_->Fill(zf_event.truth_vert.num, EVENT_WEIGHT);
+            pileup_->Fill(ZF_EVENT.truth_vert.num, EVENT_WEIGHT);
             nelectrons_->Fill(2, EVENT_WEIGHT);  // We only ever grab the two electrons from the Z
         }
         // Event weights, they are of course, unweighted
-        baseweights_->Fill(zf_event.event_weight);
+        baseweights_->Fill(ZF_EVENT.event_weight);
         fullweights_->Fill(EVENT_WEIGHT);
     }
 
