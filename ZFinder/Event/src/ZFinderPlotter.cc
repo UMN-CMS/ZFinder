@@ -234,6 +234,16 @@ namespace zf {
                     e1_pt_->Fill(ZF_EVENT.e1_truth->pt, EVENT_WEIGHT);
                     e1_eta_->Fill(ZF_EVENT.e1_truth->eta, EVENT_WEIGHT);
                     e1_phi_->Fill(ZF_EVENT.e1_truth->phi, EVENT_WEIGHT);
+                    if (ZF_EVENT.e0_trig != NULL && ZF_EVENT.e1_trig != NULL) {
+                        e0_pt_vs_trig_->Fill(
+                                ZF_EVENT.e0_truth->pt / ZF_EVENT.e0_trig->pt,
+                                EVENT_WEIGHT
+                            );
+                        e1_pt_vs_trig_->Fill(
+                                ZF_EVENT.e1_truth->pt / ZF_EVENT.e1_trig->pt,
+                                EVENT_WEIGHT
+                            );
+                    }
                 } else if (ELECTRON_0 == 1 && ELECTRON_1 == 0) {
                     e0_pt_->Fill(ZF_EVENT.e1_truth->pt, EVENT_WEIGHT);
                     e0_eta_->Fill(ZF_EVENT.e1_truth->eta, EVENT_WEIGHT);
@@ -241,6 +251,16 @@ namespace zf {
                     e1_pt_->Fill(ZF_EVENT.e0_truth->pt, EVENT_WEIGHT);
                     e1_eta_->Fill(ZF_EVENT.e0_truth->eta, EVENT_WEIGHT);
                     e1_phi_->Fill(ZF_EVENT.e0_truth->phi, EVENT_WEIGHT);
+                    if (ZF_EVENT.e0_trig != NULL && ZF_EVENT.e1_trig != NULL) {
+                        e0_pt_vs_trig_->Fill(
+                                ZF_EVENT.e1_truth->pt / ZF_EVENT.e1_trig->pt,
+                                EVENT_WEIGHT
+                            );
+                        e1_pt_vs_trig_->Fill(
+                                ZF_EVENT.e0_truth->pt / ZF_EVENT.e0_trig->pt,
+                                EVENT_WEIGHT
+                            );
+                    }
                 }
             }
             // Event Info
