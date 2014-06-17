@@ -48,9 +48,9 @@ namespace zf {
             TH1D* nelectrons_;
             TH1D* baseweights_;
             TH1D* fullweights_;
-            TH2D* e0_pt_vs_trig_;
-            TH2D* e1_pt_vs_trig_;
-            TH2D* phistar_vs_truth_;
+            TH1D* e0_pt_vs_trig_;
+            TH1D* e1_pt_vs_trig_;
+            TH1D* phistar_vs_truth_;
 
             // Use the MC or reco data
             const bool USE_MC_;

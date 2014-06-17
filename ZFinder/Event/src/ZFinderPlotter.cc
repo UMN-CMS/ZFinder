@@ -128,36 +128,21 @@ namespace zf {
 
         // e0_pt_vs_trig
         const std::string e0_pt_vs_trig_name = "p_{T,e_{0}} Vs. Trigger";
-        e0_pt_vs_trig_ = tdir.make<TH2D>(
-                e0_pt_vs_trig_name.c_str(),
-                e0_pt_vs_trig_name.c_str(),
-                200, 0., 200.,
-                200, 0., 200.
-            );
+        e0_pt_vs_trig_ = tdir.make<TH1D>(e0_pt_vs_trig_name.c_str(), e0_pt_vs_trig_name.c_str(), 200, 0., 2.);
         e0_pt_vs_trig_->GetXaxis()->SetTitle("p_{T,e_{0}}");
-        e0_pt_vs_trig_->GetYaxis()->SetTitle("p_{T,e_{Trig}}");
+        e0_pt_vs_trig_->GetYaxis()->SetTitle("Reco / Trigger");
 
         // e1_pt_vs_trig
         const std::string e1_pt_vs_trig_name = "p_{T,e_{1}} Vs. Trigger";
-        e1_pt_vs_trig_ = tdir.make<TH2D>(
-                e1_pt_vs_trig_name.c_str(),
-                e1_pt_vs_trig_name.c_str(),
-                200, 0., 200.,
-                200, 0., 200.
-            );
+        e1_pt_vs_trig_ = tdir.make<TH1D>(e1_pt_vs_trig_name.c_str(), e1_pt_vs_trig_name.c_str(), 200, 0., 2.);
         e1_pt_vs_trig_->GetXaxis()->SetTitle("p_{T,e_{1}}");
-        e1_pt_vs_trig_->GetYaxis()->SetTitle("p_{T,e_{Trig}}");
+        e1_pt_vs_trig_->GetYaxis()->SetTitle("Reco / Trigger");
 
         // phistar
         const std::string phistar_vs_truth_name = "#phi*: Reco Vs. Truth";
-        phistar_vs_truth_ = tdir.make<TH2D>(
-                phistar_vs_truth_name.c_str(),
-                phistar_vs_truth_name.c_str(),
-                4000, 0., 4.,
-                4000, 0., 4.
-            );
-        phistar_vs_truth_->GetXaxis()->SetTitle("#phi* Reco");
-        phistar_vs_truth_->GetYaxis()->SetTitle("#phi* Truth");
+        phistar_vs_truth_ = tdir.make<TH1D>(phistar_vs_truth_name.c_str(), phistar_vs_truth_name.c_str(), 200, 0., 2.);
+        phistar_vs_truth_->GetXaxis()->SetTitle("#phi*");
+        phistar_vs_truth_->GetYaxis()->SetTitle("Reco MC vs Truth");
     }
 
     void ZFinderPlotter::Fill(
@@ -195,13 +180,11 @@ namespace zf {
                     e1_charge_->Fill(ZF_EVENT.e1->charge, EVENT_WEIGHT);
                     if (ZF_EVENT.e0_trig != NULL && ZF_EVENT.e1_trig != NULL) {
                         e0_pt_vs_trig_->Fill(
-                                ZF_EVENT.e0->pt,
-                                ZF_EVENT.e0_trig->pt,
+                                ZF_EVENT.e0->pt / ZF_EVENT.e0_trig->pt,
                                 EVENT_WEIGHT
                             );
                         e1_pt_vs_trig_->Fill(
-                                ZF_EVENT.e1->pt,
-                                ZF_EVENT.e1_trig->pt,
+                                ZF_EVENT.e1->pt / ZF_EVENT.e1_trig->pt,
                                 EVENT_WEIGHT
                             );
                     }
@@ -216,13 +199,11 @@ namespace zf {
                     e1_charge_->Fill(ZF_EVENT.e0->charge, EVENT_WEIGHT);
                     if (ZF_EVENT.e0_trig != NULL && ZF_EVENT.e1_trig != NULL) {
                         e0_pt_vs_trig_->Fill(
-                                ZF_EVENT.e1->pt,
-                                ZF_EVENT.e1_trig->pt,
+                                ZF_EVENT.e1->pt / ZF_EVENT.e1_trig->pt,
                                 EVENT_WEIGHT
                             );
                         e1_pt_vs_trig_->Fill(
-                                ZF_EVENT.e0->pt,
-                                ZF_EVENT.e0_trig->pt,
+                                ZF_EVENT.e0->pt / ZF_EVENT.e0_trig->pt,
                                 EVENT_WEIGHT
                             );
                     }
@@ -273,8 +254,7 @@ namespace zf {
                 && ZF_EVENT.e1 != NULL
            ) {
             phistar_vs_truth_->Fill(
-                    ZF_EVENT.reco_z.phistar,
-                    ZF_EVENT.truth_z.phistar,
+                    ZF_EVENT.reco_z.phistar / ZF_EVENT.truth_z.phistar,
                     EVENT_WEIGHT
                 );
         }
