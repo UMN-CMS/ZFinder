@@ -141,8 +141,12 @@ namespace zf {
         // phistar
         const std::string phistar_vs_truth_name = "#phi*: Reco Vs. Truth";
         phistar_vs_truth_ = tdir.make<TH1D>(phistar_vs_truth_name.c_str(), phistar_vs_truth_name.c_str(), 200, 0., 2.);
-        phistar_vs_truth_->GetXaxis()->SetTitle("#phi* Reco MC / Truth");
+		phistar_vs_truth_->GetXaxis()->SetTitle("#phi* Reco MC / Truth");
         phistar_vs_truth_->GetYaxis()->SetTitle("Events");
+        
+        //deltaR
+        const std::string deltaR_name = "deltaR";
+        deltaR_ = tdir.make<TH1D>(deltaR_name.c_str(), deltaR_name.c_str(), 100, 0., 10.);
     }
 
     void ZFinderPlotter::Fill(
@@ -166,6 +170,7 @@ namespace zf {
             z0_rapidity_->Fill(ZF_EVENT.reco_z.y, EVENT_WEIGHT);
             z0_pt_->Fill(ZF_EVENT.reco_z.pt, EVENT_WEIGHT);
             phistar_->Fill(ZF_EVENT.reco_z.phistar, EVENT_WEIGHT);
+            deltaR_->Fill(ZF_EVENT.reco_z.deltaR, EVENT_WEIGHT);
 
             // Fill the histograms with the information from the approriate electron
             if (ZF_EVENT.e0 != NULL && ZF_EVENT.e1 != NULL){

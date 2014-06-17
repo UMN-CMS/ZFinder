@@ -73,6 +73,7 @@ namespace zf {
                 double y;
                 double phistar;
                 double eta;
+                double deltaR;
             } reco_z, truth_z;
 
             // Event weight, used for things like pileup reweighting. Most

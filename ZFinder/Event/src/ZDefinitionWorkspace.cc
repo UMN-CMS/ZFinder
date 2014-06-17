@@ -43,12 +43,14 @@ namespace zf {
         // Electrons
         e0_pt_ = new RooRealVar("e0_pt", "p_{T}^{e_{0}}", 0, 1000, "GeV");
         e0_eta_ = new RooRealVar("e0_eta", "#eta_{e_{0}}", -6, 6);
+        e0_phi_ = new RooRealVar("e0_phi", "#phi_{e_{0}}", -3.142, 3.142);
         e0_charge_ = new RooCategory("e0_charge", "q_{e_{0}}");
         e0_charge_->defineType("Unmeasured", 0);
         e0_charge_->defineType("Positive", 1);
         e0_charge_->defineType("Negative", -1);
         e1_pt_ = new RooRealVar("e1_pt", "p_{T}^{e_{1}}", 0, 1000, "GeV");
         e1_eta_ = new RooRealVar("e1_eta", "#eta_{e_{1}}", -6, 6);
+        e1_phi_ = new RooRealVar("e1_phi", "#phi_{e_{1}}", -3.142, 3.142);
         e1_charge_ = new RooCategory("e1_charge", "q_{e_{1}}");
         e1_charge_->defineType("Unmeasured", 0);
         e1_charge_->defineType("Positive", 1);
@@ -81,9 +83,11 @@ namespace zf {
         argset_ = new RooArgSet(*z_mass_, *phistar_, *z_pt_, *z_eta_, *z_y_);
         argset_->add(*e0_pt_);
         argset_->add(*e0_eta_);
+        argset_->add(*e0_phi_);
         argset_->add(*e0_charge_);
         argset_->add(*e1_pt_);
         argset_->add(*e1_eta_);
+        argset_->add(*e1_phi_);
         argset_->add(*e1_charge_);
         argset_->add(*n_vert_);
         argset_->add(*data_type_);
@@ -219,9 +223,11 @@ namespace zf {
         argset_->setRealValue("phistar", z_data->phistar);
         argset_->setRealValue("e0_pt", e_tag->pt);
         argset_->setRealValue("e0_eta", e_tag->eta);
+        argset_->setRealValue("e0_phi", e_tag->phi);
         argset_->setCatIndex("e0_charge", e_tag->charge);
         argset_->setRealValue("e1_pt", e_probe->pt);
         argset_->setRealValue("e1_eta", e_probe->eta);
+        argset_->setRealValue("e1_phi", e_probe->phi);
         argset_->setCatIndex("e1_charge", e_probe->charge);
         argset_->setRealValue("n_vert", verts);
         argset_->setRealValue("event_num", zf_event.id.event_num);
@@ -259,8 +265,10 @@ namespace zf {
         delete phistar_;
         delete e0_pt_;
         delete e0_eta_;
+        delete e0_phi_;
         delete e1_pt_;
         delete e1_eta_;
+        delete e1_phi_;
         delete e0_charge_;
         delete e1_charge_;
         delete n_vert_;

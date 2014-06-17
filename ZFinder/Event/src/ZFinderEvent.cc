@@ -93,8 +93,9 @@ namespace zf {
         InitReco(iEvent, iSetup);  // Data
         if (!is_real_data) {
             InitTruth(iEvent, iSetup);  // MC
+        } else {
+            InitTrigger(iEvent, iSetup);  // Trigger Matching
         }
-        InitTrigger(iEvent, iSetup);  // Trigger Matching
     }
 
     void ZFinderEvent::SetEventWeight(const edm::Event& iEvent) {
@@ -333,6 +334,8 @@ namespace zf {
     }
 
     void ZFinderEvent::InitNTElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+    
+    	const double DR_MIN = 0.1;
         // NT Electrons
         edm::Handle<reco::PhotonCollection> els_h;
         iEvent.getByLabel(inputtags_.nt_electron, els_h);
@@ -346,12 +349,31 @@ namespace zf {
             }
             // Because the photon collect is NOT filtered for electrons, we
             // reject all electrons outside of the NT region of ECAL.
-            if (2.5 < fabs(electron.eta()) && fabs(electron.eta()) < 2.850) {
-                ZFinderElectron* zf_electron = AddRecoElectron(electron);
+            
+            double delR=0;
+            bool flag = true;
+            if (2.5 < fabs(electron.eta()) && fabs(electron.eta()) < 2.850) {  
+            	ZFinderElectron* zf_electron;              
+                //now check for nearby GSF electrons
+                for(auto& i_elec : reco_electrons_)
+                {
+                	if(i_elec->CutPassed("type_gsf")==1)
+                	{
+                		delR = sqrt( pow( i_elec->eta-electron.eta(), 2) + pow( i_elec->phi-electron.phi(), 2) );
+                		if(delR <= DR_MIN) 
+                		{
+                			flag = false;
+                			std::cout<<"Found duplicate electron!"<<std::endl;
+                			break;
+                		}
+                	}
+                }
+                if( flag==true ) zf_electron = AddRecoElectron(electron);
+                else continue;
 
                 // Apply Alexey's Cuts
                 //const double PHOTON_ET = electron.superCluster()->rawEnergy() * sin(electron.superCluster()->theta());
-                if (       0.89 < electron.r9() && electron.r9() < 1.02
+                if (      0.89 < electron.r9() && electron.r9() < 1.02
                         && electron.hadronicOverEm() < 0.05
                         && fabs(electron.superCluster()->eta()) > 2.5
                         //&& PHOTON_ET > 20.
@@ -401,6 +423,7 @@ namespace zf {
             reco_z.pt = zlv.pt();
             reco_z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
             reco_z.eta = zlv.eta();
+            reco_z.deltaR = sqrt( pow(e0->eta - e1->eta,2) + pow(e0->phi - e1->phi,2) );
         }
     }
 
@@ -436,6 +459,7 @@ namespace zf {
         truth_z.pt = -1;
         truth_z.phistar = -1;
         truth_z.eta = -1000;
+        reco_z.deltaR = -1;
 
         // Electrons
         e0 = NULL;

@@ -51,6 +51,7 @@ namespace zf {
             TH1D* e0_pt_vs_trig_;
             TH1D* e1_pt_vs_trig_;
             TH1D* phistar_vs_truth_;
+            TH1D* deltaR_;
 
             // Use the MC or reco data
             const bool USE_MC_;

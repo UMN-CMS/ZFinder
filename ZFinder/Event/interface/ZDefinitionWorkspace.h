@@ -57,8 +57,10 @@ namespace zf {
             // Electrons
             RooRealVar* e0_pt_;
             RooRealVar* e0_eta_;
+            RooRealVar* e0_phi_;
             RooRealVar* e1_pt_;
             RooRealVar* e1_eta_;
+            RooRealVar* e1_phi_;
             RooCategory* e0_charge_;
             RooCategory* e1_charge_;
             // Event
