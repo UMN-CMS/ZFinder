@@ -123,6 +123,7 @@ namespace zf {
             // These variables are defined at the top of ZFinderEvent.cc to
             // avoid compilation issues
             static const double TRIG_DR_;
+            static const double NT_DR_;
 
             // Called by the constructor to handle MC and Data separately
             void InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup);
