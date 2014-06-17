@@ -93,9 +93,8 @@ namespace zf {
         InitReco(iEvent, iSetup);  // Data
         if (!is_real_data) {
             InitTruth(iEvent, iSetup);  // MC
-        } else {
-            InitTrigger(iEvent, iSetup);  // Trigger Matching
         }
+        InitTrigger(iEvent, iSetup);  // Trigger Matching
     }
 
     void ZFinderEvent::SetEventWeight(const edm::Event& iEvent) {
