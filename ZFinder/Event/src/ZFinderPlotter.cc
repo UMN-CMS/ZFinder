@@ -129,20 +129,20 @@ namespace zf {
         // e0_pt_vs_trig
         const std::string e0_pt_vs_trig_name = "p_{T,e_{0}} Vs. Trigger";
         e0_pt_vs_trig_ = tdir.make<TH1D>(e0_pt_vs_trig_name.c_str(), e0_pt_vs_trig_name.c_str(), 200, 0., 2.);
-        e0_pt_vs_trig_->GetXaxis()->SetTitle("p_{T,e_{0}}");
-        e0_pt_vs_trig_->GetYaxis()->SetTitle("Reco / Trigger");
+        e0_pt_vs_trig_->GetXaxis()->SetTitle("Ratio of p_{T,e_{0}} Reco / Trigger");
+        e0_pt_vs_trig_->GetYaxis()->SetTitle("Events");
 
         // e1_pt_vs_trig
         const std::string e1_pt_vs_trig_name = "p_{T,e_{1}} Vs. Trigger";
         e1_pt_vs_trig_ = tdir.make<TH1D>(e1_pt_vs_trig_name.c_str(), e1_pt_vs_trig_name.c_str(), 200, 0., 2.);
-        e1_pt_vs_trig_->GetXaxis()->SetTitle("p_{T,e_{1}}");
-        e1_pt_vs_trig_->GetYaxis()->SetTitle("Reco / Trigger");
+        e1_pt_vs_trig_->GetXaxis()->SetTitle("Ratio of p_{T,e_{1}} Reco / Trigger");
+        e1_pt_vs_trig_->GetYaxis()->SetTitle("Events");
 
         // phistar
         const std::string phistar_vs_truth_name = "#phi*: Reco Vs. Truth";
         phistar_vs_truth_ = tdir.make<TH1D>(phistar_vs_truth_name.c_str(), phistar_vs_truth_name.c_str(), 200, 0., 2.);
-        phistar_vs_truth_->GetXaxis()->SetTitle("#phi*");
-        phistar_vs_truth_->GetYaxis()->SetTitle("Reco MC vs Truth");
+        phistar_vs_truth_->GetXaxis()->SetTitle("#phi* Reco MC / Truth");
+        phistar_vs_truth_->GetYaxis()->SetTitle("Events");
     }
 
     void ZFinderPlotter::Fill(
