@@ -147,6 +147,17 @@ namespace zf {
             );
         e1_pt_vs_trig_->GetXaxis()->SetTitle("p_{T,e_{1}}");
         e1_pt_vs_trig_->GetYaxis()->SetTitle("p_{T,e_{Trig}}");
+
+        // phistar
+        const std::string phistar_vs_truth_name = "#phi*: Reco Vs. Truth";
+        phistar_vs_truth_ = tdir.make<TH2D>(
+                phistar_vs_truth_name.c_str(),
+                phistar_vs_truth_name.c_str(),
+                4000, 0., 4.,
+                4000, 0., 4.
+            );
+        phistar_vs_truth_->GetXaxis()->SetTitle("#phi* Reco");
+        phistar_vs_truth_->GetYaxis()->SetTitle("#phi* Truth");
     }
 
     void ZFinderPlotter::Fill(
@@ -253,6 +264,20 @@ namespace zf {
         // Event weights, they are of course, unweighted
         baseweights_->Fill(ZF_EVENT.event_weight);
         fullweights_->Fill(EVENT_WEIGHT);
+
+        // Phistar Reco Vs. Truth
+        if (!ZF_EVENT.is_real_data
+                && ZF_EVENT.e0_truth != NULL
+                && ZF_EVENT.e1_truth != NULL
+                && ZF_EVENT.e0 != NULL
+                && ZF_EVENT.e1 != NULL
+           ) {
+            phistar_vs_truth_->Fill(
+                    ZF_EVENT.reco_z.phistar,
+                    ZF_EVENT.truth_z.phistar,
+                    EVENT_WEIGHT
+                );
+        }
     }
 
     void ZFinderPlotter::Print(const std::string& basename) {
