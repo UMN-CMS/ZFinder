@@ -48,6 +48,9 @@ Implementation:
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // GsfElectron
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
 
+// Root
+#include <TH1I.h>
+
 // ZFinder
 #include "ZFinder/Event/interface/AcceptanceSetter.h"  // AcceptanceSetter
 #include "ZFinder/Event/interface/SetterBase.h"  // SetterBase
@@ -91,6 +94,7 @@ class ZFinder : public edm::EDAnalyzer {
         std::vector<zf::ZDefinitionWorkspace*> zdef_workspaces_;
         zf::ZEfficiencies zeffs_;
         bool is_mc_;
+        TH1I* unweighted_counter_;
 };
 
 //
@@ -120,6 +124,13 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
 
     // Setup plotters
     edm::Service<TFileService> fs;
+
+    // We use a counter histogram to count events considered, this is used to
+    // normalize MC
+    unweighted_counter_ = fs->make<TH1I>("unweighted_counter", "Unweighted Event Count", 3, 0, 2);
+    unweighted_counter_->GetXaxis()->SetTitle("");
+    unweighted_counter_->GetYaxis()->SetTitle("Number of events considered");
+
 
     // Setup ZDefinitions and plotters
     zdef_psets_ = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet> >("ZDefinitions");
@@ -188,6 +199,10 @@ ZFinder::~ZFinder() {
 void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     using namespace edm;
 
+    // We count every event, even if they do not pass any cuts
+    unweighted_counter_->Fill(1);
+
+    // Construct a ZFinderEvent
     zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_);
     if (zfe.reco_z.m > -1 && zfe.e0 != NULL && zfe.e1 != NULL) {  // We have a good Z
         // Set all cuts
