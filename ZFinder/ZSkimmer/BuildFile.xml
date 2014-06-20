@@ -1,0 +1,6 @@
+<use name="FWCore/Framework"/>
+<use name="FWCore/PluginManager"/>
+<use name="FWCore/ParameterSet"/>
+<use name="DataFormats/EgammaCandidates"/>
+<use name="DataFormats/RecoCandidate"/>
+<flags EDM_PLUGIN="1"/>
