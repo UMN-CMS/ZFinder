@@ -32,10 +32,6 @@ process.out = cms.OutputModule( "PoolOutputModule",
             )
         )
 
-## Electron ID cuts
-process.load("ElectroWeakAnalysis.WENu.simpleEleIdSequence_cff")
-process.patElectronIDs = cms.Sequence(process.simpleEleIdSequence)
-
 ## Skimmer
 process.zskimmer = cms.EDFilter('ZSkimmer')
 
