@@ -27,22 +27,92 @@ int main() {
             "ZFinder/Combined Double Reco/6 60 < M_{ee} < 120",
             "Signal MC",
             12234.4,  // cross section in pb, from https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV
-            "ZFinder/All Electrons Reco/0 acc(ALL) AND acc(ALL)",  // TDir from before any cut
+            "ZFinder/All Electrons Reco/0 acc(ALL) AND acc(ALL)/Z0 Mass: All",  // TDir from before any cut
             SIGNAL_MC
             );
     // BG
-    TFile* bg_tfile = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140506_TTBar/20140506_TTBar_hadded.root", "READ");
-    DataConfig bg_config(
-            bg_tfile,
+    TFile* bg_tfile_0 = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140506_TTBar/20140506_TTBar_hadded.root", "READ");
+    DataConfig bg_config_0(
+            bg_tfile_0,
             "ZFinder/Combined Double Reco/6 60 < M_{ee} < 120",
             "T-TBar",
-            24.,  // TTBar Inclusive is 245.8 Pb, T->Wq is 0.9621, W->lnu is 0.3257, might be off by a factor of 3!!!!!
-            "ZFinder/All Electrons Reco/0 acc(ALL) AND acc(ALL)",
+            23.64,  // TTBar Inclusive is 245.8 Pb, T->Wq is 0.9621, W->lnu is 0.3257
+            "ZFinder/All Electrons Reco/0 acc(ALL) AND acc(ALL)/Z0 Mass: All",
+            BG_MC
+            );
+    TFile* bg_tfile_1 = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140619_bgs_run_at_fnal/BG_Ditau/res/BG_Ditau_hadded.root", "READ");
+    DataConfig bg_config_1(
+            bg_tfile_1,
+            "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
+            "Z To TauTau",
+            1966.7,
+            "ZFinder/unweighted_counter",
+            BG_MC
+            );
+    TFile* bg_tfile_2 = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140619_bgs_run_at_fnal/BG_singlet_tw/res/BG_singlet_tw_hadded.root", "READ");
+    DataConfig bg_config_2(
+            bg_tfile_2,
+            "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
+            "single_t",
+            11.1,
+            "ZFinder/unweighted_counter",
+            BG_MC
+            );
+    TFile* bg_tfile_3 = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140619_bgs_run_at_fnal/BG_singlet_tbarw/res/BG_singletbar_tw_hadded.root", "READ");
+    DataConfig bg_config_3(
+            bg_tfile_3,
+            "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
+            "single_t",
+            11.1,
+            "ZFinder/unweighted_counter",
+            BG_MC
+            );
+    TFile* bg_tfile_4 = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140619_bgs_run_at_fnal/BG_wz/res/BG_wz_hadded.root", "READ");
+    DataConfig bg_config_4(
+            bg_tfile_4,
+            "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
+            "wz",
+            33.21,
+            "ZFinder/unweighted_counter",
+            BG_MC
+            );
+    TFile* bg_tfile_5 = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140619_bgs_run_at_fnal/BG_ww/res/BG_ww_hadded.root", "READ");
+    DataConfig bg_config_5(
+            bg_tfile_5,
+            "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
+            "ww",
+            54.84,
+            "ZFinder/unweighted_counter",
+            BG_MC
+            );
+    TFile* bg_tfile_6 = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140619_bgs_run_at_fnal/BG_zz/res/BG_zz_hadded.root", "READ");
+    DataConfig bg_config_6(
+            bg_tfile_6,
+            "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
+            "w",
+            17.7,
+            "ZFinder/unweighted_counter",
+            BG_MC
+            );
+    TFile* bg_tfile_7 = new TFile("/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140619_bgs_run_at_fnal/BG_w_jets/res/BG_w_jets.root", "READ");
+    DataConfig bg_config_7(
+            bg_tfile_7,
+            "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
+            "w_jets",
+            37509.,
+            "ZFinder/unweighted_counter",
             BG_MC
             );
     // BG Map
     data_config_map bg_map;
-    bg_map["T-TBar"] = bg_config;
+    bg_map["TTBar"] = bg_config_0;
+    bg_map["Z to #tau #tau"] = bg_config_1;
+    bg_map["Single Top"] = bg_config_2;
+    bg_map["Single TBar"] = bg_config_3;
+    bg_map["WZ"] = bg_config_4;
+    bg_map["WW"] = bg_config_5;
+    bg_map["ZZ"] = bg_config_6;
+    //bg_map["W + Jets"] = bg_config_7;
 
     // Setup the plotter
     CrossCheckPlotter* plotter = new CrossCheckPlotter(
@@ -73,7 +143,14 @@ int main() {
     delete plotter;
     delete data_tfile;
     delete mc_tfile;
-    delete bg_tfile;
+    delete bg_tfile_0;
+    delete bg_tfile_1;
+    delete bg_tfile_2;
+    delete bg_tfile_3;
+    delete bg_tfile_4;
+    delete bg_tfile_5;
+    delete bg_tfile_6;
+    delete bg_tfile_7;
 
     return 0;
 }

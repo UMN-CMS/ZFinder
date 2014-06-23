@@ -118,8 +118,8 @@ struct DataConfig{
         scale_factor(-1)
     {
         // We need to open the tfile and pull out the number of events
-        TH1D* tmp_histo;
-        const std::string TARGET_HISTO = tdir_uncut + "/Z0 Mass: All";
+        TH1* tmp_histo;
+        const std::string TARGET_HISTO = tdir_uncut;
         tfile->GetObject(TARGET_HISTO.c_str(), tmp_histo);
         if (!tmp_histo) {
             std::cout << "Can not open the " << name;
