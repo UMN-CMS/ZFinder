@@ -32,6 +32,15 @@ process.out = cms.OutputModule( "PoolOutputModule",
             )
         )
 
+# Run only on lumis specified in the lumi file
+# Recipe from:
+# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePythonTips#Use_a_JSON_file_of_good_lumi_sec
+from FWCore.ParameterSet.Types import untracked, VLuminosityBlockRange
+from FWCore.PythonUtilities.LumiList import LumiList
+json_file = "../../Metadata/lumi_json/Run2012ABCD.json"  # File location
+run_2012abcd_lumis = LumiList(filename = json_file).getCMSSWString().split(',')
+process.source.lumisToProcess = untracked(VLuminosityBlockRange(run_2012abcd_lumis))
+
 ## Skimmer
 process.zskimmer = cms.EDFilter('ZSkimmer')
 
