@@ -407,7 +407,7 @@ void CrossCheckPlotter::plot(
     unsigned int i_style = 0;
     for (auto& i_pair : bg_histos) {
         // Reset if we run beyond the array
-        if (i_style >=  color_styles_.size()) {
+        if (i_style >= color_styles_.size()) {
             i_style = 0;
         }
         std::pair<RootFill, int> style_pair = color_styles_[i_style];
@@ -418,7 +418,8 @@ void CrossCheckPlotter::plot(
         i_pair.second->SetFillColor(style_pair.second);
         // Add to the stack and legend
         histo_stack->Add(i_pair.second);
-        legend.AddEntry(i_pair.second, i_pair.first.c_str() ,"f");
+        const std::string BG_NAME = bg_configs_[i_pair.first].name;
+        legend.AddEntry(i_pair.second, BG_NAME.c_str(),"f");
     }
     histo_stack->Add(mc_histo);
 
@@ -623,13 +624,11 @@ void CrossCheckPlotter::init_color_styles() {
         {FORWARD_HATCH, kRed},
         {BACKWARD_HATCH, kGreen+2},
         {VERT_HATCH, kMagenta+2},
-        {HOR_HATCH, kOrange},
-        {CROSS_HATCH, kOrange+7},
-        {BACKWARD_HATCH, kRed},
-        {VERT_HATCH, kGreen+2},
-        {HOR_HATCH, kMagenta+2},
         {CROSS_HATCH, kOrange},
-        {FORWARD_HATCH, kOrange+7}
+        {BACKWARD_HATCH, kOrange+7},
+        {VERT_HATCH, kRed},
+        {CROSS_HATCH, kGreen+2},
+        {FORWARD_HATCH, kMagenta+2},
     };
 }
 

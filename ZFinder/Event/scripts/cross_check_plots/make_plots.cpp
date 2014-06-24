@@ -25,7 +25,7 @@ int main() {
     DataConfig mc_config(
             mc_tfile,
             "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
-            "Signal MC",
+            "DY to ee",
             12234.4,  // cross section in pb, from https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV
             "ZFinder/All Electrons Reco/0 acc(ALL) AND acc(ALL)/Z0 Mass: All",  // TDir from before any cut
             SIGNAL_MC
@@ -35,7 +35,7 @@ int main() {
     DataConfig bg_config_0(
             bg_tfile_0,
             "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
-            "T-TBar",
+            "t#bar{t}",
             23.64,  // TTBar Inclusive is 245.8 Pb, T->Wq is 0.9621, W->lnu is 0.3257
             "ZFinder/All Electrons Reco/0 acc(ALL) AND acc(ALL)/Z0 Mass: All",
             BG_MC
@@ -44,7 +44,7 @@ int main() {
     DataConfig bg_config_1(
             bg_tfile_1,
             "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
-            "Z To TauTau",
+            "DY to #tau#tau",
             1966.7,
             "ZFinder/unweighted_counter",
             BG_MC
@@ -53,7 +53,7 @@ int main() {
     DataConfig bg_config_2(
             bg_tfile_2,
             "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
-            "single_t",
+            "Single t",
             11.1,
             "ZFinder/unweighted_counter",
             BG_MC
@@ -62,7 +62,7 @@ int main() {
     DataConfig bg_config_3(
             bg_tfile_3,
             "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
-            "single_t",
+            "single #bar{t}",
             11.1,
             "ZFinder/unweighted_counter",
             BG_MC
@@ -71,7 +71,7 @@ int main() {
     DataConfig bg_config_4(
             bg_tfile_4,
             "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
-            "wz",
+            "WZ",
             33.21,
             "ZFinder/unweighted_counter",
             BG_MC
@@ -80,7 +80,7 @@ int main() {
     DataConfig bg_config_5(
             bg_tfile_5,
             "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
-            "ww",
+            "WW",
             54.84,
             "ZFinder/unweighted_counter",
             BG_MC
@@ -89,7 +89,7 @@ int main() {
     DataConfig bg_config_6(
             bg_tfile_6,
             "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
-            "w",
+            "ZZ",
             17.7,
             "ZFinder/unweighted_counter",
             BG_MC
@@ -98,20 +98,21 @@ int main() {
     DataConfig bg_config_7(
             bg_tfile_7,
             "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
-            "w_jets",
+            "W + Jets",
             37509.,
             "ZFinder/unweighted_counter",
             BG_MC
             );
-    // BG Map
+    // BG Map, the names are used for sort ordering alphabetically, so adding
+    // numbers to the front can be used to change the order.
     data_config_map bg_map;
-    bg_map["TTBar"] = bg_config_0;
-    bg_map["Z to #tau #tau"] = bg_config_1;
-    bg_map["Single Top"] = bg_config_2;
-    bg_map["Single TBar"] = bg_config_3;
-    bg_map["WZ"] = bg_config_4;
-    bg_map["WW"] = bg_config_5;
-    bg_map["ZZ"] = bg_config_6;
+    bg_map["9 TTBAR"] = bg_config_0;
+    bg_map["5 DY to #tau#tau"] = bg_config_1;
+    bg_map["3 Single Top"] = bg_config_2;
+    bg_map["4 Single TBar"] = bg_config_3;
+    bg_map["8 WZ"] = bg_config_4;
+    bg_map["6 WW"] = bg_config_5;
+    bg_map["7 ZZ"] = bg_config_6;
     //bg_map["W + Jets"] = bg_config_7;
 
     // Setup the plotter
