@@ -377,9 +377,14 @@ void CrossCheckPlotter::plot(
     data_histo->GetYaxis()->SetTitle(plot_config.y_label.c_str());
 
     // Set up the legend using the plot edges to set its location
-    const double LEG_HEIGHT = 0.15;
-    const double LEG_LENGTH = 0.15;
-    TLegend legend(RIGHT_EDGE_ - LEG_LENGTH, TOP_EDGE_ - LEG_HEIGHT, RIGHT_EDGE_, TOP_EDGE_);
+    const double LEG_HEIGHT = 0.30;
+    const double LEG_LENGTH = 0.20;
+    TLegend legend(
+            RIGHT_EDGE_ - LEG_LENGTH,
+            (TOP_EDGE_ - 0.025) - LEG_HEIGHT,  // 0.025 offset to avoid ticks
+            RIGHT_EDGE_,
+            TOP_EDGE_ - 0.025  // 0.025 offset to avoid the ticks
+            );
     legend.SetFillColor(kWhite);
     legend.AddEntry(data_histo, data_config_.name.c_str(), "p");
     legend.AddEntry(mc_histo, mc_config_.name.c_str(), "f");
@@ -495,8 +500,8 @@ void CrossCheckPlotter::plot(
     ratio_line.SetLineColor(kRed);
     // Make the ratio
     ratio_histo->Divide(data_histo, histo_sum);
-    ratio_histo->SetMaximum(2.1);
-    ratio_histo->SetMinimum(-0.1);
+    ratio_histo->SetMaximum(1.3);
+    ratio_histo->SetMinimum(0.7);
 
     ratio_histo->Draw("E");  // Draw first for Axis labels
     ratio_line.Draw("SAME");
@@ -842,7 +847,7 @@ void CrossCheckPlotter::init_config_map() {
                     0.034, 0.039, 0.045, 0.052, 0.057, 0.064, 0.072, 0.081,
                     0.091, 0.102, 0.114, 0.128, 0.145, 0.165, 0.189, 0.219,
                     0.258, 0.312, 0.391, 0.524, 0.695, 0.918, 1.153, 1.496,
-                    1.947, 2.522, 3.277}
+                    1.947, 2.522, 3.277, 10.}
                     )
                 )
             );
