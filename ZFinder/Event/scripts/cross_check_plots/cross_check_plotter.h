@@ -53,6 +53,7 @@ struct PlotConfig{
         std::string title,
         std::string histo_name,
         bool logy,
+        bool logx,
         std::vector<double> binning
             ) :
         x_label(x_label),
@@ -60,6 +61,7 @@ struct PlotConfig{
         title(title),
         histo_name(histo_name),
         logy(logy),
+        logx(logx),
         binning(binning)
     { // Everything needed is done by the initializer list
     }
@@ -70,6 +72,7 @@ struct PlotConfig{
     std::string title;
     std::string histo_name;
     bool logy;
+    bool logx;
     std::vector<double> binning;
 };
 

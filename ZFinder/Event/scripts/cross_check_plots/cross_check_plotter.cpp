@@ -466,6 +466,7 @@ void CrossCheckPlotter::plot(
     canvas.cd(1);
     gPad->SetPad(0, RATIO_HEIGHT, 1., 1.);
     gPad->SetLogy(plot_config.logy);
+    gPad->SetLogx(plot_config.logx);
     gPad->SetBottomMargin(0.01);  // Remove the margin, we'll put it under the ratio
 
     // Draw the histograms
@@ -481,6 +482,7 @@ void CrossCheckPlotter::plot(
     canvas.cd(2);
     gPad->SetPad(0, 0.05, 1., RATIO_HEIGHT);
     gPad->SetTopMargin(0);  // Move pad flush with plot above it
+    gPad->SetLogx(plot_config.logx);
     // Sum all the MC histos
     TH1D* histo_sum = dynamic_cast<TH1D*>(mc_histo->Clone());
     for (auto& i_pair : bg_histos) {
@@ -646,6 +648,7 @@ void CrossCheckPlotter::init_config_map() {
                     "",              // title
                     "Z0 Mass: All",  // histogram name (for reading in)
                     true,            // log Y axis
+                    false,           // log X axis
                     {}               // Desired new binning
                     )
                 )
@@ -659,6 +662,7 @@ void CrossCheckPlotter::init_config_map() {
                     "",
                     "Z0 Mass: Coarse",
                     true,
+                    false,
                     {}
                     )
                 )
@@ -672,6 +676,7 @@ void CrossCheckPlotter::init_config_map() {
                     "",
                     "Z0 Mass: Fine",
                     true,
+                    false,
                     {}
                     )
                 )
@@ -686,6 +691,7 @@ void CrossCheckPlotter::init_config_map() {
                     "",
                     "Z0 Rapidity",
                     true,
+                    false,
                     {}
                     )
                 )
@@ -700,6 +706,7 @@ void CrossCheckPlotter::init_config_map() {
                     "",
                     "Z0 p_{T}",
                     true,
+                    false,
                     {5}  // with one entry, just calls histo->Rebin(5);
                     )
                 )
@@ -713,6 +720,7 @@ void CrossCheckPlotter::init_config_map() {
                     "",
                     "p_{T,e_{0}}",
                     true,
+                    false,
                     {5}
                     )
                 )
@@ -726,6 +734,7 @@ void CrossCheckPlotter::init_config_map() {
                     "",
                     "p_{T,e_{1}}",
                     true,
+                    false,
                     {5}
                     )
                 )
@@ -740,6 +749,7 @@ void CrossCheckPlotter::init_config_map() {
                     "",
                     "#eta_{e_{0}}",
                     true,
+                    false,
                     {}
                     )
                 )
@@ -753,6 +763,7 @@ void CrossCheckPlotter::init_config_map() {
                     "",
                     "#eta_{e_{1}}",
                     true,
+                    false,
                     {}
                     )
                 )
@@ -767,6 +778,7 @@ void CrossCheckPlotter::init_config_map() {
                     "",
                     "#phi_{e_{0}}",
                     false,
+                    false,
                     {}
                     )
                 )
@@ -779,6 +791,7 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "#phi_{e_{1}}",
+                    false,
                     false,
                     {}
                     )
@@ -794,6 +807,7 @@ void CrossCheckPlotter::init_config_map() {
                     "",
                     "charge_{e_{0}}",
                     false,
+                    false,
                     {}
                     )
                 )
@@ -806,6 +820,7 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "charge_{e_{1}}",
+                    false,
                     false,
                     {}
                     )
@@ -820,6 +835,7 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "#phi*",
+                    true,
                     true,
                     // multiple entries means these are new bin edges
                     //{0.0, 0.05, 0.1, 0.2, 0.3, 0.4, 0.6, 1.0}
@@ -841,6 +857,7 @@ void CrossCheckPlotter::init_config_map() {
                     "",
                     "N_{Vertices}",
                     true,
+                    false,
                     {}
                     )
                 )
@@ -855,6 +872,7 @@ void CrossCheckPlotter::init_config_map() {
                     "",
                     "N_{e}",
                     true,
+                    false,
                     {}
                     )
                 )
