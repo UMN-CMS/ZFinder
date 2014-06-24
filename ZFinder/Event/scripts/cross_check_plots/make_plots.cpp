@@ -129,12 +129,12 @@ int main() {
     plotter->plot(Z_PT, "z_pt.png");
     plotter->plot(E0_PT, "e0_pt.png");
     plotter->plot(E0_ETA, "e0_eta.png");
-    plotter->plot(E0_PHI, "e0_phi.png");
-    plotter->plot(E0_CHARGE, "e0_charge.png");
+    //plotter->plot(E0_PHI, "e0_phi.png");
+    //plotter->plot(E0_CHARGE, "e0_charge.png");
     plotter->plot(E1_PT, "e1_pt.png");
     plotter->plot(E1_ETA, "e1_eta.png");
-    plotter->plot(E1_PHI, "e1_phi.png");
-    plotter->plot(E1_CHARGE, "e1_charge.png");
+    //plotter->plot(E1_PHI, "e1_phi.png");
+    //plotter->plot(E1_CHARGE, "e1_charge.png");
     plotter->plot(PHISTAR, "phistar.png");
     plotter->plot(N_VERTS, "n_verts.png");
     plotter->plot(N_E, "n_e.png");
