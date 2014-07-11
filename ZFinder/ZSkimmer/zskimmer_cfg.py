@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("ZFinderMC")
+process = cms.Process("ZSkimmer")
 
 # Set up message output and logging
 from FWCore.MessageService.MessageLogger_cfi import MessageLogger
