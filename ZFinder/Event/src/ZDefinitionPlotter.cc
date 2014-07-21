@@ -13,8 +13,15 @@ namespace zf {
     ZDefinitionPlotter::ZDefinitionPlotter(const ZDefinition& zdef, TFileDirectory& tdir, const bool USE_MC) : USE_MC_(USE_MC) {
         // Get the name of the cut we want
         zdef_name = zdef.NAME;
+
+        // Add the "0 All Events" set of plots
+        // Make our TFileDirectory for the plotter
+        TFileDirectory t_subdir_0 = tdir.mkdir("0 All Events", "O All Events");
+        all_events_plot_ = new ZFinderPlotter(t_subdir_0, USE_MC_);
+
         // Fill zf_ploters
-        int counter = 0;
+        // Cut names in the output start with this number and count up
+        int counter = 1;
         for (auto& i_cutlevel : zdef.clv) {
             const std::string CUT_NAME = i_cutlevel.first;
 
@@ -32,12 +39,21 @@ namespace zf {
         }
     }
 
+    ZDefinitionPlotter::~ZDefinitionPlotter(){
+        // Clean up our pointer
+        delete all_events_plot_;
+    }
+
     void ZDefinitionPlotter::Fill(const ZFinderEvent& zf_event, const int electron_0, const int electron_1) {
         /*
          * We loop over the cutlevel_vector specified by the name given to use
          * by the zdef in the constructor. We then plot the event until it
          * fails a cut, then we stop.
          */
+        // All events plot, which is always filled
+        all_events_plot_->Fill(zf_event, electron_0, electron_1, 1.);
+
+        // Cutlevel_vector loop
         const cutlevel_vector* clv = zf_event.GetZDef(zdef_name);
         if (clv != NULL) {
             bool cont = true;

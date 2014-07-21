@@ -25,6 +25,7 @@ namespace zf {
                     const bool USE_MC = false
                     );
 
+            ~ZDefinitionPlotter();
             // Add events
             void Fill(
                     const ZFinderEvent& zf_event,
@@ -41,6 +42,9 @@ namespace zf {
 
             // A Vector of our ZFinderPlotter
             std::map<std::string, ZFinderPlotter> zf_plotters;
+
+            // Space for our 0th plot of all events
+            ZFinderPlotter* all_events_plot_;
     };
 }  // namespace zf
 #endif  // ZFINDER_ZDEFINITIONPLOTTER_H_
