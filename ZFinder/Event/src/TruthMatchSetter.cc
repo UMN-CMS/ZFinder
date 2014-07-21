@@ -36,14 +36,17 @@ namespace zf {
         if (is_real_data) {
             return false;
         }
+
         // Try to match to one of the two Truth particles
         double dr0 = 9999.;
         double dr1 = 9999.;
         if (zf_event_->e0_truth != NULL) {
-            dr0 = deltaR(ZF_ELEC.eta, ZF_ELEC.phi, zf_event_->e0->eta, zf_event_->e0->phi);
+            ZFinderElectron* e0_truth = zf_event_->e0_truth;
+            dr0 = deltaR(ZF_ELEC.eta, ZF_ELEC.phi, e0_truth->eta, e0_truth->phi);
         }
         if (zf_event_->e1_truth != NULL) {
-            dr1 = deltaR(ZF_ELEC.eta, ZF_ELEC.phi, zf_event_->e1->eta, zf_event_->e1->phi);
+            ZFinderElectron* e1_truth = zf_event_->e1_truth;
+            dr1 = deltaR(ZF_ELEC.eta, ZF_ELEC.phi, e1_truth->eta, e1_truth->phi);
         }
 
         if (dr0 < DELTA_R || dr1 < DELTA_R) {
