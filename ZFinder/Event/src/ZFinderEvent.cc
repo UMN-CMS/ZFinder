@@ -162,10 +162,13 @@ namespace zf {
         // Sort our electrons and set e0, e1 as the two with the highest pt
         std::sort(reco_electrons_.begin(), reco_electrons_.end(), SortByPTHighLow);
 
-        // For Zs
+        // Set up the internal electron pointers and, if we have enough
+        // electrons, use them to make a Z
         n_reco_electrons = reco_electrons_.size();
-        if (n_reco_electrons >= 2) {
-            // Set our internal electrons
+        if (n_reco_electrons == 1) {
+            set_e0(reco_electrons_[0]);
+        }
+        else if (n_reco_electrons >= 2) {
             set_both_e(reco_electrons_[0], reco_electrons_[1]);
             // Set up the Z
             InitZ();

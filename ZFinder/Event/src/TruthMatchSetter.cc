@@ -21,6 +21,10 @@ namespace zf {
 
     void TruthMatchSetter::SetCut_(ZFinderElectron* zf_elec) {
         const double WEIGHT = 1.;
+        // Abort if we have a null pointer
+        if (zf_elec == NULL) {
+            return;
+        }
         // Now set all cuts
         zf_elec->AddCutResult("dr(0.05)", MatchTruth(*zf_elec, 0.05), WEIGHT);
         zf_elec->AddCutResult("dr(0.1)", MatchTruth(*zf_elec, 0.1), WEIGHT);

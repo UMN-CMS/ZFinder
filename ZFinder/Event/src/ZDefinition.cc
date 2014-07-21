@@ -191,9 +191,17 @@ namespace zf {
         // Get the value for the efficiency
         double efficiency = 1.;
         if (I_ELEC == 0) {
-            efficiency = zf_event->e0->CutWeight(CUT);
+            if (zf_event->e0 != NULL) {
+                efficiency = zf_event->e0->CutWeight(CUT);
+            } else {  // If the electron doesn't exist we return 0
+                return 0.;
+            }
         } else {
-            efficiency = zf_event->e1->CutWeight(CUT);
+            if (zf_event->e1 != NULL) {
+                efficiency = zf_event->e1->CutWeight(CUT);
+            } else {
+                return 0.;
+            }
         }
         // Check if the cut failed to get a result, if so we assume it is 1 and
         // return, because it makes no sense to invert at this point since we
@@ -218,9 +226,17 @@ namespace zf {
         // Check the cut on the event
         bool passed = false;
         if (I_ELEC == 0) {
-            passed = zf_event->e0->CutPassed(CUT);
+            if (zf_event->e0 != NULL) {
+                passed = zf_event->e0->CutPassed(CUT);
+            } else {
+                return false;
+            }
         } else {
-            passed = zf_event->e1->CutPassed(CUT);
+            if (zf_event->e1 != NULL) {
+                passed = zf_event->e1->CutPassed(CUT);
+            } else {
+                return false;
+            }
         }
 
         // -1 is used to indicate a missing cut, we never invert this, they are
@@ -281,17 +297,17 @@ namespace zf {
         // Get the electron we want
         ZFinderElectron* zf_elec = NULL;
         if (I_ELEC == 0) {
-            if (cut_type == TRUTH && zf_event->e0 != NULL && zf_event->e1 != NULL) {
+            if (cut_type == TRUTH) {
                 zf_elec = zf_event->e0_truth;
-            } else if (cut_type == TRIG && zf_event->e0 != NULL && zf_event->e1 != NULL) {
+            } else if (cut_type == TRIG) {
                 zf_elec = zf_event->e0_trig;
             } else {
                 zf_elec = zf_event->e0;
             }
         } else {
-            if (cut_type == TRUTH && zf_event->e0 != NULL && zf_event->e1 != NULL) {
+            if (cut_type == TRUTH) {
                 zf_elec = zf_event->e1_truth;
-            } else if (cut_type == TRIG && zf_event->e0 != NULL && zf_event->e1 != NULL) {
+            } else if (cut_type == TRIG) {
                 zf_elec = zf_event->e1_trig;
             } else {
                 zf_elec = zf_event->e1;

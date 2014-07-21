@@ -204,7 +204,9 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     // Construct a ZFinderEvent
     zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_);
-    if (zfe.reco_z.m > -1 && zfe.e0 != NULL && zfe.e1 != NULL) {  // We have a good Z
+    if ( (zfe.reco_z.m > -1 && zfe.e0 != NULL && zfe.e1 != NULL)
+            || (zfe.truth_z.m > -1 && zfe.e0_truth != NULL && zfe.e1_truth != NULL)
+       ) {  // We have a good Z in Reco OR Truth
         // Set all cuts
         for (auto& i_set : setters_) {
             i_set->SetCuts(&zfe);
