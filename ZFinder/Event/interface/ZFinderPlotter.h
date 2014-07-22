@@ -25,8 +25,6 @@ namespace zf {
                     const int SECOND_ELECTRON = 1,
                     const double EVENT_WEIGHT = 1.
                     );
-            // Make PNGs
-            void Print(const std::string& basename);
 
         protected:
             // Histograms
@@ -55,10 +53,6 @@ namespace zf {
 
             // Use the MC or reco data
             const bool USE_MC_;
-
-            // Plotting variables
-            static const int X_SIZE = 1280;
-            static const int Y_SIZE = 640;
     };
 }  // namespace zf
 #endif  // ZFINDER_ZFINDERPLOTTER_H_
