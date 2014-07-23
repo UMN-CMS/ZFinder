@@ -243,11 +243,13 @@ namespace zf {
                     e0_pt_->Fill(ZF_EVENT.e0_truth->pt, EVENT_WEIGHT);
                     e0_eta_->Fill(ZF_EVENT.e0_truth->eta, EVENT_WEIGHT);
                     e0_phi_->Fill(ZF_EVENT.e0_truth->phi, EVENT_WEIGHT);
+                    e0_charge_->Fill(ZF_EVENT.e0_truth->charge, EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e1_truth != NULL) {
                     e1_pt_->Fill(ZF_EVENT.e1_truth->pt, EVENT_WEIGHT);
                     e1_eta_->Fill(ZF_EVENT.e1_truth->eta, EVENT_WEIGHT);
                     e1_phi_->Fill(ZF_EVENT.e1_truth->phi, EVENT_WEIGHT);
+                    e1_charge_->Fill(ZF_EVENT.e1_truth->charge, EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e0_trig != NULL) {
                     e0_pt_vs_trig_->Fill(
@@ -267,11 +269,13 @@ namespace zf {
                     e0_pt_->Fill(ZF_EVENT.e1_truth->pt, EVENT_WEIGHT);
                     e0_eta_->Fill(ZF_EVENT.e1_truth->eta, EVENT_WEIGHT);
                     e0_phi_->Fill(ZF_EVENT.e1_truth->phi, EVENT_WEIGHT);
+                    e0_charge_->Fill(ZF_EVENT.e1_truth->charge, EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e0_truth != NULL) {
                     e1_pt_->Fill(ZF_EVENT.e0_truth->pt, EVENT_WEIGHT);
                     e1_eta_->Fill(ZF_EVENT.e0_truth->eta, EVENT_WEIGHT);
                     e1_phi_->Fill(ZF_EVENT.e0_truth->phi, EVENT_WEIGHT);
+                    e1_charge_->Fill(ZF_EVENT.e0_truth->charge, EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e1_trig != NULL) {
                     e0_pt_vs_trig_->Fill(
