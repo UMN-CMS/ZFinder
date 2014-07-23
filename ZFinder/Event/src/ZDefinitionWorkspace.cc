@@ -249,12 +249,20 @@ namespace zf {
         argset_->setRealValue("n_vert", verts);
         argset_->setRealValue("event_num", zf_event.id.event_num);
 
-        // We set the weight to be equal to the weight of the last cut level.
+        // We set the weight to be equal to the weight of the last cut level,
+        // unless the event is from MC and we have are plotting truth values,
+        // in which case we set it to the event_weight, which is just the
+        // weight used for pileup reweighting.
         double weight = 1.;
-        if (tag == 0) {
-            weight = last_cutlevel.t0p1_eff;
-        } else  {
-            weight = last_cutlevel.t1p0_eff;
+        if (USE_TRUTH_ && zf_event.is_real_data) {
+            weight = zf_event.event_weight;
+        }
+        else {
+            if (tag == 0) {
+                weight = last_cutlevel.t0p1_eff;
+            } else  {
+                weight = last_cutlevel.t1p0_eff;
+            }
         }
 
         // Save the argset
