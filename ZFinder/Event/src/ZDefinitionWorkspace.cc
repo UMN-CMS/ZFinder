@@ -41,14 +41,14 @@ namespace zf {
         z_pt_ = new RooRealVar("z_pt", "Z_{p_{T}}", 0, 1000, "GeV");
         phistar_ = new RooRealVar("phistar", "#phi*", -0.1, 10);
         // Electrons
-        e0_pt_ = new RooRealVar("e0_pt", "p_{T}^{e_{0}}", 0, 1000, "GeV");
+        e0_pt_ = new RooRealVar("e0_pt", "p_{T}^{e_{0}}", -1, 1000, "GeV");
         e0_eta_ = new RooRealVar("e0_eta", "#eta_{e_{0}}", -6, 6);
         e0_phi_ = new RooRealVar("e0_phi", "#phi_{e_{0}}", -3.142, 3.142);
         e0_charge_ = new RooCategory("e0_charge", "q_{e_{0}}");
         e0_charge_->defineType("Unmeasured", 0);
         e0_charge_->defineType("Positive", 1);
         e0_charge_->defineType("Negative", -1);
-        e1_pt_ = new RooRealVar("e1_pt", "p_{T}^{e_{1}}", 0, 1000, "GeV");
+        e1_pt_ = new RooRealVar("e1_pt", "p_{T}^{e_{1}}", -1, 1000, "GeV");
         e1_eta_ = new RooRealVar("e1_eta", "#eta_{e_{1}}", -6, 6);
         e1_phi_ = new RooRealVar("e1_phi", "#phi_{e_{1}}", -3.142, 3.142);
         e1_charge_ = new RooCategory("e1_charge", "q_{e_{1}}");
@@ -56,7 +56,7 @@ namespace zf {
         e1_charge_->defineType("Positive", 1);
         e1_charge_->defineType("Negative", -1);
         // Event
-        n_vert_ = new RooRealVar("n_vert", "Number of Vertices", 0, 100);
+        n_vert_ = new RooRealVar("n_vert", "Number of Vertices", -1, 100);
         // We use an unsigned int in ZFinderEvent, so event number must be
         // within these bounds
         event_num_ = new RooRealVar("event_num", "Event Number", 0, 4294967295);
@@ -206,29 +206,46 @@ namespace zf {
                 e_probe = zf_event.e0_truth;
             }
         }
-        // End if we have bad data
-        if (     e_tag == NULL
-                || e_probe == NULL
-                || z_data == NULL
-                || verts == -1
-           ) {
-            return;
-        }
 
         // Assign the variables
-        argset_->setRealValue("z_mass", z_data->m);
-        argset_->setRealValue("z_eta", z_data->eta);
-        argset_->setRealValue("z_y", z_data->y);
-        argset_->setRealValue("z_pt", z_data->pt);
-        argset_->setRealValue("phistar", z_data->phistar);
-        argset_->setRealValue("e0_pt", e_tag->pt);
-        argset_->setRealValue("e0_eta", e_tag->eta);
-        argset_->setRealValue("e0_phi", e_tag->phi);
-        argset_->setCatIndex("e0_charge", e_tag->charge);
-        argset_->setRealValue("e1_pt", e_probe->pt);
-        argset_->setRealValue("e1_eta", e_probe->eta);
-        argset_->setRealValue("e1_phi", e_probe->phi);
-        argset_->setCatIndex("e1_charge", e_probe->charge);
+        if (z_data != NULL) {
+            argset_->setRealValue("z_mass", z_data->m);
+            argset_->setRealValue("z_eta", z_data->eta);
+            argset_->setRealValue("z_y", z_data->y);
+            argset_->setRealValue("z_pt", z_data->pt);
+            argset_->setRealValue("phistar", z_data->phistar);
+        }
+        else {
+            argset_->setRealValue("z_mass", -1);
+            argset_->setRealValue("z_eta", -6);
+            argset_->setRealValue("z_y", -6);
+            argset_->setRealValue("z_pt", 0);
+            argset_->setRealValue("phistar", -0.1);
+        }
+        if (e_tag != NULL) {
+            argset_->setRealValue("e0_pt", e_tag->pt);
+            argset_->setRealValue("e0_eta", e_tag->eta);
+            argset_->setRealValue("e0_phi", e_tag->phi);
+            argset_->setCatIndex("e0_charge", e_tag->charge);
+        }
+        else {
+            argset_->setRealValue("e0_pt", -1);
+            argset_->setRealValue("e0_eta", -6);
+            argset_->setRealValue("e0_phi", -3.142);
+            argset_->setCatIndex("e0_charge", 0);
+        }
+        if (e_probe != NULL) {
+            argset_->setRealValue("e1_pt", e_probe->pt);
+            argset_->setRealValue("e1_eta", e_probe->eta);
+            argset_->setRealValue("e1_phi", e_probe->phi);
+            argset_->setCatIndex("e1_charge", e_probe->charge);
+        }
+        else {
+            argset_->setRealValue("e1_pt", -1);
+            argset_->setRealValue("e1_eta", -6);
+            argset_->setRealValue("e1_phi", -3.142);
+            argset_->setCatIndex("e1_charge", 0);
+        }
         argset_->setRealValue("n_vert", verts);
         argset_->setRealValue("event_num", zf_event.id.event_num);
 
