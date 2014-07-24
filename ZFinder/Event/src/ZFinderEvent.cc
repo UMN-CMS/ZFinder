@@ -94,12 +94,12 @@ namespace zf {
         InitReco(iEvent, iSetup);  // Data
         if (!is_real_data) {
             InitTruth(iEvent, iSetup);  // MC
-            if((reco_z.m != -1)&&(truth_z.m != -1)) //if both truth and reco Zs successfully created
-            {
-                reco_z.theOtherPhistar = truth_z.phistar;
-                reco_z.theOtherY = truth_z.y;
-                truth_z.theOtherPhistar = reco_z.phistar;
-                truth_z.theOtherY = reco_z.y;
+            //if both truth and reco Zs successfully created
+            if (reco_z.m != -1 && truth_z.m != -1) {
+                reco_z.other_phistar = truth_z.phistar;
+                reco_z.other_y = truth_z.y;
+                truth_z.other_phistar = reco_z.phistar;
+                truth_z.other_y = reco_z.y;
             }
         }
         InitTrigger(iEvent, iSetup);  // Trigger Matching
@@ -463,17 +463,17 @@ namespace zf {
         reco_z.phistar = -1;
         reco_z.eta = -1000;
         reco_z.deltaR = -1;
-        reco_z.theOtherY = -1000;
-        reco_z.theOtherPhistar = -1;
-        
+        reco_z.other_y = -1000;
+        reco_z.other_phistar = -1;
+
         truth_z.m = -1;
         truth_z.y = -1000;
         truth_z.pt = -1;
         truth_z.phistar = -1;
         truth_z.eta = -1000;
         truth_z.deltaR = -1;
-        truth_z.theOtherY = -1000;
-        truth_z.theOtherPhistar = -1;        
+        truth_z.other_y = -1000;
+        truth_z.other_phistar = -1;
 
         // Electrons
         e0 = NULL;
@@ -564,6 +564,7 @@ namespace zf {
             truth_z.y = 0.5 * log(ZEPP / ZEMP);
             truth_z.phistar = ReturnPhistar(electron_0->eta(), electron_0->phi(), electron_1->eta(), electron_1->phi());
             truth_z.eta = z_boson->eta();
+            truth_z.deltaR = deltaR(e0_truth->eta, e0_truth->phi, e1_truth->eta, e1_truth->phi);
         }
     }
 

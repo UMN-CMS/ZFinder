@@ -74,9 +74,9 @@ namespace zf {
                 double phistar;
                 double eta;
                 double deltaR;
-                //for events where gen XOR reco failed given selectoin:
-                double theOtherY;
-                double theOtherPhistar;
+                //for events where gen XOR reco failed given selection:
+                double other_y;
+                double other_phistar;
             } reco_z, truth_z;
 
             // Event weight, used for things like pileup reweighting. Most
