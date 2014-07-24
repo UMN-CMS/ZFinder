@@ -96,10 +96,10 @@ namespace zf {
             InitTruth(iEvent, iSetup);  // MC
             if((reco_z.m != -1)&&(truth_z.m != -1)) //if both truth and reco Zs successfully created
             {
-				reco_z.theOtherPhistar = truth_z.phistar;
-				reco_z.theOtherY = truth_z.y;
-				truth_z.theOtherPhistar = reco_z.phistar;
-				truth_z.theOtherY = reco_z.y;
+                reco_z.theOtherPhistar = truth_z.phistar;
+                reco_z.theOtherY = truth_z.y;
+                truth_z.theOtherPhistar = reco_z.phistar;
+                truth_z.theOtherY = reco_z.y;
             }
         }
         InitTrigger(iEvent, iSetup);  // Trigger Matching
