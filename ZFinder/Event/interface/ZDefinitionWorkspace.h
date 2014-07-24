@@ -52,8 +52,10 @@ namespace zf {
             RooRealVar* z_mass_;
             RooRealVar* z_eta_;
             RooRealVar* z_y_;
+            RooRealVar* other_y_;
             RooRealVar* z_pt_;
             RooRealVar* phistar_;
+            RooRealVar* other_phistar_;
             // Electrons
             RooRealVar* e0_pt_;
             RooRealVar* e0_eta_;
