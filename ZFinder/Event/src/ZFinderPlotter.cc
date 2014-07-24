@@ -101,6 +101,18 @@ namespace zf {
         phistar_ = tdir.make<TH1D>(phistar_name.c_str(), phistar_name.c_str(), 4000, 0., 4.);
         phistar_->GetXaxis()->SetTitle("#phi*");
         phistar_->GetYaxis()->SetTitle("Counts");
+        
+        // theOtherPhistar for gen-reco efficiencies
+        const std::string theOtherPhistar_name = "#theOtherPhistar";
+        theOtherPhistar_ = tdir.make<TH1D>(theOtherPhistar_name.c_str(), theOtherPhistar_name.c_str(), 4000, 0., 4.);
+        theOtherPhistar_->GetXaxis()->SetTitle("#theOtherPhistar");
+        theOtherPhistar_->GetYaxis()->SetTitle("Counts");
+        
+        // theOtherY_ for gen-reco efficiencies
+        const std::string theOtherY_name = "theOtherY";
+        theOtherY_ = tdir.make<TH1D>(theOtherY_name.c_str(), theOtherY_name.c_str(), 100, -5., 5.);
+        theOtherY_->GetXaxis()->SetTitle("Z_{Y, other}");
+        theOtherY_->GetYaxis()->SetTitle("Counts");
 
         // pileup
         const std::string pileup_name = "N_{Vertices}";
@@ -171,6 +183,11 @@ namespace zf {
             z0_pt_->Fill(ZF_EVENT.reco_z.pt, EVENT_WEIGHT);
             phistar_->Fill(ZF_EVENT.reco_z.phistar, EVENT_WEIGHT);
             deltaR_->Fill(ZF_EVENT.reco_z.deltaR, EVENT_WEIGHT);
+            if(!ZF_EVENT.is_real_data)//if corresponding gen info exists
+            {
+            	theOtherPhistar_->Fill(ZF_EVENT.reco_z.theOtherPhistar, EVENT_WEIGHT);
+	            theOtherY_->Fill(ZF_EVENT.reco_z.theOtherY, EVENT_WEIGHT);
+            }
 
             // Fill the histograms with the information from the approriate electron
             if (ELECTRON_0 == 0 && ELECTRON_1 == 1) {
@@ -236,6 +253,8 @@ namespace zf {
             z0_rapidity_->Fill(ZF_EVENT.truth_z.y, EVENT_WEIGHT);
             z0_pt_->Fill(ZF_EVENT.truth_z.pt, EVENT_WEIGHT);
             phistar_->Fill(ZF_EVENT.truth_z.phistar, EVENT_WEIGHT);
+            theOtherPhistar_->Fill(ZF_EVENT.truth_z.theOtherPhistar, EVENT_WEIGHT);
+            theOtherY_->Fill(ZF_EVENT.truth_z.theOtherY, EVENT_WEIGHT);
 
             // Fill the histograms with the information from the approriate electron
             if (ELECTRON_0 == 0 && ELECTRON_1 == 1) {
