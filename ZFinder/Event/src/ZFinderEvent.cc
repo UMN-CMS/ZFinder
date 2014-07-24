@@ -94,10 +94,14 @@ namespace zf {
         InitReco(iEvent, iSetup);  // Data
         if (!is_real_data) {
             InitTruth(iEvent, iSetup);  // MC
-            //if both truth and reco Zs successfully created
-            if (reco_z.m != -1 && truth_z.m != -1) {
+            // In MC we want to store the value of the Truth phistar and Y with
+            // the reco events, and vice versa, so that they may be used for
+            // unfolding
+            if (truth_z.m != -1) {  // Good truth Z
                 reco_z.other_phistar = truth_z.phistar;
                 reco_z.other_y = truth_z.y;
+            }
+            if (reco_z.m != -1) {  // Good reco Z
                 truth_z.other_phistar = reco_z.phistar;
                 truth_z.other_y = reco_z.y;
             }
