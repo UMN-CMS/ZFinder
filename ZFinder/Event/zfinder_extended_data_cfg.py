@@ -35,22 +35,38 @@ json_file = "../../Metadata/lumi_json/Run2012ABCD.json"  # File location
 run_2012abcd_lumis = LumiList(filename = json_file).getCMSSWString().split(',')
 process.source.lumisToProcess = untracked(VLuminosityBlockRange(run_2012abcd_lumis))
 
+# Energy and calibrations for electrons
+process.load('Configuration.StandardSequences.GeometryDB_cff')
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+process.GlobalTag.globaltag = 'GR_P_V42_AN3::All'
+
+from ZFinder.Event.electron_regression_cfi import CalibratedElectrons, RandomNumberGeneratorService, ElectronEnergyRegressions
+process.RandomNumberGeneratorService = RandomNumberGeneratorService
+process.CalibratedElectrons = CalibratedElectrons
+process.eleRegressionEnergy = ElectronEnergyRegressions
+
 # Import rho value for isolation correction
 from ZFinder.Event.kt6_pfjets_cfi import kt6PFJetsForIsolation
 process.kt6PFJetsForIsolation = kt6PFJetsForIsolation.clone()
 
 # Particle flow isolation
 from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso
-process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
+process.eleIsoSequence = setupPFElectronIso(process, 'CalibratedElectrons:calibratedGsfElectrons')
 process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIsoSequence)
 
 # ZFinder
 from ZFinder.Event.zfinder_cfi import ZFinder
-process.ZFinder = ZFinder.clone()
+process.ZFinder = ZFinder.clone(
+        # Use the calibrated electrons we make with
+        # process.CalibratedElectrons
+        ecalElectronsInputTag = cms.InputTag("CalibratedElectrons", "calibratedGsfElectrons"),
+        )
 
 # RUN
 process.p = cms.Path(
         process.kt6PFJetsForIsolation
+        * process.eleRegressionEnergy
+        * process.CalibratedElectrons
         * process.pfiso
         * process.ZFinder
         )
