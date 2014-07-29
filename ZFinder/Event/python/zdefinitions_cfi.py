@@ -47,6 +47,7 @@ combined_single = cms.untracked.PSet(
         )
 
 combined_single_no_trigger = combined_single.clone(
+        name = cms.untracked.string("Combined Single No Trigger"),
         cuts0 = cms.untracked.vstring("acc(ALL)", "acc(MUON_TIGHT)", "pt>30", "eg_tight"),
         cuts1 = cms.untracked.vstring("acc(ALL)", "acc(MUON_LOOSE)", "pt>20", "eg_medium"),
         )
@@ -62,6 +63,7 @@ ecal_ecal = cms.untracked.PSet(
         )
 
 ecal_ecal_no_trigger = ecal_ecal.clone(
+        name = cms.untracked.string("ET-ET Rapidity No Trigger"),
         cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>30", "eg_medium"),
         cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>20", "eg_loose"),
         )
@@ -76,6 +78,7 @@ ecal_nt = cms.untracked.PSet(
         )
 
 ecal_nt_no_trigger = ecal_nt.clone(
+        name = cms.untracked.string("ET-NT Rapidity No Trigger"),
         cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>30", "eg_medium"),
         cuts1 = cms.untracked.vstring("acc(ALL)", "acc(NT)", "pt>20", "nt_loose"),
         )
@@ -90,6 +93,7 @@ ecal_hf = cms.untracked.PSet(
         )
 
 ecal_hf_no_trigger = ecal_hf.clone(
+        name = cms.untracked.string("ET-HF Rapidity No Trigger"),
         cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>30", "eg_medium"),
         cuts1 = cms.untracked.vstring("acc(ALL)", "acc(HF)", "pt>20", "hf_2dloose"),
         )
