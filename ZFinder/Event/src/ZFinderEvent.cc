@@ -424,26 +424,28 @@ namespace zf {
             }
             
             //If necessary, do trackless electron bending correction:
-            if ((fabs(e0->eta) > 2.5) && (e0->charge == 0))
+            if(e0->CutPassed("type_photon") == 1)
             {
-               if( (e1->charge != 0) && (fabs(e1->eta) < 2.5) ) {
-               //3.18 m to EE, 3.8 T field, and a factor of 1e9 for GeV
-               e0->phi += 1 * e1>charge * tanh(e0->eta) / cosh(e0->eta) * 3.18 * 3.8 / (e0->pt * 1e9);
-               e0->AddCutResult("nt_corrected", true, 1.0);
+               if(e1->CutPassed("type_gsf") == 1) 
+               {
+                   //3.18 m to EE, 3.8 T field, and a factor of 1e9 for GeV
+                   e0->phi += 1 * e1>charge * tanh(e0->eta) / cosh(e0->eta) * 3.18 * 3.8 / (e0->pt * 1e9);
+                   e0->AddCutResult("nt_corrected", true, 1.0);
                }
                else {
                    e0->AddCutResult("nt_corrected", false, 1.0);
                }
             }
-            else if ((fabs(e1->eta) > 2.5) && (e1->charge == 0))
+            else if(e1->CutPassed("type_photon") == 1)
             {
-               if ( (e0->charge != 0) && (fabs(e1->eta) < 2.5) ){
-               //3.18 m to EE, 3.8 T field, and a factor of 1e9 for GeV
-               e1->phi += 1 * e0>charge * tanh(e1->eta) / cosh(e1->eta) * 3.18 * 3.8 / (e1->pt * 1e9);
-               e1->AddCutResult("nt_corrected", true, 1.0);
+               if(e0->CutPassed("type_gsf") == 1) 
+               {
+                   //3.18 m to EE, 3.8 T field, and a factor of 1e9 for GeV
+                   e1->phi += 1 * e0>charge * tanh(e1->eta) / cosh(e1->eta) * 3.18 * 3.8 / (e1->pt * 1e9);
+                   e1->AddCutResult("nt_corrected", true, 1.0);
                }
                else {
-                   e0->AddCutResult("nt_corrected", false, 1.0);
+                   e1->AddCutResult("nt_corrected", false, 1.0);
                }
             }
 
