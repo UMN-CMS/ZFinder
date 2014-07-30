@@ -206,6 +206,9 @@ namespace zf {
 
             // Use the muon acceptance requirements to select electrons
             bool use_muon_acceptance_;
+
+            // NT Bending Correction
+            void ApplyNTBendingCorrection();
     };
 }  // namespace zf
 #endif  // ZFINDER_ZFINDEREVENT_H_

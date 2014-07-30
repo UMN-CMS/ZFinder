@@ -181,6 +181,10 @@ namespace zf {
         }
         else if (n_reco_electrons >= 2) {
             set_both_e(reco_electrons_[0], reco_electrons_[1]);
+            // We can only apply the NT Bending correction if we already have
+            // both electrons, since we need the sign of the tracked one to
+            // infer the sign of the untracked electron.
+            ApplyNTBendingCorrection();
             // Set up the Z
             InitZ();
         }
@@ -420,30 +424,6 @@ namespace zf {
                     )
                 ) {
                     return;
-                }
-            }
-
-            //If necessary, do trackless electron bending correction:
-            const double B_FIELD = 3.8;  // Tesla
-            const double DIST_TO_EE = 3.18;  // Distance to EE in meters
-            const double WEIGHT = 1.0;
-            if (e0->CutPassed("type_photon") == 1) {
-                if (e1->CutPassed("type_gsf") == 1) {
-                    //3.18 m to EE, 3.8 T field, and a factor of 1e9 for GeV
-                    e0->phi += 1 * e1->charge * tanh(e0->eta) / cosh(e0->eta) * DIST_TO_EE * B_FIELD / (e0->pt * 1e9);
-                    e0->AddCutResult("nt_corrected", true, WEIGHT);
-                }
-                else {
-                    e0->AddCutResult("nt_corrected", false, WEIGHT);
-                }
-            }
-            else if (e1->CutPassed("type_photon") == 1) {
-                if (e0->CutPassed("type_gsf") == 1) {
-                    e1->phi += 1 * e0->charge * tanh(e1->eta) / cosh(e1->eta) * DIST_TO_EE * B_FIELD / (e1->pt * 1e9);
-                    e1->AddCutResult("nt_corrected", true, WEIGHT);
-                }
-                else {
-                    e1->AddCutResult("nt_corrected", false, WEIGHT);
                 }
             }
 
@@ -889,6 +869,51 @@ namespace zf {
             return true;
         } else {
             return false;
+        }
+    }
+
+    void ZFinderEvent::ApplyNTBendingCorrection(
+            ) {
+        // The electrons
+        ZFinderElectron* electron_to_correct = NULL;
+        const ZFinderElectron* spectator_electron = NULL;
+        if (e0->CutPassed("type_photon") == 1) {
+            electron_to_correct = e0;
+            if (e1->CutPassed("type_gsf") == 1) {
+                spectator_electron = e1;
+            }
+        }
+        else if (e1->CutPassed("type_photon") == 1) {
+            electron_to_correct = e1;
+            if (e0->CutPassed("type_gsf") == 1) {
+                spectator_electron = e0;
+            }
+        }
+
+        // If we have an NT electron and a GSF electron, we apply the
+        // correction. If we only have an NT electron, we mark that the
+        // correction was no applied. If we have neither, we do nothing.
+        if (electron_to_correct != NULL) {
+            const double WEIGHT = 1.0;
+            // We can do the correction
+            if (spectator_electron != NULL) {
+                //3.18 m to EE, 3.8 T field, and a factor of 1e9 for GeV
+                const double B_FIELD = 3.8;  // Tesla
+                const double DIST_TO_EE = 3.18;  // Distance to EE in meters
+
+                // TODO: Alexey, please break this line up so that it isn't a
+                // million miles long
+                const double ADDITIVE_CORRECTION = 1 * spectator_electron->charge * tanh(electron_to_correct->eta) / cosh(electron_to_correct->eta) * DIST_TO_EE * B_FIELD / (electron_to_correct->pt * 1e9);
+
+                electron_to_correct->phi += ADDITIVE_CORRECTION;
+                electron_to_correct->AddCutResult("nt_corrected", true, WEIGHT);
+                return;
+            }
+            // No GSF to use to correct
+            else {
+                electron_to_correct->AddCutResult("nt_corrected", false, WEIGHT);
+                return;
+            }
         }
     }
 
