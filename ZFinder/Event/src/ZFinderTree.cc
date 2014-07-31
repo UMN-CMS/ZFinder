@@ -102,16 +102,16 @@ namespace zf {
 
         if (IS_MC_) {
             if (our_e0_truth != NULL) {
-                reco_.e_pt[0] = our_e0_truth->pt;
-                reco_.e_eta[0] = our_e0_truth->eta;
-                reco_.e_phi[0] = our_e0_truth->phi;
-                reco_.e_charge[0] = our_e0_truth->charge;
+                truth_.e_pt[0] = our_e0_truth->pt;
+                truth_.e_eta[0] = our_e0_truth->eta;
+                truth_.e_phi[0] = our_e0_truth->phi;
+                truth_.e_charge[0] = our_e0_truth->charge;
             }
             if (our_e1_truth != NULL) {
-                reco_.e_pt[1] = our_e1_truth->pt;
-                reco_.e_eta[1] = our_e1_truth->eta;
-                reco_.e_phi[1] = our_e1_truth->phi;
-                reco_.e_charge[1] = our_e1_truth->charge;
+                truth_.e_pt[1] = our_e1_truth->pt;
+                truth_.e_eta[1] = our_e1_truth->eta;
+                truth_.e_phi[1] = our_e1_truth->phi;
+                truth_.e_charge[1] = our_e1_truth->charge;
             }
         }
 
