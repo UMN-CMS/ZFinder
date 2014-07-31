@@ -60,7 +60,6 @@ Implementation:
 #include "ZFinder/Event/interface/ZDefinitionWorkspace.h"  // ZDefinitionWorkspace
 #include "ZFinder/Event/interface/ZEfficiencies.h" // ZEfficiencies
 #include "ZFinder/Event/interface/ZFinderEvent.h"  // ZFinderEvent
-#include "ZFinder/Event/interface/ZFinderPlotter.h"  // ZFinderPlotter
 
 //
 // class declaration
@@ -86,7 +85,6 @@ class ZFinder : public edm::EDAnalyzer {
 
         // ----------member data ---------------------------
         const edm::ParameterSet& iConfig_;
-        std::map<std::string, zf::ZFinderPlotter*> z_plotter_map_;
         std::vector<zf::SetterBase*> setters_;
         std::vector<edm::ParameterSet> zdef_psets_;
         std::vector<zf::ZDefinition*> zdefs_;
