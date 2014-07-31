@@ -16,8 +16,9 @@ namespace zf {
 
         // Add the "0 All Events" set of plots
         // Make our TFileDirectory for the plotter
-        TFileDirectory t_subdir_0 = tdir.mkdir("0 All Events", "O All Events");
+        TFileDirectory t_subdir_0 = tdir.mkdir("0 All Events", "0 All Events");
         all_events_plot_ = new ZFinderPlotter(t_subdir_0, USE_MC_);
+        all_events_tree_ = new ZFinderTree(t_subdir_0, USE_MC_);
 
         // Fill zf_ploters
         // Cut names in the output start with this number and count up
@@ -31,17 +32,28 @@ namespace zf {
             std::string level_name = oss.str() + " " + CUT_NAME;
             ++counter;
 
-            // Make our TFileDirectory for the plotter
+            // Make our TFileDirectory for the plotter and tree
             TFileDirectory t_subdir = tdir.mkdir(level_name.c_str(), level_name.c_str());
+
+            // Set up the plotter
             ZFinderPlotter zf_plotter(t_subdir, USE_MC_);
-            std::pair<std::string, ZFinderPlotter> new_pair(CUT_NAME, zf_plotter);
-            zf_plotters.insert(new_pair);
+            std::pair<std::string, ZFinderPlotter> plot_pair(CUT_NAME, zf_plotter);
+            zf_plotters.insert(plot_pair);
+            // Set up the tree
+            ZFinderTree* zf_tree = new ZFinderTree(t_subdir, USE_MC_);
+            std::pair<std::string, ZFinderTree*> tree_pair(CUT_NAME, zf_tree);
+            zf_trees.insert(tree_pair);
         }
     }
 
     ZDefinitionPlotter::~ZDefinitionPlotter(){
         // Clean up our pointer
         delete all_events_plot_;
+        delete all_events_tree_;
+        // Clean up the trees
+        for (auto& i_map : zf_trees) {
+            delete i_map.second;
+        }
     }
 
     void ZDefinitionPlotter::Fill(const ZFinderEvent& zf_event, const int electron_0, const int electron_1) {
@@ -51,7 +63,9 @@ namespace zf {
          * fails a cut, then we stop.
          */
         // All events plot, which is always filled
-        all_events_plot_->Fill(zf_event, electron_0, electron_1, 1.);
+        const double GEN_WEIGHT = zf_event.event_weight;
+        all_events_plot_->Fill(zf_event, electron_0, electron_1, GEN_WEIGHT);
+        all_events_tree_->Fill(zf_event, electron_0, electron_1, GEN_WEIGHT, GEN_WEIGHT);
 
         // Cutlevel_vector loop
         const cutlevel_vector* clv = zf_event.GetZDef(zdef_name);
@@ -64,15 +78,21 @@ namespace zf {
                 // Check if cut fails, if it does break, otherwise fill the
                 // histogram associated with the cut
                 if (cont) {
-                    std::map<std::string, ZFinderPlotter>::iterator i_map = zf_plotters.find(CUT_NAME);
-                    if (i_map != zf_plotters.end()) {
-                        double weight = 1.;
-                        if (i_cutlevel.second.t0p1_pass) {
-                            weight = i_cutlevel.second.t0p1_eff;
-                        } else if (i_cutlevel.second.t1p0_pass) {
-                            weight = i_cutlevel.second.t1p0_eff;
-                        }
-                        i_map->second.Fill(zf_event, electron_0, electron_1, weight);
+                    double weight = 1.;
+                    if (i_cutlevel.second.t0p1_pass) {
+                        weight = i_cutlevel.second.t0p1_eff;
+                    } else if (i_cutlevel.second.t1p0_pass) {
+                        weight = i_cutlevel.second.t1p0_eff;
+                    }
+                    // Fill the plot
+                    auto i_map_plotter = zf_plotters.find(CUT_NAME);
+                    if (i_map_plotter != zf_plotters.end()) {
+                        i_map_plotter->second.Fill(zf_event, electron_0, electron_1, weight);
+                    }
+                    // Fill the tree
+                    auto i_map_tree = zf_trees.find(CUT_NAME);
+                    if (i_map_tree != zf_trees.end()) {
+                        i_map_tree->second->Fill(zf_event, electron_0, electron_1, weight, GEN_WEIGHT);
                     }
                 } else {  // We stop at the first failed cut
                     break;

@@ -10,9 +10,10 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 // ZFinder Code
+#include "ZDefinition.h"  // ZDefinition
 #include "ZFinderEvent.h"  // ZFinderEvent
 #include "ZFinderPlotter.h"  // ZFinderPlotter
-#include "ZDefinition.h"  // ZDefinition
+#include "ZFinderTree.h"  // ZFinderTree
 
 
 namespace zf {
@@ -40,11 +41,13 @@ namespace zf {
             // Use the MC or reco data
             const bool USE_MC_;
 
-            // A Vector of our ZFinderPlotter
+            // A Vector of our ZFinderPlotters, and ZFinderTrees
             std::map<std::string, ZFinderPlotter> zf_plotters;
+            std::map<std::string, ZFinderTree*> zf_trees;
 
             // Space for our 0th plot of all events
             ZFinderPlotter* all_events_plot_;
+            ZFinderTree* all_events_tree_;
     };
 }  // namespace zf
 #endif  // ZFINDER_ZDEFINITIONPLOTTER_H_
