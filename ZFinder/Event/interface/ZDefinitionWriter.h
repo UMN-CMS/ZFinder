@@ -1,5 +1,5 @@
-#ifndef ZFINDER_ZDEFINITIONPLOTTER_H_
-#define ZFINDER_ZDEFINITIONPLOTTER_H_
+#ifndef ZFINDER_ZDEFINITIONWRITER_H_
+#define ZFINDER_ZDEFINITIONWRITER_H_
 
 // Standard Library
 #include <map>  // std::map
@@ -17,16 +17,16 @@
 
 
 namespace zf {
-    class ZDefinitionPlotter{
+    class ZDefinitionWriter{
         public:
             // Constructor
-            ZDefinitionPlotter(
+            ZDefinitionWriter(
                     const ZDefinition& zdef,
                     TFileDirectory& tdir,
                     const bool USE_MC = false
                     );
 
-            ~ZDefinitionPlotter();
+            ~ZDefinitionWriter();
             // Add events
             void Fill(
                     const ZFinderEvent& zf_event,
@@ -50,4 +50,4 @@ namespace zf {
             ZFinderTree* all_events_tree_;
     };
 }  // namespace zf
-#endif  // ZFINDER_ZDEFINITIONPLOTTER_H_
+#endif  // ZFINDER_ZDEFINITIONWRITER_H_

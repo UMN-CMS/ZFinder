@@ -1,7 +1,7 @@
-#include "ZFinder/Event/interface/ZDefinitionPlotter.h"
+#include "ZFinder/Event/interface/ZDefinitionWriter.h"
 
 // Standard Library
-#include <utility>      // std::make_pair
+#include <utility>  // std::make_pair
 #include <sstream>  // std::ostringstream
 
 // ZFinder Code
@@ -10,7 +10,7 @@
 
 namespace zf {
     // Constructor
-    ZDefinitionPlotter::ZDefinitionPlotter(const ZDefinition& zdef, TFileDirectory& tdir, const bool USE_MC) : USE_MC_(USE_MC) {
+    ZDefinitionWriter::ZDefinitionWriter(const ZDefinition& zdef, TFileDirectory& tdir, const bool USE_MC) : USE_MC_(USE_MC) {
         // Get the name of the cut we want
         zdef_name = zdef.NAME;
 
@@ -46,7 +46,7 @@ namespace zf {
         }
     }
 
-    ZDefinitionPlotter::~ZDefinitionPlotter(){
+    ZDefinitionWriter::~ZDefinitionWriter(){
         // Clean up our pointer
         delete all_events_plot_;
         delete all_events_tree_;
@@ -56,7 +56,7 @@ namespace zf {
         }
     }
 
-    void ZDefinitionPlotter::Fill(const ZFinderEvent& zf_event, const int electron_0, const int electron_1) {
+    void ZDefinitionWriter::Fill(const ZFinderEvent& zf_event, const int electron_0, const int electron_1) {
         /*
          * We loop over the cutlevel_vector specified by the name given to use
          * by the zdef in the constructor. We then plot the event until it

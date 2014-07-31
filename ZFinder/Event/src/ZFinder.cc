@@ -56,7 +56,7 @@ Implementation:
 #include "ZFinder/Event/interface/SetterBase.h"  // SetterBase
 #include "ZFinder/Event/interface/TruthMatchSetter.h"  // TruthMatchSetter
 #include "ZFinder/Event/interface/ZDefinition.h"  // ZDefinition
-#include "ZFinder/Event/interface/ZDefinitionPlotter.h"  // ZDefinitionPlotter
+#include "ZFinder/Event/interface/ZDefinitionWriter.h"  // ZDefinitionWriter
 #include "ZFinder/Event/interface/ZDefinitionWorkspace.h"  // ZDefinitionWorkspace
 #include "ZFinder/Event/interface/ZEfficiencies.h" // ZEfficiencies
 #include "ZFinder/Event/interface/ZFinderEvent.h"  // ZFinderEvent
@@ -88,7 +88,7 @@ class ZFinder : public edm::EDAnalyzer {
         std::vector<zf::SetterBase*> setters_;
         std::vector<edm::ParameterSet> zdef_psets_;
         std::vector<zf::ZDefinition*> zdefs_;
-        std::vector<zf::ZDefinitionPlotter*> zdef_plotters_;
+        std::vector<zf::ZDefinitionWriter*> zdef_plotters_;
         std::vector<zf::ZDefinitionWorkspace*> zdef_workspaces_;
         zf::ZEfficiencies zeffs_;
         bool is_mc_;
@@ -149,8 +149,8 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
         zdefs_.push_back(zd_reco);
         TFileDirectory tdir_zd(fs->mkdir(name_reco));
         bool use_truth = false;
-        zf::ZDefinitionPlotter* zdp_reco = new zf::ZDefinitionPlotter(*zd_reco, tdir_zd, use_truth);
-        zdef_plotters_.push_back(zdp_reco);
+        zf::ZDefinitionWriter* zdwriter_reco = new zf::ZDefinitionWriter(*zd_reco, tdir_zd, use_truth);
+        zdef_plotters_.push_back(zdwriter_reco);
         zf::ZDefinitionWorkspace* zdw_reco = new zf::ZDefinitionWorkspace(*zd_reco, tdir_zd, use_truth, true);
         zdef_workspaces_.push_back(zdw_reco);
 
@@ -161,8 +161,8 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
             zdefs_.push_back(zd_truth);
             TFileDirectory tdir_zd_truth(fs->mkdir(name_truth));
             use_truth = true;
-            zf::ZDefinitionPlotter* zdp_truth = new zf::ZDefinitionPlotter(*zd_truth, tdir_zd_truth, use_truth);
-            zdef_plotters_.push_back(zdp_truth);
+            zf::ZDefinitionWriter* zdwriter_truth = new zf::ZDefinitionWriter(*zd_truth, tdir_zd_truth, use_truth);
+            zdef_plotters_.push_back(zdwriter_truth);
             zf::ZDefinitionWorkspace* zdw_truth = new zf::ZDefinitionWorkspace(*zd_truth, tdir_zd_truth, use_truth, true);
             zdef_workspaces_.push_back(zdw_truth);
         }
