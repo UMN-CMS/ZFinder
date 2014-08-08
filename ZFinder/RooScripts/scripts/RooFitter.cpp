@@ -150,10 +150,8 @@ int RooFitter(
     RooDataSet* postcut_mc_reco = static_cast<RooDataSet*>(mc_reco->reduce("numerator==1"));
     RooDataHist precut_mc_histo("precut_mc_histo", "precut_mc_histo", RooArgSet(z_mass), *precut_mc_reco);
     RooDataHist postcut_mc_histo("postcut_mc_histo", "postcut_mc_histo", RooArgSet(z_mass), *postcut_mc_reco);
-    //RooHistPdf precut_signalpdf("precut_signalpdf", "Signal PDF from MC before apply the last cut", z_mass, precut_mc_histo);
-    //RooHistPdf postcut_signalpdf("postcut_signalpdf", "Signal PDF from MC after applying all cuts", z_mass, postcut_mc_histo);
-    RooKeysPdf precut_signalpdf("precut_signalpdf", "Signal PDF from MC before apply the last cut", z_mass, *precut_mc_reco);
-    RooKeysPdf postcut_signalpdf("postcut_signalpdf", "Signal PDF from MC after applying all cuts", z_mass, *postcut_mc_reco);
+    RooHistPdf precut_signalpdf("precut_signalpdf", "Signal PDF from MC before apply the last cut", z_mass, precut_mc_histo);
+    RooHistPdf postcut_signalpdf("postcut_signalpdf", "Signal PDF from MC after applying all cuts", z_mass, postcut_mc_histo);
 
     RooDataSet* postcut_data_reco = static_cast<RooDataSet*>(data_reco->reduce("numerator==1"));
     RooDataHist postcut_data_hist("postcut_data_hist", "Data after applying cuts", z_mass, *postcut_data_reco);
