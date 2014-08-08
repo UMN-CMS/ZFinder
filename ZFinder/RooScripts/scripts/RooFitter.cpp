@@ -165,13 +165,13 @@ int RooFitter(
     RooFFTConvPdf smeared_postcut_signalpdf("smeared_postcut_signalpdf", "Smeared Signal Before Cuts", z_mass, postcut_signalpdf, smear_gauss);
 
     // Set up the background
-    RooRealVar alpha("alpha", "alpha", 60., 0.1, 1000.);
-    RooRealVar gamma("gamma", "gamma", 0.01, 0.00001, 0.3);
-    RooRealVar delta("delta", "delta", 10., 1., 100.);
+    RooRealVar alpha("alpha", "alpha", 60., 0.1, 100.);
+    RooRealVar gamma("gamma", "gamma", 0.02, 0.01, 0.1);
+    RooRealVar delta("delta", "delta", 20., 10., 30.);
     RooFormulaVar var1("var1", "(alpha-z_mass)/delta", RooArgSet(alpha, z_mass, delta));
     RooFormulaVar var2("var2", "-1.0*gamma*z_mass", RooArgSet(gamma, z_mass));
     RooGenericPdf bg_pdf("MyBackgroundPdf", "ROOT::Math::erfc(var1)*exp(var2)", RooArgSet(var1, var2));
-    RooRealVar sigratio("sigratio", "sigratio", 0.1, 0.0, 1.0);
+    RooRealVar sigratio("sigratio", "sigratio", 0.9, 0.0, 1.0);
 
     RooAddPdf precut_fitpdf("precut_fitpdf", "precut_fitpdf", RooArgList(bg_pdf, smeared_precut_signalpdf), RooArgList(sigratio));
     RooAddPdf postcut_fitpdf("postcut_fitpdf", "postcut_fitpdf", RooArgList(bg_pdf, smeared_postcut_signalpdf), RooArgList(sigratio));
