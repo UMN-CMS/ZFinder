@@ -119,10 +119,12 @@ int RooFitter(
     argset.add(numerator);
     argset.add(degenerate);
 
-    // Try to set binning
+    // Set binning
     RooBinning* binning = new RooBinning(0, 1000);
     binning->addUniform(500, 0, 1000);
     z_mass.setBinning(*binning);
+
+    // Add named ranges
     z_mass.setRange("signal", 80, 100);
     z_mass.setRange("analysis", 60, 120);
     z_mass.setRange("plot range", 50, 150);
@@ -179,30 +181,30 @@ int RooFitter(
     TCanvas* const canvas = get_tcanvas(1500, 750);
 
     // Plot the left side
-    precut_fitpdf.fitTo(precut_data_hist, Range(50, 150), NumCPU(N_CPU), Verbose(false));
+    precut_fitpdf.fitTo(precut_data_hist, Range("plot range"), NumCPU(N_CPU), Verbose(false));
     canvas->cd(1);
     gPad->SetLogy();
     RooPlot* precut_fitframe = z_mass.frame(40, 160);
     precut_fitframe->SetName(0);  // Unset title
-    precut_data_hist.plotOn(precut_fitframe, NumCPU(N_CPU));
+    precut_data_hist.plotOn(precut_fitframe);
     precut_fitpdf.plotOn(precut_fitframe, Components(bg_pdf), LineColor(kRed), NumCPU(N_CPU));
     precut_fitpdf.plotOn(precut_fitframe, Components(smeared_precut_signalpdf), LineColor(kGreen), NumCPU(N_CPU));
     precut_fitpdf.plotOn(precut_fitframe, LineColor(kBlue), NumCPU(N_CPU));
-    precut_data_hist.plotOn(precut_fitframe, NumCPU(N_CPU));
+    precut_data_hist.plotOn(precut_fitframe);
 
     precut_fitframe->Draw();
 
     // Plot the right side
-    postcut_fitpdf.fitTo(postcut_data_hist, Range(50, 150), NumCPU(N_CPU), Verbose(false));
+    postcut_fitpdf.fitTo(postcut_data_hist, Range("plot range"), NumCPU(N_CPU), Verbose(false));
     canvas->cd(2);
     gPad->SetLogy();
     RooPlot* postcut_fitframe = z_mass.frame(40, 160);
     postcut_fitframe->SetName(0);  // Unset title
-    postcut_data_hist.plotOn(postcut_fitframe, NumCPU(N_CPU));
+    postcut_data_hist.plotOn(postcut_fitframe);
     postcut_fitpdf.plotOn(postcut_fitframe, Components(bg_pdf), LineColor(kRed), NumCPU(N_CPU));
     postcut_fitpdf.plotOn(postcut_fitframe, Components(smeared_postcut_signalpdf), LineColor(kGreen), NumCPU(N_CPU));
     postcut_fitpdf.plotOn(postcut_fitframe, LineColor(kBlue), NumCPU(N_CPU));
-    postcut_data_hist.plotOn(postcut_fitframe, NumCPU(N_CPU));
+    postcut_data_hist.plotOn(postcut_fitframe);
 
     postcut_fitframe->Draw();
 
