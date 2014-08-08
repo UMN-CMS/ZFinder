@@ -129,10 +129,19 @@ int RooFitter(
 
     // Load the workspaces from the already open TFiles
     RooWorkspace* w_data = static_cast<RooWorkspace*>(DATA_FILE->Get(DATA_WS.c_str()));
+    if (w_data == NULL) {
+        std::cout << "Data Workspace is invalid" << std::endl;
+        return 1;
+    }
     RooDataSet* data_reco = static_cast<RooDataSet*>(w_data->data("roo_dataset"));
-    RooWorkspace* w_mc = static_cast<RooWorkspace*>(MC_FILE->Get(MC_WS.c_str()));
-    RooDataSet* mc_reco = static_cast<RooDataSet*>(w_mc->data("roo_dataset"));
     RooDataHist precut_data_hist("precut_data_hist", "Data before applying cuts", z_mass, *data_reco);
+
+    RooWorkspace* w_mc = static_cast<RooWorkspace*>(MC_FILE->Get(MC_WS.c_str()));
+    if (w_mc == NULL) {
+        std::cout << "MC Workspace is invalid" << std::endl;
+        return 1;
+    }
+    RooDataSet* mc_reco = static_cast<RooDataSet*>(w_mc->data("roo_dataset"));
 
     // Select events from before and after the last cut
     RooDataSet* precut_mc_reco = mc_reco;
