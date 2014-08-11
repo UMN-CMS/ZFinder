@@ -171,10 +171,11 @@ int RooFitter(
     RooFormulaVar var1("var1", "(alpha-z_mass)/delta", RooArgSet(alpha, z_mass, delta));
     RooFormulaVar var2("var2", "-1.0*gamma*z_mass", RooArgSet(gamma, z_mass));
     RooGenericPdf bg_pdf("MyBackgroundPdf", "ROOT::Math::erfc(var1)*exp(var2)", RooArgSet(var1, var2));
-    RooRealVar sigratio("sigratio", "sigratio", 0.9, 0.0, 1.0);
+    RooRealVar precut_sigratio("precut_sigratio", "precut_sigratio", 0.9, 0.0, 1.0);
+    RooRealVar postcut_sigratio("postcut_sigratio", "postcut_sigratio", 0.9, 0.0, 1.0);
 
-    RooAddPdf precut_fitpdf("precut_fitpdf", "precut_fitpdf", RooArgList(bg_pdf, smeared_precut_signalpdf), RooArgList(sigratio));
-    RooAddPdf postcut_fitpdf("postcut_fitpdf", "postcut_fitpdf", RooArgList(bg_pdf, smeared_postcut_signalpdf), RooArgList(sigratio));
+    RooAddPdf precut_fitpdf("precut_fitpdf", "precut_fitpdf", RooArgList(bg_pdf, smeared_precut_signalpdf), RooArgList(precut_sigratio));
+    RooAddPdf postcut_fitpdf("postcut_fitpdf", "postcut_fitpdf", RooArgList(bg_pdf, smeared_postcut_signalpdf), RooArgList(postcut_sigratio));
 
     TCanvas* const canvas = get_tcanvas(1500, 750);
 
