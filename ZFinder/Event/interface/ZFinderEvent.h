@@ -207,6 +207,9 @@ namespace zf {
             // Use the muon acceptance requirements to select electrons
             bool use_muon_acceptance_;
 
+            // Reject events that do not have a generator Z->ee event
+            bool require_gen_z_;
+
             // NT Bending Correction
             void ApplyNTBendingCorrection();
     };

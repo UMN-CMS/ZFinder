@@ -42,6 +42,7 @@ process.ZFinder = ZFinder.clone(
         ZDefinitions = zdefs_combined_mc,
         is_mc = cms.bool(True),
         use_muon_acceptance = cms.bool(True),
+        require_gen_z = cms.bool(False),
         )
 
 # RUN

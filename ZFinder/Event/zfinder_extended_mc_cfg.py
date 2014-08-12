@@ -41,6 +41,7 @@ from ZFinder.Event.zfinder_cfi import ZFinder
 process.ZFinder = ZFinder.clone(
         ZDefinitions = zdefs_extended_mc,
         is_mc = cms.bool(True),
+        require_gen_z = cms.bool(False),
         )
 
 # RUN

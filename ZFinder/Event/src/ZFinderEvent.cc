@@ -76,6 +76,9 @@ namespace zf {
         // making Zs
         use_muon_acceptance_ = iConfig.getParameter<bool>("use_muon_acceptance");
 
+        // Reject events that do not have a generator Z->ee event
+        require_gen_z_ = iConfig.getParameter<bool>("require_gen_z");
+
         // Set up the lumi reweighting, but only if it is MC.
         if (!is_real_data && lumi_weights_ == NULL) {
             lumi_weights_ = new edm::LumiReWeighting(
@@ -104,6 +107,16 @@ namespace zf {
             if (reco_z.m != -1) {  // Good reco Z
                 truth_z.other_phistar = reco_z.phistar;
                 truth_z.other_y = reco_z.y;
+            }
+            // Gen Z check
+            if (require_gen_z_ and truth_z.m == -1) {
+                // We set the electrons to NULL pointers and the z mass to -1,
+                // which mark the event as bad
+                set_both_e_truth(NULL, NULL);
+                set_both_e(NULL, NULL);
+                truth_z.m = -1;
+                reco_z.m = -1;
+                return;
             }
         }
         InitTrigger(iEvent, iSetup);  // Trigger Matching
