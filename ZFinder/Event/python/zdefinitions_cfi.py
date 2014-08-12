@@ -19,8 +19,8 @@ all_electrons = cms.untracked.PSet(
 # quantities
 combined_gen_cuts = cms.untracked.PSet(
         name = cms.untracked.string("Combined Gen Cuts"),
-        cuts0 = cms.untracked.vstring("gaeta<2.1", "gpt>30"),
-        cuts1 = cms.untracked.vstring("gaeta<2.4", "gpt>20"),
+        cuts0 = cms.untracked.vstring("gaeta<2.1", "gpt>25"),
+        cuts1 = cms.untracked.vstring("gaeta<2.4", "gpt>15"),
         min_mz = MIN_MZ,
         max_mz = MAX_MZ,
         use_truth_mass = cms.untracked.bool(True),
