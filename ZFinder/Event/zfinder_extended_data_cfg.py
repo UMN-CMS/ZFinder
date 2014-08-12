@@ -18,7 +18,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input file
 process.source = cms.Source("PoolSource",
-        fileNames = cms.untracked.vstring('file:/local/cms/phedex/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/003EC246-5E67-E211-B103-00259059642E.root')
+        fileNames = cms.untracked.vstring('file:/hdfs/cms/phedex/store/data/Run2012A/DoubleElectron/AOD/22Jan2013-v1/20000/003EC246-5E67-E211-B103-00259059642E.root')
         )
 
 # Output file
