@@ -78,6 +78,11 @@ namespace zf {
         degenerate_->defineType("Degenerate Denominator", 1);
         degenerate_->defineType("Degenerate Denominator and numerator", 2);
 
+        // Did the event pass ALL cut criteria?
+        pass_all_ = new RooCategory("pass_all", "Did the event pass all cuts applied by the ZDefinition?");
+        pass_all_->defineType("True", 1);
+        pass_all_->defineType("False", 0);
+
         // Add the weight variable
         weight_ = new RooRealVar("weight", "Event weight", 0, 100);
 
@@ -99,6 +104,7 @@ namespace zf {
         argset_->add(*degenerate_);
         argset_->add(*weight_);
         argset_->add(*event_num_);
+        argset_->add(*pass_all_);
 
         // Dataset
         roodataset_ = new RooDataSet(
@@ -121,8 +127,10 @@ namespace zf {
         if (clv->size() <= 2) {
             return;
         }
-        // We skip the very last cut because it is the mass cut, and we'll
-        // apply that later. Therefore, "last" starts at 1 from the end.
+        // We get the end of the vector, the mass cut, as well as the next two.
+        // In general we ignore the mass cut (and let it be set by hand) EXCEPT
+        // when filling pass_all_
+        const CutLevel mass_cutlevel = clv->rbegin()[0].second;  // Mass Cut element
         const CutLevel last_cutlevel = clv->rbegin()[1].second;  // Last element
         const CutLevel penult_cutlevel = clv->rbegin()[2].second;  // Penultimate element
 
@@ -182,6 +190,14 @@ namespace zf {
             argset_->setCatLabel("numerator", "False");
         } else {
             argset_->setCatLabel("numerator", "True");
+        }
+
+        // Check if the entire cut requirements were met
+        if (mass_cutlevel.pass){
+            argset_->setCatLabel("pass_all", "True");
+        }
+        else {
+            argset_->setCatLabel("pass_all", "False");
         }
 
         // Assign the correct electrons
@@ -320,5 +336,6 @@ namespace zf {
         delete argset_;
         delete degenerate_;
         delete roodataset_;
+        delete pass_all_;
     }
 }  // namespace zf

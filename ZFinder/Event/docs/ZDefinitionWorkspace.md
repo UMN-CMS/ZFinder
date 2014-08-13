@@ -42,6 +42,7 @@ The following variables are stored in the workspace.
 | numerator  | True if the event passes all cuts (*except* the mass requirement), False if it fails the last cut.                                       |
 | degenerate | Takes one of a few values, described below.                                                                                              |
 | weight     | The weight of the event, taking into account the efficiency of the cuts applied and any general weight (such as for pileup reweighting). |
+| pass_all   | Did the event pass *all* of the ZDefinition requirements, including the masss cut.                                                       |
 
 ### Degenerate
 

@@ -72,6 +72,7 @@ namespace zf {
             RooCategory* data_type_;
             RooCategory* numerator_;
             RooCategory* degenerate_;
+            RooCategory* pass_all_;
 
             void InitVariables();
 
