@@ -81,9 +81,32 @@ namespace zf {
 
         // Set up the lumi reweighting, but only if it is MC.
         if (!is_real_data && lumi_weights_ == NULL) {
+            const std::string PILEUP_ERA = iConfig.getParameter<std::string>("pileup_era");
+            // We use a flag in the python file to set the pileup reweighting
+            // to use. If a blank, or an unrecognized, string is passed, then
+            // we use the full ABCD reweighting.
+            std::vector<float> pileup_distribution_in_data = RUN_2012_ABCD_TRUE_PILEUP;
+
+            std::cout << "Pileup reweighting using era: " << PILEUP_ERA << std::endl;
+            if (PILEUP_ERA == "A") {
+                pileup_distribution_in_data = RUN_2012_A_TRUE_PILEUP;
+            }
+            else if (PILEUP_ERA == "B") {
+                pileup_distribution_in_data = RUN_2012_B_TRUE_PILEUP;
+            }
+            else if (PILEUP_ERA == "C") {
+                pileup_distribution_in_data = RUN_2012_C_TRUE_PILEUP;
+            }
+            else if (PILEUP_ERA == "D") {
+                pileup_distribution_in_data = RUN_2012_D_TRUE_PILEUP;
+            }
+            else {
+                std::cout << "Using RUN_2012_ABCD_TRUE_PILEUP" << std::endl;
+            }
+
             lumi_weights_ = new edm::LumiReWeighting(
                     SUMMER12_53X_MC_TRUE_PILEUP,  // MC distribution
-                    RUN_2012_B_TRUE_PILEUP        // Data distribution
+                    pileup_distribution_in_data   // Data distribution
                     );
         }
         // Use the lumi reweighting to set the event weight. It is 1. for data,

@@ -34,4 +34,7 @@ ZFinder = cms.EDAnalyzer('ZFinder',
         use_muon_acceptance = cms.bool(False),
         # Reject MC events that don't have a generator Z->ee event.
         require_gen_z = cms.bool(False),
+        # Pileup Era to correct MC to. Valid values are A, B, C, D. Anything
+        # else will default to the full 2012.
+        pileup_era = cms.string("A"),  # defaults to ABCD
         )
