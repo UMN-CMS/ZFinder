@@ -26,7 +26,7 @@ int main() {
             mc_tfile,
             "ZFinder/Combined Double Reco/5 60 < M_{ee} < 120",
             "DY to ee",
-            12234.4,  // cross section in pb, from https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV
+            1966.7,  // cross section in pb, from https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV
             "ZFinder/All Electrons Reco/0 acc(ALL) AND acc(ALL)/Z0 Mass: All",  // TDir from before any cut
             SIGNAL_MC
             );
