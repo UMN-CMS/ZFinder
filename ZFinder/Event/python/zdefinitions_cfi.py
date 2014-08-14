@@ -15,6 +15,16 @@ all_electrons = cms.untracked.PSet(
         use_truth_mass = cms.untracked.bool(False),
         )
 
+# Definition to look at trigger efficiency
+trigger_efficiency_cuts = cms.untracked.PSet(
+        name = cms.untracked.string("Trigger Efficiency Cuts"),
+        cuts0 = cms.untracked.vstring("acc(MUON_TIGHT)", "pt>30", "eg_tight", "trig(single_ele)", "trig(single_ele)"),
+        cuts1 = cms.untracked.vstring("acc(MUON_TIGHT)", "pt>30", "eg_tight", "pt>30",            "trig(single_ele)"),
+        min_mz = MIN_MZ,
+        max_mz = MAX_MZ,
+        use_truth_mass = cms.untracked.bool(False),
+        )
+
 # Only the kinematic cuts for the combined muon result, using generator
 # quantities
 combined_gen_cuts = cms.untracked.PSet(
@@ -128,6 +138,7 @@ zdefs_combined_data = cms.untracked.VPSet(
         all_electrons,
         combined_reco_cuts,
         combined_single,
+        trigger_efficiency_cuts,
         )
 
 # The ZDefinition for use on MC for the combined result
