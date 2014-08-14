@@ -536,9 +536,19 @@ namespace zf {
         /* Count Pile Up */
         edm::Handle<std::vector<PileupSummaryInfo> > pileup_info;
         iEvent.getByLabel(inputtags_.pileup, pileup_info);
+        // Loop over the pileup info and take the number of pileup events from
+        // the 0th bunch crossing
+        std::vector<PileupSummaryInfo>::const_iterator PILEUP_ELEMENT;
         if (pileup_info.isValid()) {
-            truth_vert.num = pileup_info->size();
-        } else {
+            for(PILEUP_ELEMENT = pileup_info->begin(); PILEUP_ELEMENT != pileup_info->end(); ++PILEUP_ELEMENT) {
+                const int BUNCH_CROSSING = PILEUP_ELEMENT->getBunchCrossing();
+                if (BUNCH_CROSSING == 0) {
+                    // The main vertex is counted as well, so add +1
+                    truth_vert.num = PILEUP_ELEMENT->getPU_NumInteractions() + 1;
+                }
+            }
+        }
+        else {
             truth_vert.num = -1;
         }
 
