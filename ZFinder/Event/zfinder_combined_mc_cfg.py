@@ -35,6 +35,10 @@ from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso
 process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
 process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIsoSequence)
 
+# Take the current git commit hash and print it to the log file
+from ZFinder.Event.git_hash_cfi import git_hash
+print "Current git hash is:", git_hash()
+
 # ZFinder
 from ZFinder.Event.zdefinitions_cfi import zdefs_combined_mc
 from ZFinder.Event.zfinder_cfi import ZFinder
