@@ -137,7 +137,8 @@ namespace zf {
             void InitHFElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
             void InitNTElectrons(const edm::Event& iEvent, const edm::EventSetup& iSetup);
 
-            void SetEventWeight(const edm::Event& iEvent);
+            void SetLumiEventWeight(const edm::Event& iEvent);
+            void SetMCEventWeight(const edm::Event& iEvent);
 
             // Update the Z Info from e0, e1
             void InitZ();

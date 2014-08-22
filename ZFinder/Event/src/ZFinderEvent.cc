@@ -11,10 +11,11 @@
 #include "DataFormats/EgammaReco/interface/HFEMClusterShapeAssociation.h"  // reco::HFEMClusterShapeAssociationCollection
 #include "DataFormats/EgammaReco/interface/HFEMClusterShapeFwd.h"  // reco::HFEMClusterShapeRef,
 #include "DataFormats/EgammaReco/interface/SuperClusterFwd.h"  // reco::SuperClusterCollection, reco::SuperClusterRef
+#include "DataFormats/HLTReco/interface/TriggerEvent.h" // trigger::TriggerEvent
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidateFwd.h"  // reco::RecoEcalCandidateCollection
 #include "EgammaAnalysis/ElectronTools/interface/EGammaCutBasedEleId.h"  // EgammaCutBasedEleId::PassWP, EgammaCutBasedEleId::*
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"  // GenEventInfoProduct
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"  // PileupSummaryInfo
-#include "DataFormats/HLTReco/interface/TriggerEvent.h" // trigger::TriggerEvent
 
 // ZFinder
 #include "ZFinder/Event/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
@@ -112,8 +113,11 @@ namespace zf {
         // Use the lumi reweighting to set the event weight. It is 1. for data,
         // and dependent on the pileup reweighting for MC.
         event_weight = 1.;
-        if (!is_real_data && lumi_weights_ != NULL) {
-            SetEventWeight(iEvent);
+        if (!is_real_data) {
+            SetMCEventWeight(iEvent);
+            if (lumi_weights_ != NULL) {
+                SetLumiEventWeight(iEvent);
+            }
         }
 
         // Finish initialization of electrons
@@ -145,7 +149,7 @@ namespace zf {
         InitTrigger(iEvent, iSetup);  // Trigger Matching
     }
 
-    void ZFinderEvent::SetEventWeight(const edm::Event& iEvent) {
+    void ZFinderEvent::SetLumiEventWeight(const edm::Event& iEvent) {
         /* Reweight the event to correct for pileup (but only MC). This recipe
          * is give on the Twiki:
          * https://twiki.cern.ch/twiki/bin/viewauth/CMS/PileupMCReweightingUtilities
@@ -160,10 +164,17 @@ namespace zf {
             const int BUNCH_CROSSING = PILEUP_ELEMENT->getBunchCrossing();
             if (BUNCH_CROSSING == 0) {
                 true_number_of_pileup = PILEUP_ELEMENT->getTrueNumInteractions();
+                break;
             }
         }
+        event_weight *= lumi_weights_->weight(true_number_of_pileup);
+    }
 
-        event_weight = lumi_weights_->weight(true_number_of_pileup);
+    void ZFinderEvent::SetMCEventWeight(const edm::Event& iEvent) {
+        // Some MC is also weighted; multiply by this weight also
+        edm::Handle<GenEventInfoProduct> gen_event_info;
+        iEvent.getByLabel("generator", gen_event_info);
+        event_weight *= gen_event_info->weight();
     }
 
     void ZFinderEvent::InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
