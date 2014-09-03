@@ -74,25 +74,25 @@ namespace zf {
 
         // e0_phi_
         const std::string e0_phi_name = "#phi_{e_{0}}";
-        e0_phi_ = tdir.make<TH1D>(e0_phi_name.c_str(), e0_phi_name.c_str(), 60, -3.15, 3.15);
+        e0_phi_ = tdir.make<TH1D>(e0_phi_name.c_str(), e0_phi_name.c_str(), 63, -3.15, 3.15);
         e0_phi_->GetXaxis()->SetTitle("#phi_{e_{0}}");
         e0_phi_->GetYaxis()->SetTitle("Counts");
 
         // e1_phi_
         const std::string e1_phi_name = "#phi_{e_{1}}";
-        e1_phi_ = tdir.make<TH1D>(e1_phi_name.c_str(), e1_phi_name.c_str(), 50, -3.15, 3.15);
+        e1_phi_ = tdir.make<TH1D>(e1_phi_name.c_str(), e1_phi_name.c_str(), 63, -3.15, 3.15);
         e1_phi_->GetXaxis()->SetTitle("#phi_{e_{1}}");
         e1_phi_->GetYaxis()->SetTitle("counts");
 
         // e0_charge_
         const std::string e0_charge_name = "charge_{e_{0}}";
-        e0_charge_ = tdir.make<TH1D>(e0_charge_name.c_str(), e0_charge_name.c_str(), 60, -3.15, 3.15);
+        e0_charge_ = tdir.make<TH1D>(e0_charge_name.c_str(), e0_charge_name.c_str(), 3, -1, 2);
         e0_charge_->GetXaxis()->SetTitle("charge_{e_{0}}");
         e0_charge_->GetYaxis()->SetTitle("Counts");
 
         // e1_charge_
         const std::string e1_charge_name = "charge_{e_{1}}";
-        e1_charge_ = tdir.make<TH1D>(e1_charge_name.c_str(), e1_charge_name.c_str(), 50, -3.15, 3.15);
+        e1_charge_ = tdir.make<TH1D>(e1_charge_name.c_str(), e1_charge_name.c_str(), 3, -1, 2);
         e1_charge_->GetXaxis()->SetTitle("charge_{e_{1}}");
         e1_charge_->GetYaxis()->SetTitle("counts");
 
