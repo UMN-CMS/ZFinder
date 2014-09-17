@@ -117,6 +117,52 @@ ecal_hf_no_trigger = ecal_hf.clone(
         cuts1 = cms.untracked.vstring("acc(ALL)", "acc(HF)", "pt>20", "hf_2dloose"),
         )
 
+# Cuts needed for "phi* by cut" plot
+sequence_plots_0_gen_mass = cms.untracked.PSet(
+        name = cms.untracked.string("0 Gen Mass Only"),
+        cuts0 = cms.untracked.vstring("acc(ALL)"),
+        cuts1 = cms.untracked.vstring("acc(ALL)"),
+        min_mz = MIN_MZ,
+        max_mz = MAX_MZ,
+        use_truth_mass = cms.untracked.bool(True),
+        )
+
+sequence_plots_1_acceptance = cms.untracked.PSet(
+        name = cms.untracked.string("1 Acceptance Cuts"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "gpt>30", "gaeta<2.1"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "gpt>20", "gaeta<2.4"),
+        min_mz = MIN_MZ,
+        max_mz = MAX_MZ,
+        use_truth_mass = cms.untracked.bool(True),
+        )
+
+sequence_plots_2_id = cms.untracked.PSet(
+        name = cms.untracked.string("2 ID Cuts"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "ACC(MUON_TIGHT)", "pt>30", "eg_tight"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "ACC(MUON_LOOSE)", "pt>20", "eg_medium"),
+        min_mz = MIN_MZ,
+        max_mz = MAX_MZ,
+        use_truth_mass = cms.untracked.bool(False),
+        )
+
+sequence_plots_3_single_trigger = cms.untracked.PSet(
+        name = cms.untracked.string("3 Single Trigger Cuts"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "ACC(MUON_TIGHT)", "pt>30", "eg_tight",  "trig(single_ele)"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "ACC(MUON_LOOSE)", "pt>20", "eg_medium", "acc(ALL)"),
+        min_mz = MIN_MZ,
+        max_mz = MAX_MZ,
+        use_truth_mass = cms.untracked.bool(False),
+        )
+
+sequence_plots_3_double_trigger = cms.untracked.PSet(
+        name = cms.untracked.string("3 Double Trigger Cuts"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "ACC(MUON_TIGHT)", "pt>30", "eg_tight",  "trig(et_et_tight)"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "ACC(MUON_LOOSE)", "pt>20", "eg_medium", "acc(et_et_loose)"),
+        min_mz = MIN_MZ,
+        max_mz = MAX_MZ,
+        use_truth_mass = cms.untracked.bool(False),
+        )
+
 # The ZDefinition for use on data for the extended electron result
 zdefs_extended_data = cms.untracked.VPSet(
         all_electrons,
@@ -148,4 +194,9 @@ zdefs_combined_mc = cms.untracked.VPSet(
         combined_relaxed_gen_cuts,
         combined_reco_cuts,
         combined_single_no_trigger,
+        sequence_plots_0_gen_mass,
+        sequence_plots_1_acceptance,
+        sequence_plots_2_id,
+        sequence_plots_3_single_trigger,
+        sequence_plots_3_double_trigger,
         )
