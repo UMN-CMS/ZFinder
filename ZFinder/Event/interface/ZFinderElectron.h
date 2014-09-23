@@ -35,14 +35,24 @@ namespace zf {
             ZFinderElectron() {};
             ZFinderElectron(reco::GsfElectron input_electron);
             ZFinderElectron(reco::GenParticle input_electron);
+            ZFinderElectron(reco::GenParticle born_electron, reco::GenParticle dressed_electron, reco::GenParticle naked_electron);
             ZFinderElectron(reco::RecoEcalCandidate input_electron);
             ZFinderElectron(reco::Photon input_electron);
             ZFinderElectron(trigger::TriggerObject input_electron);
 
             // Kinematics variables
+            //NOTE: the basic versions will, for the Truth case, correspond to *DRESSED* electrons
             double pt;
             double eta;
             double phi;
+            //"born" corresponds to PRE-FSR, "status==3" electrons
+            double bornPt;
+            double bornEta;
+            double bornPhi;
+            //"naked" corresponds to POST-FSR, without FSR
+            double nakedPt;
+            double nakedEta;
+            double nakedPhi;
 
             // Other physical properties
             int charge;
