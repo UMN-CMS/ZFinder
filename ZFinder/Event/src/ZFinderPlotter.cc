@@ -42,57 +42,117 @@ namespace zf {
         z0_rapidity_->GetXaxis()->SetTitle("Z_{Y}");
         z0_rapidity_->GetYaxis()->SetTitle("Counts");
 
-        // z0_pt
+        // z0_pt (dressed)
         const std::string z0_pt_name = "Z0 p_{T}";
         z0_pt_ = tdir.make<TH1D>(z0_pt_name.c_str(), z0_pt_name.c_str(), 200, 0., 200.);
         z0_pt_->GetXaxis()->SetTitle("p_{T,Z}");
         z0_pt_->GetYaxis()->SetTitle("Counts / GeV");
 
-        // e0_pt
+        // e0_pt_ (dressed)
         const std::string e0_pt_name = "p_{T,e_{0}}";
         e0_pt_ = tdir.make<TH1D>(e0_pt_name.c_str(), e0_pt_name.c_str(), 200, 0., 200.);
         e0_pt_->GetXaxis()->SetTitle("p_{T,e_{0}}");
         e0_pt_->GetYaxis()->SetTitle("Counts / GeV");
+        // e0_pt_naked_
+        const std::string e0n_pt_name = "p_{T,e_{0},Naked}";
+        e0_pt_naked_ = tdir.make<TH1D>(e0n_pt_name.c_str(), e0_pt_name.c_str(), 200, 0., 200.);
+        e0_pt_naked_->GetXaxis()->SetTitle("Naked p_{T,e_{0}}");
+        e0_pt_naked_->GetYaxis()->SetTitle("Counts / GeV");
+        // e0_pt_born_
+        const std::string e0b_pt_name = "p_{T,e_{0},Born}";
+        e0_pt_born_ = tdir.make<TH1D>(e0b_pt_name.c_str(), e0_pt_name.c_str(), 200, 0., 200.);
+        e0_pt_born_->GetXaxis()->SetTitle("Born p_{T,e_{0}}");
+        e0_pt_born_->GetYaxis()->SetTitle("Counts / GeV");
 
-        // e1_pt
+        // e1_pt_ (dressed)
         const std::string e1_pt_name = "p_{T,e_{1}}";
         e1_pt_ = tdir.make<TH1D>(e1_pt_name.c_str(), e1_pt_name.c_str(), 200, 0., 200.);
-        e1_pt_->GetXaxis()->SetTitle("p_{T,e_{0}}");
+        e1_pt_->GetXaxis()->SetTitle("p_{T,e_{1}}");
         e1_pt_->GetYaxis()->SetTitle("Counts / GeV");
+        // e1_pt_naked_
+        const std::string e1n_pt_name = "p_{T,e_{1},Naked}";
+        e1_pt_naked_ = tdir.make<TH1D>(e1n_pt_name.c_str(), e1_pt_name.c_str(), 200, 0., 200.);
+        e1_pt_naked_->GetXaxis()->SetTitle("Naked p_{T,e_{1}}");
+        e1_pt_naked_->GetYaxis()->SetTitle("Counts / GeV");
+        // e1_pt_born_
+        const std::string e1b_pt_name = "p_{T,e_{1},Born}";
+        e1_pt_born_ = tdir.make<TH1D>(e1b_pt_name.c_str(), e1_pt_name.c_str(), 200, 0., 200.);
+        e1_pt_born_->GetXaxis()->SetTitle("Born p_{T,e_{1}}");
+        e1_pt_born_->GetYaxis()->SetTitle("Counts / GeV");
 
-        // e0_eta_
+        // e0_eta_ (dressed)
         const std::string e0_eta_name = "#eta_{e_{0}}";
         e0_eta_ = tdir.make<TH1D>(e0_eta_name.c_str(), e0_eta_name.c_str(), 50, -5., 5.);
         e0_eta_->GetXaxis()->SetTitle("#eta_{e_{0}}");
         e0_eta_->GetYaxis()->SetTitle("Counts");
+        // e0_eta_naked_
+        const std::string e0n_eta_name = "#eta_{e_{0},Naked}";
+        e0_eta_naked_ = tdir.make<TH1D>(e0n_eta_name.c_str(), e0_eta_name.c_str(), 50, -5., 5.);
+        e0_eta_naked_->GetXaxis()->SetTitle("Naked #eta_{e_{0}}");
+        e0_eta_naked_->GetYaxis()->SetTitle("Counts");
+        // e0_eta_born_
+        const std::string e0b_eta_name = "#eta_{e_{0},Born}";
+        e0_eta_born_ = tdir.make<TH1D>(e0b_eta_name.c_str(), e0_eta_name.c_str(), 50, -5., 5.);
+        e0_eta_born_->GetXaxis()->SetTitle("Born #eta_{e_{0}}");
+        e0_eta_born_->GetYaxis()->SetTitle("Counts");
 
-        // e1_eta_
+        // e1_eta_ (dressed)
         const std::string e1_eta_name = "#eta_{e_{1}}";
         e1_eta_ = tdir.make<TH1D>(e1_eta_name.c_str(), e1_eta_name.c_str(), 50, -5., 5.);
         e1_eta_->GetXaxis()->SetTitle("#eta_{e_{1}}");
         e1_eta_->GetYaxis()->SetTitle("Counts");
+        // e1_eta_naked_
+        const std::string e1n_eta_name = "#eta_{e_{1},Naked}";
+        e1_eta_naked_ = tdir.make<TH1D>(e1n_eta_name.c_str(), e1_eta_name.c_str(), 50, -5., 5.);
+        e1_eta_naked_->GetXaxis()->SetTitle("Naked #eta_{e_{1}}");
+        e1_eta_naked_->GetYaxis()->SetTitle("Counts");
+        // e1_eta_born
+        const std::string e1b_eta_name = "#eta_{e_{1},Born}";
+        e1_eta_born_ = tdir.make<TH1D>(e1b_eta_name.c_str(), e1_eta_name.c_str(), 50, -5., 5.);
+        e1_eta_born_->GetXaxis()->SetTitle("Born #eta_{e_{1}}");
+        e1_eta_born_->GetYaxis()->SetTitle("Counts");
 
-        // e0_phi_
+        // e0_phi_ (dresse)
         const std::string e0_phi_name = "#phi_{e_{0}}";
-        e0_phi_ = tdir.make<TH1D>(e0_phi_name.c_str(), e0_phi_name.c_str(), 63, -3.15, 3.15);
+        e0_phi_ = tdir.make<TH1D>(e0_phi_name.c_str(), e0_phi_name.c_str(), 60, -3.15, 3.15);
         e0_phi_->GetXaxis()->SetTitle("#phi_{e_{0}}");
         e0_phi_->GetYaxis()->SetTitle("Counts");
+        // e0_phi_naked
+        const std::string e0n_phi_name = "#phi_{e_{0},Naked}";
+        e0_phi_naked_ = tdir.make<TH1D>(e0n_phi_name.c_str(), e0_phi_name.c_str(), 60, -3.15, 3.15);
+        e0_phi_naked_->GetXaxis()->SetTitle("Naked #phi_{e_{0}}");
+        e0_phi_naked_->GetYaxis()->SetTitle("Counts");
+        // e0_phi_born
+        const std::string e0b_phi_name = "#phi_{e_{0},Born}";
+        e0_phi_born_ = tdir.make<TH1D>(e0b_phi_name.c_str(), e0_phi_name.c_str(), 60, -3.15, 3.15);
+        e0_phi_born_->GetXaxis()->SetTitle("Born #phi_{e_{0}}");
+        e0_phi_born_->GetYaxis()->SetTitle("Counts");
 
-        // e1_phi_
+        // e1_phi_ (dressed)
         const std::string e1_phi_name = "#phi_{e_{1}}";
-        e1_phi_ = tdir.make<TH1D>(e1_phi_name.c_str(), e1_phi_name.c_str(), 63, -3.15, 3.15);
+        e1_phi_ = tdir.make<TH1D>(e1_phi_name.c_str(), e1_phi_name.c_str(), 50, -3.15, 3.15);
         e1_phi_->GetXaxis()->SetTitle("#phi_{e_{1}}");
         e1_phi_->GetYaxis()->SetTitle("counts");
+        // e1_phi_naked
+        const std::string e1n_phi_name = "#phi_{e_{1},Naked}";
+        e1_phi_naked_ = tdir.make<TH1D>(e1n_phi_name.c_str(), e1_phi_name.c_str(), 50, -3.15, 3.15);
+        e1_phi_naked_->GetXaxis()->SetTitle("Naked #phi_{e_{1}}");
+        e1_phi_naked_->GetYaxis()->SetTitle("counts");
+        // e1_phi_born_
+        const std::string e1b_phi_name = "#phi_{e_{1},Born}";
+        e1_phi_born_ = tdir.make<TH1D>(e1b_phi_name.c_str(), e1_phi_name.c_str(), 50, -3.15, 3.15);
+        e1_phi_born_->GetXaxis()->SetTitle("Born #phi_{e_{1}}");
+        e1_phi_born_->GetYaxis()->SetTitle("counts");
 
         // e0_charge_
         const std::string e0_charge_name = "charge_{e_{0}}";
-        e0_charge_ = tdir.make<TH1D>(e0_charge_name.c_str(), e0_charge_name.c_str(), 3, -1, 2);
+        e0_charge_ = tdir.make<TH1D>(e0_charge_name.c_str(), e0_charge_name.c_str(), 60, -3.15, 3.15);
         e0_charge_->GetXaxis()->SetTitle("charge_{e_{0}}");
         e0_charge_->GetYaxis()->SetTitle("Counts");
 
         // e1_charge_
         const std::string e1_charge_name = "charge_{e_{1}}";
-        e1_charge_ = tdir.make<TH1D>(e1_charge_name.c_str(), e1_charge_name.c_str(), 3, -1, 2);
+        e1_charge_ = tdir.make<TH1D>(e1_charge_name.c_str(), e1_charge_name.c_str(), 50, -3.15, 3.15);
         e1_charge_->GetXaxis()->SetTitle("charge_{e_{1}}");
         e1_charge_->GetYaxis()->SetTitle("counts");
 
@@ -263,14 +323,26 @@ namespace zf {
             if (ELECTRON_0 == 0 && ELECTRON_1 == 1) {
                 if (ZF_EVENT.e0_truth != NULL) {
                     e0_pt_->Fill(ZF_EVENT.e0_truth->pt, EVENT_WEIGHT);
+                    e0_pt_naked_->Fill(ZF_EVENT.e0_truth->nakedPt, EVENT_WEIGHT);
+                    e0_pt_born_->Fill(ZF_EVENT.e0_truth->bornPt, EVENT_WEIGHT);
                     e0_eta_->Fill(ZF_EVENT.e0_truth->eta, EVENT_WEIGHT);
+                    e0_eta_naked_->Fill(ZF_EVENT.e0_truth->nakedEta, EVENT_WEIGHT);
+                    e0_eta_born_->Fill(ZF_EVENT.e0_truth->bornEta, EVENT_WEIGHT);
                     e0_phi_->Fill(ZF_EVENT.e0_truth->phi, EVENT_WEIGHT);
+                    e0_phi_naked_->Fill(ZF_EVENT.e0_truth->nakedPhi, EVENT_WEIGHT);
+                    e0_phi_born_->Fill(ZF_EVENT.e0_truth->bornPhi, EVENT_WEIGHT);
                     e0_charge_->Fill(ZF_EVENT.e0_truth->charge, EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e1_truth != NULL) {
                     e1_pt_->Fill(ZF_EVENT.e1_truth->pt, EVENT_WEIGHT);
+                    e1_pt_naked_->Fill(ZF_EVENT.e1_truth->nakedPt, EVENT_WEIGHT);
+                    e1_pt_born_->Fill(ZF_EVENT.e1_truth->bornPt, EVENT_WEIGHT);
                     e1_eta_->Fill(ZF_EVENT.e1_truth->eta, EVENT_WEIGHT);
+                    e1_eta_naked_->Fill(ZF_EVENT.e1_truth->nakedEta, EVENT_WEIGHT);
+                    e1_eta_born_->Fill(ZF_EVENT.e1_truth->bornEta, EVENT_WEIGHT);
                     e1_phi_->Fill(ZF_EVENT.e1_truth->phi, EVENT_WEIGHT);
+                    e1_phi_naked_->Fill(ZF_EVENT.e1_truth->nakedPhi, EVENT_WEIGHT);
+                    e1_phi_born_->Fill(ZF_EVENT.e1_truth->bornPhi, EVENT_WEIGHT);
                     e1_charge_->Fill(ZF_EVENT.e1_truth->charge, EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e0_trig != NULL && ZF_EVENT.e0_truth != NULL) {
@@ -287,16 +359,28 @@ namespace zf {
                 }
             }
             else if (ELECTRON_0 == 1 && ELECTRON_1 == 0) {
-                if (ZF_EVENT.e1_truth != NULL) {
+                if (ZF_EVENT.e0_truth != NULL) {
                     e0_pt_->Fill(ZF_EVENT.e1_truth->pt, EVENT_WEIGHT);
+                    e0_pt_naked_->Fill(ZF_EVENT.e1_truth->nakedPt, EVENT_WEIGHT);
+                    e0_pt_born_->Fill(ZF_EVENT.e1_truth->bornPt, EVENT_WEIGHT);
                     e0_eta_->Fill(ZF_EVENT.e1_truth->eta, EVENT_WEIGHT);
+                    e0_eta_naked_->Fill(ZF_EVENT.e1_truth->nakedEta, EVENT_WEIGHT);
+                    e0_eta_born_->Fill(ZF_EVENT.e1_truth->bornEta, EVENT_WEIGHT);
                     e0_phi_->Fill(ZF_EVENT.e1_truth->phi, EVENT_WEIGHT);
+                    e0_phi_naked_->Fill(ZF_EVENT.e1_truth->nakedPhi, EVENT_WEIGHT);
+                    e0_phi_born_->Fill(ZF_EVENT.e1_truth->bornPhi, EVENT_WEIGHT);
                     e0_charge_->Fill(ZF_EVENT.e1_truth->charge, EVENT_WEIGHT);
                 }
-                if (ZF_EVENT.e0_truth != NULL) {
+                if (ZF_EVENT.e1_truth != NULL) {
                     e1_pt_->Fill(ZF_EVENT.e0_truth->pt, EVENT_WEIGHT);
+                    e1_pt_naked_->Fill(ZF_EVENT.e0_truth->nakedPt, EVENT_WEIGHT);
+                    e1_pt_born_->Fill(ZF_EVENT.e0_truth->bornPt, EVENT_WEIGHT);
                     e1_eta_->Fill(ZF_EVENT.e0_truth->eta, EVENT_WEIGHT);
+                    e1_eta_naked_->Fill(ZF_EVENT.e0_truth->nakedEta, EVENT_WEIGHT);
+                    e1_eta_born_->Fill(ZF_EVENT.e0_truth->bornEta, EVENT_WEIGHT);
                     e1_phi_->Fill(ZF_EVENT.e0_truth->phi, EVENT_WEIGHT);
+                    e1_phi_naked_->Fill(ZF_EVENT.e0_truth->nakedPhi, EVENT_WEIGHT);
+                    e1_phi_born_->Fill(ZF_EVENT.e0_truth->bornPhi, EVENT_WEIGHT);
                     e1_charge_->Fill(ZF_EVENT.e0_truth->charge, EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e1_trig != NULL && ZF_EVENT.e1_truth != NULL) {

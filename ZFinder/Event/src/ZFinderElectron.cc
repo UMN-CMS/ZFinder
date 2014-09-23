@@ -40,6 +40,37 @@ namespace zf {
             charge = 1;
         }
     }
+    
+    ZFinderElectron::ZFinderElectron(reco::GenParticle born_electron, reco::GenParticle dressed_electron, 
+                                        reco::GenParticle naked_electron) {
+        /* Set type of candidate and assign */
+        candidate_type_ = RECO_GENPARTICLE;
+        AddCutResult("type_gen", true, 1.);
+        gen_elec_ = dressed_electron;
+        // reco::GenParticle is a child of reco::candidate
+        candidate_ = dynamic_cast<reco::Candidate*>(&gen_elec_);
+        //here using only the dressed one, becaues it should share
+        //all the properties with the other two, except kinematics
+        /* Extract the useful quantities from a gen electron */
+        pt = dressed_electron.pt();
+        phi = dressed_electron.phi();
+        eta = dressed_electron.eta();
+        //born:
+        bornPt = born_electron.pt();
+        bornPhi = born_electron.phi();
+        bornEta = born_electron.eta();
+        //naked:
+        nakedPt = naked_electron.pt();
+        nakedPhi = naked_electron.phi();
+        nakedEta = naked_electron.eta();
+        // Using the input_electron Data Group ID Number, determine if the input_electron is an
+        // electron or positron
+        if (dressed_electron.pdgId() == ELECTRON) {
+            charge = -1;
+        } else if (dressed_electron.pdgId() == POSITRON) {
+            charge = 1;
+        }
+    }
 
     ZFinderElectron::ZFinderElectron(reco::RecoEcalCandidate input_electron) {
         /* Set type of candidate and assign */

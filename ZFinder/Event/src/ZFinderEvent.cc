@@ -124,6 +124,21 @@ namespace zf {
         InitReco(iEvent, iSetup);  // Data
         if (!is_real_data) {
             InitTruth(iEvent, iSetup);  // MC
+            //diagnostic cout:
+            /*if( fabs(e0_truth->bornPt - e0_truth->nakedPt) > 1e-6 ) {
+                std::cout<<"e0:\n\tBornPtEtaPhi("<< e0_truth->bornPt<<", "<<e0_truth->bornEta<<
+                            ", "<<e0_truth->bornPhi<<")"<<std::endl;
+                std::cout<<"\tNakedPtEtaPhi("<< e0_truth->nakedPt<<", "<<e0_truth->nakedEta<<
+                            ", "<<e0_truth->nakedPhi<<")"<<std::endl;
+                std::cout<<"\tDressedPtEtaPhi("<< e0_truth->pt<<", "<<e0_truth->eta<<
+                            ", "<<e0_truth->phi<<")"<<std::endl;
+                std::cout<<"e1:\n\tBornPtEtaPhi("<< e1_truth->bornPt<<", "<<e1_truth->bornEta<<
+                            ", "<<e1_truth->bornPhi<<")"<<std::endl;
+                std::cout<<"\tNakedPtEtaPhi("<< e1_truth->nakedPt<<", "<<e1_truth->nakedEta<<
+                            ", "<<e1_truth->nakedPhi<<")"<<std::endl;
+                std::cout<<"\tDressedPtEtaPhi("<< e1_truth->pt<<", "<<e1_truth->eta<<
+                            ", "<<e1_truth->phi<<")"<<std::endl;
+            }*/
             // In MC we want to store the value of the Truth phistar and Y with
             // the reco events, and vice versa, so that they may be used for
             // unfolding
@@ -448,6 +463,11 @@ namespace zf {
                     const double WEIGHT = 1.;
                     zf_electron->AddCutResult("nt_loose", PASSED, WEIGHT);
                 }
+                else {
+                    zf_electron->AddCutResult("nt_loose", false, 1.);
+                }
+                //diagnostic printout:
+                //else std::cout<<"NT loose Failed!"<<std::endl;
 
                 // Check for trigger matching
                 // HLT_Ele27_CaloIdT_CaloIsoVL_TrkIdVL_TrkIsoVL_Ele15_CaloIdT_CaloIsoVL_trackless_v8
@@ -578,8 +598,15 @@ namespace zf {
          * make sure it came from a Z. This might have problems in ZZ->eeee
          * decays, but we expect those to be impossibly rare.
          */
-        const reco::GenParticle* electron_0 = NULL;
-        const reco::GenParticle* electron_1 = NULL;
+         //default electrons--which are now DRESSED!
+        reco::GenParticle* electron_0 = NULL;
+        reco::GenParticle* electron_1 = NULL;
+        //born electrons:
+        const reco::GenParticle* bornElectron_0 = NULL;
+        const reco::GenParticle* bornElectron_1 = NULL;
+        //naked (final) electrons:
+        const reco::GenParticle* nakedElectron_0 = NULL;
+        const reco::GenParticle* nakedElectron_1 = NULL;
         const reco::GenParticle* z_boson = NULL;
 
         for(unsigned int i = 0; i < mc_particles->size(); ++i) {
@@ -597,15 +624,32 @@ namespace zf {
                     && (electron_0 == NULL || electron_1 == NULL)
                     ) {
                 for (size_t j = 0; j < gen_particle->numberOfMothers(); ++j) {
-                    if (gen_particle->mother(j)->pdgId() == ZBOSON) {
-                        if (electron_0 == NULL) {
-                            electron_0 = gen_particle;
+                    if (gen_particle->mother(j)->pdgId() == ZBOSON && gen_particle->status()==3 ) {
+                        if (bornElectron_0 == NULL) {
+                            //std::cout<<"PingA"<<std::endl;
+                            bornElectron_0 = FollowElectron(&gen_particle);//WARNING:
+                                                                           //this funciton uses a POINTER to a POINTER to make gen_particle point at
+                                                                           //the NAKED electron at the end of the decay chain
+                            //std::cout<<"PingB"<<std::endl;
+                            nakedElectron_0 = gen_particle;
+                            //now we DRESS it:
+                            if (gen_particle != NULL) electron_0 = DressElectron(gen_particle, mc_particles);
+                            else electron_0 = NULL;
+                            //std::cout<<"PingC"<<std::endl;
                         } else {
-                            electron_1 = gen_particle;
+                            //std::cout<<"PingD"<<std::endl;
+                            bornElectron_1 = FollowElectron(&gen_particle);
+                            //std::cout<<"PingE"<<std::endl;
+                            nakedElectron_1 = gen_particle;
+                            //now we DRESS it:
+                            if (gen_particle != NULL) electron_1 = DressElectron(gen_particle, mc_particles);
+                            else electron_1 = NULL;
+                            //std::cout<<"PingF"<<std::endl;
                         }
                     }
                 }
             }
+            if (z_boson != NULL && electron_0 != NULL && electron_1 != NULL) break;
         }
 
         // Continue only if all particles have been found
@@ -613,12 +657,14 @@ namespace zf {
             // We set electron_0 to the higher pt electron
             if (electron_0->pt() < electron_1->pt()) {
                 std::swap(electron_0, electron_1);
+                std::swap(nakedElectron_0, nakedElectron_1);
+                std::swap(bornElectron_0, bornElectron_1);
             }
 
             // Add electrons
-            ZFinderElectron* zf_electron_0 = AddTruthElectron(*electron_0);
+            ZFinderElectron* zf_electron_0 = AddTruthElectron(*bornElectron_0, *electron_0, *nakedElectron_0);
             set_e0_truth(zf_electron_0);
-            ZFinderElectron* zf_electron_1 = AddTruthElectron(*electron_1);
+            ZFinderElectron* zf_electron_1 = AddTruthElectron(*bornElectron_1, *electron_1, *nakedElectron_1);
             set_e1_truth(zf_electron_1);
 
             // Z Properties
@@ -674,11 +720,86 @@ namespace zf {
         truth_electrons_.push_back(zf_electron);
         return zf_electron;
     }
+    //the trifecto version:
+    ZFinderElectron* ZFinderEvent::AddTruthElectron(reco::GenParticle bornElectron,
+                                                    reco::GenParticle dressedElectron,
+                                                    reco::GenParticle nakedElectron) {
+        ZFinderElectron* zf_electron = new ZFinderElectron(bornElectron,dressedElectron,nakedElectron);
+        truth_electrons_.push_back(zf_electron);
+        return zf_electron;
+    }
 
     ZFinderElectron* ZFinderEvent::AddHLTElectron(trigger::TriggerObject electron) {
         ZFinderElectron* zf_electron = new ZFinderElectron(electron);
         hlt_electrons_.push_back(zf_electron);
         return zf_electron;
+    }
+    
+    const reco::GenParticle* ZFinderEvent::FollowElectron(const reco::GenParticle **gen_particle)
+    {       
+        //NOTE: so as not to end up with born and naked pointing to the same gen particle,
+        //I RETURN a copy of the original, but advance the gen_particle itself
+        const reco::GenParticle *born_e = new reco::GenParticle( (*gen_particle)->charge(),
+                                                                 (*gen_particle)->p4(), 
+                                                                 (*gen_particle)->vertex(), 
+                                                                 (*gen_particle)->pdgId(),
+                                                                 (*gen_particle)->status(), 1 );
+        //I need a copy of the content, not just a copy of the pointer!
+        bool stop = false;
+        //unsigned int nDaught = gen_particle->numberOfDaughters();
+        //std::cout<<"status is "<<gen_particle->status()<<", ID "<<gen_particle->pdgId()<<", pt = "<<gen_particle->pt()
+        //<<"; "<<gen_particle->numberOfDaughters()<<" daughters:"<<std::endl;
+        while( (*gen_particle)->status() != 1 && !stop){  
+            if((*gen_particle)->numberOfDaughters() == 0) {
+                (*gen_particle) = NULL;
+                break;
+            }
+            //std::cout<<gen_particle->numberOfDaughters()<<" daughters"<<std::endl;
+            stop = true;
+            size_t k;
+            for (k = 0; k < (*gen_particle)->numberOfDaughters(); k++) {
+                //std::cout<<"Daughter "<<k<<": ID = "<<gen_particle->daughter(k)->pdgId()<<", pt = "<<gen_particle->daughter(k)->pt()
+                //<<", status "<<gen_particle->daughter(k)->status()<<", "<<gen_particle->daughter(k)->numberOfDaughters()<<std::endl;
+                if ( fabs((*gen_particle)->daughter(k)->pdgId() ) == ELECTRON ) {
+                    stop = false;
+                    *gen_particle = dynamic_cast<const reco::GenParticle*>((*gen_particle)->daughter(k)); 
+                    if((*gen_particle)->status() == 1 ){
+                        //std::cout<<"Found stable electron!"<<std::endl;
+                        break;
+                    }
+                }
+            }
+        }
+        if(stop) *gen_particle = NULL;
+        //std::cout<<"PingX"<<std::endl;
+        return born_e;
+    }
+    
+    reco::GenParticle* ZFinderEvent::DressElectron(const reco::GenParticle* nakedElectron,
+                                           edm::Handle<reco::GenParticleCollection> mc_particles)
+    {     
+        //electron mass:
+        const double ELECTRON_MASS = 5.109989e-4;
+        math::PtEtaPhiMLorentzVector e0p4( nakedElectron->pt(), nakedElectron->eta(),
+                                           nakedElectron->phi(), ELECTRON_MASS  );
+        for(unsigned int i = 0; i < mc_particles->size(); ++i) {
+            if(mc_particles->at(i).pdgId()==22 && mc_particles->at(i).status()==1 ){
+                //check deltaR<0.1
+                if( deltaR( mc_particles->at(i).eta(),mc_particles->at(i).phi(),
+                            e0p4.eta(),e0p4.phi() ) < 0.1 )
+                {
+                    e0p4 += math::PtEtaPhiMLorentzVector( mc_particles->at(i).pt(),
+                                    mc_particles->at(i).eta(), mc_particles->at(i).phi(),
+                                    ELECTRON_MASS  );
+                }
+            }
+        }  
+        //make new gen particle from old ones:
+        reco::GenParticle *dressed_e = new reco::GenParticle( nakedElectron->charge(), e0p4, 
+                                            nakedElectron->vertex(), 
+                                            nakedElectron->pdgId(),
+                                            nakedElectron->status(), 1 ); 
+        return dressed_e;                                            
     }
 
     double ZFinderEvent::ReturnPhistar(const double& eta0, const double& phi0, const double& eta1, const double& phi1) {
@@ -954,13 +1075,16 @@ namespace zf {
             const double WEIGHT = 1.0;
             // We can do the correction
             if (spectator_electron != NULL) {
-                //3.18 m to EE, 3.8 T field, and a factor of 1e9 for GeV
+                //3.18 m to EE, 3.8 T field, and a factor of 10/3 for GeV/c
                 const double B_FIELD = 3.8;  // Tesla
                 const double DIST_TO_EE = 3.18;  // Distance to EE in meters
 
-                // TODO: Alexey, please break this line up so that it isn't a
-                // million miles long
-                const double ADDITIVE_CORRECTION = 1 * spectator_electron->charge * tanh(electron_to_correct->eta) / cosh(electron_to_correct->eta) * DIST_TO_EE * B_FIELD / (electron_to_correct->pt * 1e9);
+                const int Q_NT = -1 * spectator_electron->charge;//inferred NT electron charge
+                const double NUMERIC_FACTOR = DIST_TO_EE * B_FIELD * 3 / 20;
+                // 1/(10/3) is from GeV/c, and 1/2 is geometric
+                const double ETA_NT = fabs(electron_to_correct->eta);//sign of eta is unimportant
+                const double PT_NT = electron_to_correct->pt;
+                const double ADDITIVE_CORRECTION =  Q_NT * NUMERIC_FACTOR / sinh( ETA_NT ) / PT_NT;
 
                 electron_to_correct->phi += ADDITIVE_CORRECTION;
                 electron_to_correct->AddCutResult("nt_corrected", true, WEIGHT);
