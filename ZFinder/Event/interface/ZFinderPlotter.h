@@ -54,6 +54,8 @@ namespace zf {
             TH1D* e0_charge_;
             TH1D* e1_charge_;
             TH1D* phistar_;
+            TH1D* phistar_born_;
+            TH1D* phistar_naked_;
             TH1D* pileup_;
             TH1D* nelectrons_;
             TH1D* baseweights_;

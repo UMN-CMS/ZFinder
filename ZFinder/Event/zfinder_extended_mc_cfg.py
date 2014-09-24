@@ -23,7 +23,7 @@ process.source = cms.Source("PoolSource",
 
 # Output file
 process.TFileService = cms.Service("TFileService",
-        fileName = cms.string("test_extended_mc.root")
+        fileName = cms.string("test_extended_mc_newGenVars_001.root")
         )
 
 # Import rho value for isolation correction
