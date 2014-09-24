@@ -156,11 +156,21 @@ namespace zf {
         e1_charge_->GetXaxis()->SetTitle("charge_{e_{1}}");
         e1_charge_->GetYaxis()->SetTitle("counts");
 
-        // phistar
+        // phistar (dressed)
         const std::string phistar_name = "#phi*";
         phistar_ = tdir.make<TH1D>(phistar_name.c_str(), phistar_name.c_str(), 4000, 0., 4.);
         phistar_->GetXaxis()->SetTitle("#phi*");
         phistar_->GetYaxis()->SetTitle("Counts");
+        // phistar born
+        const std::string phistar_name_born = "Born #phi*";
+        phistar_born_ = tdir.make<TH1D>(phistar_name_born.c_str(), phistar_name_born.c_str(), 4000, 0., 4.);
+        phistar_born_->GetXaxis()->SetTitle("Born #phi*");
+        phistar_born_->GetYaxis()->SetTitle("Counts");
+        // phistar naked
+        const std::string phistar_name_naked = "Naked #phi*";
+        phistar_naked_ = tdir.make<TH1D>(phistar_name_naked.c_str(), phistar_name_naked.c_str(), 4000, 0., 4.);
+        phistar_naked_->GetXaxis()->SetTitle("Naked #phi*");
+        phistar_naked_->GetYaxis()->SetTitle("Counts");
 
         // other_phistar for gen-reco efficiencies
         const std::string other_phistar_name = "Other #phi*";
@@ -315,6 +325,8 @@ namespace zf {
             z0_rapidity_->Fill(ZF_EVENT.truth_z.y, EVENT_WEIGHT);
             z0_pt_->Fill(ZF_EVENT.truth_z.pt, EVENT_WEIGHT);
             phistar_->Fill(ZF_EVENT.truth_z.phistar, EVENT_WEIGHT);
+            phistar_born_->Fill(ZF_EVENT.truth_z.bornPhistar, EVENT_WEIGHT);
+            phistar_naked_->Fill(ZF_EVENT.truth_z.nakedPhistar, EVENT_WEIGHT);
             deltaR_->Fill(ZF_EVENT.truth_z.deltaR, EVENT_WEIGHT);
             other_phistar_->Fill(ZF_EVENT.truth_z.other_phistar, EVENT_WEIGHT);
             other_y_->Fill(ZF_EVENT.truth_z.other_y, EVENT_WEIGHT);

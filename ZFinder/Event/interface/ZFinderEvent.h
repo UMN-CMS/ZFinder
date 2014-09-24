@@ -72,6 +72,8 @@ namespace zf {
                 double pt;
                 double y;
                 double phistar;
+                double bornPhistar;
+                double nakedPhistar;
                 double eta;
                 double deltaR;
                 //for events where gen XOR reco failed given selection:

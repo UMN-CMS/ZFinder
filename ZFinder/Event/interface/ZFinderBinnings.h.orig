@@ -1,0 +1,77 @@
+#ifndef ZFINDER_ZFINDERBINNING_H_
+#define ZFINDER_ZFINDERBINNING_H_
+
+// Standard Library
+#include <vector>
+
+
+namespace zf {
+
+    typedef std::pair<double, double> coordinate_pair;
+
+    class ZFinderBinning {
+        public:
+            // Get Bins
+            int GetPhistarBin(const double PHISTAR) const;
+            int GetRapidityBin(const double Y) const;
+
+        protected:
+            int GetBin(const double VALUE, const std::vector<double>& VECTOR) const;
+            /* The binning lists here _MUST_ be sorted, as the loop terminates
+             * as soon as it finds i such that: 
+             * BINS[i] < input_value < BINS[i + 1]
+             *
+             * The last entry should be the upper bounds, if it is reached the
+             * code will return -1
+             */
+            // ATLAS binning
+            static constexp std::vector<double> PHISTAR_BINS_ = {
+                0.000,
+                0.004,
+                0.008,
+                0.012,
+                0.016,
+                0.020,
+                0.024,
+                0.029,
+                0.034,
+                0.039,
+                0.045,
+                0.052,
+                0.057,
+                0.064,
+                0.072,
+                0.081,
+                0.091,
+                0.102,
+                0.114,
+                0.128,
+                0.145,
+                0.165,
+                0.189,
+                0.219,
+                0.258,
+                0.312,
+                0.391,
+                0.524,
+                0.695,
+                0.918,
+                1.153,
+                1.496,
+                1.947,
+                2.522,
+                3.277,
+                10.0,
+            };
+
+            // ATLAS binning
+            static constexp std::vector<double> RAPIDITY_BINS_ = {
+                0.0,
+                0.8,
+                1.6,
+                10.0,
+            };
+    };
+
+}  // namespace zf
+#endif  // ZFINDER_ZFINDERBINNING_H_

@@ -124,21 +124,6 @@ namespace zf {
         InitReco(iEvent, iSetup);  // Data
         if (!is_real_data) {
             InitTruth(iEvent, iSetup);  // MC
-            //diagnostic cout:
-            /*if( fabs(e0_truth->bornPt - e0_truth->nakedPt) > 1e-6 ) {
-                std::cout<<"e0:\n\tBornPtEtaPhi("<< e0_truth->bornPt<<", "<<e0_truth->bornEta<<
-                            ", "<<e0_truth->bornPhi<<")"<<std::endl;
-                std::cout<<"\tNakedPtEtaPhi("<< e0_truth->nakedPt<<", "<<e0_truth->nakedEta<<
-                            ", "<<e0_truth->nakedPhi<<")"<<std::endl;
-                std::cout<<"\tDressedPtEtaPhi("<< e0_truth->pt<<", "<<e0_truth->eta<<
-                            ", "<<e0_truth->phi<<")"<<std::endl;
-                std::cout<<"e1:\n\tBornPtEtaPhi("<< e1_truth->bornPt<<", "<<e1_truth->bornEta<<
-                            ", "<<e1_truth->bornPhi<<")"<<std::endl;
-                std::cout<<"\tNakedPtEtaPhi("<< e1_truth->nakedPt<<", "<<e1_truth->nakedEta<<
-                            ", "<<e1_truth->nakedPhi<<")"<<std::endl;
-                std::cout<<"\tDressedPtEtaPhi("<< e1_truth->pt<<", "<<e1_truth->eta<<
-                            ", "<<e1_truth->phi<<")"<<std::endl;
-            }*/
             // In MC we want to store the value of the Truth phistar and Y with
             // the reco events, and vice versa, so that they may be used for
             // unfolding
@@ -536,6 +521,8 @@ namespace zf {
         reco_z.y = -1000;
         reco_z.pt = -1;
         reco_z.phistar = -1;
+        reco_z.bornPhistar = -1;
+        reco_z.nakedPhistar = -1;
         reco_z.eta = -1000;
         reco_z.deltaR = -1;
         reco_z.other_y = -1000;
@@ -545,6 +532,8 @@ namespace zf {
         truth_z.y = -1000;
         truth_z.pt = -1;
         truth_z.phistar = -1;
+        truth_z.bornPhistar = -1;
+        truth_z.nakedPhistar = -1;
         truth_z.eta = -1000;
         truth_z.deltaR = -1;
         truth_z.other_y = -1000;
@@ -626,25 +615,19 @@ namespace zf {
                 for (size_t j = 0; j < gen_particle->numberOfMothers(); ++j) {
                     if (gen_particle->mother(j)->pdgId() == ZBOSON && gen_particle->status()==3 ) {
                         if (bornElectron_0 == NULL) {
-                            //std::cout<<"PingA"<<std::endl;
                             bornElectron_0 = FollowElectron(&gen_particle);//WARNING:
                                                                            //this funciton uses a POINTER to a POINTER to make gen_particle point at
                                                                            //the NAKED electron at the end of the decay chain
-                            //std::cout<<"PingB"<<std::endl;
                             nakedElectron_0 = gen_particle;
                             //now we DRESS it:
                             if (gen_particle != NULL) electron_0 = DressElectron(gen_particle, mc_particles);
                             else electron_0 = NULL;
-                            //std::cout<<"PingC"<<std::endl;
                         } else {
-                            //std::cout<<"PingD"<<std::endl;
                             bornElectron_1 = FollowElectron(&gen_particle);
-                            //std::cout<<"PingE"<<std::endl;
                             nakedElectron_1 = gen_particle;
                             //now we DRESS it:
                             if (gen_particle != NULL) electron_1 = DressElectron(gen_particle, mc_particles);
                             else electron_1 = NULL;
-                            //std::cout<<"PingF"<<std::endl;
                         }
                     }
                 }
@@ -673,7 +656,9 @@ namespace zf {
             const double ZEPP = z_boson->energy() + z_boson->pz();
             const double ZEMP = z_boson->energy() - z_boson->pz();
             truth_z.y = 0.5 * log(ZEPP / ZEMP);
-            truth_z.phistar = ReturnPhistar(electron_0->eta(), electron_0->phi(), electron_1->eta(), electron_1->phi());
+            truth_z.phistar = ReturnPhistar(e0_truth->eta, e0_truth->phi, e1_truth->eta, e1_truth->phi);
+            truth_z.bornPhistar = ReturnPhistar(e0_truth->bornEta, e0_truth->bornPhi, e1_truth->bornEta, e1_truth->bornPhi);
+            truth_z.nakedPhistar = ReturnPhistar(e0_truth->nakedEta, e0_truth->nakedPhi, e1_truth->nakedEta, e1_truth->nakedPhi);
             truth_z.eta = z_boson->eta();
             truth_z.deltaR = deltaR(e0_truth->eta, e0_truth->phi, e1_truth->eta, e1_truth->phi);
         }
