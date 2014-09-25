@@ -188,13 +188,15 @@ namespace zf {
 
             std::vector<ZFinderElectron*> truth_electrons_;
             ZFinderElectron* AddTruthElectron(reco::GenParticle electron);
-            ZFinderElectron* AddTruthElectron(reco::GenParticle bornElectron,
-                                              reco::GenParticle dressedElectron,
-                                              reco::GenParticle nakedElectron);
+            ZFinderElectron* AddTruthElectron(
+                    reco::GenParticle bornElectron,
+                    reco::GenParticle dressedElectron,
+                    reco::GenParticle nakedElectron
+                    );
 
             std::vector<ZFinderElectron*> hlt_electrons_;
             ZFinderElectron* AddHLTElectron(trigger::TriggerObject electron);
-            
+
             //follow an electron from vertex to post-fsr
             const reco::GenParticle* FollowElectron(const reco::GenParticle **gen_particle);//returns NULL if for some reason not successful.
             //dress a post-fsr electron with photons around it

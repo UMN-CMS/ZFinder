@@ -112,47 +112,47 @@ namespace zf {
         e1_eta_born_->GetXaxis()->SetTitle("Born #eta_{e_{1}}");
         e1_eta_born_->GetYaxis()->SetTitle("Counts");
 
-        // e0_phi_ (dresse)
+        // e0_phi (dressed)
         const std::string e0_phi_name = "#phi_{e_{0}}";
-        e0_phi_ = tdir.make<TH1D>(e0_phi_name.c_str(), e0_phi_name.c_str(), 60, -3.15, 3.15);
+        e0_phi_ = tdir.make<TH1D>(e0_phi_name.c_str(), e0_phi_name.c_str(), 63, -3.15, 3.15);
         e0_phi_->GetXaxis()->SetTitle("#phi_{e_{0}}");
         e0_phi_->GetYaxis()->SetTitle("Counts");
         // e0_phi_naked
         const std::string e0n_phi_name = "#phi_{e_{0},Naked}";
-        e0_phi_naked_ = tdir.make<TH1D>(e0n_phi_name.c_str(), e0_phi_name.c_str(), 60, -3.15, 3.15);
+        e0_phi_naked_ = tdir.make<TH1D>(e0n_phi_name.c_str(), e0_phi_name.c_str(), 63, -3.15, 3.15);
         e0_phi_naked_->GetXaxis()->SetTitle("Naked #phi_{e_{0}}");
         e0_phi_naked_->GetYaxis()->SetTitle("Counts");
         // e0_phi_born
         const std::string e0b_phi_name = "#phi_{e_{0},Born}";
-        e0_phi_born_ = tdir.make<TH1D>(e0b_phi_name.c_str(), e0_phi_name.c_str(), 60, -3.15, 3.15);
+        e0_phi_born_ = tdir.make<TH1D>(e0b_phi_name.c_str(), e0_phi_name.c_str(), 63, -3.15, 3.15);
         e0_phi_born_->GetXaxis()->SetTitle("Born #phi_{e_{0}}");
         e0_phi_born_->GetYaxis()->SetTitle("Counts");
 
-        // e1_phi_ (dressed)
+        // e1_phi (dressed)
         const std::string e1_phi_name = "#phi_{e_{1}}";
-        e1_phi_ = tdir.make<TH1D>(e1_phi_name.c_str(), e1_phi_name.c_str(), 50, -3.15, 3.15);
+        e1_phi_ = tdir.make<TH1D>(e1_phi_name.c_str(), e1_phi_name.c_str(), 63, -3.15, 3.15);
         e1_phi_->GetXaxis()->SetTitle("#phi_{e_{1}}");
         e1_phi_->GetYaxis()->SetTitle("counts");
         // e1_phi_naked
         const std::string e1n_phi_name = "#phi_{e_{1},Naked}";
-        e1_phi_naked_ = tdir.make<TH1D>(e1n_phi_name.c_str(), e1_phi_name.c_str(), 50, -3.15, 3.15);
+        e1_phi_naked_ = tdir.make<TH1D>(e1n_phi_name.c_str(), e1_phi_name.c_str(), 63, -3.15, 3.15);
         e1_phi_naked_->GetXaxis()->SetTitle("Naked #phi_{e_{1}}");
         e1_phi_naked_->GetYaxis()->SetTitle("counts");
-        // e1_phi_born_
+        // e1_phi_born
         const std::string e1b_phi_name = "#phi_{e_{1},Born}";
-        e1_phi_born_ = tdir.make<TH1D>(e1b_phi_name.c_str(), e1_phi_name.c_str(), 50, -3.15, 3.15);
+        e1_phi_born_ = tdir.make<TH1D>(e1b_phi_name.c_str(), e1_phi_name.c_str(), 63, -3.15, 3.15);
         e1_phi_born_->GetXaxis()->SetTitle("Born #phi_{e_{1}}");
         e1_phi_born_->GetYaxis()->SetTitle("counts");
 
-        // e0_charge_
+        // e0_charge
         const std::string e0_charge_name = "charge_{e_{0}}";
-        e0_charge_ = tdir.make<TH1D>(e0_charge_name.c_str(), e0_charge_name.c_str(), 60, -3.15, 3.15);
+        e0_charge_ = tdir.make<TH1D>(e0_charge_name.c_str(), e0_charge_name.c_str(), 3, -1.5, 1.5);
         e0_charge_->GetXaxis()->SetTitle("charge_{e_{0}}");
         e0_charge_->GetYaxis()->SetTitle("Counts");
 
-        // e1_charge_
+        // e1_charge
         const std::string e1_charge_name = "charge_{e_{1}}";
-        e1_charge_ = tdir.make<TH1D>(e1_charge_name.c_str(), e1_charge_name.c_str(), 50, -3.15, 3.15);
+        e1_charge_ = tdir.make<TH1D>(e1_charge_name.c_str(), e1_charge_name.c_str(), 3, -1.5, 1.5);
         e1_charge_->GetXaxis()->SetTitle("charge_{e_{1}}");
         e1_charge_->GetYaxis()->SetTitle("counts");
 
@@ -161,11 +161,13 @@ namespace zf {
         phistar_ = tdir.make<TH1D>(phistar_name.c_str(), phistar_name.c_str(), 4000, 0., 4.);
         phistar_->GetXaxis()->SetTitle("#phi*");
         phistar_->GetYaxis()->SetTitle("Counts");
+
         // phistar born
         const std::string phistar_name_born = "Born #phi*";
         phistar_born_ = tdir.make<TH1D>(phistar_name_born.c_str(), phistar_name_born.c_str(), 4000, 0., 4.);
         phistar_born_->GetXaxis()->SetTitle("Born #phi*");
         phistar_born_->GetYaxis()->SetTitle("Counts");
+
         // phistar naked
         const std::string phistar_name_naked = "Naked #phi*";
         phistar_naked_ = tdir.make<TH1D>(phistar_name_naked.c_str(), phistar_name_naked.c_str(), 4000, 0., 4.);
@@ -178,7 +180,7 @@ namespace zf {
         other_phistar_->GetXaxis()->SetTitle("#phi*_{other}");
         other_phistar_->GetYaxis()->SetTitle("Counts");
 
-        // other_y_ for gen-reco efficiencies
+        // other_y for gen-reco efficiencies
         const std::string other_y_name = "Other Rapidity";
         other_y_ = tdir.make<TH1D>(other_y_name.c_str(), other_y_name.c_str(), 100, -5., 5.);
         other_y_->GetXaxis()->SetTitle("Z_{Y, other}");
@@ -223,7 +225,7 @@ namespace zf {
         // phistar
         const std::string phistar_vs_truth_name = "#phi*: Reco Vs. Truth";
         phistar_vs_truth_ = tdir.make<TH1D>(phistar_vs_truth_name.c_str(), phistar_vs_truth_name.c_str(), 200, 0., 2.);
-		phistar_vs_truth_->GetXaxis()->SetTitle("#phi* Reco MC / Truth");
+        phistar_vs_truth_->GetXaxis()->SetTitle("#phi* Reco MC / Truth");
         phistar_vs_truth_->GetYaxis()->SetTitle("Events");
 
         //deltaR
@@ -371,7 +373,7 @@ namespace zf {
                 }
             }
             else if (ELECTRON_0 == 1 && ELECTRON_1 == 0) {
-                if (ZF_EVENT.e0_truth != NULL) {
+                if (ZF_EVENT.e1_truth != NULL) {
                     e0_pt_->Fill(ZF_EVENT.e1_truth->pt, EVENT_WEIGHT);
                     e0_pt_naked_->Fill(ZF_EVENT.e1_truth->nakedPt, EVENT_WEIGHT);
                     e0_pt_born_->Fill(ZF_EVENT.e1_truth->bornPt, EVENT_WEIGHT);
@@ -383,7 +385,7 @@ namespace zf {
                     e0_phi_born_->Fill(ZF_EVENT.e1_truth->bornPhi, EVENT_WEIGHT);
                     e0_charge_->Fill(ZF_EVENT.e1_truth->charge, EVENT_WEIGHT);
                 }
-                if (ZF_EVENT.e1_truth != NULL) {
+                if (ZF_EVENT.e0_truth != NULL) {
                     e1_pt_->Fill(ZF_EVENT.e0_truth->pt, EVENT_WEIGHT);
                     e1_pt_naked_->Fill(ZF_EVENT.e0_truth->nakedPt, EVENT_WEIGHT);
                     e1_pt_born_->Fill(ZF_EVENT.e0_truth->bornPt, EVENT_WEIGHT);

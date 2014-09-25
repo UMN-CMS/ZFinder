@@ -35,7 +35,11 @@ namespace zf {
             ZFinderElectron() {};
             ZFinderElectron(reco::GsfElectron input_electron);
             ZFinderElectron(reco::GenParticle input_electron);
-            ZFinderElectron(reco::GenParticle born_electron, reco::GenParticle dressed_electron, reco::GenParticle naked_electron);
+            ZFinderElectron(
+                    reco::GenParticle born_electron,
+                    reco::GenParticle dressed_electron,
+                    reco::GenParticle naked_electron
+                );
             ZFinderElectron(reco::RecoEcalCandidate input_electron);
             ZFinderElectron(reco::Photon input_electron);
             ZFinderElectron(trigger::TriggerObject input_electron);

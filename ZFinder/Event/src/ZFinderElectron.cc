@@ -36,13 +36,15 @@ namespace zf {
         // electron or positron
         if (input_electron.pdgId() == ELECTRON) {
             charge = -1;
-        } else if (input_electron.pdgId() == POSITRON) {
+        }
+        else if (input_electron.pdgId() == POSITRON) {
             charge = 1;
         }
     }
-    
-    ZFinderElectron::ZFinderElectron(reco::GenParticle born_electron, reco::GenParticle dressed_electron, 
-                                        reco::GenParticle naked_electron) {
+
+    ZFinderElectron::ZFinderElectron(reco::GenParticle born_electron,
+                                     reco::GenParticle dressed_electron,
+                                     reco::GenParticle naked_electron) {
         /* Set type of candidate and assign */
         candidate_type_ = RECO_GENPARTICLE;
         AddCutResult("type_gen", true, 1.);
@@ -67,7 +69,8 @@ namespace zf {
         // electron or positron
         if (dressed_electron.pdgId() == ELECTRON) {
             charge = -1;
-        } else if (dressed_electron.pdgId() == POSITRON) {
+        }
+        else if (dressed_electron.pdgId() == POSITRON) {
             charge = 1;
         }
     }
@@ -119,7 +122,8 @@ namespace zf {
         // Return a CutResult if it exists, otherwise return NULL
         if (i != cutresults_.end()) {
             return &(i->second);
-        } else {
+        }
+        else {
             return NULL;
         }
     }
@@ -130,7 +134,8 @@ namespace zf {
         // If the CutResult exists, return the passed value, otherwise return -1
         if (cr != NULL) {
             return cr->passed;
-        } else {
+        }
+        else {
             return -1;
         }
     }
@@ -143,7 +148,8 @@ namespace zf {
         // Using either 0 or 1 might be appropriate depending on the case.
         if (cr != NULL) {
             return cr->weight;
-        } else {
+        }
+        else {
             return -1.;
         }
     }
@@ -169,7 +175,8 @@ namespace zf {
         if (cr != NULL) {
             AddCutResult(cr->name, cr->passed, WEIGHT);
             return 0;
-        } else {
+        }
+        else {
             // Failure
             return 1.;
         }

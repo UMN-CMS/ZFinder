@@ -560,7 +560,7 @@ namespace zf {
         // the 0th bunch crossing
         std::vector<PileupSummaryInfo>::const_iterator PILEUP_ELEMENT;
         if (pileup_info.isValid()) {
-            for(PILEUP_ELEMENT = pileup_info->begin(); PILEUP_ELEMENT != pileup_info->end(); ++PILEUP_ELEMENT) {
+            for (PILEUP_ELEMENT = pileup_info->begin(); PILEUP_ELEMENT != pileup_info->end(); ++PILEUP_ELEMENT) {
                 const int BUNCH_CROSSING = PILEUP_ELEMENT->getBunchCrossing();
                 if (BUNCH_CROSSING == 0) {
                     // The main vertex is counted as well, so add +1
@@ -587,7 +587,7 @@ namespace zf {
          * make sure it came from a Z. This might have problems in ZZ->eeee
          * decays, but we expect those to be impossibly rare.
          */
-         //default electrons--which are now DRESSED!
+        //default electrons--which are now DRESSED!
         reco::GenParticle* electron_0 = NULL;
         reco::GenParticle* electron_1 = NULL;
         //born electrons:
@@ -598,7 +598,7 @@ namespace zf {
         const reco::GenParticle* nakedElectron_1 = NULL;
         const reco::GenParticle* z_boson = NULL;
 
-        for(unsigned int i = 0; i < mc_particles->size(); ++i) {
+        for (unsigned int i = 0; i < mc_particles->size(); ++i) {
             const reco::GenParticle* gen_particle = &mc_particles->at(i);
             // Is a Z
             if (gen_particle->pdgId() == ZBOSON && z_boson == NULL) {
@@ -608,31 +608,47 @@ namespace zf {
                         break;
                     }
                 }
-                // Is an electron
-            } else if (   fabs(gen_particle->pdgId()) == ELECTRON  // In pdgId, fabs(POSITRON) == ELECTRON
+            }
+            // Is an electron
+            else if (fabs(gen_particle->pdgId()) == ELECTRON  // In pdgId, fabs(POSITRON) == ELECTRON
                     && (electron_0 == NULL || electron_1 == NULL)
                     ) {
                 for (size_t j = 0; j < gen_particle->numberOfMothers(); ++j) {
-                    if (gen_particle->mother(j)->pdgId() == ZBOSON && gen_particle->status()==3 ) {
+                    if (gen_particle->mother(j)->pdgId() == ZBOSON && gen_particle->status() == 3) {
+                        // If we haven't filled the first electron
                         if (bornElectron_0 == NULL) {
-                            bornElectron_0 = FollowElectron(&gen_particle);//WARNING:
-                                                                           //this funciton uses a POINTER to a POINTER to make gen_particle point at
-                                                                           //the NAKED electron at the end of the decay chain
+                            //WARNING: this funciton uses a POINTER to a
+                            //POINTER to make gen_particle point at the NAKED
+                            //electron at the end of the decay chain
+                            bornElectron_0 = FollowElectron(&gen_particle);
                             nakedElectron_0 = gen_particle;
                             //now we DRESS it:
-                            if (gen_particle != NULL) electron_0 = DressElectron(gen_particle, mc_particles);
-                            else electron_0 = NULL;
-                        } else {
+                            if (gen_particle != NULL) {
+                                electron_0 = DressElectron(gen_particle, mc_particles);
+                            }
+                            else {
+                                electron_0 = NULL;
+                            }
+                        }
+                        // We have filled the first electron, so fill the second
+                        else {
                             bornElectron_1 = FollowElectron(&gen_particle);
                             nakedElectron_1 = gen_particle;
                             //now we DRESS it:
-                            if (gen_particle != NULL) electron_1 = DressElectron(gen_particle, mc_particles);
-                            else electron_1 = NULL;
+                            if (gen_particle != NULL) {
+                                electron_1 = DressElectron(gen_particle, mc_particles);
+                            }
+                            else {
+                                electron_1 = NULL;
+                            }
                         }
                     }
                 }
             }
-            if (z_boson != NULL && electron_0 != NULL && electron_1 != NULL) break;
+            // If we've found all our particles, exit the loop
+            if (z_boson != NULL && electron_0 != NULL && electron_1 != NULL) {
+                break;
+            }
         }
 
         // Continue only if all particles have been found
@@ -644,7 +660,7 @@ namespace zf {
                 std::swap(bornElectron_0, bornElectron_1);
             }
 
-            // Add electrons
+            // Add electrons to the ZFEvent
             ZFinderElectron* zf_electron_0 = AddTruthElectron(*bornElectron_0, *electron_0, *nakedElectron_0);
             set_e0_truth(zf_electron_0);
             ZFinderElectron* zf_electron_1 = AddTruthElectron(*bornElectron_1, *electron_1, *nakedElectron_1);
@@ -719,72 +735,71 @@ namespace zf {
         hlt_electrons_.push_back(zf_electron);
         return zf_electron;
     }
-    
-    const reco::GenParticle* ZFinderEvent::FollowElectron(const reco::GenParticle **gen_particle)
-    {       
+
+    const reco::GenParticle* ZFinderEvent::FollowElectron(const reco::GenParticle** gen_particle) {
         //NOTE: so as not to end up with born and naked pointing to the same gen particle,
         //I RETURN a copy of the original, but advance the gen_particle itself
-        const reco::GenParticle *born_e = new reco::GenParticle( (*gen_particle)->charge(),
-                                                                 (*gen_particle)->p4(), 
-                                                                 (*gen_particle)->vertex(), 
-                                                                 (*gen_particle)->pdgId(),
-                                                                 (*gen_particle)->status(), 1 );
+        const reco::GenParticle* born_e = new reco::GenParticle(
+                (*gen_particle)->charge(),
+                (*gen_particle)->p4(),
+                (*gen_particle)->vertex(),
+                (*gen_particle)->pdgId(),
+                (*gen_particle)->status(),
+                1
+            );
         //I need a copy of the content, not just a copy of the pointer!
         bool stop = false;
-        //unsigned int nDaught = gen_particle->numberOfDaughters();
-        //std::cout<<"status is "<<gen_particle->status()<<", ID "<<gen_particle->pdgId()<<", pt = "<<gen_particle->pt()
-        //<<"; "<<gen_particle->numberOfDaughters()<<" daughters:"<<std::endl;
-        while( (*gen_particle)->status() != 1 && !stop){  
-            if((*gen_particle)->numberOfDaughters() == 0) {
+        while (!stop && (*gen_particle)->status() != 1) {
+            if ((*gen_particle)->numberOfDaughters() == 0) {
                 (*gen_particle) = NULL;
                 break;
             }
-            //std::cout<<gen_particle->numberOfDaughters()<<" daughters"<<std::endl;
             stop = true;
             size_t k;
             for (k = 0; k < (*gen_particle)->numberOfDaughters(); k++) {
-                //std::cout<<"Daughter "<<k<<": ID = "<<gen_particle->daughter(k)->pdgId()<<", pt = "<<gen_particle->daughter(k)->pt()
-                //<<", status "<<gen_particle->daughter(k)->status()<<", "<<gen_particle->daughter(k)->numberOfDaughters()<<std::endl;
-                if ( fabs((*gen_particle)->daughter(k)->pdgId() ) == ELECTRON ) {
+                if (fabs((*gen_particle)->daughter(k)->pdgId()) == ELECTRON) {
                     stop = false;
-                    *gen_particle = dynamic_cast<const reco::GenParticle*>((*gen_particle)->daughter(k)); 
-                    if((*gen_particle)->status() == 1 ){
-                        //std::cout<<"Found stable electron!"<<std::endl;
+                    *gen_particle = dynamic_cast<const reco::GenParticle*>((*gen_particle)->daughter(k));
+                    if ((*gen_particle)->status() == 1) {
                         break;
                     }
                 }
             }
         }
-        if(stop) *gen_particle = NULL;
-        //std::cout<<"PingX"<<std::endl;
+        if (stop) {
+            *gen_particle = NULL;
+        }
         return born_e;
     }
-    
-    reco::GenParticle* ZFinderEvent::DressElectron(const reco::GenParticle* nakedElectron,
-                                           edm::Handle<reco::GenParticleCollection> mc_particles)
-    {     
+
+    reco::GenParticle* ZFinderEvent::DressElectron(const reco::GenParticle* nakedElectron, edm::Handle<reco::GenParticleCollection> mc_particles) {
         //electron mass:
         const double ELECTRON_MASS = 5.109989e-4;
-        math::PtEtaPhiMLorentzVector e0p4( nakedElectron->pt(), nakedElectron->eta(),
-                                           nakedElectron->phi(), ELECTRON_MASS  );
-        for(unsigned int i = 0; i < mc_particles->size(); ++i) {
-            if(mc_particles->at(i).pdgId()==22 && mc_particles->at(i).status()==1 ){
-                //check deltaR<0.1
-                if( deltaR( mc_particles->at(i).eta(),mc_particles->at(i).phi(),
-                            e0p4.eta(),e0p4.phi() ) < 0.1 )
-                {
-                    e0p4 += math::PtEtaPhiMLorentzVector( mc_particles->at(i).pt(),
-                                    mc_particles->at(i).eta(), mc_particles->at(i).phi(),
-                                    ELECTRON_MASS  );
+        math::PtEtaPhiMLorentzVector e0p4(nakedElectron->pt(), nakedElectron->eta(), nakedElectron->phi(), ELECTRON_MASS);
+        // Loop over photons and collect those near the electron for summing
+        for (unsigned int i = 0; i < mc_particles->size(); ++i) {
+            if (mc_particles->at(i).pdgId() == PHOTON && mc_particles->at(i).status() == 1) {
+                //check that the photon is within deltaR < 0.1 of the electron
+                if (deltaR(mc_particles->at(i).eta(), mc_particles->at(i).phi(), e0p4.eta(), e0p4.phi()) < 0.1) {
+                    e0p4 += math::PtEtaPhiMLorentzVector(
+                            mc_particles->at(i).pt(),
+                            mc_particles->at(i).eta(),
+                            mc_particles->at(i).phi(),
+                            ELECTRON_MASS
+                        );
                 }
             }
-        }  
+        }
         //make new gen particle from old ones:
-        reco::GenParticle *dressed_e = new reco::GenParticle( nakedElectron->charge(), e0p4, 
-                                            nakedElectron->vertex(), 
-                                            nakedElectron->pdgId(),
-                                            nakedElectron->status(), 1 ); 
-        return dressed_e;                                            
+        reco::GenParticle* dressed_e = new reco::GenParticle(
+                nakedElectron->charge(),
+                e0p4,
+                nakedElectron->vertex(),
+                nakedElectron->pdgId(),
+                nakedElectron->status(),
+                1
+            );
+        return dressed_e;
     }
 
     double ZFinderEvent::ReturnPhistar(const double& eta0, const double& phi0, const double& eta1, const double& phi1) {
