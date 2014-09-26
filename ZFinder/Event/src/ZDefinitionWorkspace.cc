@@ -41,6 +41,8 @@ namespace zf {
         other_y_ = new RooRealVar("other_y", "Other Z_{Y}", -6, 6);
         z_pt_ = new RooRealVar("z_pt", "Z_{p_{T}}", 0, 1000, "GeV");
         phistar_ = new RooRealVar("phistar", "#phi*", -0.1, 10);
+        phistar_born_ = new RooRealVar("born_phistar", "#phi*", -0.1, 10);
+        phistar_naked_ = new RooRealVar("naked_phistar", "#phi*", -0.1, 10);
         other_phistar_ = new RooRealVar("other_phistar", "Other #phi*", -0.1, 10);
         // Electrons
         e0_pt_ = new RooRealVar("e0_pt", "p_{T}^{e_{0}}", -1, 1000, "GeV");
@@ -89,6 +91,8 @@ namespace zf {
         // Argsets
         argset_ = new RooArgSet(*z_mass_, *phistar_, *z_pt_, *z_eta_, *z_y_);
         argset_->add(*other_y_);
+        argset_->add(*phistar_born_);
+        argset_->add(*phistar_naked_);
         argset_->add(*other_phistar_);
         argset_->add(*e0_pt_);
         argset_->add(*e0_eta_);
@@ -234,6 +238,8 @@ namespace zf {
             argset_->setRealValue("z_y", z_data->y);
             argset_->setRealValue("z_pt", z_data->pt);
             argset_->setRealValue("phistar", z_data->phistar);
+            argset_->setRealValue("born_phistar", z_data->bornPhistar);
+            argset_->setRealValue("naked_phistar", z_data->nakedPhistar);
             if (!zf_event.is_real_data) { // Is MC
                 argset_->setRealValue("other_y", z_data->other_y);
                 argset_->setRealValue("other_phistar", z_data->other_phistar);
