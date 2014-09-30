@@ -325,6 +325,8 @@ namespace zf {
         delete other_y_;
         delete z_pt_;
         delete phistar_;
+        delete phistar_born_;
+        delete phistar_naked_;
         delete other_phistar_;
         delete e0_pt_;
         delete e0_eta_;
