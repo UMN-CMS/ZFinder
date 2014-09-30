@@ -202,7 +202,11 @@ namespace zf {
                     const reco::GenParticle * const BORN_ELECTRON
                     );
             //dress a post-fsr electron with photons around it
-            reco::GenParticle* DressElectron(const reco::GenParticle*, edm::Handle<reco::GenParticleCollection>);
+            const reco::GenParticle* GetDressedElectron(
+                    const reco::GenParticle * const BORN_ELECTRON,
+                    const reco::GenParticle * const NAKED_ELECTRON,
+                    const double MAX_DELTA_R = 0.1
+                    );
 
             // Calculate phistar
             static double ReturnPhistar(const double& eta0, const double& phi0, const double& eta1, const double& phi1);

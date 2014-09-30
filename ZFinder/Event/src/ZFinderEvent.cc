@@ -588,8 +588,8 @@ namespace zf {
          * decays, but we expect those to be impossibly rare.
          */
         //default electrons--which are now DRESSED!
-        reco::GenParticle* electron_0 = NULL;
-        reco::GenParticle* electron_1 = NULL;
+        const reco::GenParticle* electron_0 = NULL;
+        const reco::GenParticle* electron_1 = NULL;
         //born electrons:
         const reco::GenParticle* bornElectron_0 = NULL;
         const reco::GenParticle* bornElectron_1 = NULL;
@@ -624,11 +624,8 @@ namespace zf {
                             nakedElectron_0 = GetNakedElectron(bornElectron_0);
 
                             //now we DRESS it:
-                            if (gen_particle != NULL) {
-                                electron_0 = DressElectron(gen_particle, mc_particles);
-                            }
-                            else {
-                                electron_0 = NULL;
+                            if (bornElectron_0 && nakedElectron_0) {
+                                electron_0 = GetDressedElectron(bornElectron_0, nakedElectron_0);
                             }
                         }
                         // We have filled the first electron, so fill the second
@@ -636,11 +633,8 @@ namespace zf {
                             bornElectron_1 = gen_particle;
                             nakedElectron_1 = GetNakedElectron(bornElectron_1);
                             //now we DRESS it:
-                            if (gen_particle != NULL) {
-                                electron_1 = DressElectron(gen_particle, mc_particles);
-                            }
-                            else {
-                                electron_1 = NULL;
+                            if (bornElectron_1 && nakedElectron_1) {
+                                electron_1 = GetDressedElectron(bornElectron_1, nakedElectron_1);
                             }
                         }
                     }
@@ -737,7 +731,7 @@ namespace zf {
         return zf_electron;
     }
 
-    const reco::GenParticle* ZFinderEvent::GetNakedElectron(const reco::GenParticle* const BORN_ELECTRON) {
+    const reco::GenParticle* ZFinderEvent::GetNakedElectron(const reco::GenParticle * const BORN_ELECTRON) {
         const reco::GenParticle* naked_electron = BORN_ELECTRON;
         // We walk down the tree of decays, grabbing the electron in the decay
         // each time until we come to a"status() == 1" electron, meaning it is
@@ -761,33 +755,64 @@ namespace zf {
         return naked_electron;
     }
 
-    reco::GenParticle* ZFinderEvent::DressElectron(const reco::GenParticle* nakedElectron, edm::Handle<reco::GenParticleCollection> mc_particles) {
-        //electron mass:
+    const reco::GenParticle* ZFinderEvent::GetDressedElectron(
+            const reco::GenParticle * const BORN_ELECTRON,
+            const reco::GenParticle * const NAKED_ELECTRON,
+            const double MAX_DELTA_R
+            ) {
         const double ELECTRON_MASS = 5.109989e-4;
-        math::PtEtaPhiMLorentzVector e0p4(nakedElectron->pt(), nakedElectron->eta(), nakedElectron->phi(), ELECTRON_MASS);
-        // Loop over photons and collect those near the electron for summing
-        for (unsigned int i = 0; i < mc_particles->size(); ++i) {
-            if (mc_particles->at(i).pdgId() == PHOTON && mc_particles->at(i).status() == 1) {
-                //check that the photon is within deltaR < 0.1 of the electron
-                if (deltaR(mc_particles->at(i).eta(), mc_particles->at(i).phi(), e0p4.eta(), e0p4.phi()) < 0.1) {
-                    e0p4 += math::PtEtaPhiMLorentzVector(
-                            mc_particles->at(i).pt(),
-                            mc_particles->at(i).eta(),
-                            mc_particles->at(i).phi(),
-                            ELECTRON_MASS
-                        );
+        // Make a 4 vector for the dressed electron
+        math::PtEtaPhiMLorentzVector dressed_p4(NAKED_ELECTRON->pt(), NAKED_ELECTRON->eta(), NAKED_ELECTRON->phi(), ELECTRON_MASS);
+
+        // Dive down the decay tree from the born electron until we hit the
+        // naked electron, saving all the photons and summing them if they are
+        // within DeltaR of 0.1 of the naked electon.
+        const reco::GenParticle* tmp_electron = BORN_ELECTRON;
+        while (tmp_electron != NAKED_ELECTRON) {
+            // For some reason there are no daughters, but the particle is
+            // "unstable". Abort and return NULL.
+            if (tmp_electron->numberOfDaughters() == 0) {
+                return NULL;
+            }
+            // Otherwise look through the daughters and find an electron
+            const reco::GenParticle* swap_electron = NULL;
+            for (size_t i = 0; i < tmp_electron->numberOfDaughters(); ++i) {
+                const reco::Candidate* test_particle = tmp_electron->daughter(i);
+                // If we find electron, we save it as the next item to recurse over
+                if (fabs(test_particle->pdgId()) == ELECTRON) {
+                    swap_electron = dynamic_cast<const reco::GenParticle*>(test_particle);
+                }
+                // If we find a photon, add its 4 vector if it is within some
+                // distance of the naked electron
+                else if (fabs(test_particle->pdgId()) == PHOTON) {
+                    const double DELTA_R = deltaR(test_particle->eta(), test_particle->phi(), NAKED_ELECTRON->eta(), NAKED_ELECTRON->phi());
+                    if (DELTA_R < MAX_DELTA_R) {
+                        dressed_p4 += math::PtEtaPhiMLorentzVector(
+                                test_particle->pt(),
+                                test_particle->eta(),
+                                test_particle->phi(),
+                                ELECTRON_MASS
+                                );
+                    }
                 }
             }
+            // Now that we done searching this level of the decay tree, move to
+            // the next
+            if (swap_electron) {
+                tmp_electron = swap_electron;
+            }
         }
-        //make new gen particle from old ones:
+
+        // Make a GenParticle from the vector and return it
         reco::GenParticle* dressed_e = new reco::GenParticle(
-                nakedElectron->charge(),
-                e0p4,
-                nakedElectron->vertex(),
-                nakedElectron->pdgId(),
-                nakedElectron->status(),
+                NAKED_ELECTRON->charge(),
+                dressed_p4,
+                NAKED_ELECTRON->vertex(),
+                NAKED_ELECTRON->pdgId(),
+                NAKED_ELECTRON->status(),
                 1
             );
+
         return dressed_e;
     }
 
