@@ -620,8 +620,9 @@ namespace zf {
                             //WARNING: this funciton uses a POINTER to a
                             //POINTER to make gen_particle point at the NAKED
                             //electron at the end of the decay chain
-                            bornElectron_0 = FollowElectron(&gen_particle);
-                            nakedElectron_0 = gen_particle;
+                            bornElectron_0 = gen_particle;
+                            nakedElectron_0 = GetNakedElectron(bornElectron_0);
+
                             //now we DRESS it:
                             if (gen_particle != NULL) {
                                 electron_0 = DressElectron(gen_particle, mc_particles);
@@ -632,8 +633,8 @@ namespace zf {
                         }
                         // We have filled the first electron, so fill the second
                         else {
-                            bornElectron_1 = FollowElectron(&gen_particle);
-                            nakedElectron_1 = gen_particle;
+                            bornElectron_1 = gen_particle;
+                            nakedElectron_1 = GetNakedElectron(bornElectron_1);
                             //now we DRESS it:
                             if (gen_particle != NULL) {
                                 electron_1 = DressElectron(gen_particle, mc_particles);
@@ -736,40 +737,28 @@ namespace zf {
         return zf_electron;
     }
 
-    const reco::GenParticle* ZFinderEvent::FollowElectron(const reco::GenParticle** gen_particle) {
-        //NOTE: so as not to end up with born and naked pointing to the same gen particle,
-        //I RETURN a copy of the original, but advance the gen_particle itself
-        const reco::GenParticle* born_e = new reco::GenParticle(
-                (*gen_particle)->charge(),
-                (*gen_particle)->p4(),
-                (*gen_particle)->vertex(),
-                (*gen_particle)->pdgId(),
-                (*gen_particle)->status(),
-                1
-            );
-        //I need a copy of the content, not just a copy of the pointer!
-        bool stop = false;
-        while (!stop && (*gen_particle)->status() != 1) {
-            if ((*gen_particle)->numberOfDaughters() == 0) {
-                (*gen_particle) = NULL;
-                break;
+    const reco::GenParticle* ZFinderEvent::GetNakedElectron(const reco::GenParticle* const BORN_ELECTRON) {
+        const reco::GenParticle* naked_electron = BORN_ELECTRON;
+        // We walk down the tree of decays, grabbing the electron in the decay
+        // each time until we come to a"status() == 1" electron, meaning it is
+        // stable and will no longer FSR.
+        while (naked_electron->status() != 1) {
+            // For some reason there are no daughters, but the particle is
+            // "unstable". Abort and return NULL.
+            if (naked_electron->numberOfDaughters() == 0) {
+                return NULL;
             }
-            stop = true;
-            size_t k;
-            for (k = 0; k < (*gen_particle)->numberOfDaughters(); k++) {
-                if (fabs((*gen_particle)->daughter(k)->pdgId()) == ELECTRON) {
-                    stop = false;
-                    *gen_particle = dynamic_cast<const reco::GenParticle*>((*gen_particle)->daughter(k));
-                    if ((*gen_particle)->status() == 1) {
-                        break;
-                    }
+            // Otherwise look through the daughters and find an electron
+            for (size_t i = 0; i < naked_electron->numberOfDaughters(); ++i) {
+                const reco::Candidate* test_particle = naked_electron->daughter(i);
+                if (fabs(test_particle->pdgId()) == ELECTRON) {
+                    naked_electron = dynamic_cast<const reco::GenParticle*>(test_particle);
+                    break;
                 }
             }
         }
-        if (stop) {
-            *gen_particle = NULL;
-        }
-        return born_e;
+
+        return naked_electron;
     }
 
     reco::GenParticle* ZFinderEvent::DressElectron(const reco::GenParticle* nakedElectron, edm::Handle<reco::GenParticleCollection> mc_particles) {

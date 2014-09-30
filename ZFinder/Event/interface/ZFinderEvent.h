@@ -198,7 +198,9 @@ namespace zf {
             ZFinderElectron* AddHLTElectron(trigger::TriggerObject electron);
 
             //follow an electron from vertex to post-fsr
-            const reco::GenParticle* FollowElectron(const reco::GenParticle **gen_particle);//returns NULL if for some reason not successful.
+            const reco::GenParticle* GetNakedElectron(
+                    const reco::GenParticle * const BORN_ELECTRON
+                    );
             //dress a post-fsr electron with photons around it
             reco::GenParticle* DressElectron(const reco::GenParticle*, edm::Handle<reco::GenParticleCollection>);
 
