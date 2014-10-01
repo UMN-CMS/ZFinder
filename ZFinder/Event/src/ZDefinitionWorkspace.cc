@@ -232,23 +232,28 @@ namespace zf {
         }
 
         // Assign the variables
+
+        // Make sure we have a valid object
         if (z_data != NULL) {
             argset_->setRealValue("z_mass", z_data->m);
             argset_->setRealValue("z_eta", z_data->eta);
             argset_->setRealValue("z_y", z_data->y);
             argset_->setRealValue("z_pt", z_data->pt);
             argset_->setRealValue("phistar", z_data->phistar);
-            argset_->setRealValue("born_phistar", z_data->bornPhistar);
-            argset_->setRealValue("naked_phistar", z_data->nakedPhistar);
             if (!zf_event.is_real_data) { // Is MC
                 argset_->setRealValue("other_y", z_data->other_y);
                 argset_->setRealValue("other_phistar", z_data->other_phistar);
+                argset_->setRealValue("born_phistar", z_data->bornPhistar);
+                argset_->setRealValue("naked_phistar", z_data->nakedPhistar);
             }
             else {
                 argset_->setRealValue("other_y", -6);
                 argset_->setRealValue("other_phistar", -0.1);
+                argset_->setRealValue("born_phistar", -0.1);
+                argset_->setRealValue("naked_phistar", -0.1);
             }
         }
+        // Object is invalid, so fill with values that are obviously wrong
         else {
             argset_->setRealValue("z_mass", -1);
             argset_->setRealValue("z_eta", -6);
@@ -258,24 +263,28 @@ namespace zf {
             argset_->setRealValue("other_y", -6);
             argset_->setRealValue("other_phistar", -0.1);
         }
+        // Make sure the tag is valid
         if (e_tag != NULL) {
             argset_->setRealValue("e0_pt", e_tag->pt);
             argset_->setRealValue("e0_eta", e_tag->eta);
             argset_->setRealValue("e0_phi", e_tag->phi);
             argset_->setCatIndex("e0_charge", e_tag->charge);
         }
+        // Tag is invalid, fill with obviously wrong data
         else {
             argset_->setRealValue("e0_pt", -1);
             argset_->setRealValue("e0_eta", -6);
             argset_->setRealValue("e0_phi", -3.142);
             argset_->setCatIndex("e0_charge", 0);
         }
+        // Make sure the probe is valid
         if (e_probe != NULL) {
             argset_->setRealValue("e1_pt", e_probe->pt);
             argset_->setRealValue("e1_eta", e_probe->eta);
             argset_->setRealValue("e1_phi", e_probe->phi);
             argset_->setCatIndex("e1_charge", e_probe->charge);
         }
+        // Probe is invalid, fill with obviously wrong data
         else {
             argset_->setRealValue("e1_pt", -1);
             argset_->setRealValue("e1_eta", -6);
@@ -307,7 +316,6 @@ namespace zf {
     }
 
     void ZDefinitionWorkspace::Write() {
-
         write_dir_->cd();
         // Make the workspace and save it
         RooWorkspace *w = new RooWorkspace("workspace", "RooWorkspace");

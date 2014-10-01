@@ -122,14 +122,20 @@ namespace zf {
 
         // Finish initialization of electrons
         InitReco(iEvent, iSetup);  // Data
+
+        // Set up the MC, including saving some of the truth quantites to the
+        // reco quantities in MC
         if (!is_real_data) {
             InitTruth(iEvent, iSetup);  // MC
             // In MC we want to store the value of the Truth phistar and Y with
             // the reco events, and vice versa, so that they may be used for
-            // unfolding
+            // unfolding. We also store the MC naked phistar and born phistar
+            // in the reco.
             if (truth_z.m != -1) {  // Good truth Z
                 reco_z.other_phistar = truth_z.phistar;
                 reco_z.other_y = truth_z.y;
+                reco_z.bornPhistar = truth_z.bornPhistar;
+                reco_z.nakedPhistar = truth_z.nakedPhistar;
             }
             if (reco_z.m != -1) {  // Good reco Z
                 truth_z.other_phistar = reco_z.phistar;

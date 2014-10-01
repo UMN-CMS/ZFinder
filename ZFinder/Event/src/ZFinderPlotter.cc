@@ -261,6 +261,8 @@ namespace zf {
             if(!ZF_EVENT.is_real_data) {
                 other_phistar_->Fill(ZF_EVENT.reco_z.other_phistar, EVENT_WEIGHT);
                 other_y_->Fill(ZF_EVENT.reco_z.other_y, EVENT_WEIGHT);
+                phistar_born_->Fill(ZF_EVENT.reco_z.bornPhistar, EVENT_WEIGHT);
+                phistar_naked_->Fill(ZF_EVENT.reco_z.nakedPhistar, EVENT_WEIGHT);
             }
 
             // Fill the histograms with the information from the approriate electron
