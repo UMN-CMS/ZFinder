@@ -1,16 +1,9 @@
 // Standard Library
-#include <algorithm>  //std::equal_range, std::sort, std::unique
-#include <cmath>  // std::abs
 #include <iostream>
-#include <map>
 #include <string>
-#include <vector>
 
 // ROOT
-#include <TCanvas.h>
 #include <TFile.h>
-#include <TLegend.h>
-#include <TStyle.h>
 #include <TH1D.h>
 
 
@@ -47,6 +40,10 @@ int main() {
     // you're using.
     const double LUMI = B_LUMI;
 
+    // Mass range
+    const double MASS_LOW = 60.;
+    const double MASS_HIGH = 120.;
+
     // Open the TFiles
     TFile* mc_tfile = new TFile(MC_FILE.c_str());
     if (!mc_tfile) {
@@ -80,16 +77,16 @@ int main() {
     }
 
     // Integrate the histograms to get event counts
-    const int DATA_LOW = data_histo->FindBin(60.);
-    const int DATA_HIGH = data_histo->FindBin(120.);
+    const int DATA_LOW = data_histo->FindBin(MASS_LOW);
+    const int DATA_HIGH = data_histo->FindBin(MASS_HIGH);
     const double DATA_COUNT = data_histo->Integral(DATA_LOW, DATA_HIGH);
 
-    const int MC_ALL_LOW = mc_histo_all->FindBin(60.);
-    const int MC_ALL_HIGH = mc_histo_all->FindBin(120.);
+    const int MC_ALL_LOW = mc_histo_all->FindBin(MASS_LOW);
+    const int MC_ALL_HIGH = mc_histo_all->FindBin(MASS_HIGH);
     const double MC_COUNT_ALL = mc_histo_all->Integral(MC_ALL_LOW, MC_ALL_HIGH);
 
-    const int MC_ACC_LOW = mc_histo_acc->FindBin(60.);
-    const int MC_ACC_HIGH = mc_histo_acc->FindBin(120.);
+    const int MC_ACC_LOW = mc_histo_acc->FindBin(MASS_LOW);
+    const int MC_ACC_HIGH = mc_histo_acc->FindBin(MASS_HIGH);
     const double MC_COUNT_ACC = mc_histo_acc->Integral(MC_ACC_LOW, MC_ACC_HIGH);
 
     // Calculate the final number
