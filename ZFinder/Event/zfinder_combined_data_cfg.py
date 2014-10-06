@@ -54,15 +54,23 @@ from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso
 process.eleIsoSequence = setupPFElectronIso(process, 'CalibratedElectrons:calibratedGsfElectrons')
 process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIsoSequence)
 
+# Get the python string from the file name, and use it set up the name of the
+# tuple output file. Note that pythonValue() returns the string with literal '
+# on either end, so we need to strip those.
+output_name = process.TFileService.fileName.pythonValue().strip("'")
+tuple_names = cms.untracked.string(output_name.split('.root')[0] + "_tuples.root")
+
 # ZFinder
 from ZFinder.Event.zdefinitions_cfi import zdefs_combined_data
 from ZFinder.Event.zfinder_cfi import ZFinder
+
 process.ZFinder = ZFinder.clone(
         # Use the calibrated electrons we make with
         # process.CalibratedElectrons
         ecalElectronsInputTag = cms.InputTag("CalibratedElectrons", "calibratedGsfElectrons"),
         ZDefinitions = zdefs_combined_data,
         use_muon_acceptance = cms.bool(True),
+        tuple_output_file = tuple_names,
         )
 
 # RUN

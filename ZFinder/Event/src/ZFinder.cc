@@ -49,6 +49,7 @@ Implementation:
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
 
 // Root
+#include <TFile.h>
 #include <TH1I.h>
 
 // ZFinder
@@ -93,6 +94,8 @@ class ZFinder : public edm::EDAnalyzer {
         zf::ZEfficiencies zeffs_;
         bool is_mc_;
         TH1I* unweighted_counter_;
+        TFile* tuple_output_file_;
+
 };
 
 //
@@ -111,6 +114,15 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
 
     // is_mc_ is used to determine if we should make truth objects
     is_mc_ = iConfig.getParameter<bool>("is_mc");
+
+    // Get the file name for the tuples
+    const std::string TUPLE_OUTPUT_FILE_NAME_ = iConfig.getUntrackedParameter<std::string>("tuple_output_file");
+    if (TUPLE_OUTPUT_FILE_NAME_ != "NONE") {
+        tuple_output_file_ = new TFile(TUPLE_OUTPUT_FILE_NAME_.c_str(), "RECREATE");
+    }
+    else {
+        tuple_output_file_ = NULL;
+    }
 
     // Setup Cut Setters
     zf::AcceptanceSetter* accset = new zf::AcceptanceSetter();
@@ -186,6 +198,10 @@ ZFinder::~ZFinder() {
     for (auto& i_zdefw : zdef_workspaces_) {
         delete i_zdefw;
     }
+    if (tuple_output_file_) {
+        tuple_output_file_->Close();
+        delete tuple_output_file_;
+    }
 }
 
 
@@ -239,6 +255,11 @@ void ZFinder::endJob() {
     // Write all ZDef workspaces
     for (auto& i_zdefw : zdef_workspaces_) {
         i_zdefw->Write();
+    }
+
+    // Write the tuple file
+    if (tuple_output_file_) {
+        tuple_output_file_->Write();
     }
 }
 
