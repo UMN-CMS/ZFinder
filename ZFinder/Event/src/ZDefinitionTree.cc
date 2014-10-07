@@ -29,7 +29,7 @@ namespace zf {
         tree_->Branch("event_info", &event_, EVENT_CODE.c_str());
     }
 
-    ZDefinitionTree::~ZDefinitionTree(){
+    ZDefinitionTree::~ZDefinitionTree() {
         // Clean up our pointer
         delete tree_;
     }
@@ -121,7 +121,8 @@ namespace zf {
             // 1st electron is the tag.
             if (last_cutlevel.t0p1_pass) {
                 weight = last_cutlevel.t0p1_eff;
-            } else if (last_cutlevel.t1p0_pass) {
+            }
+            else if (last_cutlevel.t1p0_pass) {
                 weight = last_cutlevel.t1p0_eff;
             }
         }

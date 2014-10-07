@@ -16,14 +16,14 @@
 
 
 namespace zf {
-    class ZDefinitionTree{
+    class ZDefinitionTree {
         public:
             // Constructor
             ZDefinitionTree(
-                    const ZDefinition& zdef,
-                    TFile* output_file,
-                    const bool IS_MC = false
-                    );
+                const ZDefinition& zdef,
+                TFile* output_file,
+                const bool IS_MC = false
+            );
 
             // destructor
             ~ZDefinitionTree();
@@ -56,7 +56,9 @@ namespace zf {
                     n_verts = -1;
                 }
                 // Constructor
-                branch_struct() { clear_values(); }
+                branch_struct() {
+                    clear_values();
+                }
 
                 double z_m;
                 double z_y;
@@ -81,7 +83,9 @@ namespace zf {
                 }
 
                 // Constructor
-                event_branch() { clear_values(); }
+                event_branch() {
+                    clear_values();
+                }
 
                 double gen_weight;
                 double event_weight;
