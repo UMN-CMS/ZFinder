@@ -37,8 +37,7 @@ namespace zf {
         protected:
             // Structs that map to the branches
             struct branch_struct {
-                // Constructor
-                branch_struct() {
+                void clear_values() {
                     z_m = -1;
                     z_y = -10;
                     z_phistar_born = -1;
@@ -52,12 +51,11 @@ namespace zf {
                     e_pt[1] = -1;
                     e_eta[1] = -10;
                     e_phi[1] = -10;
-                    gen_weight = -1;
-                    event_weight = -1;
                     e_charge[0] = -2;
                     e_charge[1] = -2;
-                    is_mc = false;
                 }
+                // Constructor
+                branch_struct() { clear_values(); }
 
                 double z_m;
                 double z_y;
@@ -69,14 +67,25 @@ namespace zf {
                 double e_pt[2];
                 double e_eta[2];
                 double e_phi[2];
-                double gen_weight;
-                double event_weight;
                 int e_charge[2];
-                bool is_mc;
             } reco_, truth_;
 
-            // Clear the branch structs
-            void Clear(branch_struct& branch);
+            struct event_branch {
+                void clear_values() {
+                    gen_weight = -1;
+                    event_weight = -1;
+                    event_number = 0;
+                    is_mc = false;
+                }
+
+                // Constructor
+                event_branch() { clear_values(); }
+
+                double gen_weight;
+                double event_weight;
+                unsigned int event_number;
+                bool is_mc;
+            } event_;
 
             // Name
             std::string zdef_name_;
