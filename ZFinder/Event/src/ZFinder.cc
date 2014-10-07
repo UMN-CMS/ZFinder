@@ -57,8 +57,9 @@ Implementation:
 #include "ZFinder/Event/interface/SetterBase.h"  // SetterBase
 #include "ZFinder/Event/interface/TruthMatchSetter.h"  // TruthMatchSetter
 #include "ZFinder/Event/interface/ZDefinition.h"  // ZDefinition
-#include "ZFinder/Event/interface/ZDefinitionWriter.h"  // ZDefinitionWriter
+#include "ZFinder/Event/interface/ZDefinitionTree.h"  // ZDefinitionTree
 #include "ZFinder/Event/interface/ZDefinitionWorkspace.h"  // ZDefinitionWorkspace
+#include "ZFinder/Event/interface/ZDefinitionWriter.h"  // ZDefinitionWriter
 #include "ZFinder/Event/interface/ZEfficiencies.h" // ZEfficiencies
 #include "ZFinder/Event/interface/ZFinderEvent.h"  // ZFinderEvent
 
@@ -91,6 +92,7 @@ class ZFinder : public edm::EDAnalyzer {
         std::vector<zf::ZDefinition*> zdefs_;
         std::vector<zf::ZDefinitionWriter*> zdef_plotters_;
         std::vector<zf::ZDefinitionWorkspace*> zdef_workspaces_;
+        std::vector<zf::ZDefinitionTree*> zdef_tuples_;
         zf::ZEfficiencies zeffs_;
         bool is_mc_;
         TH1I* unweighted_counter_;
@@ -141,7 +143,6 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     unweighted_counter_->GetXaxis()->SetTitle("");
     unweighted_counter_->GetYaxis()->SetTitle("Number of events considered");
 
-
     // Setup ZDefinitions and plotters
     zdef_psets_ = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet> >("ZDefinitions");
     for (auto& i_pset : zdef_psets_) {
@@ -178,6 +179,15 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
             zf::ZDefinitionWorkspace* zdw_truth = new zf::ZDefinitionWorkspace(*zd_truth, tdir_zd_truth, use_truth, true);
             zdef_workspaces_.push_back(zdw_truth);
         }
+
+        // Now make the Trees for the tuples
+        if (tuple_output_file_ != NULL) {
+            // We use zd_reco, but that's only because both the "reco" and
+            // "truth" quantities are stored in the same Tree, so there is no
+            // need to make a second tree like there is with the plots.
+            zf::ZDefinitionTree* zdtree = new zf::ZDefinitionTree(*zd_reco, tuple_output_file_, is_mc_);
+            zdef_tuples_.push_back(zdtree);
+        }
     }
 }
 
@@ -197,6 +207,9 @@ ZFinder::~ZFinder() {
     }
     for (auto& i_zdefw : zdef_workspaces_) {
         delete i_zdefw;
+    }
+    for (auto& i_zdeft : zdef_tuples_) {
+        delete i_zdeft;
     }
     if (tuple_output_file_) {
         tuple_output_file_->Close();
@@ -243,6 +256,12 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         for (auto& i_zdefw : zdef_workspaces_) {
             i_zdefw->Fill(zfe);
         }
+        // Make all ZDef Trees
+        if (tuple_output_file_ != NULL) {
+            for (auto& i_zdeft : zdef_tuples_) {
+                i_zdeft->Fill(zfe);
+            }
+        }
     }
 }
 
@@ -258,7 +277,10 @@ void ZFinder::endJob() {
     }
 
     // Write the tuple file
-    if (tuple_output_file_) {
+    if (tuple_output_file_ != NULL) {
+        for (auto& i_zdeft : zdef_tuples_) {
+            i_zdeft->Write();
+        }
         tuple_output_file_->Write();
     }
 }
