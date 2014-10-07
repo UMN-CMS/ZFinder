@@ -20,7 +20,7 @@ namespace zf {
 
         // Make the Tree to write to
         tree_ = new TTree(zdef.NAME.c_str(), zdef.NAME.c_str());
-        const std::string CODE = "z_m/D:z_y:z_phistar_born:z_phistar_dressed:z_phistar_naked:z_pt:z_eta:e_pt0:e_pt1:e_eta0:e_eta1:e_phi0:e_phi1:e_charge0/I:e_charge1";
+        const std::string CODE = "z_m/D:z_y:z_phistar_born:z_phistar_dressed:z_phistar_naked:z_pt:z_eta:e_pt0:e_pt1:e_eta0:e_eta1:e_phi0:e_phi1:e_charge0/I:e_charge1:n_verts/i";
         tree_->Branch("reco", &reco_, CODE.c_str());
         if (IS_MC_) {
             tree_->Branch("truth", &truth_, CODE.c_str());
@@ -61,6 +61,7 @@ namespace zf {
         reco_.z_phistar_naked = zf_event.reco_z.nakedPhistar;
         reco_.z_pt = zf_event.reco_z.pt;
         reco_.z_eta = zf_event.reco_z.eta;
+        reco_.n_verts = zf_event.reco_vert.num;
         if (zf_event.e0 != NULL) {
             reco_.e_pt[0] = zf_event.e0->pt;
             reco_.e_eta[0] = zf_event.e0->eta;
@@ -82,6 +83,7 @@ namespace zf {
             truth_.z_phistar_naked = zf_event.truth_z.nakedPhistar;
             truth_.z_pt = zf_event.truth_z.pt;
             truth_.z_eta = zf_event.truth_z.eta;
+            truth_.n_verts = zf_event.truth_vert.num;
             if (zf_event.e0_truth != NULL) {
                 truth_.e_pt[0] = zf_event.e0_truth->pt;
                 truth_.e_eta[0] = zf_event.e0_truth->eta;

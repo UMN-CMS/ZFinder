@@ -53,6 +53,7 @@ namespace zf {
                     e_phi[1] = -10;
                     e_charge[0] = -2;
                     e_charge[1] = -2;
+                    n_verts = -1;
                 }
                 // Constructor
                 branch_struct() { clear_values(); }
@@ -68,6 +69,7 @@ namespace zf {
                 double e_eta[2];
                 double e_phi[2];
                 int e_charge[2];
+                unsigned int n_verts;
             } reco_, truth_;
 
             struct event_branch {
