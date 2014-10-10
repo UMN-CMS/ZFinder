@@ -22,6 +22,7 @@ Implementation:
 #include <memory>
 
 // standard library files
+#include <algorithm>  // std::find
 #include <map>  // std::map
 #include <string>  // std::string
 #include <utility>  // std::pair
@@ -278,10 +279,25 @@ void ZFinder::endJob() {
 
     // Write the tuple file
     if (tuple_output_file_ != NULL) {
-        for (auto& i_zdeft : zdef_tuples_) {
-            i_zdeft->Write();
-        }
+        // Write the initial file
         tuple_output_file_->Write();
+
+        // Since large trees will automatically make new files, we need to get
+        // the current file from each tree and write it, but only if it is new
+        // and hasn't be previously written
+        TFile* file = NULL;
+        std::vector<TFile*> seen;
+        seen.push_back(tuple_output_file_);
+
+        for (auto& i_zdeft : zdef_tuples_) {
+            file = i_zdeft->GetCurrentFile();
+            // Check if we have seen this file before. If we have not then
+            // write the file and add it to the vector
+            if (std::find(seen.begin(), seen.end(), file) == seen.end()) {
+                file->Write();
+                seen.push_back(file);
+            }
+        }
     }
 }
 

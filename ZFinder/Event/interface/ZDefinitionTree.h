@@ -31,8 +31,8 @@ namespace zf {
             // Add event
             void Fill(const ZFinderEvent& zf_event);
 
-            // Write the Tree
-            void Write();
+            // Wrapper around TTree::GetCurrentFile()
+            TFile* GetCurrentFile();
 
         protected:
             // Structs that map to the branches

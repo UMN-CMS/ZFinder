@@ -129,7 +129,7 @@ namespace zf {
         return weight;
     }
 
-    void ZDefinitionTree::Write() {
-        tree_->Write();
+    TFile* ZDefinitionTree::GetCurrentFile() {
+        return tree_->GetCurrentFile();
     }
 }  // namespace zf
