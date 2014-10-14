@@ -36,15 +36,6 @@ combined_gen_cuts = cms.untracked.PSet(
         use_truth_mass = cms.untracked.bool(True),
         )
 
-combined_relaxed_gen_cuts = cms.untracked.PSet(
-        name = cms.untracked.string("Combined Relaxed Gen Cuts"),
-        cuts0 = cms.untracked.vstring("gaeta<2.1", "gpt>25"),
-        cuts1 = cms.untracked.vstring("gaeta<2.4", "gpt>15"),
-        min_mz = MIN_MZ,
-        max_mz = MAX_MZ,
-        use_truth_mass = cms.untracked.bool(True),
-        )
-
 # Only the kinematic cuts for the combined muon result, using reco quantities
 combined_reco_cuts = cms.untracked.PSet(
         name = cms.untracked.string("Combined Reco Cuts"),
@@ -191,7 +182,6 @@ zdefs_combined_data = cms.untracked.VPSet(
 zdefs_combined_mc = cms.untracked.VPSet(
         all_electrons,
         combined_gen_cuts,
-        combined_relaxed_gen_cuts,
         combined_reco_cuts,
         combined_single_no_trigger,
         sequence_plots_0_gen_mass,
