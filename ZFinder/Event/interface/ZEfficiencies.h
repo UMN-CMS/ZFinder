@@ -35,6 +35,7 @@ namespace zf {
             EfficiencyTable ecal_medium_scale_factors_;
             EfficiencyTable ecal_loose_scale_factors_;
             EfficiencyTable ecal_veto_scale_factors_;
+            EfficiencyTable gsf_scale_factors_;
 
             // A map of cut names to an EfficiencyTable
             std::map<std::string, EfficiencyTable*> table_map_;

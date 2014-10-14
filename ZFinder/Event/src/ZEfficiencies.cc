@@ -194,6 +194,44 @@ namespace zf {
         ecal_veto_scale_factors_.AddEfficiency(30.00, 40.00, 2.00, 2.50, 0.990, 0.002, 0.002);
         ecal_veto_scale_factors_.AddEfficiency(40.00, 50.00, 2.00, 2.50, 0.993, 0.001, 0.001);
         ecal_veto_scale_factors_.AddEfficiency(50.00, 200.00, 2.00, 2.50, 0.990, 0.002, 0.002);
+
+        // GSF Reconstruction
+        // https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgCommissioningAndPhysicsDeliverables#Electron_reconstruction_effi_AN1
+        //
+        // STATS ONLY!
+        //
+        table_map_["type_gsf"] = &gsf_scale_factors_;
+        // pt_min, pt_max, eta_min, eta_max, eff, +err, -err
+        gsf_scale_factors_.AddEfficiency(10, 15, 0.0, 0.8, 0.977, 0.024, 0.024);
+        gsf_scale_factors_.AddEfficiency(15, 20, 0.0, 0.8, 0.997, 0.009, 0.009);
+        gsf_scale_factors_.AddEfficiency(20, 30, 0.0, 0.8, 0.982, 0.003, 0.003);
+        gsf_scale_factors_.AddEfficiency(30, 40, 0.0, 0.8, 0.988, 0.001, 0.001);
+        gsf_scale_factors_.AddEfficiency(40, 50, 0.0, 0.8, 0.990, 0.001, 0.001);
+        gsf_scale_factors_.AddEfficiency(50, 200, 0.0, 0.8, 0.990, 0.001, 0.001);
+        gsf_scale_factors_.AddEfficiency(10, 15, 0.8, 1.4442, 0.977, 0.024, 0.024);
+        gsf_scale_factors_.AddEfficiency(15, 20, 0.8, 1.4442, 0.997, 0.009, 0.009);
+        gsf_scale_factors_.AddEfficiency(20, 30, 0.8, 1.4442, 0.993, 0.002, 0.002);
+        gsf_scale_factors_.AddEfficiency(30, 40, 0.8, 1.4442, 0.993, 0.001, 0.001);
+        gsf_scale_factors_.AddEfficiency(40, 50, 0.8, 1.4442, 0.993, 0.001, 0.001);
+        gsf_scale_factors_.AddEfficiency(50, 200, 0.8, 1.4442, 0.991, 0.001, 0.001);
+        gsf_scale_factors_.AddEfficiency(10, 15, 1.4442, 1.566, 1.076, 0.152, 0.152);
+        gsf_scale_factors_.AddEfficiency(15, 20, 1.4442, 1.566, 0.952, 0.025, 0.025);
+        gsf_scale_factors_.AddEfficiency(20, 30, 1.4442, 1.566, 1.016, 0.012, 0.012);
+        gsf_scale_factors_.AddEfficiency(30, 40, 1.4442, 1.566, 0.985, 0.004, 0.004);
+        gsf_scale_factors_.AddEfficiency(40, 50, 1.4442, 1.566, 0.987, 0.004, 0.004);
+        gsf_scale_factors_.AddEfficiency(50, 200, 1.4442, 1.566, 0.974, 0.009, 0.009);
+        gsf_scale_factors_.AddEfficiency(10, 15, 1.566, 2.0, 1.096, 0.036, 0.036);
+        gsf_scale_factors_.AddEfficiency(15, 20, 1.566, 2.0, 1.008, 0.010, 0.010);
+        gsf_scale_factors_.AddEfficiency(20, 30, 1.566, 2.0, 0.988, 0.003, 0.003);
+        gsf_scale_factors_.AddEfficiency(30, 40, 1.566, 2.0, 0.993, 0.002, 0.002);
+        gsf_scale_factors_.AddEfficiency(40, 50, 1.566, 2.0, 0.992, 0.001, 0.001);
+        gsf_scale_factors_.AddEfficiency(50, 200, 1.566, 2.0, 0.990, 0.003, 0.003);
+        gsf_scale_factors_.AddEfficiency(10, 15, 2.0, 2.5, 1.096, 0.036, 0.036);
+        gsf_scale_factors_.AddEfficiency(15, 20, 2.0, 2.5, 1.008, 0.010, 0.010);
+        gsf_scale_factors_.AddEfficiency(20, 30, 2.0, 2.5, 1.002, 0.004, 0.004);
+        gsf_scale_factors_.AddEfficiency(30, 40, 2.0, 2.5, 1.004, 0.002, 0.002);
+        gsf_scale_factors_.AddEfficiency(40, 50, 2.0, 2.5, 1.005, 0.002, 0.002);
+        gsf_scale_factors_.AddEfficiency(50, 200, 2.0, 2.5, 0.998, 0.004, 0.004);
     }
 
 }  // namespace zf;

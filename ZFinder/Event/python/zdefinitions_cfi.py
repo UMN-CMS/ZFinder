@@ -18,8 +18,8 @@ all_electrons = cms.untracked.PSet(
 # Definition to look at trigger efficiency
 trigger_efficiency_cuts = cms.untracked.PSet(
         name = cms.untracked.string("Trigger Efficiency Cuts"),
-        cuts0 = cms.untracked.vstring("acc(MUON_TIGHT)", "pt>30", "eg_tight", "trig(single_ele)", "acc(ALL)"),
-        cuts1 = cms.untracked.vstring("acc(MUON_TIGHT)", "pt>30", "eg_tight", "acc(ALL)",         "trig(single_ele)"),
+        cuts0 = cms.untracked.vstring("type_gsf", "acc(MUON_TIGHT)", "pt>30", "eg_tight", "trig(single_ele)", "acc(ALL)"),
+        cuts1 = cms.untracked.vstring("type_gsf", "acc(MUON_TIGHT)", "pt>30", "eg_tight", "acc(ALL)",         "trig(single_ele)"),
         min_mz = MIN_MZ,
         max_mz = MAX_MZ,
         use_truth_mass = cms.untracked.bool(False),
@@ -49,8 +49,8 @@ combined_reco_cuts = cms.untracked.PSet(
 # Cuts for the combined muon result assuming a single electron trigger
 combined_single = cms.untracked.PSet(
         name = cms.untracked.string("Combined Single"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(MUON_TIGHT)", "trig(single_ele)", "pt>30", "eg_tight"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(MUON_LOOSE)", "acc(ALL)",         "pt>20", "eg_medium"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_TIGHT)", "trig(single_ele)", "pt>30", "eg_tight"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_LOOSE)", "acc(ALL)",         "pt>20", "eg_medium"),
         min_mz = MIN_MZ,
         max_mz = MAX_MZ,
         use_truth_mass = cms.untracked.bool(False),
@@ -58,8 +58,8 @@ combined_single = cms.untracked.PSet(
 
 combined_single_no_trigger = combined_single.clone(
         name = cms.untracked.string("Combined Single No Trigger"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(MUON_TIGHT)", "pt>30", "eg_tight"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(MUON_LOOSE)", "pt>20", "eg_medium"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_TIGHT)", "pt>30", "eg_tight"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_LOOSE)", "pt>20", "eg_medium"),
         )
 
 # Cuts for the electron only analysis
@@ -129,8 +129,8 @@ sequence_plots_1_acceptance = cms.untracked.PSet(
 
 sequence_plots_2_id = cms.untracked.PSet(
         name = cms.untracked.string("2 ID Cuts"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "ACC(MUON_TIGHT)", "pt>30", "eg_tight"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "ACC(MUON_LOOSE)", "pt>20", "eg_medium"),
+        cuts0 = cms.untracked.vstring("type_gsf", "acc(ALL)", "ACC(MUON_TIGHT)", "pt>30", "eg_tight"),
+        cuts1 = cms.untracked.vstring("type_gsf", "acc(ALL)", "ACC(MUON_LOOSE)", "pt>20", "eg_medium"),
         min_mz = MIN_MZ,
         max_mz = MAX_MZ,
         use_truth_mass = cms.untracked.bool(False),
@@ -138,8 +138,8 @@ sequence_plots_2_id = cms.untracked.PSet(
 
 sequence_plots_3_single_trigger = cms.untracked.PSet(
         name = cms.untracked.string("3 Single Trigger Cuts"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "ACC(MUON_TIGHT)", "pt>30", "eg_tight",  "trig(single_ele)"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "ACC(MUON_LOOSE)", "pt>20", "eg_medium", "acc(ALL)"),
+        cuts0 = cms.untracked.vstring("type_gsf", "acc(ALL)", "ACC(MUON_TIGHT)", "pt>30", "eg_tight",  "trig(single_ele)"),
+        cuts1 = cms.untracked.vstring("type_gsf", "acc(ALL)", "ACC(MUON_LOOSE)", "pt>20", "eg_medium", "acc(ALL)"),
         min_mz = MIN_MZ,
         max_mz = MAX_MZ,
         use_truth_mass = cms.untracked.bool(False),
@@ -147,8 +147,8 @@ sequence_plots_3_single_trigger = cms.untracked.PSet(
 
 sequence_plots_3_double_trigger = cms.untracked.PSet(
         name = cms.untracked.string("3 Double Trigger Cuts"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "ACC(MUON_TIGHT)", "pt>30", "eg_tight",  "trig(et_et_tight)"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "ACC(MUON_LOOSE)", "pt>20", "eg_medium", "trig(et_et_loose)"),
+        cuts0 = cms.untracked.vstring("type_gsf", "acc(ALL)", "ACC(MUON_TIGHT)", "pt>30", "eg_tight",  "trig(et_et_tight)"),
+        cuts1 = cms.untracked.vstring("type_gsf", "acc(ALL)", "ACC(MUON_LOOSE)", "pt>20", "eg_medium", "trig(et_et_loose)"),
         min_mz = MIN_MZ,
         max_mz = MAX_MZ,
         use_truth_mass = cms.untracked.bool(False),
@@ -183,6 +183,7 @@ zdefs_combined_mc = cms.untracked.VPSet(
         all_electrons,
         combined_gen_cuts,
         combined_reco_cuts,
+        combined_single,
         combined_single_no_trigger,
         sequence_plots_0_gen_mass,
         sequence_plots_1_acceptance,
