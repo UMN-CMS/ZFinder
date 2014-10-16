@@ -146,14 +146,13 @@ int Plotter(
     // Open the TFILE
     TFile* input_tfile = new TFile(INPUT_FILE.c_str());
 
-    const int NUMBER_OF_HISTOGRAMS = 4;
+    const int NUMBER_OF_HISTOGRAMS = 5;
     TH1D* histograms[NUMBER_OF_HISTOGRAMS];
-    //input_tfile->GetObject("ZFinder/0 Gen Mass Only Reco/2 60 < GEN M_{ee} < 120/Naked #phi*", histograms[0]);
     input_tfile->GetObject("ZFinder/0 Gen Mass Only Reco/0 All Events/Naked #phi*", histograms[0]);
-    input_tfile->GetObject("ZFinder/1 Acceptance Cuts Reco/4 60 < GEN M_{ee} < 120/Naked #phi*", histograms[1]);
-    input_tfile->GetObject("ZFinder/2 ID Cuts Reco/6 60 < M_{ee} < 120/Naked #phi*", histograms[2]);
-    input_tfile->GetObject("ZFinder/3 Single Trigger Cuts Reco/7 60 < M_{ee} < 120/Naked #phi*", histograms[3]);
-    //input_tfile->GetObject("ZFinder/3 Double Trigger Cuts Reco/6 60 < M_{ee} < 120/#phi*", histograms[4]);
+    input_tfile->GetObject("ZFinder/0 Gen Mass Only Reco/2 60 < GEN M_{ee} < 120/Naked #phi*", histograms[1]);
+    input_tfile->GetObject("ZFinder/1 Acceptance Cuts Reco/4 60 < GEN M_{ee} < 120/Naked #phi*", histograms[2]);
+    input_tfile->GetObject("ZFinder/2 ID Cuts Reco/6 60 < M_{ee} < 120/Naked #phi*", histograms[3]);
+    input_tfile->GetObject("ZFinder/3 Single Trigger Cuts Reco/7 60 < M_{ee} < 120/Naked #phi*", histograms[4]);
 
     for (int i = 0; i < NUMBER_OF_HISTOGRAMS; ++i) {
         if (!histograms[i]) {
@@ -198,11 +197,11 @@ int Plotter(
     );
     legend.SetFillColor(kWhite);
     const std::string LED_TYPE = "l";
-    legend.AddEntry(histograms[0], "60 < Gen M_{ee} < 120", LED_TYPE.c_str());
-    legend.AddEntry(histograms[1], "|#eta| < 2.1 (2.4), p_{T} > 30 (20)", LED_TYPE.c_str());
-    legend.AddEntry(histograms[2], "ID Tight (Medium)", LED_TYPE.c_str());
-    legend.AddEntry(histograms[3], "Single E Trigger", LED_TYPE.c_str());
-    //legend.AddEntry(histograms[4], "Double E Trigger", LED_TYPE.c_str());
+    legend.AddEntry(histograms[0], "All Z Like Events", LED_TYPE.c_str());
+    legend.AddEntry(histograms[1], "GSF + 60 < Gen M_{ee} < 120", LED_TYPE.c_str());
+    legend.AddEntry(histograms[2], "|#eta| < 2.1 (2.4), p_{T} > 30 (20)", LED_TYPE.c_str());
+    legend.AddEntry(histograms[3], "ID Tight (Medium)", LED_TYPE.c_str());
+    legend.AddEntry(histograms[4], "Single E Trigger", LED_TYPE.c_str());
     legend.SetBorderSize(0);  // Remove drop shadow and border
     legend.SetFillStyle(0);  // Transparent
     legend.Draw();
@@ -215,11 +214,11 @@ int Plotter(
     canvas2.cd();
     gPad->SetLogx(true);
 
-    TH1D* total_histo = dynamic_cast<TH1D*>(histograms[0]->Clone());
-    TH1D* acceptance_histo = dynamic_cast<TH1D*>(histograms[1]->Clone());
+    TH1D* total_histo = dynamic_cast<TH1D*>(histograms[1]->Clone());
+    TH1D* acceptance_histo = dynamic_cast<TH1D*>(histograms[2]->Clone());
 
-    total_histo->Divide(histograms[3], total_histo, 1, 1, "B");
-    acceptance_histo->Divide(histograms[3], acceptance_histo, 1, 1, "B");
+    total_histo->Divide(histograms[4], total_histo, 1, 1, "B");
+    acceptance_histo->Divide(histograms[4], acceptance_histo, 1, 1, "B");
 
     total_histo->GetYaxis()->SetTitle("Ratio");
 
@@ -238,8 +237,8 @@ int Plotter(
         TOP_EDGE_ - 0.025
     );
     legend2.SetFillColor(kWhite);
-    legend2.AddEntry(acceptance_histo, "All Cuts / Mass and Acceptance Cuts", LED_TYPE.c_str());
-    legend2.AddEntry(total_histo, "All Cuts / Mass Cut", LED_TYPE.c_str());
+    legend2.AddEntry(acceptance_histo, "All Cuts / Mass, GSF, Acceptance Cuts", LED_TYPE.c_str());
+    legend2.AddEntry(total_histo, "All Cuts / Mass and GSF Cut", LED_TYPE.c_str());
     legend2.SetBorderSize(0);  // Remove drop shadow and border
     legend2.SetFillStyle(0);  // Transparent
     legend2.Draw();
