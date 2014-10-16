@@ -123,71 +123,6 @@ void set_plot_style() {
     style_->cd();
 }
 
-
-std::vector<double> Get_Rebinning_Vector(
-    std::vector<double> desired_bins,
-    const TH1* const HISTO
-) {
-    /* Given a desired set of bin edges, and a histogram, finds the bin edges
-     * in the histogram that most closely approximate the desired edges. This
-     * is done by, for each desired edge, choosing the bin edge from the
-     * histogram gram that is closest in terms of linear distance.
-     */
-    std::vector<double> out_vec;
-    // Fill the old bins
-    std::vector<double> old_bins;
-    const int N_BINS = HISTO->GetXaxis()->GetNbins();
-    for (int i_bin = 1; i_bin <= N_BINS; ++i_bin) {
-        double bin_edge = HISTO->GetXaxis()->GetBinLowEdge(i_bin);
-        old_bins.push_back(bin_edge);
-    }
-    // Add the high edge, which isn't included but is needed
-    old_bins.push_back(HISTO->GetXaxis()->GetBinUpEdge(N_BINS));
-    std::sort(old_bins.begin(), old_bins.end());
-
-    // Loop through the desired bins.
-    //
-    // We use a binary search to find the actual
-    // bins on either side of the desired bin, we then compare the distance and
-    // pick the closest. At the end we remove duplicate entries. equal_range
-    // will return a pointer to the first entry that is not less than our
-    // desired bin, and one that is strictly greater than our test bin. This
-    // means we might need to move one of the pointers back, and of course we
-    // need to check that they don't run off the edge of the vector.
-    std::sort(desired_bins.begin(), desired_bins.end());
-    for (auto& i : desired_bins) {
-        const double DESIRED_BIN = i;
-        auto bounds = std::equal_range(old_bins.begin(), old_bins.end(), DESIRED_BIN);
-        // Move the first pointer back if needed
-        if (bounds.first == bounds.second
-                && bounds.first != old_bins.begin()
-                && *bounds.first != DESIRED_BIN
-           ) {
-            --bounds.first;
-        }
-        // Check distance, pick the closest (or the first for a tie)
-        const double FIRST_BIN = *bounds.first;
-        const double SECOND_BIN = *bounds.second;
-        const double FIRST_DIST = std::abs(FIRST_BIN - DESIRED_BIN);
-        const double SECOND_DIST = std::abs(SECOND_BIN - DESIRED_BIN);
-        if (SECOND_DIST >= FIRST_DIST) {
-            out_vec.push_back(FIRST_BIN);
-        }
-        else {
-            out_vec.push_back(SECOND_BIN);
-        }
-    }
-
-    // Remove the non-unique entries. Unique moves the non-uniques to the end
-    // and returns a pointer to the first non-unique item, erase then removes
-    // them.
-    std::sort(out_vec.begin(), out_vec.end());
-    out_vec.erase(std::unique(out_vec.begin(), out_vec.end()), out_vec.end());
-
-    // Return our vector
-    return out_vec;
-}
-
 int Plotter(
         const std::string& INPUT_FILE,
         const std::string& OUTPUT_FILE,
@@ -227,18 +162,6 @@ int Plotter(
         }
     }
 
-    // Set up the rebinning and do it
-    std::vector<double> new_binning = Get_Rebinning_Vector(DESIRED_BINNING, histograms[0]);
-
-    for (int i = 0; i < NUMBER_OF_HISTOGRAMS; ++i) {
-        histograms[i] = dynamic_cast<TH1D*>(
-                            histograms[i]->Rebin(
-                                new_binning.size() - 1,
-                                "mc_rebinned_histo",
-                                &new_binning[0]  // double*
-                            )
-                        );
-    }
     // set up the canvas
     TCanvas canvas("canvas", "canvas", X_SIZE, Y_SIZE);
     gPad->SetLogy(true);
