@@ -188,16 +188,16 @@ std::vector<double> Get_Rebinning_Vector(
     return out_vec;
 }
 
-int main() {
+int Plotter(
+        const std::string& INPUT_FILE,
+        const std::string& OUTPUT_FILE,
+        const std::string& RATIO_OUTPUT_FILE
+        ) {
     // Constants
     const double RIGHT_EDGE_ = 0.96;
     const double TOP_EDGE_ = 0.95;
-    const std::string INPUT_FILE =
-        "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20140915_signal_mc_powheg_pythia/20140915_signal_mc_powheg_pythia_hadded.root";
     const int X_SIZE = 1200;
     const int Y_SIZE = 800;
-    const std::string OUTPUT_FILE = "phistar_by_cuts.png";
-    const std::string RATIO_OUTPUT_FILE = "ratio_by_cuts.png";
     const std::vector<double> DESIRED_BINNING = {
         0.001, 0.004, 0.008, 0.012, 0.016, 0.020, 0.024, 0.029, 0.034, 0.039,
         0.045, 0.052, 0.057, 0.064, 0.072, 0.081, 0.091, 0.102, 0.114, 0.128,
@@ -213,10 +213,11 @@ int main() {
 
     const int NUMBER_OF_HISTOGRAMS = 4;
     TH1D* histograms[NUMBER_OF_HISTOGRAMS];
-    input_tfile->GetObject("ZFinder/0 Gen Mass Only Reco/2 60 < GEN M_{ee} < 120/#phi*", histograms[0]);
-    input_tfile->GetObject("ZFinder/1 Acceptance Cuts Reco/4 60 < GEN M_{ee} < 120/#phi*", histograms[1]);
-    input_tfile->GetObject("ZFinder/2 ID Cuts Reco/5 60 < M_{ee} < 120/#phi*", histograms[2]);
-    input_tfile->GetObject("ZFinder/3 Single Trigger Cuts Reco/6 60 < M_{ee} < 120/#phi*", histograms[3]);
+    //input_tfile->GetObject("ZFinder/0 Gen Mass Only Reco/2 60 < GEN M_{ee} < 120/Naked #phi*", histograms[0]);
+    input_tfile->GetObject("ZFinder/0 Gen Mass Only Reco/0 All Events/Naked #phi*", histograms[0]);
+    input_tfile->GetObject("ZFinder/1 Acceptance Cuts Reco/4 60 < GEN M_{ee} < 120/Naked #phi*", histograms[1]);
+    input_tfile->GetObject("ZFinder/2 ID Cuts Reco/6 60 < M_{ee} < 120/Naked #phi*", histograms[2]);
+    input_tfile->GetObject("ZFinder/3 Single Trigger Cuts Reco/7 60 < M_{ee} < 120/Naked #phi*", histograms[3]);
     //input_tfile->GetObject("ZFinder/3 Double Trigger Cuts Reco/6 60 < M_{ee} < 120/#phi*", histograms[4]);
 
     for (int i = 0; i < NUMBER_OF_HISTOGRAMS; ++i) {
@@ -240,11 +241,11 @@ int main() {
     }
     // set up the canvas
     TCanvas canvas("canvas", "canvas", X_SIZE, Y_SIZE);
-    gPad->SetLogy(false);
+    gPad->SetLogy(true);
     gPad->SetLogx(true);
 
     // Add all the plots
-    const double SCALE_FACTOR = 19.7e15 / 1.13e9 / histograms[0]->Integral();
+    //const double SCALE_FACTOR = 19.7e15 / 1.13e9 / histograms[0]->Integral();
     //histograms[0]->SetMaximum(30 * histograms[0]->GetMaximum());  // rescale to avoid hitting the ledgend
     histograms[0]->GetYaxis()->SetTitle("Events / Unit #phi*");
     for (int i = 0; i < NUMBER_OF_HISTOGRAMS; ++i) {
@@ -321,4 +322,25 @@ int main() {
     legend2.Draw();
 
     canvas2.Print(RATIO_OUTPUT_FILE.c_str(), "png");
+
+    return 0;
+}
+
+int main(int argc, char* argv[]) {
+    const int ARGN = 4;
+
+    if (argc < ARGN) {
+        std::cout<<"Not enough arguments.";
+        return 1;
+    } else if (argc > ARGN) {
+        std::cout<<"Too many arguments.";
+        return 1;
+    } else {
+        /* Read in arguments */
+        std::string input_file(argv[1]);
+        std::string output_file(argv[2]);
+        std::string ratio_output_file(argv[3]);
+
+        return Plotter(input_file, output_file, ratio_output_file);
+    }
 }
