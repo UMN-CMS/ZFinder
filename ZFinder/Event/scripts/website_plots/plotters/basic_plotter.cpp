@@ -1,8 +1,9 @@
 // Standard Library
 #include <iostream>
+#include <sstream>
 #include <string>
-#include <vector>
 #include <utility>  // std::pair
+#include <vector>
 
 // ROOT
 #include <TCanvas.h>
@@ -12,11 +13,18 @@
 // Plotters
 #include "lib/style.h"  // set_plot_style
 
-int Plotter(const std::string& INPUT_FILE, const std::string& OUTPUT_DIR) {
+int Plotter(
+        const std::string& INPUT_FILE,
+        const std::string& OUTPUT_DIR,
+        const bool is_mc
+        ) {
     // Constants
     const int X_SIZE = 1200;
     const int Y_SIZE = 800;
-    const std::string BASE_DIRECTORY = "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120/";
+    std::string base_directory = "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120/";
+    if (is_mc) {
+        base_directory = "ZFinder/Combined Single MC/7 60 < M_{ee} < 120/";
+    }
     // A list of all the histograms to write:
     // { Name in TFIle, Name to use for output plot }
     const std::vector<std::pair<std::string, std::string>> HISTOGRAM_NAMES = {
@@ -59,6 +67,10 @@ int Plotter(const std::string& INPUT_FILE, const std::string& OUTPUT_DIR) {
         {"#phi*: Reco Vs. Truth", "phistar_reco_vs_truth",},
         {"#DeltaR", "delta_r",},
     };
+    int plot_color = kBlue;
+    if (is_mc) {
+        plot_color = kRed;
+    }
 
     set_plot_style();
 
@@ -69,7 +81,7 @@ int Plotter(const std::string& INPUT_FILE, const std::string& OUTPUT_DIR) {
     for (auto& name_pair : HISTOGRAM_NAMES) {
         // Open the histogram
         TH1D* histo;
-        const std::string NAME = BASE_DIRECTORY + name_pair.first;
+        const std::string NAME = base_directory + name_pair.first;
         input_tfile->GetObject(NAME.c_str(), histo);
         if (!histo) {
             std::cout << "Histogram " << name_pair.first << " failed to load!" << std::endl;
@@ -88,23 +100,26 @@ int Plotter(const std::string& INPUT_FILE, const std::string& OUTPUT_DIR) {
 
         // Set the line color and style
         histo->Scale(1, "width");
-        histo->SetLineColor(kBlue);
+        histo->SetLineColor(plot_color);
         histo->SetLineWidth(2);
         const int FORWARD_HATCH = 3004;
         histo->SetFillStyle(FORWARD_HATCH);
-        histo->SetFillColor(kBlue);
+        histo->SetFillColor(plot_color);
         histo->Draw();
 
         // Save the output file
-        const std::string OUTPUT_FILE = OUTPUT_DIR + '/' + name_pair.second + ".png";
-        canvas.Print(OUTPUT_FILE.c_str(), "png");
+        std::string output_file = OUTPUT_DIR + '/' + name_pair.second + ".png";
+        if (is_mc) {
+            output_file = OUTPUT_DIR + '/' + name_pair.second + "_mc.png";
+        }
+        canvas.Print(output_file.c_str(), "png");
     }
 
     return 0;
 }
 
 int main(int argc, char* argv[]) {
-    const int ARGN = 3;
+    const int ARGN = 4;
 
     if (argc < ARGN) {
         std::cout<<"Not enough arguments.";
@@ -117,6 +132,15 @@ int main(int argc, char* argv[]) {
         std::string input_file(argv[1]);
         std::string output_dir(argv[2]);
 
-        return Plotter(input_file, output_dir);
+        std::istringstream ss(argv[3]);
+        bool is_mc;
+        if (!(ss >> is_mc)) {
+            std::cout << "Invalid bool " << argv[1] << std::endl;
+            return 1;
+        }
+
+        std::cout << is_mc << std::endl;
+
+        return Plotter(input_file, output_dir, is_mc);
     }
 }
