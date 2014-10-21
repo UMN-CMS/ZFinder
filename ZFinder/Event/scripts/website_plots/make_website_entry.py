@@ -2,8 +2,8 @@
 
 from tempfile import mkdtemp
 from sys import exit
-from os import makedirs
-from os.path import isdir, exists, basename
+from os import makedirs, listdir
+from os.path import isdir, exists, basename, isfile
 from shutil import move, rmtree
 import plotter
 
@@ -35,13 +35,23 @@ if __name__ == '__main__':
     # Make the plotters
     plotters = []
 
+    # The directories used by the basic plots
+    basic_data_dir = "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120/"
+    basic_mc_dir = basic_data_dir.replace("Reco", "MC")
+    plot_mc = True
+
+    # Data plots (and reco MC)
+    plotters.append(plotter.BasicPlotter(input_file, tmp_dir, basic_data_dir))
+
+    # MC plots
     if options.is_mc:
         plotters.append(plotter.CutByCut(input_file, tmp_dir))
+        plotters.append(plotter.BasicPlotter(input_file, tmp_dir, basic_mc_dir, plot_mc))
+
 
     # Run the plotters
     for p in plotters:
         p.make_plots()
-        plots += p.plots
 
     # Make the website directory
     if not exists(output_dir):
@@ -51,6 +61,7 @@ if __name__ == '__main__':
         exit(2)
 
     # Move the plots to the output directory
+    plots = [tmp_dir + '/' + p for p in listdir(tmp_dir) if (isfile(tmp_dir + '/' + p) and p.endswith(".png"))]
     for plot in plots:
         move(plot, output_dir + "/" + basename(plot))
 
