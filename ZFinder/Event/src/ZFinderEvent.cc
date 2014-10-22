@@ -607,20 +607,20 @@ namespace zf {
         for (unsigned int i = 0; i < mc_particles->size(); ++i) {
             const reco::GenParticle* gen_particle = &mc_particles->at(i);
             // Is a Z
-            if (gen_particle->pdgId() == ZBOSON && z_boson == nullptr) {
+            if (gen_particle->pdgId() == PDGID::ZBOSON && z_boson == nullptr) {
                 for (size_t j = 0; j < gen_particle->numberOfDaughters(); ++j) {
-                    if (gen_particle->daughter(j)->pdgId() == ELECTRON) {
+                    if (gen_particle->daughter(j)->pdgId() == PDGID::ELECTRON) {
                         z_boson = gen_particle;
                         break;
                     }
                 }
             }
             // Is an electron
-            else if (fabs(gen_particle->pdgId()) == ELECTRON  // In pdgId, fabs(POSITRON) == ELECTRON
+            else if (fabs(gen_particle->pdgId()) == PDGID::ELECTRON  // In pdgId, fabs(POSITRON) == ELECTRON
                     && (electron_0 == nullptr || electron_1 == nullptr)
                     ) {
                 for (size_t j = 0; j < gen_particle->numberOfMothers(); ++j) {
-                    if (gen_particle->mother(j)->pdgId() == ZBOSON && gen_particle->status() == 3) {
+                    if (gen_particle->mother(j)->pdgId() == PDGID::ZBOSON && gen_particle->status() == 3) {
                         // If we haven't filled the first electron
                         if (bornElectron_0 == nullptr) {
                             //WARNING: this funciton uses a POINTER to a

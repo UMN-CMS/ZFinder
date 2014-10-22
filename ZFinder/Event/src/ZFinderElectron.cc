@@ -34,10 +34,10 @@ namespace zf {
         eta = input_electron.eta();
         // Using the input_electron Data Group ID Number, determine if the input_electron is an
         // electron or positron
-        if (input_electron.pdgId() == ELECTRON) {
+        if (input_electron.pdgId() == PDGID::ELECTRON) {
             charge = -1;
         }
-        else if (input_electron.pdgId() == POSITRON) {
+        else if (input_electron.pdgId() == PDGID::POSITRON) {
             charge = 1;
         }
     }
@@ -67,10 +67,10 @@ namespace zf {
         nakedEta = naked_electron.eta();
         // Using the input_electron Data Group ID Number, determine if the input_electron is an
         // electron or positron
-        if (dressed_electron.pdgId() == ELECTRON) {
+        if (dressed_electron.pdgId() == PDGID::ELECTRON) {
             charge = -1;
         }
-        else if (dressed_electron.pdgId() == POSITRON) {
+        else if (dressed_electron.pdgId() == PDGID::POSITRON) {
             charge = 1;
         }
     }
