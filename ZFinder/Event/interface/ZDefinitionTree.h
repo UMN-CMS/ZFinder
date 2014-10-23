@@ -3,6 +3,7 @@
 
 // Standard Library
 #include <string>  // string
+#include <utility>  // pair
 
 // ROOT
 #include "TBranch.h"  // TBranch
@@ -76,8 +77,6 @@ namespace zf {
 
             struct event_branch {
                 void clear_values() {
-                    gen_weight = -1;
-                    event_weight = -1;
                     event_number = 0;
                     is_mc = false;
                 }
@@ -86,12 +85,22 @@ namespace zf {
                 event_branch() {
                     clear_values();
                 }
-
-                double gen_weight;
-                double event_weight;
                 unsigned int event_number;
                 bool is_mc;
             } event_;
+
+            // Set up a variable size branch for the weights
+            int weight_size_;
+            static constexpr int MAX_SIZE_ = 100;
+            // Although vectors seem like the right solution, since TTrees need
+            // the memory used for the array to be static, an array is
+            // (unfortunately) the best choice
+            double weights_[MAX_SIZE_];
+            int weight_ids_[MAX_SIZE_];
+
+            // We insert the weights and the IDs into this vector, and then
+            // read it out into the array before filling the tree
+            std::vector<std::pair<int, double>> weight_id_vector_;
 
             // Name
             std::string zdef_name_;
@@ -106,7 +115,8 @@ namespace zf {
             TTree* tree_;
 
             // Get the weight of the cuts
-            double GetCutWeight(cutlevel_vector const * const CUT_LEVEL_VECTOR);
+            void FillCutWeights(cutlevel_vector const * const CUT_LEVEL_VECTOR);
+            double GetTotalWeight(cutlevel_vector const * const CUT_LEVEL_VECTOR);
     };
 }  // namespace zf
 #endif  // ZFINDER_ZDEFINITIONTREE_H_

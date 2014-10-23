@@ -1,11 +1,11 @@
 #include "ZFinder/Event/interface/ZDefinitionTree.h"
 
 // Standard Library
-#include <utility>  // std::make_pair
-#include <sstream>  // std::ostringstream
+#include <algorithm>  // std::min
 
 // ZFinder Code
 #include "ZFinder/Event/interface/CutLevel.h"  // cutlevel_vector
+#include "ZFinder/Event/interface/WeightID.h"  // WeightID, STR_TO_WEIGHTID
 
 
 namespace zf {
@@ -25,8 +25,13 @@ namespace zf {
         if (IS_MC_) {
             tree_->Branch("truth", &truth_, CODE.c_str());
         }
-        const std::string EVENT_CODE = "gen_weight/D:event_weight:event_number/i:is_mc/O";
+        const std::string EVENT_CODE = "event_number/i:is_mc/O";
         tree_->Branch("event_info", &event_, EVENT_CODE.c_str());
+        if (IS_MC_) {
+            tree_->Branch("weight_size", &weight_size_, "weight_size/I");
+            tree_->Branch("weights", weights_, "weights[weight_size]/D");
+            tree_->Branch("weight_ids", weight_ids_, "weight_ids[weight_size]/I");
+        }
     }
 
     ZDefinitionTree::~ZDefinitionTree() {
@@ -44,14 +49,31 @@ namespace zf {
         reco_.clear_values();
         truth_.clear_values();
         event_.clear_values();
+        weight_id_vector_.clear();
 
-        // The weight from the generator, and the weight from the scale
-        // factors, which we set to 1 but then read from the cut level vector
-        const double GEN_WEIGHT = zf_event.event_weight;
+        // Set the weights
+        if (IS_MC_) {
+            // The weight from the generator, and the weight from the scale
+            // factors, which we set to 1 but then read from the cut level vector
+            const double GEN_WEIGHT = zf_event.event_weight;
+            weight_id_vector_.push_back(std::make_pair(WeightID::GEN_MC, GEN_WEIGHT));
 
-        // Get the scale factors weight
-        const cutlevel_vector* clv = zf_event.GetZDef(zdef_name_);
-        double weight = GetCutWeight(clv);
+
+            // Get the scale factors weight and fill up weight_id_vector_ with them
+            const cutlevel_vector* clv = zf_event.GetZDef(zdef_name_);
+            FillCutWeights(clv);
+
+            // Loop over out vector of weights and save them to the arrays so that
+            // the tree can grab the values. If the vector is longer than
+            // MAX_SIZE_, we stop there so as not to overflow our array!
+            weight_size_ = weight_id_vector_.size();
+            for (int i = 0; i < std::min(weight_size_, MAX_SIZE_); ++i) {
+                const int WEIGHT_ID = weight_id_vector_.at(i).first;
+                const double WEIGHT = weight_id_vector_.at(i).second;
+                weights_[i] = WEIGHT;
+                weight_ids_[i] = WEIGHT_ID;
+            }
+        }
 
         // Reco
         reco_.z_m = zf_event.reco_z.m;
@@ -98,8 +120,6 @@ namespace zf {
             }
         }
         // General Event info
-        event_.gen_weight = GEN_WEIGHT;
-        event_.event_weight = weight;
         event_.is_mc = !zf_event.is_real_data;
         event_.event_number = zf_event.id.event_num;
 
@@ -110,23 +130,42 @@ namespace zf {
         }
     }
 
-    double ZDefinitionTree::GetCutWeight(cutlevel_vector const * const CUT_LEVEL_VECTOR) {
-        /* Get the cut weight from the last level of cuts */
-        double weight = 1.;
+    void ZDefinitionTree::FillCutWeights(cutlevel_vector const * const CUT_LEVEL_VECTOR) {
         if (CUT_LEVEL_VECTOR != nullptr) {
-            // Get the last level of cuts
+            // Check if we pass via Tag 0 Probe 1, or Tag 1 Probe 1
             CutLevel last_cutlevel = CUT_LEVEL_VECTOR->back().second;
-            // The cut can pass two ways. We check if the 0th electron is the
-            // tag, and take that way if it suceeds, otherwise we check if the
-            // 1st electron is the tag.
-            if (last_cutlevel.t0p1_pass) {
-                weight = last_cutlevel.t0p1_eff;
-            }
-            else if (last_cutlevel.t1p0_pass) {
-                weight = last_cutlevel.t1p0_eff;
+            bool t0p1 = last_cutlevel.t0p1_pass;  // Takes Priority
+            bool t1p0 = last_cutlevel.t1p0_pass;
+
+            // Loop over our vector and at each level pull out the right
+            for (auto& i_cutlevel : *CUT_LEVEL_VECTOR) {
+                // Get the cut names and try to find the matching WeightIDs
+                const std::string TAG_CUT = i_cutlevel.second.tag_cut;
+                const std::string PROBE_CUT = i_cutlevel.second.probe_cut;
+                std::map<std::string, int>::const_iterator tag_it = STR_TO_WEIGHTID.find(TAG_CUT);
+                std::map<std::string, int>::const_iterator probe_it = STR_TO_WEIGHTID.find(PROBE_CUT);
+                // Get the weights for the tag and probe
+                double tag_weight = 1.;
+                double probe_weight = 1.;
+                if (t0p1) {
+                    tag_weight = i_cutlevel.second.t0p1_tag_weight;
+                    probe_weight = i_cutlevel.second.t0p1_probe_weight;
+                }
+                else if (t1p0) {
+                    tag_weight = i_cutlevel.second.t1p0_tag_weight;
+                    probe_weight = i_cutlevel.second.t1p0_probe_weight;
+                }
+                // The Tag has a WeightID
+                if (tag_it != STR_TO_WEIGHTID.end()) {
+                    const int WEIGHTID = tag_it->second;
+                    weight_id_vector_.push_back(std::make_pair(WEIGHTID, tag_weight));
+                }
+                if (probe_it != STR_TO_WEIGHTID.end()) {
+                    const int WEIGHTID = probe_it->second;
+                    weight_id_vector_.push_back(std::make_pair(WEIGHTID, probe_weight));
+                }
             }
         }
-        return weight;
     }
 
     TFile* ZDefinitionTree::GetCurrentFile() {
