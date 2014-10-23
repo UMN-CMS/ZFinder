@@ -507,11 +507,29 @@ namespace zf {
         // things like pileup reweighting)
         double t0p1_eff = base_event_weight_;
         double t1p0_eff = base_event_weight_;
+        // And the weights for each level and configuration
+        double t0p1_tag_weight;
+        double t0p1_probe_weight;
+        double t1p0_tag_weight;
+        double t1p0_probe_weight;
+        // And the names for the cuts
+        std::string tag_cut;
+        std::string probe_cut;
+
         for (size_t i = 0; i < SIZE; ++i) {
             t0p1_pass = t0p1_pass && pass_[0][0].at(i) && pass_[1][1].at(i);
             t1p0_pass = t1p0_pass && pass_[0][1].at(i) && pass_[1][0].at(i);
             t0p1_eff = t0p1_eff * eff_[0][0].at(i) * eff_[1][1].at(i);
             t1p0_eff = t1p0_eff * eff_[0][1].at(i) * eff_[1][0].at(i);
+            t0p1_tag_weight = eff_[0][0].at(i);
+            t0p1_probe_weight = eff_[1][1].at(i);
+            t1p0_tag_weight = eff_[0][1].at(i);
+            t1p0_probe_weight = eff_[1][0].at(i);
+
+            // Set the strings
+            tag_cut = cutinfo_[0].at(i).cut;
+            probe_cut = cutinfo_[1].at(i).cut;
+
             // Now set the values in the vector
             CutLevel* cl = &clv.at(i).second;
             cl->t0p1_pass = t0p1_pass;
@@ -519,7 +537,14 @@ namespace zf {
             cl->pass = cl->t0p1_pass || cl->t1p0_pass;
             cl->t0p1_eff = t0p1_eff;
             cl->t1p0_eff = t1p0_eff;
+            cl->t0p1_tag_weight = t0p1_tag_weight;
+            cl->t0p1_probe_weight = t0p1_probe_weight;
+            cl->t1p0_tag_weight = t1p0_tag_weight;
+            cl->t1p0_probe_weight = t1p0_probe_weight;
+            cl->tag_cut = tag_cut;
+            cl->probe_cut = probe_cut;
         }
+
         // Finally, we add the Mass window cut, which is the very last one (and
         // not included in the above loop)
         t0p1_pass = t0p1_pass && pass_mz_cut_;
@@ -529,5 +554,11 @@ namespace zf {
         clv.back().second.pass = t0p1_pass || t1p0_pass;
         clv.back().second.t0p1_eff = t0p1_eff;
         clv.back().second.t0p1_eff = t0p1_eff;
+        clv.back().second.t0p1_tag_weight = 1.;
+        clv.back().second.t0p1_probe_weight = 1.;
+        clv.back().second.t1p0_tag_weight = 1.;
+        clv.back().second.t1p0_probe_weight = 1.;
+        clv.back().second.tag_cut = "MASS";
+        clv.back().second.probe_cut = "MASS";
     }
 }  // namespace zf
