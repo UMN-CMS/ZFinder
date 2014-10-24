@@ -48,7 +48,7 @@ namespace zf {
         table_iterator = table_map_.find(CUT_NAME);
         if (table_iterator != table_map_.end()) {
             EfficiencyTable const * const eff_table = table_iterator->second;
-            return eff_table->GetEfficiency(PT, ETA);  // Returns 1 on failure
+            return eff_table->GetEfficiency(PT, ETA);  // Returns -1 on failure
         }
 
         // Failure to find a matching cut

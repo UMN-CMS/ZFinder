@@ -1,5 +1,9 @@
 #include "ZFinder/Event/interface/EfficiencyTable.h"
 
+// Standard Library
+#include <cmath>  // fabs
+#include <iostream>  // std::cout, std::endl
+
 
 namespace zf {
 
@@ -20,6 +24,13 @@ namespace zf {
          * Insert a row from the efficiency tables into our object. If no error
          * bars are specified, they default to -1.
          */
+        // We do not support negative Eta! We take fabs(eta) when checking for
+        // efficiency!
+        if (ETA_MIN < 0 or ETA_MAX < 0) {
+            std::cout << "Adding EfficiencyTable entry with negative eta!";
+            std::cout << "This entry will NEVER be found by GetEfficiency!";
+            std::cout << std::endl;
+        }
         coordinate_pair pt_pair(PT_MIN, PT_MAX);
         coordinate_pair eta_pair(ETA_MIN, ETA_MAX);
         Efficiency eff(EFFICIENCY, POSITIVE_ERROR_BAR, NEGATIVE_ERROR_BAR);
@@ -38,9 +49,10 @@ namespace zf {
          * in eta and pt, then it selects the first bin.
          */
         // Check all eta bins
+        const double FETA = fabs(ETA);
         for (auto& outter_pair : eff_table_) {
             const coordinate_pair ETA_PAIR = outter_pair.first;
-            if (ETA_PAIR.first <= ETA && ETA < ETA_PAIR.second) {
+            if (ETA_PAIR.first <= FETA && FETA < ETA_PAIR.second) {
                 // Check all pt bins in the map from the matching eta bin
                 for (auto& inner_pair : outter_pair.second) {
                     const coordinate_pair PT_PAIR = inner_pair.first;
