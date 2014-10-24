@@ -124,7 +124,7 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
         tuple_output_file_ = new TFile(TUPLE_OUTPUT_FILE_NAME_.c_str(), "RECREATE");
     }
     else {
-        tuple_output_file_ = NULL;
+        tuple_output_file_ = nullptr;
     }
 
     // Setup Cut Setters
@@ -182,7 +182,7 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
         }
 
         // Now make the Trees for the tuples
-        if (tuple_output_file_ != NULL) {
+        if (tuple_output_file_ != nullptr) {
             // We use zd_reco, but that's only because both the "reco" and
             // "truth" quantities are stored in the same Tree, so there is no
             // need to make a second tree like there is with the plots.
@@ -232,8 +232,8 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     // Construct a ZFinderEvent
     zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_);
-    if ( (zfe.reco_z.m > -1 && zfe.e0 != NULL && zfe.e1 != NULL)
-            || (zfe.truth_z.m > -1 && zfe.e0_truth != NULL && zfe.e1_truth != NULL)
+    if ( (zfe.reco_z.m > -1 && zfe.e0 != nullptr && zfe.e1 != nullptr)
+            || (zfe.truth_z.m > -1 && zfe.e0_truth != nullptr && zfe.e1_truth != nullptr)
        ) {  // We have a good Z in Reco OR Truth
         // Set all cuts
         for (auto& i_set : setters_) {
@@ -258,7 +258,7 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
             i_zdefw->Fill(zfe);
         }
         // Make all ZDef Trees
-        if (tuple_output_file_ != NULL) {
+        if (tuple_output_file_ != nullptr) {
             for (auto& i_zdeft : zdef_tuples_) {
                 i_zdeft->Fill(zfe);
             }
@@ -278,14 +278,14 @@ void ZFinder::endJob() {
     }
 
     // Write the tuple file
-    if (tuple_output_file_ != NULL) {
+    if (tuple_output_file_ != nullptr) {
         // Write the initial file
         tuple_output_file_->Write();
 
         // Since large trees will automatically make new files, we need to get
         // the current file from each tree and write it, but only if it is new
         // and hasn't be previously written
-        TFile* file = NULL;
+        TFile* file = nullptr;
         std::vector<TFile*> seen;
         seen.push_back(tuple_output_file_);
 

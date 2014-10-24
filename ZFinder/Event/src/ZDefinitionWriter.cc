@@ -58,7 +58,7 @@ namespace zf {
 
         // Cutlevel_vector loop
         const cutlevel_vector* clv = zf_event.GetZDef(zdef_name);
-        if (clv != NULL) {
+        if (clv != nullptr) {
             bool cont = true;
             // Loop over cuts until one fails
             for (auto& i_cutlevel : *clv) {

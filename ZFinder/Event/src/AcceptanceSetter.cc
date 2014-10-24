@@ -13,10 +13,10 @@ namespace zf {
             SetCut_(i_elec);
         }
         // Also MC
-        if (zf_event->e0_truth != NULL) {
+        if (zf_event->e0_truth != nullptr) {
             SetCut_(zf_event->e0_truth);
         }
-        if (zf_event->e1_truth != NULL) {
+        if (zf_event->e1_truth != nullptr) {
             SetCut_(zf_event->e1_truth);
         }
     }

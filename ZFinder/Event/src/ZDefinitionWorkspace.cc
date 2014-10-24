@@ -124,7 +124,7 @@ namespace zf {
         */
         const cutlevel_vector* clv = zf_event.GetZDef(zdef_name_);
         // Reject if the cut wasn't found
-        if (clv == NULL) {
+        if (clv == nullptr) {
             return;
         }
         // If our vector doesn't have enough cuts, we skip it
@@ -205,9 +205,9 @@ namespace zf {
         }
 
         // Assign the correct electrons
-        ZFinderElectron* e_tag = NULL;
-        ZFinderElectron* e_probe = NULL;
-        const ZFinderEvent::ZData* z_data = NULL;
+        ZFinderElectron* e_tag = nullptr;
+        ZFinderElectron* e_probe = nullptr;
+        const ZFinderEvent::ZData* z_data = nullptr;
         int verts = -1;
         if (zf_event.is_real_data || !USE_TRUTH_) {
             z_data = &zf_event.reco_z;
@@ -234,7 +234,7 @@ namespace zf {
         // Assign the variables
 
         // Make sure we have a valid object
-        if (z_data != NULL) {
+        if (z_data != nullptr) {
             argset_->setRealValue("z_mass", z_data->m);
             argset_->setRealValue("z_eta", z_data->eta);
             argset_->setRealValue("z_y", z_data->y);
@@ -264,7 +264,7 @@ namespace zf {
             argset_->setRealValue("other_phistar", -0.1);
         }
         // Make sure the tag is valid
-        if (e_tag != NULL) {
+        if (e_tag != nullptr) {
             argset_->setRealValue("e0_pt", e_tag->pt);
             argset_->setRealValue("e0_eta", e_tag->eta);
             argset_->setRealValue("e0_phi", e_tag->phi);
@@ -278,7 +278,7 @@ namespace zf {
             argset_->setCatIndex("e0_charge", 0);
         }
         // Make sure the probe is valid
-        if (e_probe != NULL) {
+        if (e_probe != nullptr) {
             argset_->setRealValue("e1_pt", e_probe->pt);
             argset_->setRealValue("e1_eta", e_probe->eta);
             argset_->setRealValue("e1_phi", e_probe->phi);

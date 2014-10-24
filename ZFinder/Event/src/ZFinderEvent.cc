@@ -38,7 +38,7 @@ namespace zf {
      * can't be turned off. We get around this be constructing one static
      * instance and sharing it with all instances of the class.
      */
-    edm::LumiReWeighting* ZFinderEvent::lumi_weights_ = NULL;
+    edm::LumiReWeighting* ZFinderEvent::lumi_weights_ = nullptr;
 
     ZFinderEvent::ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup, const edm::ParameterSet& iConfig) {
         /* Given an event, parses them for the information needed to make the
@@ -81,7 +81,7 @@ namespace zf {
         require_gen_z_ = iConfig.getParameter<bool>("require_gen_z");
 
         // Set up the lumi reweighting, but only if it is MC.
-        if (!is_real_data && lumi_weights_ == NULL) {
+        if (!is_real_data && lumi_weights_ == nullptr) {
             const std::string PILEUP_ERA = iConfig.getParameter<std::string>("pileup_era");
             // We use a flag in the python file to set the pileup reweighting
             // to use. If a blank, or an unrecognized, string is passed, then
@@ -115,7 +115,7 @@ namespace zf {
         event_weight = 1.;
         if (!is_real_data) {
             SetMCEventWeight(iEvent);
-            if (lumi_weights_ != NULL) {
+            if (lumi_weights_ != nullptr) {
                 SetLumiEventWeight(iEvent);
             }
         }
@@ -143,10 +143,10 @@ namespace zf {
             }
             // Gen Z check
             if (require_gen_z_ and truth_z.m == -1) {
-                // We set the electrons to NULL pointers and the z mass to -1,
-                // which mark the event as bad
-                set_both_e_truth(NULL, NULL);
-                set_both_e(NULL, NULL);
+                // We set the electrons to nullptr and the z mass to -1, which
+                // mark the event as bad
+                set_both_e_truth(nullptr, nullptr);
+                set_both_e(nullptr, nullptr);
                 truth_z.m = -1;
                 reco_z.m = -1;
                 return;
@@ -467,7 +467,7 @@ namespace zf {
     }
 
     void ZFinderEvent::InitZ() {
-        if (e0 != NULL && e1 != NULL) {
+        if (e0 != nullptr && e1 != nullptr) {
             // Sometimes we want to preselect our electrons using the muon acceptance
             if (use_muon_acceptance_) {
                 const double FETA0 = fabs(e0->eta);
@@ -546,13 +546,13 @@ namespace zf {
         truth_z.other_phistar = -1;
 
         // Electrons
-        e0 = NULL;
-        e1 = NULL;
+        e0 = nullptr;
+        e1 = nullptr;
         n_reco_electrons = -1;
-        e0_truth = NULL;
-        e1_truth = NULL;
-        e0_trig = NULL;
-        e1_trig = NULL;
+        e0_truth = nullptr;
+        e1_truth = nullptr;
+        e0_trig = nullptr;
+        e1_trig = nullptr;
 
         // Is Data
         is_real_data = false;
@@ -594,20 +594,20 @@ namespace zf {
          * decays, but we expect those to be impossibly rare.
          */
         //default electrons--which are now DRESSED!
-        const reco::GenParticle* electron_0 = NULL;
-        const reco::GenParticle* electron_1 = NULL;
+        const reco::GenParticle* electron_0 = nullptr;
+        const reco::GenParticle* electron_1 = nullptr;
         //born electrons:
-        const reco::GenParticle* bornElectron_0 = NULL;
-        const reco::GenParticle* bornElectron_1 = NULL;
+        const reco::GenParticle* bornElectron_0 = nullptr;
+        const reco::GenParticle* bornElectron_1 = nullptr;
         //naked (final) electrons:
-        const reco::GenParticle* nakedElectron_0 = NULL;
-        const reco::GenParticle* nakedElectron_1 = NULL;
-        const reco::GenParticle* z_boson = NULL;
+        const reco::GenParticle* nakedElectron_0 = nullptr;
+        const reco::GenParticle* nakedElectron_1 = nullptr;
+        const reco::GenParticle* z_boson = nullptr;
 
         for (unsigned int i = 0; i < mc_particles->size(); ++i) {
             const reco::GenParticle* gen_particle = &mc_particles->at(i);
             // Is a Z
-            if (gen_particle->pdgId() == ZBOSON && z_boson == NULL) {
+            if (gen_particle->pdgId() == ZBOSON && z_boson == nullptr) {
                 for (size_t j = 0; j < gen_particle->numberOfDaughters(); ++j) {
                     if (gen_particle->daughter(j)->pdgId() == ELECTRON) {
                         z_boson = gen_particle;
@@ -617,12 +617,12 @@ namespace zf {
             }
             // Is an electron
             else if (fabs(gen_particle->pdgId()) == ELECTRON  // In pdgId, fabs(POSITRON) == ELECTRON
-                    && (electron_0 == NULL || electron_1 == NULL)
+                    && (electron_0 == nullptr || electron_1 == nullptr)
                     ) {
                 for (size_t j = 0; j < gen_particle->numberOfMothers(); ++j) {
                     if (gen_particle->mother(j)->pdgId() == ZBOSON && gen_particle->status() == 3) {
                         // If we haven't filled the first electron
-                        if (bornElectron_0 == NULL) {
+                        if (bornElectron_0 == nullptr) {
                             //WARNING: this funciton uses a POINTER to a
                             //POINTER to make gen_particle point at the NAKED
                             //electron at the end of the decay chain
@@ -647,13 +647,13 @@ namespace zf {
                 }
             }
             // If we've found all our particles, exit the loop
-            if (z_boson != NULL && electron_0 != NULL && electron_1 != NULL) {
+            if (z_boson != nullptr && electron_0 != nullptr && electron_1 != nullptr) {
                 break;
             }
         }
 
         // Continue only if all particles have been found
-        if (z_boson != NULL && electron_0 != NULL && electron_1 != NULL) {
+        if (z_boson != nullptr && electron_0 != nullptr && electron_1 != nullptr) {
             // We set electron_0 to the higher pt electron
             if (electron_0->pt() < electron_1->pt()) {
                 std::swap(electron_0, electron_1);
@@ -683,16 +683,16 @@ namespace zf {
 
     void ZFinderEvent::InitTrigger(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         // Get the trigger objects that are closest in dR to our reco electrons
-        if (e0 != NULL && e1 != NULL) {
+        if (e0 != nullptr && e1 != nullptr) {
             const trigger::TriggerObject* trig_obj_0 = GetBestMatchedTriggerObject(iEvent, ALL_TRIGGERS, e0->eta, e0->phi);
             const trigger::TriggerObject* trig_obj_1 = GetBestMatchedTriggerObject(iEvent, ALL_TRIGGERS, e1->eta, e1->phi);
 
             // If the electrons are good, set them as our trigger electrons
-            if (trig_obj_0 != NULL) {
+            if (trig_obj_0 != nullptr) {
                 ZFinderElectron* tmp_e0 = AddHLTElectron(*trig_obj_0);
                 set_e0_trig(tmp_e0);
             }
-            if (trig_obj_1 != NULL) {
+            if (trig_obj_1 != nullptr) {
                 ZFinderElectron* tmp_e1 = AddHLTElectron(*trig_obj_1);
                 set_e1_trig(tmp_e1);
             }
@@ -744,9 +744,9 @@ namespace zf {
         // stable and will no longer FSR.
         while (naked_electron->status() != 1) {
             // For some reason there are no daughters, but the particle is
-            // "unstable". Abort and return NULL.
+            // "unstable". Abort and return nullptr.
             if (naked_electron->numberOfDaughters() == 0) {
-                return NULL;
+                return nullptr;
             }
             // Otherwise look through the daughters and find an electron
             for (size_t i = 0; i < naked_electron->numberOfDaughters(); ++i) {
@@ -776,12 +776,12 @@ namespace zf {
         const reco::GenParticle* tmp_electron = BORN_ELECTRON;
         while (tmp_electron != NAKED_ELECTRON) {
             // For some reason there are no daughters, but the particle is
-            // "unstable". Abort and return NULL.
+            // "unstable". Abort and return nullptr.
             if (tmp_electron->numberOfDaughters() == 0) {
-                return NULL;
+                return nullptr;
             }
             // Otherwise look through the daughters and find an electron
-            const reco::GenParticle* swap_electron = NULL;
+            const reco::GenParticle* swap_electron = nullptr;
             for (size_t i = 0; i < tmp_electron->numberOfDaughters(); ++i) {
                 const reco::Candidate* test_particle = tmp_electron->daughter(i);
                 // If we find electron, we save it as the next item to recurse over
@@ -878,7 +878,7 @@ namespace zf {
                 if (PRINT_CUTS) { PrintCuts(i_elec); }
             }
         } else if (TYPE == TRUTH && !is_real_data) {
-            if (e0_truth != NULL && e1_truth != NULL) {
+            if (e0_truth != nullptr && e1_truth != nullptr) {
                 cout << " Truth Z Mass " << truth_z.m << endl;
                 cout << "\tpt: " << e0_truth->pt;
                 cout << " eta: " << e0_truth->eta;
@@ -890,16 +890,16 @@ namespace zf {
                 if (PRINT_CUTS) { PrintCuts(e1_truth); }
             }
         } else if (TYPE == TRIG) {
-            if (e0_trig != NULL || e1_trig != NULL) {
+            if (e0_trig != nullptr || e1_trig != nullptr) {
                 cout << " Trigger Electrons:" << std::endl;
             }
-            if (e0_trig != NULL) {
+            if (e0_trig != nullptr) {
                 cout << "\tpt: " << e0_trig->pt;
                 cout << " eta: " << e0_trig->eta;
                 cout << " phi: " << e0_trig->phi << endl;
                 if (PRINT_CUTS) { PrintCuts(e0_trig); }
             }
-            if (e1_trig != NULL) {
+            if (e1_trig != nullptr) {
                 cout << "\tpt: " << e1_trig->pt;
                 cout << " eta: " << e1_trig->eta;
                 cout << " phi: " << e1_trig->phi << endl;
@@ -980,7 +980,7 @@ namespace zf {
         if (it != zdef_map_.end()) {
             return &(it->second);
         } else {
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -996,7 +996,7 @@ namespace zf {
          */
         // If our vector is empty or the first item is blank
         if (trig_names.size() == 0 || trig_names[0].size() == 0) {
-            return NULL;
+            return nullptr;
         }
 
         // Load Trigger Objects
@@ -1006,7 +1006,7 @@ namespace zf {
         iEvent.getByLabel(hltTrigInfoTag, trig_event);
         if (!trig_event.isValid() ){
             std::cout << "No valid hltTriggerSummaryAOD." << std::endl;
-            return NULL;
+            return nullptr;
         }
 
         trig_dr_vec* out_v = new trig_dr_vec();
@@ -1046,7 +1046,7 @@ namespace zf {
         const trig_dr_vec* trig_vec = GetMatchedTriggerObjects(iEvent, trig_names, ETA, PHI, MIN_DR);
 
         double best_dr = 1.;
-        const trigger::TriggerObject* trig_obj = NULL;
+        const trigger::TriggerObject* trig_obj = nullptr;
         for (auto& i_obj : *trig_vec) {
             if (i_obj.second < best_dr) {
                 best_dr = i_obj.second;
@@ -1063,7 +1063,7 @@ namespace zf {
             ) {
         // Get the vector and see if there are objects
         const trig_dr_vec* zev = GetMatchedTriggerObjects(iEvent, trig_names, ETA, PHI, DR_CUT);
-        if (zev != NULL && zev->size() >= 1) {
+        if (zev != nullptr && zev->size() >= 1) {
             return true;
         } else {
             return false;
@@ -1073,8 +1073,8 @@ namespace zf {
     void ZFinderEvent::ApplyNTBendingCorrection(
             ) {
         // The electrons
-        ZFinderElectron* electron_to_correct = NULL;
-        const ZFinderElectron* spectator_electron = NULL;
+        ZFinderElectron* electron_to_correct = nullptr;
+        const ZFinderElectron* spectator_electron = nullptr;
         if (e0->CutPassed("type_photon") == 1) {
             electron_to_correct = e0;
             if (e1->CutPassed("type_gsf") == 1) {
@@ -1091,10 +1091,10 @@ namespace zf {
         // If we have an NT electron and a GSF electron, we apply the
         // correction. If we only have an NT electron, we mark that the
         // correction was no applied. If we have neither, we do nothing.
-        if (electron_to_correct != NULL) {
+        if (electron_to_correct != nullptr) {
             const double WEIGHT = 1.0;
             // We can do the correction
-            if (spectator_electron != NULL) {
+            if (spectator_electron != nullptr) {
                 //3.18 m to EE, 3.8 T field, and a factor of 10/3 for GeV/c
                 const double B_FIELD = 3.8;  // Tesla
                 const double DIST_TO_EE = 3.18;  // Distance to EE in meters

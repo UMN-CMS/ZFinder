@@ -274,25 +274,25 @@ namespace zf {
 
             // Fill the histograms with the information from the approriate electron
             if (ELECTRON_0 == 0 && ELECTRON_1 == 1) {
-                if (ZF_EVENT.e0 != NULL) {
+                if (ZF_EVENT.e0 != nullptr) {
                     e0_pt_->Fill(ZF_EVENT.e0->pt, EVENT_WEIGHT);
                     e0_eta_->Fill(ZF_EVENT.e0->eta, EVENT_WEIGHT);
                     e0_phi_->Fill(ZF_EVENT.e0->phi, EVENT_WEIGHT);
                     e0_charge_->Fill(ZF_EVENT.e0->charge, EVENT_WEIGHT);
                 }
-                if (ZF_EVENT.e1 != NULL) {
+                if (ZF_EVENT.e1 != nullptr) {
                     e1_pt_->Fill(ZF_EVENT.e1->pt, EVENT_WEIGHT);
                     e1_eta_->Fill(ZF_EVENT.e1->eta, EVENT_WEIGHT);
                     e1_phi_->Fill(ZF_EVENT.e1->phi, EVENT_WEIGHT);
                     e1_charge_->Fill(ZF_EVENT.e1->charge, EVENT_WEIGHT);
                 }
-                if (ZF_EVENT.e0_trig != NULL && ZF_EVENT.e0 != NULL) {
+                if (ZF_EVENT.e0_trig != nullptr && ZF_EVENT.e0 != nullptr) {
                     e0_pt_vs_trig_->Fill(
                             ZF_EVENT.e0->pt / ZF_EVENT.e0_trig->pt,
                             EVENT_WEIGHT
                             );
                 }
-                if (ZF_EVENT.e1_trig != NULL && ZF_EVENT.e1 != NULL) {
+                if (ZF_EVENT.e1_trig != nullptr && ZF_EVENT.e1 != nullptr) {
                     e1_pt_vs_trig_->Fill(
                             ZF_EVENT.e1->pt / ZF_EVENT.e1_trig->pt,
                             EVENT_WEIGHT
@@ -300,25 +300,25 @@ namespace zf {
                 }
             }
             else if (ELECTRON_0 == 1 && ELECTRON_1 == 0) {
-                if (ZF_EVENT.e1 != NULL) {
+                if (ZF_EVENT.e1 != nullptr) {
                     e0_pt_->Fill(ZF_EVENT.e1->pt, EVENT_WEIGHT);
                     e0_eta_->Fill(ZF_EVENT.e1->eta, EVENT_WEIGHT);
                     e0_phi_->Fill(ZF_EVENT.e1->phi, EVENT_WEIGHT);
                     e0_charge_->Fill(ZF_EVENT.e1->charge, EVENT_WEIGHT);
                 }
-                if (ZF_EVENT.e0 != NULL) {
+                if (ZF_EVENT.e0 != nullptr) {
                     e1_pt_->Fill(ZF_EVENT.e0->pt, EVENT_WEIGHT);
                     e1_eta_->Fill(ZF_EVENT.e0->eta, EVENT_WEIGHT);
                     e1_phi_->Fill(ZF_EVENT.e0->phi, EVENT_WEIGHT);
                     e1_charge_->Fill(ZF_EVENT.e0->charge, EVENT_WEIGHT);
                 }
-                if (ZF_EVENT.e1_trig != NULL && ZF_EVENT.e1 != NULL) {
+                if (ZF_EVENT.e1_trig != nullptr && ZF_EVENT.e1 != nullptr) {
                     e0_pt_vs_trig_->Fill(
                             ZF_EVENT.e1->pt / ZF_EVENT.e1_trig->pt,
                             EVENT_WEIGHT
                             );
                 }
-                if (ZF_EVENT.e0_trig != NULL && ZF_EVENT.e0 != NULL) {
+                if (ZF_EVENT.e0_trig != nullptr && ZF_EVENT.e0 != nullptr) {
                     e1_pt_vs_trig_->Fill(
                             ZF_EVENT.e0->pt / ZF_EVENT.e0_trig->pt,
                             EVENT_WEIGHT
@@ -344,7 +344,7 @@ namespace zf {
 
             // Fill the histograms with the information from the approriate electron
             if (ELECTRON_0 == 0 && ELECTRON_1 == 1) {
-                if (ZF_EVENT.e0_truth != NULL) {
+                if (ZF_EVENT.e0_truth != nullptr) {
                     e0_pt_->Fill(ZF_EVENT.e0_truth->pt, EVENT_WEIGHT);
                     e0_pt_naked_->Fill(ZF_EVENT.e0_truth->nakedPt, EVENT_WEIGHT);
                     e0_pt_born_->Fill(ZF_EVENT.e0_truth->bornPt, EVENT_WEIGHT);
@@ -356,7 +356,7 @@ namespace zf {
                     e0_phi_born_->Fill(ZF_EVENT.e0_truth->bornPhi, EVENT_WEIGHT);
                     e0_charge_->Fill(ZF_EVENT.e0_truth->charge, EVENT_WEIGHT);
                 }
-                if (ZF_EVENT.e1_truth != NULL) {
+                if (ZF_EVENT.e1_truth != nullptr) {
                     e1_pt_->Fill(ZF_EVENT.e1_truth->pt, EVENT_WEIGHT);
                     e1_pt_naked_->Fill(ZF_EVENT.e1_truth->nakedPt, EVENT_WEIGHT);
                     e1_pt_born_->Fill(ZF_EVENT.e1_truth->bornPt, EVENT_WEIGHT);
@@ -368,13 +368,13 @@ namespace zf {
                     e1_phi_born_->Fill(ZF_EVENT.e1_truth->bornPhi, EVENT_WEIGHT);
                     e1_charge_->Fill(ZF_EVENT.e1_truth->charge, EVENT_WEIGHT);
                 }
-                if (ZF_EVENT.e0_trig != NULL && ZF_EVENT.e0_truth != NULL) {
+                if (ZF_EVENT.e0_trig != nullptr && ZF_EVENT.e0_truth != nullptr) {
                     e0_pt_vs_trig_->Fill(
                             ZF_EVENT.e0_truth->pt / ZF_EVENT.e0_trig->pt,
                             EVENT_WEIGHT
                             );
                 }
-                if (ZF_EVENT.e1_trig != NULL && ZF_EVENT.e1_truth != NULL) {
+                if (ZF_EVENT.e1_trig != nullptr && ZF_EVENT.e1_truth != nullptr) {
                     e1_pt_vs_trig_->Fill(
                             ZF_EVENT.e1_truth->pt / ZF_EVENT.e1_trig->pt,
                             EVENT_WEIGHT
@@ -382,7 +382,7 @@ namespace zf {
                 }
             }
             else if (ELECTRON_0 == 1 && ELECTRON_1 == 0) {
-                if (ZF_EVENT.e1_truth != NULL) {
+                if (ZF_EVENT.e1_truth != nullptr) {
                     e0_pt_->Fill(ZF_EVENT.e1_truth->pt, EVENT_WEIGHT);
                     e0_pt_naked_->Fill(ZF_EVENT.e1_truth->nakedPt, EVENT_WEIGHT);
                     e0_pt_born_->Fill(ZF_EVENT.e1_truth->bornPt, EVENT_WEIGHT);
@@ -394,7 +394,7 @@ namespace zf {
                     e0_phi_born_->Fill(ZF_EVENT.e1_truth->bornPhi, EVENT_WEIGHT);
                     e0_charge_->Fill(ZF_EVENT.e1_truth->charge, EVENT_WEIGHT);
                 }
-                if (ZF_EVENT.e0_truth != NULL) {
+                if (ZF_EVENT.e0_truth != nullptr) {
                     e1_pt_->Fill(ZF_EVENT.e0_truth->pt, EVENT_WEIGHT);
                     e1_pt_naked_->Fill(ZF_EVENT.e0_truth->nakedPt, EVENT_WEIGHT);
                     e1_pt_born_->Fill(ZF_EVENT.e0_truth->bornPt, EVENT_WEIGHT);
@@ -406,13 +406,13 @@ namespace zf {
                     e1_phi_born_->Fill(ZF_EVENT.e0_truth->bornPhi, EVENT_WEIGHT);
                     e1_charge_->Fill(ZF_EVENT.e0_truth->charge, EVENT_WEIGHT);
                 }
-                if (ZF_EVENT.e1_trig != NULL && ZF_EVENT.e1_truth != NULL) {
+                if (ZF_EVENT.e1_trig != nullptr && ZF_EVENT.e1_truth != nullptr) {
                     e0_pt_vs_trig_->Fill(
                             ZF_EVENT.e1_truth->pt / ZF_EVENT.e1_trig->pt,
                             EVENT_WEIGHT
                             );
                 }
-                if (ZF_EVENT.e0_trig != NULL && ZF_EVENT.e0_truth != NULL) {
+                if (ZF_EVENT.e0_trig != nullptr && ZF_EVENT.e0_truth != nullptr) {
                     e1_pt_vs_trig_->Fill(
                             ZF_EVENT.e0_truth->pt / ZF_EVENT.e0_trig->pt,
                             EVENT_WEIGHT
@@ -429,10 +429,10 @@ namespace zf {
 
         // Phistar Reco Vs. Truth
         if (!ZF_EVENT.is_real_data
-                && ZF_EVENT.e0_truth != NULL
-                && ZF_EVENT.e1_truth != NULL
-                && ZF_EVENT.e0 != NULL
-                && ZF_EVENT.e1 != NULL
+                && ZF_EVENT.e0_truth != nullptr
+                && ZF_EVENT.e1_truth != nullptr
+                && ZF_EVENT.e0 != nullptr
+                && ZF_EVENT.e1 != nullptr
            ) {
             phistar_vs_truth_->Fill(
                     ZF_EVENT.reco_z.phistar / ZF_EVENT.truth_z.phistar,

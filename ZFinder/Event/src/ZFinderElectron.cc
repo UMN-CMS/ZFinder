@@ -107,7 +107,7 @@ namespace zf {
         candidate_type_ = RECO_TRIGGER;
         AddCutResult("type_hlt", true, 1.);
         trig_elec_ = input_electron;
-        candidate_ = NULL;
+        candidate_ = nullptr;
         /* Extract the useful quantities from a GsfElectron */
         pt = input_electron.pt();
         eta = input_electron.eta();
@@ -119,12 +119,12 @@ namespace zf {
         /* Return a CutResult based on the name */
         // Find the cut
         std::map<std::string, CutResult>::const_iterator i = cutresults_.find(cut_name);
-        // Return a CutResult if it exists, otherwise return NULL
+        // Return a CutResult if it exists, otherwise return nullptr
         if (i != cutresults_.end()) {
             return &(i->second);
         }
         else {
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -132,7 +132,7 @@ namespace zf {
         /* Return the passed status of a cut based on the name */
         const CutResult* cr = GetCutResult(cut_name);
         // If the CutResult exists, return the passed value, otherwise return -1
-        if (cr != NULL) {
+        if (cr != nullptr) {
             return cr->passed;
         }
         else {
@@ -146,7 +146,7 @@ namespace zf {
         // If the CutResult exists, return the weight, otherwise return -1.
         // This way calling code can decide what to do when no result exists.
         // Using either 0 or 1 might be appropriate depending on the case.
-        if (cr != NULL) {
+        if (cr != nullptr) {
             return cr->weight;
         }
         else {
@@ -172,7 +172,7 @@ namespace zf {
          * the new value. On success it returns 0, otherwise 1 is returned.
          */
         const CutResult* cr = GetCutResult(cut_name);
-        if (cr != NULL) {
+        if (cr != nullptr) {
             AddCutResult(cr->name, cr->passed, WEIGHT);
             return 0;
         }

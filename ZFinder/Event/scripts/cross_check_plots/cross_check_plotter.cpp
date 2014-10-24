@@ -113,7 +113,7 @@ double CrossCheckPlotter::set_area_rescale_factor() {
     TH1D* mc_histo = histo_store.mc_histo;
     std::vector<std::pair<std::string, TH1D*>> bg_histos = histo_store.bg_histos;
     // Check that open_histos exited successfully, otherwise end
-    if (data_histo == NULL || mc_histo == NULL) {
+    if (data_histo == nullptr || mc_histo == nullptr) {
         return -1;
     }
 
@@ -213,7 +213,7 @@ HistoStore CrossCheckPlotter::open_histos(
     data_config_.tfile->GetObject(DATA_HISTO_NAME.c_str(), tmp_histo);
     if (!tmp_histo) {
         std::cout << "Can not open the Data Histogram!" << std::endl;
-        return HistoStore(NULL, NULL, {});
+        return HistoStore(nullptr, nullptr, {});
     }
     TH1D* data_histo = dynamic_cast<TH1D*>(tmp_histo->Clone());
 
@@ -221,7 +221,7 @@ HistoStore CrossCheckPlotter::open_histos(
     mc_config_.tfile->GetObject(MC_HISTO_NAME.c_str(), tmp_histo);
     if (!tmp_histo) {
         std::cout << "Can not open the MC Histogram!" << std::endl;
-        return HistoStore(NULL, NULL, {});
+        return HistoStore(nullptr, nullptr, {});
     }
     TH1D* mc_histo = dynamic_cast<TH1D*>(tmp_histo->Clone());
     if (DO_RESCALE) {
@@ -239,7 +239,7 @@ HistoStore CrossCheckPlotter::open_histos(
                 std::cout << "Can not open the BG Histogram for ";
                 std::cout << i_pair.first;
                 std::cout << "!" << std::endl;
-                return HistoStore(NULL, NULL, {});
+                return HistoStore(nullptr, nullptr, {});
             }
             // Clone incase, for some unknown reason (perhaps testing) we want
             // to use the same histogram twice
@@ -275,7 +275,7 @@ void CrossCheckPlotter::plot(
     TH1D* mc_histo = histo_store.mc_histo;
     std::vector<std::pair<std::string, TH1D*>> bg_histos = histo_store.bg_histos;
     // Check that open_histos exited successfully, otherwise end
-    if (data_histo == NULL || mc_histo == NULL) {
+    if (data_histo == nullptr || mc_histo == nullptr) {
         return;
     }
 
@@ -454,7 +454,7 @@ void CrossCheckPlotter::plot(
     }
 
     // Add title
-    TLatex *plot_title = NULL;
+    TLatex *plot_title = nullptr;
     if (plot_config.title != "") {
         const std::string TITLE = plot_config.title;
         plot_title = new TLatex(0.18, 0.93, TITLE.c_str());
@@ -480,7 +480,7 @@ void CrossCheckPlotter::plot(
     histo_stack->Draw("HIST SAME");
     data_histo->Draw("E SAME");
     legend.Draw();
-    if (plot_title != NULL) {
+    if (plot_title != nullptr) {
         plot_title->Draw();
     }
 

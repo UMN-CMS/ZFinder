@@ -191,13 +191,13 @@ namespace zf {
         // Get the value for the efficiency
         double efficiency = 1.;
         if (I_ELEC == 0) {
-            if (zf_event->e0 != NULL) {
+            if (zf_event->e0 != nullptr) {
                 efficiency = zf_event->e0->CutWeight(CUT);
             } else {  // If the electron doesn't exist we return 0
                 return 0.;
             }
         } else {
-            if (zf_event->e1 != NULL) {
+            if (zf_event->e1 != nullptr) {
                 efficiency = zf_event->e1->CutWeight(CUT);
             } else {
                 return 0.;
@@ -226,13 +226,13 @@ namespace zf {
         // Check the cut on the event
         bool passed = false;
         if (I_ELEC == 0) {
-            if (zf_event->e0 != NULL) {
+            if (zf_event->e0 != nullptr) {
                 passed = zf_event->e0->CutPassed(CUT);
             } else {
                 return false;
             }
         } else {
-            if (zf_event->e1 != NULL) {
+            if (zf_event->e1 != nullptr) {
                 passed = zf_event->e1->CutPassed(CUT);
             } else {
                 return false;
@@ -295,7 +295,7 @@ namespace zf {
         }
 
         // Get the electron we want
-        ZFinderElectron* zf_elec = NULL;
+        ZFinderElectron* zf_elec = nullptr;
         if (I_ELEC == 0) {
             if (cut_type == TRUTH) {
                 zf_elec = zf_event->e0_truth;
@@ -315,7 +315,7 @@ namespace zf {
         }
 
         // Not all the required electrons existed, so fail
-        if (zf_elec == NULL) {
+        if (zf_elec == nullptr) {
             return false;
         }
 
