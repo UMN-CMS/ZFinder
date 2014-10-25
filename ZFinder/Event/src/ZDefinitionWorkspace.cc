@@ -265,10 +265,10 @@ namespace zf {
         }
         // Make sure the tag is valid
         if (e_tag != nullptr) {
-            argset_->setRealValue("e0_pt", e_tag->pt);
-            argset_->setRealValue("e0_eta", e_tag->eta);
-            argset_->setRealValue("e0_phi", e_tag->phi);
-            argset_->setCatIndex("e0_charge", e_tag->charge);
+            argset_->setRealValue("e0_pt", e_tag->pt());
+            argset_->setRealValue("e0_eta", e_tag->eta());
+            argset_->setRealValue("e0_phi", e_tag->phi());
+            argset_->setCatIndex("e0_charge", e_tag->charge());
         }
         // Tag is invalid, fill with obviously wrong data
         else {
@@ -279,10 +279,10 @@ namespace zf {
         }
         // Make sure the probe is valid
         if (e_probe != nullptr) {
-            argset_->setRealValue("e1_pt", e_probe->pt);
-            argset_->setRealValue("e1_eta", e_probe->eta);
-            argset_->setRealValue("e1_phi", e_probe->phi);
-            argset_->setCatIndex("e1_charge", e_probe->charge);
+            argset_->setRealValue("e1_pt", e_probe->pt());
+            argset_->setRealValue("e1_eta", e_probe->eta());
+            argset_->setRealValue("e1_phi", e_probe->phi());
+            argset_->setCatIndex("e1_charge", e_probe->charge());
         }
         // Probe is invalid, fill with obviously wrong data
         else {

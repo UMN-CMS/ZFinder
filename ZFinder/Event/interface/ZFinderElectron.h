@@ -44,23 +44,6 @@ namespace zf {
             ZFinderElectron(reco::Photon input_electron);
             ZFinderElectron(trigger::TriggerObject input_electron);
 
-            // Kinematics variables
-            //NOTE: the basic versions will, for the Truth case, correspond to *DRESSED* electrons
-            double pt;
-            double eta;
-            double phi;
-            //"born" corresponds to PRE-FSR, "status==3" electrons
-            double bornPt;
-            double bornEta;
-            double bornPhi;
-            //"naked" corresponds to POST-FSR, without FSR
-            double nakedPt;
-            double nakedEta;
-            double nakedPhi;
-
-            // Other physical properties
-            int charge;
-
             // Handling cuts
             const CutResult* GetCutResult(const std::string& cut_name) const;
             void AddCutResult(const std::string& cut_name, const bool passed, const double weight=1.);
@@ -74,6 +57,21 @@ namespace zf {
 
             // Return type
             ElectronType get_type() const { return candidate_type_; }
+
+            // Getters
+            double pt() const { return pt_; }
+            double eta() const { return eta_; }
+            double phi() const { return phi_; }
+            double bornPt() const { return bornPt_; }
+            double bornEta() const { return bornEta_; }
+            double bornPhi() const { return bornPhi_; }
+            double nakedPt() const { return nakedPt_; }
+            double nakedEta() const { return nakedEta_; }
+            double nakedPhi() const { return nakedPhi_; }
+            int charge() const { return charge_; }
+
+            //Setters
+            void set_phi(double new_phi) { phi_ = new_phi; }
 
         protected:
             std::map<std::string, CutResult> cutresults_;
@@ -91,6 +89,22 @@ namespace zf {
             reco::Photon photon_elec_;
             trigger::TriggerObject trig_elec_;
 
+            // Kinematics variables
+            //NOTE: the basic versions will, for the Truth case, correspond to *DRESSED* electrons
+            double pt_;
+            double eta_;
+            double phi_;
+            //"born" corresponds to PRE-FSR, "status==3" electrons
+            double bornPt_;
+            double bornEta_;
+            double bornPhi_;
+            //"naked" corresponds to POST-FSR, without FSR
+            double nakedPt_;
+            double nakedEta_;
+            double nakedPhi_;
+
+            // Other physical properties
+            int charge_;
     };
 }  // namespace zfe
 #endif  // ZFINDER_ZFINDERELECTRON_H_

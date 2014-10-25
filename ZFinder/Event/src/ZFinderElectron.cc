@@ -15,10 +15,10 @@ namespace zf {
         gsf_elec_ = input_electron;
         candidate_ = &input_electron;
         /* Extract the useful quantities from a GsfElectron */
-        pt = input_electron.pt();
-        eta = input_electron.eta();
-        phi = input_electron.phi();
-        charge = input_electron.charge();
+        pt_ = input_electron.pt();
+        eta_ = input_electron.eta();
+        phi_ = input_electron.phi();
+        charge_ = input_electron.charge();
     }
 
     ZFinderElectron::ZFinderElectron(reco::GenParticle input_electron) {
@@ -29,16 +29,16 @@ namespace zf {
         // reco::GenParticle is a child of reco::candidate
         candidate_ = dynamic_cast<reco::Candidate*>(&gen_elec_);
         /* Extract the useful quantities from a gen electron */
-        pt = input_electron.pt();
-        phi = input_electron.phi();
-        eta = input_electron.eta();
+        pt_ = input_electron.pt();
+        phi_ = input_electron.phi();
+        eta_ = input_electron.eta();
         // Using the input_electron Data Group ID Number, determine if the input_electron is an
         // electron or positron
         if (input_electron.pdgId() == PDGID::ELECTRON) {
-            charge = -1;
+            charge_ = -1;
         }
         else if (input_electron.pdgId() == PDGID::POSITRON) {
-            charge = 1;
+            charge_ = 1;
         }
     }
 
@@ -54,24 +54,24 @@ namespace zf {
         //here using only the dressed one, becaues it should share
         //all the properties with the other two, except kinematics
         /* Extract the useful quantities from a gen electron */
-        pt = dressed_electron.pt();
-        phi = dressed_electron.phi();
-        eta = dressed_electron.eta();
+        pt_ = dressed_electron.pt();
+        phi_ = dressed_electron.phi();
+        eta_ = dressed_electron.eta();
         //born:
-        bornPt = born_electron.pt();
-        bornPhi = born_electron.phi();
-        bornEta = born_electron.eta();
+        bornPt_ = born_electron.pt();
+        bornPhi_ = born_electron.phi();
+        bornEta_ = born_electron.eta();
         //naked:
-        nakedPt = naked_electron.pt();
-        nakedPhi = naked_electron.phi();
-        nakedEta = naked_electron.eta();
+        nakedPt_ = naked_electron.pt();
+        nakedPhi_ = naked_electron.phi();
+        nakedEta_ = naked_electron.eta();
         // Using the input_electron Data Group ID Number, determine if the input_electron is an
         // electron or positron
         if (dressed_electron.pdgId() == PDGID::ELECTRON) {
-            charge = -1;
+            charge_ = -1;
         }
         else if (dressed_electron.pdgId() == PDGID::POSITRON) {
-            charge = 1;
+            charge_ = 1;
         }
     }
 
@@ -82,10 +82,10 @@ namespace zf {
         recan_elec_ = input_electron;
         candidate_ = &input_electron;
         /* Extract the useful quantities from a GsfElectron */
-        pt = input_electron.pt();
-        eta = input_electron.eta();
-        phi = input_electron.phi();
-        charge = input_electron.charge();
+        pt_ = input_electron.pt();
+        eta_ = input_electron.eta();
+        phi_ = input_electron.phi();
+        charge_ = input_electron.charge();
         // Add cut result to store parent information
     }
 
@@ -96,10 +96,10 @@ namespace zf {
         photon_elec_ = input_electron;
         candidate_ = &input_electron;
         /* Extract the useful quantities from a GsfElectron */
-        pt = input_electron.pt();
-        eta = input_electron.eta();
-        phi = input_electron.phi();
-        charge = 0;  // No charge because no tracker
+        pt_ = input_electron.pt();
+        eta_ = input_electron.eta();
+        phi_ = input_electron.phi();
+        charge_ = 0;  // No charge because no tracker
     }
 
     ZFinderElectron::ZFinderElectron(trigger::TriggerObject input_electron) {
@@ -109,10 +109,10 @@ namespace zf {
         trig_elec_ = input_electron;
         candidate_ = nullptr;
         /* Extract the useful quantities from a GsfElectron */
-        pt = input_electron.pt();
-        eta = input_electron.eta();
-        phi = input_electron.phi();
-        charge = 0;  // No charge
+        pt_ = input_electron.pt();
+        eta_ = input_electron.eta();
+        phi_ = input_electron.phi();
+        charge_ = 0;  // No charge
     }
 
     const CutResult* ZFinderElectron::GetCutResult(const std::string& cut_name) const {

@@ -212,7 +212,7 @@ namespace zf {
             static double ReturnPhistar(const double& eta0, const double& phi0, const double& eta1, const double& phi1);
 
             // Sorting functions
-            static bool SortByPTHighLow(const ZFinderElectron* e0, const ZFinderElectron* e1) { return (e0->pt > e1->pt); }
+            static bool SortByPTHighLow(const ZFinderElectron* e0, const ZFinderElectron* e1) { return (e0->pt() > e1->pt()); }
 
             // Print cuts
             void PrintCuts(ZFinderElectron* zf_elec);

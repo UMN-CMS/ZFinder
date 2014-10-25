@@ -327,13 +327,13 @@ namespace zf {
             zf_electron->AddCutResult("eg_trigwp70", TRIGWP70, WEIGHT);
 
             // Check for trigger matching
-            const bool EE_TIGHT = TriggerMatch(iEvent, ET_ET_TIGHT, zf_electron->eta, zf_electron->phi, TRIG_DR_);
-            const bool EE_LOOSE = TriggerMatch(iEvent, ET_ET_LOOSE, zf_electron->eta, zf_electron->phi, TRIG_DR_);
-            const bool EE_DZ = TriggerMatch(iEvent, ET_ET_DZ, zf_electron->eta, zf_electron->phi, TRIG_DR_);
-            const bool EENT_TIGHT = TriggerMatch(iEvent, ET_NT_ET_TIGHT, zf_electron->eta, zf_electron->phi, TRIG_DR_);
+            const bool EE_TIGHT = TriggerMatch(iEvent, ET_ET_TIGHT, zf_electron->eta(), zf_electron->phi(), TRIG_DR_);
+            const bool EE_LOOSE = TriggerMatch(iEvent, ET_ET_LOOSE, zf_electron->eta(), zf_electron->phi(), TRIG_DR_);
+            const bool EE_DZ = TriggerMatch(iEvent, ET_ET_DZ, zf_electron->eta(), zf_electron->phi(), TRIG_DR_);
+            const bool EENT_TIGHT = TriggerMatch(iEvent, ET_NT_ET_TIGHT, zf_electron->eta(), zf_electron->phi(), TRIG_DR_);
             const bool EEHF_TIGHT = EENT_TIGHT;
-            const bool EEHF_LOOSE = TriggerMatch(iEvent, ET_HF_ET_LOOSE, zf_electron->eta, zf_electron->phi, TRIG_DR_);
-            const bool SINGLE_E = TriggerMatch(iEvent, SINGLE_ELECTRON_TRIGGER, zf_electron->eta, zf_electron->phi, TRIG_DR_);
+            const bool EEHF_LOOSE = TriggerMatch(iEvent, ET_HF_ET_LOOSE, zf_electron->eta(), zf_electron->phi(), TRIG_DR_);
+            const bool SINGLE_E = TriggerMatch(iEvent, SINGLE_ELECTRON_TRIGGER, zf_electron->eta(), zf_electron->phi(), TRIG_DR_);
 
             zf_electron->AddCutResult("trig(et_et_tight)", EE_TIGHT, WEIGHT);
             zf_electron->AddCutResult("trig(et_et_loose)", EE_LOOSE, WEIGHT);
@@ -396,10 +396,10 @@ namespace zf {
             zf_electron->AddCutResult("hf_2dloose", HFLOOSE, WEIGHT);
 
             // Check for trigger matching
-            const bool HIGHLOW_03 = TriggerMatch(iEvent, ET_HF_HF_LOOSE, zf_electron->eta, zf_electron->phi, TRIG_DR_);
+            const bool HIGHLOW_03 = TriggerMatch(iEvent, ET_HF_HF_LOOSE, zf_electron->eta(), zf_electron->phi(), TRIG_DR_);
             zf_electron->AddCutResult("trig(hf_loose)", HIGHLOW_03, WEIGHT);
 
-            const bool LOWHIGH_03 = TriggerMatch(iEvent, ET_HF_HF_TIGHT, zf_electron->eta, zf_electron->phi, TRIG_DR_);
+            const bool LOWHIGH_03 = TriggerMatch(iEvent, ET_HF_HF_TIGHT, zf_electron->eta(), zf_electron->phi(), TRIG_DR_);
             zf_electron->AddCutResult("trig(hf_tight)", LOWHIGH_03, WEIGHT);
         }
     }
@@ -426,7 +426,7 @@ namespace zf {
                 // Now check for nearby GSF electrons
                 for(auto& i_elec : reco_electrons_) {
                     if(i_elec->CutPassed("type_gsf") == 1) {
-                        const double DR = deltaR(i_elec->eta, i_elec->phi, electron.eta(), electron.phi());
+                        const double DR = deltaR(i_elec->eta(), i_elec->phi(), electron.eta(), electron.phi());
                         if(DR <= NT_DR_) {
                             is_unmatched = false;
                             break;
@@ -470,15 +470,15 @@ namespace zf {
         if (e0 != nullptr && e1 != nullptr) {
             // Sometimes we want to preselect our electrons using the muon acceptance
             if (use_muon_acceptance_) {
-                const double FETA0 = fabs(e0->eta);
-                const double FETA1 = fabs(e1->eta);
+                const double FETA0 = fabs(e0->eta());
+                const double FETA1 = fabs(e1->eta());
                 // Both electrons have already passed the looser pt>20 and
                 // |eta|<2.4 selection, so we just need one that passes the
                 // tighter pt>30 and |eta|<2.1 selection
                 if (
                     !(
-                        (FETA0 < 2.1 && e0->pt > 30)
-                        || (FETA1 < 2.1 && e1->pt > 30)
+                        (FETA0 < 2.1 && e0->pt() > 30)
+                        || (FETA1 < 2.1 && e1->pt() > 30)
                     )
                 ) {
                     return;
@@ -487,17 +487,17 @@ namespace zf {
 
             // Set Z properties
             const double ELECTRON_MASS = 5.109989e-4;
-            math::PtEtaPhiMLorentzVector e0lv(e0->pt, e0->eta, e0->phi, ELECTRON_MASS);
-            math::PtEtaPhiMLorentzVector e1lv(e1->pt, e1->eta, e1->phi, ELECTRON_MASS);
+            math::PtEtaPhiMLorentzVector e0lv(e0->pt(), e0->eta(), e0->phi(), ELECTRON_MASS);
+            math::PtEtaPhiMLorentzVector e1lv(e1->pt(), e1->eta(), e1->phi(), ELECTRON_MASS);
             math::PtEtaPhiMLorentzVector zlv;
             zlv = e0lv + e1lv;
 
             reco_z.m = zlv.mass();
             reco_z.y = zlv.Rapidity();
             reco_z.pt = zlv.pt();
-            reco_z.phistar = ReturnPhistar(e0->eta, e0->phi, e1->eta, e1->phi);
+            reco_z.phistar = ReturnPhistar(e0->eta(), e0->phi(), e1->eta(), e1->phi());
             reco_z.eta = zlv.eta();
-            reco_z.deltaR = deltaR(e0->eta, e0->phi, e1->eta, e1->phi);
+            reco_z.deltaR = deltaR(e0->eta(), e0->phi(), e1->eta(), e1->phi());
         }
     }
 
@@ -673,19 +673,19 @@ namespace zf {
             const double ZEPP = z_boson->energy() + z_boson->pz();
             const double ZEMP = z_boson->energy() - z_boson->pz();
             truth_z.y = 0.5 * log(ZEPP / ZEMP);
-            truth_z.phistar = ReturnPhistar(e0_truth->eta, e0_truth->phi, e1_truth->eta, e1_truth->phi);
-            truth_z.bornPhistar = ReturnPhistar(e0_truth->bornEta, e0_truth->bornPhi, e1_truth->bornEta, e1_truth->bornPhi);
-            truth_z.nakedPhistar = ReturnPhistar(e0_truth->nakedEta, e0_truth->nakedPhi, e1_truth->nakedEta, e1_truth->nakedPhi);
+            truth_z.phistar = ReturnPhistar(e0_truth->eta(), e0_truth->phi(), e1_truth->eta(), e1_truth->phi());
+            truth_z.bornPhistar = ReturnPhistar(e0_truth->bornEta(), e0_truth->bornPhi(), e1_truth->bornEta(), e1_truth->bornPhi());
+            truth_z.nakedPhistar = ReturnPhistar(e0_truth->nakedEta(), e0_truth->nakedPhi(), e1_truth->nakedEta(), e1_truth->nakedPhi());
             truth_z.eta = z_boson->eta();
-            truth_z.deltaR = deltaR(e0_truth->eta, e0_truth->phi, e1_truth->eta, e1_truth->phi);
+            truth_z.deltaR = deltaR(e0_truth->eta(), e0_truth->phi(), e1_truth->eta(), e1_truth->phi());
         }
     }
 
     void ZFinderEvent::InitTrigger(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         // Get the trigger objects that are closest in dR to our reco electrons
         if (e0 != nullptr && e1 != nullptr) {
-            const trigger::TriggerObject* trig_obj_0 = GetBestMatchedTriggerObject(iEvent, ALL_TRIGGERS, e0->eta, e0->phi);
-            const trigger::TriggerObject* trig_obj_1 = GetBestMatchedTriggerObject(iEvent, ALL_TRIGGERS, e1->eta, e1->phi);
+            const trigger::TriggerObject* trig_obj_0 = GetBestMatchedTriggerObject(iEvent, ALL_TRIGGERS, e0->eta(), e0->phi());
+            const trigger::TriggerObject* trig_obj_1 = GetBestMatchedTriggerObject(iEvent, ALL_TRIGGERS, e1->eta(), e1->phi());
 
             // If the electrons are good, set them as our trigger electrons
             if (trig_obj_0 != nullptr) {
@@ -872,21 +872,21 @@ namespace zf {
         if (TYPE == RECO) {
             cout << " Reco Z Mass " << reco_z.m << std::endl;
             for (auto& i_elec : reco_electrons_) {
-                cout << "\tpt: " << i_elec->pt;
-                cout << " eta: " << i_elec->eta;
-                cout << " phi: " << i_elec->phi << endl;
+                cout << "\tpt: " << i_elec->pt();
+                cout << " eta: " << i_elec->eta();
+                cout << " phi: " << i_elec->phi() << endl;
                 if (PRINT_CUTS) { PrintCuts(i_elec); }
             }
         } else if (TYPE == TRUTH && !is_real_data) {
             if (e0_truth != nullptr && e1_truth != nullptr) {
                 cout << " Truth Z Mass " << truth_z.m << endl;
-                cout << "\tpt: " << e0_truth->pt;
-                cout << " eta: " << e0_truth->eta;
-                cout << " phi: " << e0_truth->phi << endl;
+                cout << "\tpt: " << e0_truth->pt();
+                cout << " eta: " << e0_truth->eta();
+                cout << " phi: " << e0_truth->phi() << endl;
                 if (PRINT_CUTS) { PrintCuts(e0_truth); }
-                cout << "\tpt: " << e1_truth->pt;
-                cout << " eta: " << e1_truth->eta;
-                cout << " phi: " << e1_truth->phi << endl;
+                cout << "\tpt: " << e1_truth->pt();
+                cout << " eta: " << e1_truth->eta();
+                cout << " phi: " << e1_truth->phi() << endl;
                 if (PRINT_CUTS) { PrintCuts(e1_truth); }
             }
         } else if (TYPE == TRIG) {
@@ -894,15 +894,15 @@ namespace zf {
                 cout << " Trigger Electrons:" << std::endl;
             }
             if (e0_trig != nullptr) {
-                cout << "\tpt: " << e0_trig->pt;
-                cout << " eta: " << e0_trig->eta;
-                cout << " phi: " << e0_trig->phi << endl;
+                cout << "\tpt: " << e0_trig->pt();
+                cout << " eta: " << e0_trig->eta();
+                cout << " phi: " << e0_trig->phi() << endl;
                 if (PRINT_CUTS) { PrintCuts(e0_trig); }
             }
             if (e1_trig != nullptr) {
-                cout << "\tpt: " << e1_trig->pt;
-                cout << " eta: " << e1_trig->eta;
-                cout << " phi: " << e1_trig->phi << endl;
+                cout << "\tpt: " << e1_trig->pt();
+                cout << " eta: " << e1_trig->eta();
+                cout << " phi: " << e1_trig->phi() << endl;
                 if (PRINT_CUTS) { PrintCuts(e1_trig); }
             }
         }
@@ -1099,14 +1099,14 @@ namespace zf {
                 const double B_FIELD = 3.8;  // Tesla
                 const double DIST_TO_EE = 3.18;  // Distance to EE in meters
 
-                const int Q_NT = -1 * spectator_electron->charge;//inferred NT electron charge
+                const int Q_NT = -1 * spectator_electron->charge();//inferred NT electron charge
                 const double NUMERIC_FACTOR = DIST_TO_EE * B_FIELD * 3 / 20;
                 // 1/(10/3) is from GeV/c, and 1/2 is geometric
-                const double ETA_NT = fabs(electron_to_correct->eta);//sign of eta is unimportant
-                const double PT_NT = electron_to_correct->pt;
+                const double ETA_NT = fabs(electron_to_correct->eta());//sign of eta is unimportant
+                const double PT_NT = electron_to_correct->pt();
                 const double ADDITIVE_CORRECTION =  Q_NT * NUMERIC_FACTOR / sinh( ETA_NT ) / PT_NT;
 
-                electron_to_correct->phi += ADDITIVE_CORRECTION;
+                electron_to_correct->set_phi(electron_to_correct->phi() + ADDITIVE_CORRECTION);
                 electron_to_correct->AddCutResult("nt_corrected", true, WEIGHT);
                 return;
             }

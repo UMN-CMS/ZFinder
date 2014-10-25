@@ -16,8 +16,8 @@ namespace zf {
          */
         std::vector<ZFinderElectron*> const * const ZF_ELECTRONS = zf_event->FilteredElectrons();
         for (auto& i_elec : *ZF_ELECTRONS) {
-            const double PT = i_elec->pt;
-            const double ETA = i_elec->eta;
+            const double PT = i_elec->pt();
+            const double ETA = i_elec->eta();
             std::vector<const CutResult*> const * const ALL_CUTS = i_elec->GetAllCuts();
             for (auto& i_cut : *ALL_CUTS) {
                 const std::string CUT_NAME = i_cut->name;

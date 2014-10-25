@@ -46,11 +46,11 @@ namespace zf {
         double dr1 = 9999.;
         if (zf_event_->e0_truth != nullptr) {
             ZFinderElectron* e0_truth = zf_event_->e0_truth;
-            dr0 = deltaR(ZF_ELEC.eta, ZF_ELEC.phi, e0_truth->eta, e0_truth->phi);
+            dr0 = deltaR(ZF_ELEC.eta(), ZF_ELEC.phi(), e0_truth->eta(), e0_truth->phi());
         }
         if (zf_event_->e1_truth != nullptr) {
             ZFinderElectron* e1_truth = zf_event_->e1_truth;
-            dr1 = deltaR(ZF_ELEC.eta, ZF_ELEC.phi, e1_truth->eta, e1_truth->phi);
+            dr1 = deltaR(ZF_ELEC.eta(), ZF_ELEC.phi(), e1_truth->eta(), e1_truth->phi());
         }
 
         if (dr0 < DELTA_R || dr1 < DELTA_R) {

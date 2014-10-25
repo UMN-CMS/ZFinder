@@ -23,8 +23,8 @@ namespace zf {
 
     void AcceptanceSetter::SetCut_(ZFinderElectron* zf_elec) {
         const double WEIGHT = 1.;
-        const double ETA = zf_elec->eta;
-        const double FETA = fabs(zf_elec->eta);
+        const double ETA = zf_elec->eta();
+        const double FETA = fabs(zf_elec->eta());
         // All the bools
         bool detector = false;
         bool eb = false;

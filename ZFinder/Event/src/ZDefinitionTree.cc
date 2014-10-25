@@ -85,16 +85,16 @@ namespace zf {
         reco_.z_eta = zf_event.reco_z.eta;
         reco_.n_verts = zf_event.reco_vert.num;
         if (zf_event.e0 != nullptr) {
-            reco_.e_pt[0] = zf_event.e0->pt;
-            reco_.e_eta[0] = zf_event.e0->eta;
-            reco_.e_phi[0] = zf_event.e0->phi;
-            reco_.e_charge[0] = zf_event.e0->charge;
+            reco_.e_pt[0] = zf_event.e0->pt();
+            reco_.e_eta[0] = zf_event.e0->eta();
+            reco_.e_phi[0] = zf_event.e0->phi();
+            reco_.e_charge[0] = zf_event.e0->charge();
         }
         if (zf_event.e1 != nullptr) {
-            reco_.e_pt[1] = zf_event.e1->pt;
-            reco_.e_eta[1] = zf_event.e1->eta;
-            reco_.e_phi[1] = zf_event.e1->phi;
-            reco_.e_charge[1] = zf_event.e1->charge;
+            reco_.e_pt[1] = zf_event.e1->pt();
+            reco_.e_eta[1] = zf_event.e1->eta();
+            reco_.e_phi[1] = zf_event.e1->phi();
+            reco_.e_charge[1] = zf_event.e1->charge();
         }
         // Truth
         if (IS_MC_ && !zf_event.is_real_data) {
@@ -107,16 +107,16 @@ namespace zf {
             truth_.z_eta = zf_event.truth_z.eta;
             truth_.n_verts = zf_event.truth_vert.num;
             if (zf_event.e0_truth != nullptr) {
-                truth_.e_pt[0] = zf_event.e0_truth->pt;
-                truth_.e_eta[0] = zf_event.e0_truth->eta;
-                truth_.e_phi[0] = zf_event.e0_truth->phi;
-                truth_.e_charge[0] = zf_event.e0_truth->charge;
+                truth_.e_pt[0] = zf_event.e0_truth->pt();
+                truth_.e_eta[0] = zf_event.e0_truth->eta();
+                truth_.e_phi[0] = zf_event.e0_truth->phi();
+                truth_.e_charge[0] = zf_event.e0_truth->charge();
             }
             if (zf_event.e1_truth != nullptr) {
-                truth_.e_pt[1] = zf_event.e1_truth->pt;
-                truth_.e_eta[1] = zf_event.e1_truth->eta;
-                truth_.e_phi[1] = zf_event.e1_truth->phi;
-                truth_.e_charge[1] = zf_event.e1_truth->charge;
+                truth_.e_pt[1] = zf_event.e1_truth->pt();
+                truth_.e_eta[1] = zf_event.e1_truth->eta();
+                truth_.e_phi[1] = zf_event.e1_truth->phi();
+                truth_.e_charge[1] = zf_event.e1_truth->charge();
             }
         }
         // General Event info

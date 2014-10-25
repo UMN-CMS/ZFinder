@@ -325,27 +325,27 @@ namespace zf {
             case CV_PT:
             case CV_GPT:
             case CV_TPT:
-                e_val = zf_elec->pt;
+                e_val = zf_elec->pt();
                 break;
             case CV_ETA:
             case CV_GETA:
             case CV_TETA:
-                e_val = zf_elec->eta;
+                e_val = zf_elec->eta();
                 break;
             case CV_PHI:
             case CV_GPHI:
             case CV_TPHI:
-                e_val = zf_elec->phi;
+                e_val = zf_elec->phi();
                 break;
             case CV_CHARGE:
             case CV_GCHARGE:
             case CV_TCHARGE:
-                e_val = zf_elec->charge;
+                e_val = zf_elec->charge();
                 break;
             case CV_AETA:
             case CV_GAETA:
             case CV_TAETA:
-                e_val = fabs(zf_elec->eta);
+                e_val = fabs(zf_elec->eta());
                 break;
                 // Cases where it makes no sense to continue
             case CV_NONE:
