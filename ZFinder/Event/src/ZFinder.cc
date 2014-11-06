@@ -59,7 +59,6 @@ Implementation:
 #include "ZFinder/Event/interface/TruthMatchSetter.h"  // TruthMatchSetter
 #include "ZFinder/Event/interface/ZDefinition.h"  // ZDefinition
 #include "ZFinder/Event/interface/ZDefinitionTree.h"  // ZDefinitionTree
-#include "ZFinder/Event/interface/ZDefinitionWorkspace.h"  // ZDefinitionWorkspace
 #include "ZFinder/Event/interface/ZDefinitionWriter.h"  // ZDefinitionWriter
 #include "ZFinder/Event/interface/ZEfficiencies.h" // ZEfficiencies
 #include "ZFinder/Event/interface/ZFinderEvent.h"  // ZFinderEvent
@@ -92,7 +91,6 @@ class ZFinder : public edm::EDAnalyzer {
         std::vector<edm::ParameterSet> zdef_psets_;
         std::vector<zf::ZDefinition*> zdefs_;
         std::vector<zf::ZDefinitionWriter*> zdef_plotters_;
-        std::vector<zf::ZDefinitionWorkspace*> zdef_workspaces_;
         std::vector<zf::ZDefinitionTree*> zdef_tuples_;
         zf::ZEfficiencies zeffs_;
         bool is_mc_;
@@ -165,8 +163,6 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
         bool use_truth = false;
         zf::ZDefinitionWriter* zdwriter_reco = new zf::ZDefinitionWriter(*zd_reco, tdir_zd, use_truth);
         zdef_plotters_.push_back(zdwriter_reco);
-        zf::ZDefinitionWorkspace* zdw_reco = new zf::ZDefinitionWorkspace(*zd_reco, tdir_zd, use_truth, true);
-        zdef_workspaces_.push_back(zdw_reco);
 
         if (is_mc_) {
             std::string name_truth = i_pset.getUntrackedParameter<std::string>("name") + " MC";
@@ -177,8 +173,6 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
             use_truth = true;
             zf::ZDefinitionWriter* zdwriter_truth = new zf::ZDefinitionWriter(*zd_truth, tdir_zd_truth, use_truth);
             zdef_plotters_.push_back(zdwriter_truth);
-            zf::ZDefinitionWorkspace* zdw_truth = new zf::ZDefinitionWorkspace(*zd_truth, tdir_zd_truth, use_truth, true);
-            zdef_workspaces_.push_back(zdw_truth);
         }
 
         // Now make the Trees for the tuples
@@ -205,9 +199,6 @@ ZFinder::~ZFinder() {
     }
     for (auto& i_zdefp : zdef_plotters_) {
         delete i_zdefp;
-    }
-    for (auto& i_zdefw : zdef_workspaces_) {
-        delete i_zdefw;
     }
     for (auto& i_zdeft : zdef_tuples_) {
         delete i_zdeft;
@@ -253,10 +244,6 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         for (auto& i_zdefp : zdef_plotters_) {
             i_zdefp->Fill(zfe);
         }
-        // Make all ZDef workspaces for reco (data and reco MC)
-        for (auto& i_zdefw : zdef_workspaces_) {
-            i_zdefw->Fill(zfe);
-        }
         // Make all ZDef Trees
         if (tuple_output_file_ != nullptr) {
             for (auto& i_zdeft : zdef_tuples_) {
@@ -272,11 +259,6 @@ void ZFinder::beginJob() {
 
 // ------------ method called once each job just after ending the event loop  ------------
 void ZFinder::endJob() {
-    // Write all ZDef workspaces
-    for (auto& i_zdefw : zdef_workspaces_) {
-        i_zdefw->Write();
-    }
-
     // Write the tuple file
     if (tuple_output_file_ != nullptr) {
         // Write the initial file
