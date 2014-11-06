@@ -82,18 +82,18 @@ namespace zf {
             }
             weight_cteq_size_ = zf_event.weights_cteq.size();
             for (int i = 0; i < std::min(weight_cteq_size_, MAX_SIZE_PDF_); ++i) {
-	      weights_cteq_[i] = zf_event.weights_cteq[i];   
-	    }
+              weights_cteq_[i] = zf_event.weights_cteq[i];
+            }
             weight_mstw_size_ = zf_event.weights_mstw.size();
             for (int i = 0; i < std::min(weight_mstw_size_, MAX_SIZE_PDF_); ++i) {
-	      weights_mstw_[i] = zf_event.weights_mstw[i];   
-	    }
+              weights_mstw_[i] = zf_event.weights_mstw[i];
+            }
             weight_nnpdf_size_ = zf_event.weights_nnpdf.size();
             for (int i = 0; i < std::min(weight_nnpdf_size_, MAX_SIZE_PDF_); ++i) {
-	      weights_nnpdf_[i] = zf_event.weights_nnpdf[i];   
-	    }
+              weights_nnpdf_[i] = zf_event.weights_nnpdf[i];
+            }
 
-	    weight_fsr_=zf_event.weight_fsr;
+            weight_fsr_=zf_event.weight_fsr;
          }
 
         // Reco

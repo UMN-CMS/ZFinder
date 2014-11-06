@@ -92,7 +92,7 @@ namespace zf {
             // Set up a variable size branch for the weights
             int weight_size_;
             double weight_fsr_;
-	    int weight_cteq_size_;
+            int weight_cteq_size_;
             int weight_mstw_size_;
             int weight_nnpdf_size_;
             static constexpr int MAX_SIZE_ = 100;

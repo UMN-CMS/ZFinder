@@ -87,9 +87,9 @@ namespace zf {
             // efficiency calculated in ZDefinition.
             double event_weight;
             double weight_fsr;
- 	    std::vector<double> weights_cteq; 
-	    std::vector<double> weights_mstw; 
-	    std::vector<double> weights_nnpdf; 
+            std::vector<double> weights_cteq;
+            std::vector<double> weights_mstw;
+            std::vector<double> weights_nnpdf;
 
             // These are the special, selected electrons used to make the Z
             ZFinderElectron* e0;
