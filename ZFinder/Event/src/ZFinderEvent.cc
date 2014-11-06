@@ -181,6 +181,26 @@ namespace zf {
         edm::Handle<GenEventInfoProduct> gen_event_info;
         iEvent.getByLabel("generator", gen_event_info);
         event_weight *= gen_event_info->weight();
+
+	edm::InputTag pdfWeightTag_cteq("pdfWeights:CT10"); // or any other PDF set
+	edm::Handle<std::vector<double> > weightHandle_cteq;
+	iEvent.getByLabel(pdfWeightTag_cteq, weightHandle_cteq);
+	weights_cteq = (*weightHandle_cteq);
+
+	edm::InputTag pdfWeightTag_mstw("pdfWeights:MSTW2008nlo68cl"); // or any other PDF set
+	edm::Handle<std::vector<double> > weightHandle_mstw;
+	iEvent.getByLabel(pdfWeightTag_mstw, weightHandle_mstw);
+	weights_mstw = (*weightHandle_mstw);
+
+	edm::InputTag pdfWeightTag_nnpdf("pdfWeights:NNPDF21"); // or any other PDF set
+	edm::Handle<std::vector<double> > weightHandle_nnpdf;
+	iEvent.getByLabel(pdfWeightTag_nnpdf, weightHandle_nnpdf);
+	weights_nnpdf = (*weightHandle_nnpdf);
+
+	edm::Handle<double > weightHandle_fsr;
+	iEvent.getByLabel("fsrWeight", weightHandle_fsr);
+	weight_fsr = (*weightHandle_fsr);
+
     }
 
     void ZFinderEvent::InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup) {

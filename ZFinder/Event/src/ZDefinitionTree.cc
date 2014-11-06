@@ -31,6 +31,13 @@ namespace zf {
             tree_->Branch("weight_size", &weight_size_, "weight_size/I");
             tree_->Branch("weights", weights_, "weights[weight_size]/D");
             tree_->Branch("weight_ids", weight_ids_, "weight_ids[weight_size]/I");
+            tree_->Branch("weight_cteq_size", &weight_cteq_size_, "weight_cteq_size/I");
+            tree_->Branch("weights_cteq", weights_cteq_, "weights_cteq[weight_cteq_size]/D");
+            tree_->Branch("weight_mstw_size", &weight_mstw_size_, "weight_mstw_size/I");
+            tree_->Branch("weights_mstw", weights_mstw_, "weights_mstw[weight_mstw_size]/D");
+            tree_->Branch("weight_nnpdf_size", &weight_nnpdf_size_, "weight_nnpdf_size/I");
+            tree_->Branch("weights_nnpdf", weights_nnpdf_, "weights_nnpdf[weight_nnpdf_size]/D");
+            tree_->Branch("weight_fsr", &weight_fsr_, "weight_fsr/D");
         }
     }
 
@@ -73,7 +80,21 @@ namespace zf {
                 weights_[i] = WEIGHT;
                 weight_ids_[i] = WEIGHT_ID;
             }
-        }
+            weight_cteq_size_ = zf_event.weights_cteq.size();
+            for (int i = 0; i < std::min(weight_cteq_size_, MAX_SIZE_PDF_); ++i) {
+	      weights_cteq_[i] = zf_event.weights_cteq[i];   
+	    }
+            weight_mstw_size_ = zf_event.weights_mstw.size();
+            for (int i = 0; i < std::min(weight_mstw_size_, MAX_SIZE_PDF_); ++i) {
+	      weights_mstw_[i] = zf_event.weights_mstw[i];   
+	    }
+            weight_nnpdf_size_ = zf_event.weights_nnpdf.size();
+            for (int i = 0; i < std::min(weight_nnpdf_size_, MAX_SIZE_PDF_); ++i) {
+	      weights_nnpdf_[i] = zf_event.weights_nnpdf[i];   
+	    }
+
+	    weight_fsr_=zf_event.weight_fsr;
+         }
 
         // Reco
         reco_.z_m = zf_event.reco_z.m;

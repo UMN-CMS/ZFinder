@@ -91,12 +91,20 @@ namespace zf {
 
             // Set up a variable size branch for the weights
             int weight_size_;
+            double weight_fsr_;
+	    int weight_cteq_size_;
+            int weight_mstw_size_;
+            int weight_nnpdf_size_;
             static constexpr int MAX_SIZE_ = 100;
+            static constexpr int MAX_SIZE_PDF_ = 110;
             // Although vectors seem like the right solution, since TTrees need
             // the memory used for the array to be static, an array is
             // (unfortunately) the best choice
             double weights_[MAX_SIZE_];
             int weight_ids_[MAX_SIZE_];
+            double weights_cteq_[MAX_SIZE_PDF_];
+            double weights_mstw_[MAX_SIZE_PDF_];
+            double weights_nnpdf_[MAX_SIZE_PDF_];
 
             // We insert the weights and the IDs into this vector, and then
             // read it out into the array before filling the tree

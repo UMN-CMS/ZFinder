@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-process = cms.Process("ZFinderMC")
+process = cms.Process("ZFinderMCs")
 
 # Set up message output and logging
 from FWCore.MessageService.MessageLogger_cfi import MessageLogger
@@ -9,7 +9,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100  # Report status ever 100
 
 # Number of events from each file to process. It should be -1 (all) when
 # running for an analysis
-N_EVENTS_TO_PROCESS = -1
+N_EVENTS_TO_PROCESS = 100
 if N_EVENTS_TO_PROCESS != -1:
     print "NOT RUNNING ON ALL EVENTS IN THE FILE!"
 process.maxEvents = cms.untracked.PSet(
@@ -26,6 +26,8 @@ process.TFileService = cms.Service("TFileService",
         fileName = cms.string("test_combined_mc.root")
         )
 
+# Produce PDF weights (maximum is 3)
+
 # Import rho value for isolation correction
 from ZFinder.Event.kt6_pfjets_cfi import kt6PFJetsForIsolation
 process.kt6PFJetsForIsolation = kt6PFJetsForIsolation.clone()
@@ -35,6 +37,25 @@ from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso
 process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
 process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIsoSequence)
 
+process.pdfWeights = cms.EDProducer("PdfWeightProducer",
+                                    # Fix POWHEG if buggy (this PDF set will also appear on output,
+                                    # so only two more PDF sets can be added in PdfSetNames if not "")
+                                    #FixPOWHEG = cms.untracked.string("cteq66.LHgrid"),
+                                    GenTag = cms.untracked.InputTag("genParticles"),
+                                    PdfInfoTag = cms.untracked.InputTag("generator"),
+                                    PdfSetNames = cms.untracked.vstring(
+                                                                        "NNPDF21_100.LHgrid"
+                                                                        ,"MSTW2008nlo68cl.LHgrid"
+                                                                        ,"CT10.LHgrid"
+                                                                        #"Cteq66.LHgrid"
+                                                                        #, "MRST2006nnlo.LHgrid"
+                                                                        #, "NNPDF10_100.LHgrid"
+                                                                        )
+                                    )
+
+process.fsrWeight = cms.EDProducer("FSRWeightProducer",
+      GenTag = cms.untracked.InputTag("genParticles"),
+)
 # Get the python string from the file name, and use it set up the name of the
 # tuple output file. Note that pythonValue() returns the string with literal '
 # on either end, so we need to strip those.
@@ -54,7 +75,9 @@ process.ZFinder = ZFinder.clone(
 
 # RUN
 process.p = cms.Path(
-        process.kt6PFJetsForIsolation
+        process.pdfWeights
+        * process.fsrWeight
+        * process.kt6PFJetsForIsolation
         * process.pfiso
         * process.ZFinder
         )
