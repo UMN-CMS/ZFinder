@@ -10,13 +10,12 @@
 
 namespace zf {
     // Constructor
-    ZDefinitionTree::ZDefinitionTree(const ZDefinition& zdef, TFile* tfile, const bool IS_MC) : IS_MC_(IS_MC) {
+    ZDefinitionTree::ZDefinitionTree(const ZDefinition& zdef, TFileDirectory& tdir, const bool IS_MC) : IS_MC_(IS_MC) {
         // Get the name of the cut we want
         zdef_name_ = zdef.NAME;
 
         // Make the directory to save files to
-        tdir_ = tfile->mkdir(zdef_name_.c_str());
-        tdir_->cd();
+        tdir.cd();
 
         // Make the Tree to write to
         tree_ = new TTree(zdef.NAME.c_str(), zdef.NAME.c_str());

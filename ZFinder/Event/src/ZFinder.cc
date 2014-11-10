@@ -50,7 +50,6 @@ Implementation:
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"  // GenParticle
 
 // Root
-#include <TFile.h>
 #include <TH1I.h>
 
 // ZFinder
@@ -95,7 +94,6 @@ class ZFinder : public edm::EDAnalyzer {
         zf::ZEfficiencies zeffs_;
         bool is_mc_;
         TH1I* unweighted_counter_;
-        TFile* tuple_output_file_;
 
 };
 
@@ -115,15 +113,6 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
 
     // is_mc_ is used to determine if we should make truth objects
     is_mc_ = iConfig.getParameter<bool>("is_mc");
-
-    // Get the file name for the tuples
-    const std::string TUPLE_OUTPUT_FILE_NAME_ = iConfig.getUntrackedParameter<std::string>("tuple_output_file");
-    if (TUPLE_OUTPUT_FILE_NAME_ != "NONE") {
-        tuple_output_file_ = new TFile(TUPLE_OUTPUT_FILE_NAME_.c_str(), "RECREATE");
-    }
-    else {
-        tuple_output_file_ = nullptr;
-    }
 
     // Setup Cut Setters
     zf::AcceptanceSetter* accset = new zf::AcceptanceSetter();
@@ -175,14 +164,11 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
             zdef_plotters_.push_back(zdwriter_truth);
         }
 
-        // Now make the Trees for the tuples
-        if (tuple_output_file_ != nullptr) {
-            // We use zd_reco, but that's only because both the "reco" and
-            // "truth" quantities are stored in the same Tree, so there is no
-            // need to make a second tree like there is with the plots.
-            zf::ZDefinitionTree* zdtree = new zf::ZDefinitionTree(*zd_reco, tuple_output_file_, is_mc_);
-            zdef_tuples_.push_back(zdtree);
-        }
+        // We use zd_reco, but that's only because both the "reco" and
+        // "truth" quantities are stored in the same Tree, so there is no
+        // need to make a second tree like there is with the plots.
+        zf::ZDefinitionTree* zdtree = new zf::ZDefinitionTree(*zd_reco, tdir_zd, is_mc_);
+        zdef_tuples_.push_back(zdtree);
     }
 }
 
@@ -202,10 +188,6 @@ ZFinder::~ZFinder() {
     }
     for (auto& i_zdeft : zdef_tuples_) {
         delete i_zdeft;
-    }
-    if (tuple_output_file_) {
-        tuple_output_file_->Close();
-        delete tuple_output_file_;
     }
 }
 
@@ -245,10 +227,8 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
             i_zdefp->Fill(zfe);
         }
         // Make all ZDef Trees
-        if (tuple_output_file_ != nullptr) {
-            for (auto& i_zdeft : zdef_tuples_) {
-                i_zdeft->Fill(zfe);
-            }
+        for (auto& i_zdeft : zdef_tuples_) {
+            i_zdeft->Fill(zfe);
         }
     }
 }
@@ -259,26 +239,19 @@ void ZFinder::beginJob() {
 
 // ------------ method called once each job just after ending the event loop  ------------
 void ZFinder::endJob() {
-    // Write the tuple file
-    if (tuple_output_file_ != nullptr) {
-        // Write the initial file
-        tuple_output_file_->Write();
+    // Since large trees will automatically make new files, we need to get
+    // the current file from each tree and write it, but only if it is new
+    // and hasn't be previously written
+    TFile* file = nullptr;
+    std::vector<TFile*> seen;
 
-        // Since large trees will automatically make new files, we need to get
-        // the current file from each tree and write it, but only if it is new
-        // and hasn't be previously written
-        TFile* file = nullptr;
-        std::vector<TFile*> seen;
-        seen.push_back(tuple_output_file_);
-
-        for (auto& i_zdeft : zdef_tuples_) {
-            file = i_zdeft->GetCurrentFile();
-            // Check if we have seen this file before. If we have not then
-            // write the file and add it to the vector
-            if (std::find(seen.begin(), seen.end(), file) == seen.end()) {
-                file->Write();
-                seen.push_back(file);
-            }
+    for (auto& i_zdeft : zdef_tuples_) {
+        file = i_zdeft->GetCurrentFile();
+        // Check if we have seen this file before. If we have not then
+        // write the file and add it to the vector
+        if (std::find(seen.begin(), seen.end(), file) == seen.end()) {
+            file->Write();
+            seen.push_back(file);
         }
     }
 }

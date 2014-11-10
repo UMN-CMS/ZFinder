@@ -8,8 +8,10 @@
 // ROOT
 #include "TBranch.h"  // TBranch
 #include "TDirectory.h"  // TDirectory
-#include "TFile.h"  // TFile
 #include "TTree.h"  // TTree
+
+// CMSSW
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 // ZFinder Code
 #include "ZDefinition.h"  // ZDefinition
@@ -22,7 +24,7 @@ namespace zf {
             // Constructor
             ZDefinitionTree(
                 const ZDefinition& zdef,
-                TFile* output_file,
+                TFileDirectory& tdir,
                 const bool IS_MC = false
             );
 
