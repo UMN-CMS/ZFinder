@@ -26,7 +26,15 @@ process.TFileService = cms.Service("TFileService",
         fileName = cms.string("test_combined_mc.root")
         )
 
-# Produce PDF weights (maximum is 3)
+# Energy and calibrations for electrons
+process.load('Configuration.StandardSequences.GeometryDB_cff')
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+process.GlobalTag.globaltag = 'GR_P_V42_AN3::All'
+
+from ZFinder.Event.electron_regression_cfi import CalibratedElectrons_MC, RandomNumberGeneratorService, ElectronEnergyRegressions_MC
+process.RandomNumberGeneratorService = RandomNumberGeneratorService
+process.CalibratedElectrons = CalibratedElectrons_MC
+process.eleRegressionEnergy = ElectronEnergyRegressions_MC
 
 # Import rho value for isolation correction
 from ZFinder.Event.kt6_pfjets_cfi import kt6PFJetsForIsolation
@@ -34,7 +42,7 @@ process.kt6PFJetsForIsolation = kt6PFJetsForIsolation.clone()
 
 # Particle flow isolation
 from CommonTools.ParticleFlow.Tools.pfIsolation import setupPFElectronIso
-process.eleIsoSequence = setupPFElectronIso(process, 'gsfElectrons')
+process.eleIsoSequence = setupPFElectronIso(process, 'CalibratedElectrons:calibratedGsfElectrons')
 process.pfiso = cms.Sequence(process.pfParticleSelectionSequence + process.eleIsoSequence)
 
 # Compute PDF weights for uncertainty calculation
@@ -44,6 +52,7 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
         #FixPOWHEG = cms.untracked.string("cteq66.LHgrid"),
         GenTag = cms.untracked.InputTag("genParticles"),
         PdfInfoTag = cms.untracked.InputTag("generator"),
+        # Produce PDF weights (maximum is 3)
         PdfSetNames = cms.untracked.vstring(
             "NNPDF21_100.LHgrid",
             "MSTW2008nlo68cl.LHgrid",
@@ -69,6 +78,8 @@ tuple_names = cms.untracked.string(output_name.split('.root')[0] + "_tuples.root
 from ZFinder.Event.zdefinitions_cfi import zdefs_combined_mc
 from ZFinder.Event.zfinder_cfi import ZFinder
 process.ZFinder = ZFinder.clone(
+        # Use the calibrated electrons we make with process.CalibratedElectrons
+        ecalElectronsInputTag = cms.InputTag("CalibratedElectrons", "calibratedGsfElectrons"),
         ZDefinitions = zdefs_combined_mc,
         is_mc = cms.bool(True),
         use_muon_acceptance = cms.bool(True),
@@ -81,6 +92,8 @@ process.p = cms.Path(
         process.pdfWeights
         * process.fsrWeight
         * process.kt6PFJetsForIsolation
+        * process.eleRegressionEnergy
+        * process.CalibratedElectrons
         * process.pfiso
         * process.ZFinder
         )

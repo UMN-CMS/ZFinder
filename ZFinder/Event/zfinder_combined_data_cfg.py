@@ -65,8 +65,7 @@ from ZFinder.Event.zdefinitions_cfi import zdefs_combined_data
 from ZFinder.Event.zfinder_cfi import ZFinder
 
 process.ZFinder = ZFinder.clone(
-        # Use the calibrated electrons we make with
-        # process.CalibratedElectrons
+        # Use the calibrated electrons we make with process.CalibratedElectrons
         ecalElectronsInputTag = cms.InputTag("CalibratedElectrons", "calibratedGsfElectrons"),
         ZDefinitions = zdefs_combined_data,
         use_muon_acceptance = cms.bool(True),
