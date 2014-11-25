@@ -154,6 +154,35 @@ sequence_plots_3_double_trigger = cms.untracked.PSet(
         use_truth_mass = cms.untracked.bool(False),
         )
 
+# Regression Checks
+regression_r9_lt_eta_lt = cms.untracked.PSet(
+        name = cms.untracked.string("Regression Check R9<0.94 |eta|<1"),
+        cuts0 = cms.untracked.vstring("aeta<1", "r9<0.94"),
+        cuts1 = cms.untracked.vstring("aeta<1", "r9<0.94"),
+        min_mz = MIN_MZ,
+        max_mz = MAX_MZ,
+        use_truth_mass = cms.untracked.bool(False),
+        )
+
+regression_r9_lt_eta_gt = regression_r9_lt_eta_lt.clone(
+        name = cms.untracked.string("Regression Check R9<0.94 |eta|>1"),
+        cuts0 = cms.untracked.vstring("aeta>1", "r9<0.94"),
+        cuts1 = cms.untracked.vstring("aeta>1", "r9<0.94"),
+        )
+
+regression_r9_gt_eta_lt = regression_r9_lt_eta_lt.clone(
+        name = cms.untracked.string("Regression Check R9>0.94 |eta|<1"),
+        cuts0 = cms.untracked.vstring("aeta<1", "r9>0.94"),
+        cuts1 = cms.untracked.vstring("aeta<1", "r9>0.94"),
+        )
+
+regression_r9_gt_eta_gt = regression_r9_lt_eta_lt.clone(
+        name = cms.untracked.string("Regression Check R9>0.94 |eta|>1"),
+        cuts0 = cms.untracked.vstring("aeta>1", "r9>0.94"),
+        cuts1 = cms.untracked.vstring("aeta>1", "r9>0.94"),
+        )
+
+
 # The ZDefinition for use on data for the extended electron result
 zdefs_extended_data = cms.untracked.VPSet(
         all_electrons,
@@ -176,6 +205,10 @@ zdefs_combined_data = cms.untracked.VPSet(
         combined_reco_cuts,
         combined_single,
         trigger_efficiency_cuts,
+        regression_r9_lt_eta_lt,
+        regression_r9_lt_eta_gt,
+        regression_r9_gt_eta_lt,
+        regression_r9_gt_eta_gt,
         )
 
 # The ZDefinition for use on MC for the combined result
@@ -190,4 +223,8 @@ zdefs_combined_mc = cms.untracked.VPSet(
         sequence_plots_2_id,
         sequence_plots_3_single_trigger,
         sequence_plots_3_double_trigger,
+        regression_r9_lt_eta_lt,
+        regression_r9_lt_eta_gt,
+        regression_r9_gt_eta_lt,
+        regression_r9_gt_eta_gt,
         )
