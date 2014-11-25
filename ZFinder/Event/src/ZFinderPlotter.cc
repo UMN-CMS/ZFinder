@@ -163,6 +163,18 @@ namespace zf {
         e1_charge_->GetXaxis()->SetTitle("charge_{e_{1}}");
         e1_charge_->GetYaxis()->SetTitle("counts");
 
+        // e0_r9
+        const std::string e0_r9_name = "r9_{e_{0}}";
+        e0_r9_ = tdir.make<TH1D>(e0_r9_name.c_str(), e0_r9_name.c_str(), 100, 0., 1.);
+        e0_r9_->GetXaxis()->SetTitle("r9_{e_{0}}");
+        e0_r9_->GetYaxis()->SetTitle("Counts");
+
+        // e1_r9
+        const std::string e1_r9_name = "r9_{e_{1}}";
+        e1_r9_ = tdir.make<TH1D>(e1_r9_name.c_str(), e1_r9_name.c_str(), 100, 0., 1.);
+        e1_r9_->GetXaxis()->SetTitle("r9_{e_{1}}");
+        e1_r9_->GetYaxis()->SetTitle("counts");
+
         // phistar (dressed)
         const std::string phistar_name = "#phi*";
         phistar_ = tdir.make<TH1D>(phistar_name.c_str(), phistar_name.c_str(), ATLAS_PHISTAR_BINNING.size() - 1, &ATLAS_PHISTAR_BINNING[0]);
@@ -279,12 +291,14 @@ namespace zf {
                     e0_eta_->Fill(ZF_EVENT.e0->eta(), EVENT_WEIGHT);
                     e0_phi_->Fill(ZF_EVENT.e0->phi(), EVENT_WEIGHT);
                     e0_charge_->Fill(ZF_EVENT.e0->charge(), EVENT_WEIGHT);
+                    e0_r9_->Fill(ZF_EVENT.e0->r9(), EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e1 != nullptr) {
                     e1_pt_->Fill(ZF_EVENT.e1->pt(), EVENT_WEIGHT);
                     e1_eta_->Fill(ZF_EVENT.e1->eta(), EVENT_WEIGHT);
                     e1_phi_->Fill(ZF_EVENT.e1->phi(), EVENT_WEIGHT);
                     e1_charge_->Fill(ZF_EVENT.e1->charge(), EVENT_WEIGHT);
+                    e1_r9_->Fill(ZF_EVENT.e1->r9(), EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e0_trig != nullptr && ZF_EVENT.e0 != nullptr) {
                     e0_pt_vs_trig_->Fill(
@@ -305,12 +319,14 @@ namespace zf {
                     e0_eta_->Fill(ZF_EVENT.e1->eta(), EVENT_WEIGHT);
                     e0_phi_->Fill(ZF_EVENT.e1->phi(), EVENT_WEIGHT);
                     e0_charge_->Fill(ZF_EVENT.e1->charge(), EVENT_WEIGHT);
+                    e0_r9_->Fill(ZF_EVENT.e1->r9(), EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e0 != nullptr) {
                     e1_pt_->Fill(ZF_EVENT.e0->pt(), EVENT_WEIGHT);
                     e1_eta_->Fill(ZF_EVENT.e0->eta(), EVENT_WEIGHT);
                     e1_phi_->Fill(ZF_EVENT.e0->phi(), EVENT_WEIGHT);
                     e1_charge_->Fill(ZF_EVENT.e0->charge(), EVENT_WEIGHT);
+                    e1_r9_->Fill(ZF_EVENT.e0->r9(), EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e1_trig != nullptr && ZF_EVENT.e1 != nullptr) {
                     e0_pt_vs_trig_->Fill(
@@ -355,6 +371,7 @@ namespace zf {
                     e0_phi_naked_->Fill(ZF_EVENT.e0_truth->nakedPhi(), EVENT_WEIGHT);
                     e0_phi_born_->Fill(ZF_EVENT.e0_truth->bornPhi(), EVENT_WEIGHT);
                     e0_charge_->Fill(ZF_EVENT.e0_truth->charge(), EVENT_WEIGHT);
+                    e0_r9_->Fill(ZF_EVENT.e0_truth->r9(), EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e1_truth != nullptr) {
                     e1_pt_->Fill(ZF_EVENT.e1_truth->pt(), EVENT_WEIGHT);
@@ -367,6 +384,7 @@ namespace zf {
                     e1_phi_naked_->Fill(ZF_EVENT.e1_truth->nakedPhi(), EVENT_WEIGHT);
                     e1_phi_born_->Fill(ZF_EVENT.e1_truth->bornPhi(), EVENT_WEIGHT);
                     e1_charge_->Fill(ZF_EVENT.e1_truth->charge(), EVENT_WEIGHT);
+                    e1_r9_->Fill(ZF_EVENT.e1_truth->r9(), EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e0_trig != nullptr && ZF_EVENT.e0_truth != nullptr) {
                     e0_pt_vs_trig_->Fill(
@@ -393,6 +411,7 @@ namespace zf {
                     e0_phi_naked_->Fill(ZF_EVENT.e1_truth->nakedPhi(), EVENT_WEIGHT);
                     e0_phi_born_->Fill(ZF_EVENT.e1_truth->bornPhi(), EVENT_WEIGHT);
                     e0_charge_->Fill(ZF_EVENT.e1_truth->charge(), EVENT_WEIGHT);
+                    e0_r9_->Fill(ZF_EVENT.e1_truth->r9(), EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e0_truth != nullptr) {
                     e1_pt_->Fill(ZF_EVENT.e0_truth->pt(), EVENT_WEIGHT);
@@ -405,6 +424,7 @@ namespace zf {
                     e1_phi_naked_->Fill(ZF_EVENT.e0_truth->nakedPhi(), EVENT_WEIGHT);
                     e1_phi_born_->Fill(ZF_EVENT.e0_truth->bornPhi(), EVENT_WEIGHT);
                     e1_charge_->Fill(ZF_EVENT.e0_truth->charge(), EVENT_WEIGHT);
+                    e1_r9_->Fill(ZF_EVENT.e0_truth->r9(), EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e1_trig != nullptr && ZF_EVENT.e1_truth != nullptr) {
                     e0_pt_vs_trig_->Fill(

@@ -53,6 +53,8 @@ namespace zf {
             TH1D* e1_phi_born_;
             TH1D* e0_charge_;
             TH1D* e1_charge_;
+            TH1D* e0_r9_;
+            TH1D* e1_r9_;
             TH1D* phistar_;
             TH1D* phistar_born_;
             TH1D* phistar_naked_;

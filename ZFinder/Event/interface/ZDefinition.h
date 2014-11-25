@@ -69,7 +69,8 @@ namespace zf {
                 CV_TCHARGE,
                 CV_AETA,
                 CV_GAETA,
-                CV_TAETA
+                CV_TAETA,
+                CV_R9
             };
 
             ComparisonType GetComparisonType(const std::string* cut);

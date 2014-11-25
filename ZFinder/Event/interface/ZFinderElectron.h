@@ -69,6 +69,7 @@ namespace zf {
             double nakedEta() const { return nakedEta_; }
             double nakedPhi() const { return nakedPhi_; }
             int charge() const { return charge_; }
+            double r9() const { return r9_; }
 
             //Setters
             void set_phi(double new_phi) { phi_ = new_phi; }
@@ -102,6 +103,9 @@ namespace zf {
             double nakedPt_;
             double nakedEta_;
             double nakedPhi_;
+
+            // Other interesting quantities
+            double r9_;
 
             // Other physical properties
             int charge_;

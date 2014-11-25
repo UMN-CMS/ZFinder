@@ -347,7 +347,10 @@ namespace zf {
             case CV_TAETA:
                 e_val = fabs(zf_elec->eta());
                 break;
-                // Cases where it makes no sense to continue
+            case CV_R9:
+                e_val = zf_elec->r9();
+                break;
+            // Cases where it makes no sense to continue
             case CV_NONE:
             default:
                 return false;
@@ -465,6 +468,9 @@ namespace zf {
         }
         else if (cut->compare(0, 5, "taeta") == 0 ) {
             return CV_TAETA;
+        }
+        else if (cut->compare(0, 2, "r9") == 0 ) {
+            return CV_R9;
         }
         return CV_NONE;
     }
