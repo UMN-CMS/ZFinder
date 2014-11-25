@@ -87,6 +87,8 @@ namespace zf {
             // efficiency calculated in ZDefinition.
             double event_weight;
             double weight_fsr;
+            double weight_vertex;
+            double weight_natural_mc;
             std::vector<double> weights_cteq;
             std::vector<double> weights_mstw;
             std::vector<double> weights_nnpdf;

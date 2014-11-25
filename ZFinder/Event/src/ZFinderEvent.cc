@@ -173,14 +173,16 @@ namespace zf {
                 break;
             }
         }
-        event_weight *= lumi_weights_->weight(true_number_of_pileup);
+        weight_vertex = lumi_weights_->weight(true_number_of_pileup);
+        event_weight *= weight_vertex;
     }
 
     void ZFinderEvent::SetMCEventWeight(const edm::Event& iEvent) {
         // Some MC is also weighted; multiply by this weight also
         edm::Handle<GenEventInfoProduct> gen_event_info;
         iEvent.getByLabel("generator", gen_event_info);
-        event_weight *= gen_event_info->weight();
+        weight_natural_mc = gen_event_info->weight();
+        event_weight *= weight_natural_mc;
 
         edm::InputTag pdfWeightTag_cteq("pdfWeights:CT10"); // or any other PDF set
         edm::Handle<std::vector<double> > weightHandle_cteq;

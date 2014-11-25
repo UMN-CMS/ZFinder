@@ -59,11 +59,13 @@ namespace zf {
 
         // Set the weights
         if (IS_MC_) {
-            // The weight from the generator, and the weight from the scale
-            // factors, which we set to 1 but then read from the cut level vector
-            const double GEN_WEIGHT = zf_event.event_weight;
+            // The weight from the generator
+            const double GEN_WEIGHT = zf_event.weight_natural_mc;
             weight_id_vector_.push_back(std::make_pair(WeightID::GEN_MC, GEN_WEIGHT));
 
+            // The pileup weight
+            const double VERT_WEIGHT = zf_event.weight_vertex;
+            weight_id_vector_.push_back(std::make_pair(WeightID::PILEUP, VERT_WEIGHT));
 
             // Get the scale factors weight and fill up weight_id_vector_ with them
             const cutlevel_vector* clv = zf_event.GetZDef(zdef_name_);
