@@ -578,6 +578,12 @@ namespace zf {
 
         // Is Data
         is_real_data = false;
+
+        // Weights
+        event_weight = 1;
+        weight_fsr = 1;
+        weight_vertex = 1;
+        weight_natural_mc = 1;
     }
 
     void ZFinderEvent::InitTruth(const edm::Event& iEvent, const edm::EventSetup& iSetup) {

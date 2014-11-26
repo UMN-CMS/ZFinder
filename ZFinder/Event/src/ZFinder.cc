@@ -94,6 +94,7 @@ class ZFinder : public edm::EDAnalyzer {
         zf::ZEfficiencies zeffs_;
         bool is_mc_;
         TH1I* unweighted_counter_;
+        TH1D* weighted_counter_;
 
 };
 
@@ -130,6 +131,9 @@ ZFinder::ZFinder(const edm::ParameterSet& iConfig) : iConfig_(iConfig) {
     unweighted_counter_ = fs->make<TH1I>("unweighted_counter", "Unweighted Event Count", 3, 0, 2);
     unweighted_counter_->GetXaxis()->SetTitle("");
     unweighted_counter_->GetYaxis()->SetTitle("Number of events considered");
+    weighted_counter_ = fs->make<TH1D>("weighted_counter", "weighted Event Count", 3, 0, 2);
+    weighted_counter_->GetXaxis()->SetTitle("");
+    weighted_counter_->GetYaxis()->SetTitle("Number of events considered");
 
     // Setup ZDefinitions and plotters
     zdef_psets_ = iConfig.getUntrackedParameter<std::vector<edm::ParameterSet> >("ZDefinitions");
@@ -205,6 +209,12 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     // Construct a ZFinderEvent
     zf::ZFinderEvent zfe(iEvent, iSetup, iConfig_);
+
+    // For MC, some events are weighted even without any additional
+    // reweighting, so we count those, again, even if they don't pass any cuts.
+    weighted_counter_->Fill(1, zfe.weight_natural_mc);
+
+    // If the even has a good Z, process further
     if ( (zfe.reco_z.m > -1 && zfe.e0 != nullptr && zfe.e1 != nullptr)
             || (zfe.truth_z.m > -1 && zfe.e0_truth != nullptr && zfe.e1_truth != nullptr)
        ) {  // We have a good Z in Reco OR Truth
