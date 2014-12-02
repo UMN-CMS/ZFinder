@@ -175,7 +175,7 @@ namespace zf {
 
     void ZFinderElectron::SetCutWeight(const std::string& cut_name, const double WEIGHT) {
         /* Given the name of a cut and a weight, sets the weight of the cut to
-         * the new value. On success it returns 1, otherwise 0 is returned.
+         * the new value.
          */
         const CutResult* cr = GetCutResult(cut_name);
         if (cr != nullptr) {
