@@ -49,7 +49,7 @@ namespace zf {
             void AddCutResult(const std::string& cut_name, const bool passed, const double weight=1.);
             int CutPassed(const std::string& cut_name) const;
             double CutWeight(const std::string& cut_name) const;
-            int SetCutWeight(const std::string& cut_name, const double WEIGHT);
+            void SetCutWeight(const std::string& cut_name, const double WEIGHT);
 
             std::vector<const CutResult*>* GetPassedCuts() { return GetCutsBool(true); };
             std::vector<const CutResult*>* GetFailedCuts() { return GetCutsBool(false); };

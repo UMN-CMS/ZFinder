@@ -173,18 +173,13 @@ namespace zf {
         cutresults_[cut_name] = cr;  // This will overwrite
     }
 
-    int ZFinderElectron::SetCutWeight(const std::string& cut_name, const double WEIGHT) {
+    void ZFinderElectron::SetCutWeight(const std::string& cut_name, const double WEIGHT) {
         /* Given the name of a cut and a weight, sets the weight of the cut to
-         * the new value. On success it returns 0, otherwise 1 is returned.
+         * the new value. On success it returns 1, otherwise 0 is returned.
          */
         const CutResult* cr = GetCutResult(cut_name);
         if (cr != nullptr) {
             AddCutResult(cr->name, cr->passed, WEIGHT);
-            return 0;
-        }
-        else {
-            // Failure
-            return 1.;
         }
     }
 
