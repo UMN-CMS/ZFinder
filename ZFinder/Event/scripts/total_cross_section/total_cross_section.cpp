@@ -10,9 +10,9 @@
 int main() {
     // Input Files
     const std::string MC_FILE =
-        "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20141001_signal_mc_powheg_pythia_2012ABCD/20141001_signal_mc_powheg_pythia_2012ABCD_hadded.root";
+        "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20141126_regressed_and_smeared_MC/madgraph_hadded.root";
     const std::string DATA_FILE =
-        "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20141002_SingleElectron_2012B/20141002_SingleElectron_2012B_hadded.root";
+        "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20141010_SingleElectron_2012ALL/20141010_SingleElectron_2012ALL_hadded.root";
 
     // Histograms
     // The Histogram containing the full event count with no acceptance or
@@ -23,7 +23,7 @@ int main() {
     // applied. This is used in a ratio with MC_HISTO_ALL to correct for
     // efficiency and acceptance.
     const std::string MC_HISTO_ACC =
-        "ZFinder/3 Single Trigger Cuts Reco/6 60 < M_{ee} < 120/Z0 Mass: All";
+        "ZFinder/3 Single Trigger Cuts Reco/7 60 < M_{ee} < 120/Z0 Mass: All";
     // The data after all cuts.
     const std::string DATA_HISTO =
         "ZFinder/Combined Single Reco/6 60 < M_{ee} < 120/Z0 Mass: All";
@@ -38,7 +38,7 @@ int main() {
 
     // The Luminosity figure to use; set it to the correct one for the data
     // you're using.
-    const double LUMI = B_LUMI;
+    const double LUMI = TOTAL_LUMI;
 
     // Mass range
     const double MASS_LOW = 60.;
