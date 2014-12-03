@@ -92,6 +92,37 @@ namespace zf {
         ecal_tight_scale_factors_.AddEfficiency(30.00, 40.00, 2.00, 2.50, 0.987, 0.004, 0.004);
         ecal_tight_scale_factors_.AddEfficiency(40.00, 50.00, 2.00, 2.50, 0.991, 0.003, 0.003);
         ecal_tight_scale_factors_.AddEfficiency(50.00, 200.00, 2.00, 2.50, 0.999, 0.005, 0.005);
+        // Negative Eta
+        ecal_tight_scale_factors_.AddEfficiency(10.00, 15.00, -0.80, -0.00, 0.827, 0.021, 0.021);
+        ecal_tight_scale_factors_.AddEfficiency(15.00, 20.00, -0.80, -0.00, 0.924, 0.010, 0.010);
+        ecal_tight_scale_factors_.AddEfficiency(20.00, 30.00, -0.80, -0.00, 0.960, 0.003, 0.003);
+        ecal_tight_scale_factors_.AddEfficiency(30.00, 40.00, -0.80, -0.00, 0.978, 0.001, 0.001);
+        ecal_tight_scale_factors_.AddEfficiency(40.00, 50.00, -0.80, -0.00, 0.981, 0.001, 0.001);
+        ecal_tight_scale_factors_.AddEfficiency(50.00, 200.00, -0.80, -0.00, 0.982, 0.002, 0.002);
+        ecal_tight_scale_factors_.AddEfficiency(10.00, 15.00, -1.44, -0.80, 0.948, 0.023, 0.024);
+        ecal_tight_scale_factors_.AddEfficiency(15.00, 20.00, -1.44, -0.80, 0.932, 0.012, 0.012);
+        ecal_tight_scale_factors_.AddEfficiency(20.00, 30.00, -1.44, -0.80, 0.936, 0.004, 0.004);
+        ecal_tight_scale_factors_.AddEfficiency(30.00, 40.00, -1.44, -0.80, 0.958, 0.002, 0.002);
+        ecal_tight_scale_factors_.AddEfficiency(40.00, 50.00, -1.44, -0.80, 0.969, 0.001, 0.001);
+        ecal_tight_scale_factors_.AddEfficiency(50.00, 200.00, -1.44, -0.80, 0.969, 0.002, 0.002);
+        ecal_tight_scale_factors_.AddEfficiency(10.00, 15.00, -1.57, -1.44, 1.073, 0.107, 0.117);
+        ecal_tight_scale_factors_.AddEfficiency(15.00, 20.00, -1.57, -1.44, 0.808, 0.042, 0.045);
+        ecal_tight_scale_factors_.AddEfficiency(20.00, 30.00, -1.57, -1.44, 0.933, 0.017, 0.015);
+        ecal_tight_scale_factors_.AddEfficiency(30.00, 40.00, -1.57, -1.44, 0.907, 0.008, 0.008);
+        ecal_tight_scale_factors_.AddEfficiency(40.00, 50.00, -1.57, -1.44, 0.904, 0.004, 0.004);
+        ecal_tight_scale_factors_.AddEfficiency(50.00, 200.00, -1.57, -1.44, 0.926, 0.011, 0.011);
+        ecal_tight_scale_factors_.AddEfficiency(10.00, 15.00, -2.00, -1.57, 0.854, 0.047, 0.048);
+        ecal_tight_scale_factors_.AddEfficiency(15.00, 20.00, -2.00, -1.57, 0.853, 0.022, 0.022);
+        ecal_tight_scale_factors_.AddEfficiency(20.00, 30.00, -2.00, -1.57, 0.879, 0.007, 0.007);
+        ecal_tight_scale_factors_.AddEfficiency(30.00, 40.00, -2.00, -1.57, 0.909, 0.003, 0.003);
+        ecal_tight_scale_factors_.AddEfficiency(40.00, 50.00, -2.00, -1.57, 0.942, 0.002, 0.002);
+        ecal_tight_scale_factors_.AddEfficiency(50.00, 200.00, -2.00, -1.57, 0.957, 0.004, 0.004);
+        ecal_tight_scale_factors_.AddEfficiency(10.00, 15.00, -2.50, -2.00, 1.007, 0.046, 0.047);
+        ecal_tight_scale_factors_.AddEfficiency(15.00, 20.00, -2.50, -2.00, 0.903, 0.029, 0.029);
+        ecal_tight_scale_factors_.AddEfficiency(20.00, 30.00, -2.50, -2.00, 0.974, 0.004, 0.004);
+        ecal_tight_scale_factors_.AddEfficiency(30.00, 40.00, -2.50, -2.00, 0.987, 0.004, 0.004);
+        ecal_tight_scale_factors_.AddEfficiency(40.00, 50.00, -2.50, -2.00, 0.991, 0.003, 0.003);
+        ecal_tight_scale_factors_.AddEfficiency(50.00, 200.00, -2.50, -2.00, 0.999, 0.005, 0.005);
 
         // Medium Scale Factors from:
         // http://lovedeep.web.cern.ch/lovedeep/WORK13/TnPRun2012ReReco_2013Oct28/effiTable.html
@@ -126,6 +157,37 @@ namespace zf {
         ecal_medium_scale_factors_.AddEfficiency(30.00, 40.00, 2.00, 2.50, 1.021, 0.003, 0.003);
         ecal_medium_scale_factors_.AddEfficiency(40.00, 50.00, 2.00, 2.50, 1.019, 0.002, 0.002);
         ecal_medium_scale_factors_.AddEfficiency(50.00, 200.00, 2.00, 2.50, 1.022, 0.004, 0.004);
+        // Negative Eta
+        ecal_medium_scale_factors_.AddEfficiency(10.00, 15.00, -0.80, -0.00, 0.863, 0.020, 0.008);
+        ecal_medium_scale_factors_.AddEfficiency(5.00, 20.00, -0.80, -0.00, 0.956, 0.009, 0.009);
+        ecal_medium_scale_factors_.AddEfficiency(20.00, 30.00, -0.80, -0.00, 0.986, 0.001, 0.002);
+        ecal_medium_scale_factors_.AddEfficiency(30.00, 40.00, -0.80, -0.00, 1.002, 0.001, 0.001);
+        ecal_medium_scale_factors_.AddEfficiency(40.00, 50.00, -0.80, -0.00, 1.005, 0.001, 0.001);
+        ecal_medium_scale_factors_.AddEfficiency(50.00, 200.00, -0.80, -0.00, 1.004, 0.001, 0.001);
+        ecal_medium_scale_factors_.AddEfficiency(10.00, 15.00, -1.44, -0.80, 0.973, 0.022, 0.022);
+        ecal_medium_scale_factors_.AddEfficiency(15.00, 20.00, -1.44, -0.80, 0.962, 0.011, 0.011);
+        ecal_medium_scale_factors_.AddEfficiency(20.00, 30.00, -1.44, -0.80, 0.959, 0.003, 0.003);
+        ecal_medium_scale_factors_.AddEfficiency(30.00, 40.00, -1.44, -0.80, 0.980, 0.001, 0.001);
+        ecal_medium_scale_factors_.AddEfficiency(40.00, 50.00, -1.44, -0.80, 0.988, 0.001, 0.001);
+        ecal_medium_scale_factors_.AddEfficiency(50.00, 200.00, -1.44, -0.80, 0.988, 0.002, 0.002);
+        ecal_medium_scale_factors_.AddEfficiency(10.00, 15.00, -1.57, -1.44, 1.090, 0.097, 0.107);
+        ecal_medium_scale_factors_.AddEfficiency(15.00, 20.00, -1.57, -1.44, 0.867, 0.037, 0.040);
+        ecal_medium_scale_factors_.AddEfficiency(20.00, 30.00, -1.57, -1.44, 0.967, 0.013, 0.007);
+        ecal_medium_scale_factors_.AddEfficiency(30.00, 40.00, -1.57, -1.44, 0.950, 0.007, 0.006);
+        ecal_medium_scale_factors_.AddEfficiency(40.00, 50.00, -1.57, -1.44, 0.958, 0.005, 0.005);
+        ecal_medium_scale_factors_.AddEfficiency(50.00, 200.00, -1.57, -1.44, 0.966, 0.009, 0.009);
+        ecal_medium_scale_factors_.AddEfficiency(10.00, 15.00, -2.00, -1.57, 0.944, 0.045, 0.042);
+        ecal_medium_scale_factors_.AddEfficiency(15.00, 20.00, -2.00, -1.57, 0.911, 0.012, 0.012);
+        ecal_medium_scale_factors_.AddEfficiency(20.00, 30.00, -2.00, -1.57, 0.941, 0.005, 0.005);
+        ecal_medium_scale_factors_.AddEfficiency(30.00, 40.00, -2.00, -1.57, 0.967, 0.003, 0.003);
+        ecal_medium_scale_factors_.AddEfficiency(40.00, 50.00, -2.00, -1.57, 0.992, 0.002, 0.002);
+        ecal_medium_scale_factors_.AddEfficiency(50.00, 200.00, -2.00, -1.57, 1.000, 0.003, 0.003);
+        ecal_medium_scale_factors_.AddEfficiency(10.00, 15.00, -2.50, -2.00, 1.024, 0.039, 0.040);
+        ecal_medium_scale_factors_.AddEfficiency(15.00, 20.00, -2.50, -2.00, 0.934, 0.018, 0.018);
+        ecal_medium_scale_factors_.AddEfficiency(20.00, 30.00, -2.50, -2.00, 1.020, 0.003, 0.003);
+        ecal_medium_scale_factors_.AddEfficiency(30.00, 40.00, -2.50, -2.00, 1.021, 0.003, 0.003);
+        ecal_medium_scale_factors_.AddEfficiency(40.00, 50.00, -2.50, -2.00, 1.019, 0.002, 0.002);
+        ecal_medium_scale_factors_.AddEfficiency(50.00, 200.00, -2.50, -2.00, 1.022, 0.004, 0.004);
 
         // Loose Scale Factors from:
         // http://lovedeep.web.cern.ch/lovedeep/WORK13/TnPRun2012ReReco_2013Oct28/Tables/Loose/sFGsfIdLoose.txt
@@ -160,6 +222,36 @@ namespace zf {
         ecal_loose_scale_factors_.AddEfficiency(30.00, 40.00, 2.00, 2.50, 1.019, 0.003, 0.003);
         ecal_loose_scale_factors_.AddEfficiency(40.00, 50.00, 2.00, 2.50, 1.019, 0.002, 0.002);
         ecal_loose_scale_factors_.AddEfficiency(50.00, 200.00, 2.00, 2.50, 1.023, 0.004, 0.004);
+        // Negative Eta
+        ecal_loose_scale_factors_.AddEfficiency(15.00, 20.00, -0.80, -0.00, 0.958, 0.009, 0.009);
+        ecal_loose_scale_factors_.AddEfficiency(20.00, 30.00, -0.80, -0.00, 0.988, 0.002, 0.002);
+        ecal_loose_scale_factors_.AddEfficiency(30.00, 40.00, -0.80, -0.00, 1.002, 0.001, 0.001);
+        ecal_loose_scale_factors_.AddEfficiency(40.00, 50.00, -0.80, -0.00, 1.005, 0.001, 0.001);
+        ecal_loose_scale_factors_.AddEfficiency(50.00, 200.00, -0.80, -0.00, 1.005, 0.001, 0.001);
+        ecal_loose_scale_factors_.AddEfficiency(10.00, 15.00, -1.44, -0.80, 0.967, 0.020, 0.020);
+        ecal_loose_scale_factors_.AddEfficiency(15.00, 20.00, -1.44, -0.80, 0.971, 0.010, 0.010);
+        ecal_loose_scale_factors_.AddEfficiency(20.00, 30.00, -1.44, -0.80, 0.965, 0.003, 0.003);
+        ecal_loose_scale_factors_.AddEfficiency(30.00, 40.00, -1.44, -0.80, 0.985, 0.001, 0.001);
+        ecal_loose_scale_factors_.AddEfficiency(40.00, 50.00, -1.44, -0.80, 0.989, 0.001, 0.001);
+        ecal_loose_scale_factors_.AddEfficiency(50.00, 200.00, -1.44, -0.80, 0.989, 0.002, 0.002);
+        ecal_loose_scale_factors_.AddEfficiency(10.00, 15.00, -1.57, -1.44, 1.064, 0.092, 0.103);
+        ecal_loose_scale_factors_.AddEfficiency(15.00, 20.00, -1.57, -1.44, 0.902, 0.032, 0.036);
+        ecal_loose_scale_factors_.AddEfficiency(20.00, 30.00, -1.57, -1.44, 0.990, 0.011, 0.011);
+        ecal_loose_scale_factors_.AddEfficiency(30.00, 40.00, -1.57, -1.44, 0.966, 0.005, 0.005);
+        ecal_loose_scale_factors_.AddEfficiency(40.00, 50.00, -1.57, -1.44, 0.971, 0.004, 0.004);
+        ecal_loose_scale_factors_.AddEfficiency(50.00, 200.00, -1.57, -1.44, 0.980, 0.008, 0.008);
+        ecal_loose_scale_factors_.AddEfficiency(10.00, 15.00, -2.00, -1.57, 0.939, 0.038, 0.039);
+        ecal_loose_scale_factors_.AddEfficiency(15.00, 20.00, -2.00, -1.57, 0.897, 0.016, 0.016);
+        ecal_loose_scale_factors_.AddEfficiency(20.00, 30.00, -2.00, -1.57, 0.953, 0.005, 0.005);
+        ecal_loose_scale_factors_.AddEfficiency(30.00, 40.00, -2.00, -1.57, 0.980, 0.003, 0.003);
+        ecal_loose_scale_factors_.AddEfficiency(40.00, 50.00, -2.00, -1.57, 0.999, 0.002, 0.002);
+        ecal_loose_scale_factors_.AddEfficiency(50.00, 200.00, -2.00, -1.57, 1.004, 0.002, 0.003);
+        ecal_loose_scale_factors_.AddEfficiency(10.00, 15.00, -2.50, -2.00, 1.050, 0.019, 0.019);
+        ecal_loose_scale_factors_.AddEfficiency(15.00, 20.00, -2.50, -2.00, 0.941, 0.017, 0.017);
+        ecal_loose_scale_factors_.AddEfficiency(20.00, 30.00, -2.50, -2.00, 1.017, 0.005, 0.005);
+        ecal_loose_scale_factors_.AddEfficiency(30.00, 40.00, -2.50, -2.00, 1.019, 0.003, 0.003);
+        ecal_loose_scale_factors_.AddEfficiency(40.00, 50.00, -2.50, -2.00, 1.019, 0.002, 0.002);
+        ecal_loose_scale_factors_.AddEfficiency(50.00, 200.00, -2.50, -2.00, 1.023, 0.004, 0.004);
 
         // Veto Scale Factors from:
         // http://lovedeep.web.cern.ch/lovedeep/WORK13/TnPRun2012ReReco_2013Oct28/Tables/Veto/sFGsfIdVeto.txt
@@ -194,6 +286,37 @@ namespace zf {
         ecal_veto_scale_factors_.AddEfficiency(30.00, 40.00, 2.00, 2.50, 0.990, 0.002, 0.002);
         ecal_veto_scale_factors_.AddEfficiency(40.00, 50.00, 2.00, 2.50, 0.993, 0.001, 0.001);
         ecal_veto_scale_factors_.AddEfficiency(50.00, 200.00, 2.00, 2.50, 0.990, 0.002, 0.002);
+        // Negative Eta
+        ecal_veto_scale_factors_.AddEfficiency(10.00, 15.00, -0.80, -0.00, 0.862, 0.019, 0.019);
+        ecal_veto_scale_factors_.AddEfficiency(15.00, 20.00, -0.80, -0.00, 0.953, 0.008, 0.008);
+        ecal_veto_scale_factors_.AddEfficiency(20.00, 30.00, -0.80, -0.00, 0.990, 0.002, 0.002);
+        ecal_veto_scale_factors_.AddEfficiency(30.00, 40.00, -0.80, -0.00, 1.005, 0.001, 0.001);
+        ecal_veto_scale_factors_.AddEfficiency(40.00, 50.00, -0.80, -0.00, 1.006, 0.001, 0.001);
+        ecal_veto_scale_factors_.AddEfficiency(50.00, 200.00, -0.80, -0.00, 1.007, 0.001, 0.001);
+        ecal_veto_scale_factors_.AddEfficiency(10.00, 15.00, -1.44, -0.80, 0.957, 0.019, 0.020);
+        ecal_veto_scale_factors_.AddEfficiency(15.00, 20.00, -1.44, -0.80, 0.975, 0.004, 0.010);
+        ecal_veto_scale_factors_.AddEfficiency(20.00, 30.00, -1.44, -0.80, 0.972, 0.003, 0.003);
+        ecal_veto_scale_factors_.AddEfficiency(30.00, 40.00, -1.44, -0.80, 0.990, 0.001, 0.001);
+        ecal_veto_scale_factors_.AddEfficiency(40.00, 50.00, -1.44, -0.80, 0.994, 0.001, 0.001);
+        ecal_veto_scale_factors_.AddEfficiency(50.00, 200.00, -1.44, -0.80, 0.993, 0.001, 0.001);
+        ecal_veto_scale_factors_.AddEfficiency(10.00, 15.00, -1.57, -1.44, 1.017, 0.089, 0.121);
+        ecal_veto_scale_factors_.AddEfficiency(15.00, 20.00, -1.57, -1.44, 0.933, 0.032, 0.036);
+        ecal_veto_scale_factors_.AddEfficiency(20.00, 30.00, -1.57, -1.44, 0.998, 0.010, 0.010);
+        ecal_veto_scale_factors_.AddEfficiency(30.00, 40.00, -1.57, -1.44, 0.978, 0.004, 0.004);
+        ecal_veto_scale_factors_.AddEfficiency(40.00, 50.00, -1.57, -1.44, 0.979, 0.003, 0.003);
+        ecal_veto_scale_factors_.AddEfficiency(50.00, 200.00, -1.57, -1.44, 0.997, 0.006, 0.005);
+        ecal_veto_scale_factors_.AddEfficiency(10.00, 15.00, -2.00, -1.57, 0.944, 0.035, 0.035);
+        ecal_veto_scale_factors_.AddEfficiency(15.00, 20.00, -2.00, -1.57, 0.934, 0.007, 0.007);
+        ecal_veto_scale_factors_.AddEfficiency(20.00, 30.00, -2.00, -1.57, 0.947, 0.002, 0.004);
+        ecal_veto_scale_factors_.AddEfficiency(30.00, 40.00, -2.00, -1.57, 0.974, 0.002, 0.002);
+        ecal_veto_scale_factors_.AddEfficiency(40.00, 50.00, -2.00, -1.57, 0.988, 0.001, 0.001);
+        ecal_veto_scale_factors_.AddEfficiency(50.00, 200.00, -2.00, -1.57, 0.989, 0.002, 0.002);
+        ecal_veto_scale_factors_.AddEfficiency(10.00, 15.00, -2.50, -2.00, 1.044, 0.032, 0.015);
+        ecal_veto_scale_factors_.AddEfficiency(15.00, 20.00, -2.50, -2.00, 0.958, 0.014, 0.014);
+        ecal_veto_scale_factors_.AddEfficiency(20.00, 30.00, -2.50, -2.00, 0.984, 0.004, 0.004);
+        ecal_veto_scale_factors_.AddEfficiency(30.00, 40.00, -2.50, -2.00, 0.990, 0.002, 0.002);
+        ecal_veto_scale_factors_.AddEfficiency(40.00, 50.00, -2.50, -2.00, 0.993, 0.001, 0.001);
+        ecal_veto_scale_factors_.AddEfficiency(50.00, 200.00, -2.50, -2.00, 0.990, 0.002, 0.002);
 
         // GSF Reconstruction
         // https://twiki.cern.ch/twiki/bin/viewauth/CMS/EgCommissioningAndPhysicsDeliverables#Electron_reconstruction_effi_AN1
@@ -202,6 +325,7 @@ namespace zf {
         //
         table_map_["type_gsf"] = &gsf_scale_factors_;
         // pt_min, pt_max, eta_min, eta_max, eff, +err, -err
+        // Positive Eta
         gsf_scale_factors_.AddEfficiency(10, 15, 0.0, 0.8, 0.977, 0.024, 0.024);
         gsf_scale_factors_.AddEfficiency(15, 20, 0.0, 0.8, 0.997, 0.009, 0.009);
         gsf_scale_factors_.AddEfficiency(20, 30, 0.0, 0.8, 0.982, 0.003, 0.003);
@@ -232,6 +356,37 @@ namespace zf {
         gsf_scale_factors_.AddEfficiency(30, 40, 2.0, 2.5, 1.004, 0.002, 0.002);
         gsf_scale_factors_.AddEfficiency(40, 50, 2.0, 2.5, 1.005, 0.002, 0.002);
         gsf_scale_factors_.AddEfficiency(50, 200, 2.0, 2.5, 0.998, 0.004, 0.004);
+        // Negative Eta
+        gsf_scale_factors_.AddEfficiency(10, 15, -0.8, -0.0, 0.977, 0.024, 0.024);
+        gsf_scale_factors_.AddEfficiency(15, 20, -0.8, -0.0, 0.997, 0.009, 0.009);
+        gsf_scale_factors_.AddEfficiency(20, 30, -0.8, -0.0, 0.982, 0.003, 0.003);
+        gsf_scale_factors_.AddEfficiency(30, 40, -0.8, -0.0, 0.988, 0.001, 0.001);
+        gsf_scale_factors_.AddEfficiency(40, 50, -0.8, -0.0, 0.990, 0.001, 0.001);
+        gsf_scale_factors_.AddEfficiency(50, 200, -0.8, -0.0, 0.990, 0.001, 0.001);
+        gsf_scale_factors_.AddEfficiency(10, 15, -1.4442, -0.8, 0.977, 0.024, 0.024);
+        gsf_scale_factors_.AddEfficiency(15, 20, -1.4442, -0.8, 0.997, 0.009, 0.009);
+        gsf_scale_factors_.AddEfficiency(20, 30, -1.4442, -0.8, 0.993, 0.002, 0.002);
+        gsf_scale_factors_.AddEfficiency(30, 40, -1.4442, -0.8, 0.993, 0.001, 0.001);
+        gsf_scale_factors_.AddEfficiency(40, 50, -1.4442, -0.8, 0.993, 0.001, 0.001);
+        gsf_scale_factors_.AddEfficiency(50, 200, -1.4442, -0.8, 0.991, 0.001, 0.001);
+        gsf_scale_factors_.AddEfficiency(10, 15, -1.566, -1.4442, 1.076, 0.152, 0.152);
+        gsf_scale_factors_.AddEfficiency(15, 20, -1.566, -1.4442, 0.952, 0.025, 0.025);
+        gsf_scale_factors_.AddEfficiency(20, 30, -1.566, -1.4442, 1.016, 0.012, 0.012);
+        gsf_scale_factors_.AddEfficiency(30, 40, -1.566, -1.4442, 0.985, 0.004, 0.004);
+        gsf_scale_factors_.AddEfficiency(40, 50, -1.566, -1.4442, 0.987, 0.004, 0.004);
+        gsf_scale_factors_.AddEfficiency(50, 200, -1.566, -1.4442, 0.974, 0.009, 0.009);
+        gsf_scale_factors_.AddEfficiency(10, 15, -2.0, -1.566, 1.096, 0.036, 0.036);
+        gsf_scale_factors_.AddEfficiency(15, 20, -2.0, -1.566, 1.008, 0.010, 0.010);
+        gsf_scale_factors_.AddEfficiency(20, 30, -2.0, -1.566, 0.988, 0.003, 0.003);
+        gsf_scale_factors_.AddEfficiency(30, 40, -2.0, -1.566, 0.993, 0.002, 0.002);
+        gsf_scale_factors_.AddEfficiency(40, 50, -2.0, -1.566, 0.992, 0.001, 0.001);
+        gsf_scale_factors_.AddEfficiency(50, 200, -2.0, -1.566, 0.990, 0.003, 0.003);
+        gsf_scale_factors_.AddEfficiency(10, 15, -2.5, -2.0, 1.096, 0.036, 0.036);
+        gsf_scale_factors_.AddEfficiency(15, 20, -2.5, -2.0, 1.008, 0.010, 0.010);
+        gsf_scale_factors_.AddEfficiency(20, 30, -2.5, -2.0, 1.002, 0.004, 0.004);
+        gsf_scale_factors_.AddEfficiency(30, 40, -2.5, -2.0, 1.004, 0.002, 0.002);
+        gsf_scale_factors_.AddEfficiency(40, 50, -2.5, -2.0, 1.005, 0.002, 0.002);
+        gsf_scale_factors_.AddEfficiency(50, 200, -2.5, -2.0, 0.998, 0.004, 0.004);
     }
 
 }  // namespace zf;
