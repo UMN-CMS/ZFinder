@@ -56,6 +56,10 @@ Implementation:
 // Electrons
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // GsfElectron
 
+// Pileup reweighting
+#include "PhysicsTools/Utilities/interface/LumiReWeighting.h"  // edm::LumiReWeighting
+#include "ZFinder/Event/interface/PileupReweighting.h"  // RUN_2012_*_TRUE_PILEUP, SUMMER12_53X_MC_TRUE_PILEUP
+
 // ROOT
 #include <TH2D.h>
 
@@ -85,6 +89,7 @@ class TrigEff : public edm::EDAnalyzer {
         TH2D* numerator_;
         TH2D* denominator_;
         edm::InputTag ecal_electron_;
+        edm::LumiReWeighting* lumi_weights_;
 };
 
 //
@@ -119,13 +124,18 @@ TrigEff::TrigEff(const edm::ParameterSet& iConfig) {
     //rho_iso_ = iConfig.getParameter<edm::InputTag>("rhoIsoInputTag");
     //vertex_ = iConfig.getParameter<edm::InputTag>("primaryVertexInputTag");
     //iso_vals_ = iConfig.getParameter<std::vector<edm::InputTag> >("isoValInputTags");
+
+    // Lumi reweighting
+    lumi_weights_ = new edm::LumiReWeighting(
+            zf::SUMMER12_53X_MC_TRUE_PILEUP,  // MC distribution
+            zf::RUN_2012_ABCD_TRUE_PILEUP     // Data distribution
+            );
 }
 
 TrigEff::~TrigEff() {
-
     // do anything here that needs to be done at desctruction time
     // (e.g. close files, deallocate resources etc.)
-
+    delete lumi_weights_;
 }
 
 
@@ -135,6 +145,27 @@ TrigEff::~TrigEff() {
 
 // ------------ method called for each event  ------------
 void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
+
+    // Find the lumi reweighting weight
+
+    edm::Handle<std::vector<PileupSummaryInfo> > pileup_info;
+    iEvent.getByLabel("addPileupInfo", pileup_info);
+
+    // Must be a float because weight() below takes float or int
+    double weight = 1;
+    if (!iEvent.isRealData()) {
+        float true_number_of_pileup = -1.;
+        std::vector<PileupSummaryInfo>::const_iterator PILEUP_ELEMENT;
+        for(PILEUP_ELEMENT = pileup_info->begin(); PILEUP_ELEMENT != pileup_info->end(); ++PILEUP_ELEMENT) {
+            const int BUNCH_CROSSING = PILEUP_ELEMENT->getBunchCrossing();
+            if (BUNCH_CROSSING == 0) {
+                true_number_of_pileup = PILEUP_ELEMENT->getTrueNumInteractions();
+                break;
+            }
+        }
+        weight = lumi_weights_->weight(true_number_of_pileup);
+    }
+    const double WEIGHT = weight;
 
     // Get 2 good GSF electrons
     edm::Handle<reco::GsfElectronCollection> els_h;
@@ -267,15 +298,15 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
         // Fill historgrams
         if (match_hlt_0) {
-            denominator_->Fill(our_electrons[0].pt(), fabs(our_electrons[0].eta()));
+            denominator_->Fill(our_electrons[0].pt(), our_electrons[0].eta(), WEIGHT);
             if (match_hlt_1) {
-                numerator_->Fill(our_electrons[0].pt(), fabs(our_electrons[0].eta()));
+                numerator_->Fill(our_electrons[0].pt(), our_electrons[0].eta(), WEIGHT);
             }
         }
         if (match_hlt_1) {
-            denominator_->Fill(our_electrons[1].pt(), fabs(our_electrons[1].eta()));
+            denominator_->Fill(our_electrons[1].pt(), our_electrons[1].eta(), WEIGHT);
             if (match_hlt_0) {
-                numerator_->Fill(our_electrons[1].pt(), fabs(our_electrons[1].eta()));
+                numerator_->Fill(our_electrons[1].pt(), our_electrons[1].eta(), WEIGHT);
             }
         }
     }
