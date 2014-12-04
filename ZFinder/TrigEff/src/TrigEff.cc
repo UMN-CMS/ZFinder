@@ -102,8 +102,8 @@ TrigEff::TrigEff(const edm::ParameterSet& iConfig) {
     //now do what ever initialization is needed
     edm::Service<TFileService> fs;
 
-    const std::vector<double> ETA_BINS = {0., 0.8, 1.478, 2.5};
-    const std::vector<double> PT_BINS = {30., 40., 50., 200.};
+    const std::vector<double> ETA_BINS = {-2.1, -1.478, -0.8, 0., 0.8, 1.478, 2.1};
+    const std::vector<double> PT_BINS = {30., 40., 50., 200., 2000.};
 
     numerator_ = fs->make<TH2D>("numerator", "numerator", PT_BINS.size() - 1, &PT_BINS[0], ETA_BINS.size() - 1, &ETA_BINS[0]);
     numerator_->GetYaxis()->SetTitle("Probe #eta");
