@@ -21,7 +21,6 @@ namespace zf {
             // Apply cuts to a ZEvent
             void SetWeights(ZFinderEvent* zf_event);
 
-        protected:
             // Get efficiencies based on a cut name, pt, and eta
             double GetEfficiency(
                     const std::string CUT_NAME,
@@ -29,6 +28,7 @@ namespace zf {
                     const double ETA
                     ) const;
 
+        protected:
             // Store the hard coded efficiencies
             void Setup();
             EfficiencyTable ecal_tight_scale_factors_;

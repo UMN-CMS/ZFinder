@@ -60,6 +60,9 @@ Implementation:
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"  // edm::LumiReWeighting
 #include "ZFinder/Event/interface/PileupReweighting.h"  // RUN_2012_*_TRUE_PILEUP, SUMMER12_53X_MC_TRUE_PILEUP
 
+// Scale Factors
+#include "ZFinder/Event/interface/ZEfficiencies.h"
+
 // ROOT
 #include <TH2D.h>
 
@@ -90,6 +93,7 @@ class TrigEff : public edm::EDAnalyzer {
         TH2D* denominator_;
         edm::InputTag ecal_electron_;
         edm::LumiReWeighting* lumi_weights_;
+        zf::ZEfficiencies scale_factors_;
 };
 
 //
@@ -165,7 +169,6 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         }
         weight = lumi_weights_->weight(true_number_of_pileup);
     }
-    const double WEIGHT = weight;
 
     // Get 2 good GSF electrons
     edm::Handle<reco::GsfElectronCollection> els_h;
@@ -241,6 +244,16 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     // Number of electrons
     if (our_electrons.size() == 2) {
 
+        // Apply GSF scale factors
+        if (!iEvent.isRealData()) {
+            const std::string GSF_STR = "type_gsf";
+            weight *= scale_factors_.GetEfficiency(GSF_STR, our_electrons[0].pt(), our_electrons[0].eta());
+            weight *= scale_factors_.GetEfficiency(GSF_STR, our_electrons[1].pt(), our_electrons[1].eta());
+            const std::string EG_TIGHT = "eg_tight";
+            weight *= scale_factors_.GetEfficiency(EG_TIGHT, our_electrons[0].pt(), our_electrons[0].eta());
+            weight *= scale_factors_.GetEfficiency(EG_TIGHT, our_electrons[1].pt(), our_electrons[1].eta());
+        }
+
         // Check how many trigger objects we have
         edm::InputTag hltTrigInfoTag("hltTriggerSummaryAOD","","HLT");
         edm::Handle<trigger::TriggerEvent> trig_event;
@@ -298,15 +311,15 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
         // Fill historgrams
         if (match_hlt_0) {
-            denominator_->Fill(our_electrons[0].pt(), our_electrons[0].eta(), WEIGHT);
+            denominator_->Fill(our_electrons[0].pt(), our_electrons[0].eta(), weight);
             if (match_hlt_1) {
-                numerator_->Fill(our_electrons[0].pt(), our_electrons[0].eta(), WEIGHT);
+                numerator_->Fill(our_electrons[0].pt(), our_electrons[0].eta(), weight);
             }
         }
         if (match_hlt_1) {
-            denominator_->Fill(our_electrons[1].pt(), our_electrons[1].eta(), WEIGHT);
+            denominator_->Fill(our_electrons[1].pt(), our_electrons[1].eta(), weight);
             if (match_hlt_0) {
-                numerator_->Fill(our_electrons[1].pt(), our_electrons[1].eta(), WEIGHT);
+                numerator_->Fill(our_electrons[1].pt(), our_electrons[1].eta(), weight);
             }
         }
     }
