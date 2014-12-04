@@ -150,7 +150,7 @@ TrigEff::~TrigEff() {
 // ------------ method called for each event  ------------
 void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-    // Find the lumi reweighting weight
+    // Find the lumi reweighting weight and the natural weight
 
     edm::Handle<std::vector<PileupSummaryInfo> > pileup_info;
     iEvent.getByLabel("addPileupInfo", pileup_info);
@@ -158,6 +158,7 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     // Must be a float because weight() below takes float or int
     double weight = 1;
     if (!iEvent.isRealData()) {
+        // Lumi Weight
         float true_number_of_pileup = -1.;
         std::vector<PileupSummaryInfo>::const_iterator PILEUP_ELEMENT;
         for(PILEUP_ELEMENT = pileup_info->begin(); PILEUP_ELEMENT != pileup_info->end(); ++PILEUP_ELEMENT) {
@@ -168,6 +169,11 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
             }
         }
         weight = lumi_weights_->weight(true_number_of_pileup);
+
+        // Natural weight
+        edm::Handle<GenEventInfoProduct> gen_event_info;
+        iEvent.getByLabel("generator", gen_event_info);
+        weight *= gen_event_info->weight();
     }
 
     // Get 2 good GSF electrons
