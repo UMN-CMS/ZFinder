@@ -61,6 +61,7 @@ Implementation:
 #include "ZFinder/Event/interface/ZDefinitionWriter.h"  // ZDefinitionWriter
 #include "ZFinder/Event/interface/ZEfficiencies.h" // ZEfficiencies
 #include "ZFinder/Event/interface/ZFinderEvent.h"  // ZFinderEvent
+#include "ZFinder/Event/interface/ZTriggerEfficiencies.h" // ZTriggerEfficiencies
 
 //
 // class declaration
@@ -92,6 +93,7 @@ class ZFinder : public edm::EDAnalyzer {
         std::vector<zf::ZDefinitionWriter*> zdef_plotters_;
         std::vector<zf::ZDefinitionTree*> zdef_tuples_;
         zf::ZEfficiencies zeffs_;
+        zf::ZTriggerEfficiencies ztrgeffs_;
         bool is_mc_;
         TH1I* unweighted_counter_;
         TH1D* weighted_counter_;
@@ -227,6 +229,7 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         if (!zfe.is_real_data) {
             // We set weights for MC only, as we don't want to change the data
             zeffs_.SetWeights(&zfe);
+            ztrgeffs_.SetWeights(&zfe);
         }
         // Set all ZDefs
         for (auto& i_zdef : zdefs_) {
