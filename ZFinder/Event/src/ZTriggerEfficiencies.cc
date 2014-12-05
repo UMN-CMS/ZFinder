@@ -30,7 +30,7 @@ namespace zf {
         // Single Electron Trigger
         int passing_electrons = 0;
         if (e0 != nullptr) {
-            if (e1->pt() >= 30 && fabs(e1->eta()) <= 2.1 && e1->CutPassed("trig(single_ele)") == 1) {
+            if (e0->pt() >= 30 && fabs(e0->eta()) <= 2.1 && e0->CutPassed("trig(single_ele)") == 1) {
                 passing_electrons++;
             }
         }
