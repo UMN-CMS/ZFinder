@@ -9,6 +9,7 @@
 <use name="PhysicsTools/Utilities"/>
 <use name="SimDataFormats/GeneratorProducts"/>
 <use name="SimDataFormats/PileupSummaryInfo"/>
+<use name="ZFinder/Event"/>
 <use name="roofit"/>
 <use name="roostats"/>
 <use name="root"/>
