@@ -88,6 +88,8 @@ namespace zf {
             double event_weight;
             double weight_fsr;
             double weight_vertex;
+            double weight_vertex_plus;
+            double weight_vertex_minus;
             double weight_natural_mc;
             std::vector<double> weights_cteq;
             std::vector<double> weights_mstw;
@@ -228,6 +230,8 @@ namespace zf {
 
             // Pileup reweighting
             static edm::LumiReWeighting* lumi_weights_;
+            static edm::LumiReWeighting* lumi_weights_plus_;
+            static edm::LumiReWeighting* lumi_weights_minus_;
 
             // Use the muon acceptance requirements to select electrons
             bool use_muon_acceptance_;

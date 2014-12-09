@@ -39,6 +39,8 @@ namespace zf {
      * instance and sharing it with all instances of the class.
      */
     edm::LumiReWeighting* ZFinderEvent::lumi_weights_ = nullptr;
+    edm::LumiReWeighting* ZFinderEvent::lumi_weights_plus_ = nullptr;
+    edm::LumiReWeighting* ZFinderEvent::lumi_weights_minus_ = nullptr;
 
     ZFinderEvent::ZFinderEvent(const edm::Event& iEvent, const edm::EventSetup& iSetup, const edm::ParameterSet& iConfig) {
         /* Given an event, parses them for the information needed to make the
@@ -81,25 +83,39 @@ namespace zf {
         require_gen_z_ = iConfig.getParameter<bool>("require_gen_z");
 
         // Set up the lumi reweighting, but only if it is MC.
-        if (!is_real_data && lumi_weights_ == nullptr) {
+        if (!is_real_data
+            && lumi_weights_ == nullptr
+            && lumi_weights_plus_ == nullptr
+            && lumi_weights_minus_ == nullptr
+        ) {
             const std::string PILEUP_ERA = iConfig.getParameter<std::string>("pileup_era");
             // We use a flag in the python file to set the pileup reweighting
             // to use. If a blank, or an unrecognized, string is passed, then
             // we use the full ABCD reweighting.
             std::vector<float> pileup_distribution_in_data = RUN_2012_ABCD_TRUE_PILEUP;
+            std::vector<float> pileup_distribution_in_data_plus = RUN_2012_ABCD_TRUE_PILEUP_PLUS;
+            std::vector<float> pileup_distribution_in_data_minus = RUN_2012_ABCD_TRUE_PILEUP_MINUS;
 
             std::cout << "Pileup reweighting using era: " << PILEUP_ERA << std::endl;
             if (PILEUP_ERA == "A") {
                 pileup_distribution_in_data = RUN_2012_A_TRUE_PILEUP;
+                pileup_distribution_in_data_plus = RUN_2012_A_TRUE_PILEUP_PLUS;
+                pileup_distribution_in_data_minus = RUN_2012_A_TRUE_PILEUP_MINUS;
             }
             else if (PILEUP_ERA == "B") {
                 pileup_distribution_in_data = RUN_2012_B_TRUE_PILEUP;
+                pileup_distribution_in_data_plus = RUN_2012_B_TRUE_PILEUP_PLUS;
+                pileup_distribution_in_data_minus = RUN_2012_B_TRUE_PILEUP_MINUS;
             }
             else if (PILEUP_ERA == "C") {
                 pileup_distribution_in_data = RUN_2012_C_TRUE_PILEUP;
+                pileup_distribution_in_data_plus = RUN_2012_C_TRUE_PILEUP_PLUS;
+                pileup_distribution_in_data_minus = RUN_2012_C_TRUE_PILEUP_MINUS;
             }
             else if (PILEUP_ERA == "D") {
                 pileup_distribution_in_data = RUN_2012_D_TRUE_PILEUP;
+                pileup_distribution_in_data_plus = RUN_2012_D_TRUE_PILEUP_PLUS;
+                pileup_distribution_in_data_minus = RUN_2012_D_TRUE_PILEUP_MINUS;
             }
             else {
                 std::cout << "Using RUN_2012_ABCD_TRUE_PILEUP" << std::endl;
@@ -109,13 +125,24 @@ namespace zf {
                     SUMMER12_53X_MC_TRUE_PILEUP,  // MC distribution
                     pileup_distribution_in_data   // Data distribution
                     );
+            lumi_weights_plus_ = new edm::LumiReWeighting(
+                    SUMMER12_53X_MC_TRUE_PILEUP,
+                    pileup_distribution_in_data_plus
+                    );
+            lumi_weights_minus_ = new edm::LumiReWeighting(
+                    SUMMER12_53X_MC_TRUE_PILEUP,
+                    pileup_distribution_in_data_minus
+                    );
         }
         // Use the lumi reweighting to set the event weight. It is 1. for data,
         // and dependent on the pileup reweighting for MC.
         event_weight = 1.;
         if (!is_real_data) {
             SetMCEventWeight(iEvent);
-            if (lumi_weights_ != nullptr) {
+            if (lumi_weights_ != nullptr
+                && lumi_weights_plus_ != nullptr
+                && lumi_weights_minus_ != nullptr
+            ) {
                 SetLumiEventWeight(iEvent);
             }
         }
@@ -175,6 +202,10 @@ namespace zf {
         }
         weight_vertex = lumi_weights_->weight(true_number_of_pileup);
         event_weight *= weight_vertex;
+
+        // Set the weights to use for systematic uncertainty
+        weight_vertex_plus = lumi_weights_plus_->weight(true_number_of_pileup);
+        weight_vertex_minus = lumi_weights_minus_->weight(true_number_of_pileup);
     }
 
     void ZFinderEvent::SetMCEventWeight(const edm::Event& iEvent) {
@@ -583,6 +614,8 @@ namespace zf {
         event_weight = 1;
         weight_fsr = 1;
         weight_vertex = 1;
+        weight_vertex_plus = 1;
+        weight_vertex_minus = 1;
         weight_natural_mc = 1;
     }
 

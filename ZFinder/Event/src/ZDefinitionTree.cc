@@ -66,6 +66,10 @@ namespace zf {
             // The pileup weight
             const double VERT_WEIGHT = zf_event.weight_vertex;
             weight_id_vector_.push_back(std::make_pair(WeightID::PILEUP, VERT_WEIGHT));
+            const double VERT_WEIGHT_PLUS = zf_event.weight_vertex_plus;
+            weight_id_vector_.push_back(std::make_pair(WeightID::PILEUP_PLUS, VERT_WEIGHT_PLUS));
+            const double VERT_WEIGHT_MINUS = zf_event.weight_vertex_minus;
+            weight_id_vector_.push_back(std::make_pair(WeightID::PILEUP_MINUS, VERT_WEIGHT_MINUS));
 
             // Get the scale factors weight and fill up weight_id_vector_ with them
             const cutlevel_vector* clv = zf_event.GetZDef(zdef_name_);

@@ -13,6 +13,8 @@ namespace zf {
         TOTAL = 0,
         GEN_MC = 1,
         PILEUP = 2,
+        PILEUP_PLUS = 3,
+        PILEUP_MINUS = 4,
         VETO = 10,
         LOOSE = 11,
         MEDIUM = 12,
