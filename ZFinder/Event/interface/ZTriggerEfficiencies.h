@@ -30,6 +30,12 @@ namespace zf {
             EfficiencyTable single_electron_efficiency_reco_;
             EfficiencyTable single_electron_efficiency_mc_;
 
+            // Check if the electron passes the requirements used to measure
+            // the efficiencies
+            bool PassSingleElectronTriggerRequirements(
+                ZFinderElectron const * const electron
+            ) const;
+
     };
 }  // namespace zf
 #endif  // ZFINDER_ZTRIGGEREFFICIENCIES_H_
