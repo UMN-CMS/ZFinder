@@ -30,12 +30,20 @@ namespace zf {
         // Single Electron Trigger
         int passing_electrons = 0;
         if (e0 != nullptr) {
-            if (e0->pt() >= 30 && fabs(e0->eta()) <= 2.1 && e0->CutPassed("trig(single_ele)") == 1) {
+            if (e0->pt() >= 30
+                && fabs(e0->eta()) <= 2.1
+                && e0->CutPassed("eg_tight") == 1
+                && e0->CutPassed("trig(single_ele)") == 1
+            ) {
                 passing_electrons++;
             }
         }
         if (e1 != nullptr) {
-            if (e1->pt() >= 30 && fabs(e1->eta()) <= 2.1 && e1->CutPassed("trig(single_ele)") == 1) {
+            if (e1->pt() >= 30
+                && fabs(e1->eta()) <= 2.1
+                && e1->CutPassed("eg_tight") == 1
+                && e1->CutPassed("trig(single_ele)") == 1
+            ) {
                 passing_electrons++;
             }
         }
@@ -54,29 +62,40 @@ namespace zf {
 
     void ZTriggerEfficiencies::SetSingleElectronWeight(ZFinderEvent* zf_event) {
         const std::string CUT_NAME = "trig(single_ele)";
+        const std::string EG_NAME = "eg_tight";
 
         ZFinderElectron* electron = nullptr;
         // The first one is the right one, because we know only one passes
-        if (zf_event->e0 != nullptr && zf_event->e0->CutPassed(CUT_NAME)) {
+        if (zf_event->e0 != nullptr
+            && fabs(zf_event->e0->eta()) <= 2.1
+            && zf_event->e0->CutPassed(EG_NAME) == 1
+            && zf_event->e0->CutPassed(CUT_NAME) == 1
+        ) {
             electron = zf_event->e0;
         }
-        else if (zf_event->e1 != nullptr && zf_event->e1->CutPassed(CUT_NAME)) {
-            electron = zf_event->e0;
+        else if (zf_event->e1 != nullptr
+            && fabs(zf_event->e1->eta()) <= 2.1
+            && zf_event->e1->CutPassed(EG_NAME) == 1
+            && zf_event->e1->CutPassed(CUT_NAME) == 1
+        ) {
+            electron = zf_event->e1;
         }
 
-        const double ETA = electron->eta();
-        const double PT = electron->pt();
+        if (electron != nullptr) {
+            const double ETA = electron->eta();
+            const double PT = electron->pt();
 
-        const double RECO_EFF = single_electron_efficiency_reco_.GetEfficiency(PT, ETA);
-        const double MC_EFF = single_electron_efficiency_mc_.GetEfficiency(PT, ETA);
+            const double RECO_EFF = single_electron_efficiency_reco_.GetEfficiency(PT, ETA);
+            const double MC_EFF = single_electron_efficiency_mc_.GetEfficiency(PT, ETA);
 
-        // GetEfficiency returns -1 on failure
-        if (RECO_EFF < 0 || MC_EFF < 0) {
-            return;
+            // GetEfficiency returns -1 on failure
+            if (RECO_EFF < 0 || MC_EFF < 0) {
+                return;
+            }
+
+            const double SCALE_FACTOR = RECO_EFF / MC_EFF;
+            electron->SetCutWeight(CUT_NAME, SCALE_FACTOR);
         }
-
-        const double SCALE_FACTOR = RECO_EFF / MC_EFF;
-        electron->SetCutWeight(CUT_NAME, SCALE_FACTOR);
     }
 
     void ZTriggerEfficiencies::SetDoubleElectronWeight(ZFinderEvent* zf_event) {
