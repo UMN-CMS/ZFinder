@@ -1,6 +1,26 @@
 # Running with PDF uncertainties
 
-To compile you'll need to do the following:
+You will need to modify the file the tells CMSSW where to find pdfs:
+
+    vi $CMSSW_BASE/config/toolbox/$SCRAM_ARCH/tools/selected/lhapdffull.xml
+
+Change it to read as follows (for CMSSW_5_3):
+
+```
+<tool name="lhapdffull" version="5.9.1"> <!-- Note the new version: 5.9.1 -->
+  <lib name="LHAPDF"/>
+  <client>
+    <environment name="LHAPDFFULL_BASE" default="/cvmfs/cms.cern.ch/slc5_amd64_gcc462/external/lhapdf/5.9.1"/> <!-- Note the new version: 5.9.1 -->
+    <environment name="LIBDIR" default="$LHAPDFFULL_BASE/full/lib"/>
+    <environment name="INCLUDE" default="$LHAPDFFULL_BASE/include"/>
+  </client>
+  <runtime name="LHAPATH" value="$LHAPDFFULL_BASE/share/lhapdf/PDFsets"/>
+  <use name="f77compiler"/>
+</tool>
+
+```
+
+Then, to compile you'll need to do the following:
 
 1. scram setup lhapdffull
 2. touch $CMSSW_BASE/src/ElectroWeakAnalysis/Utilities/BuildFile.xml

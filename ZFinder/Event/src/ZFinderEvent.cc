@@ -225,7 +225,7 @@ namespace zf {
         iEvent.getByLabel(pdfWeightTag_mstw, weightHandle_mstw);
         weights_mstw = (*weightHandle_mstw);
 
-        edm::InputTag pdfWeightTag_nnpdf("pdfWeights:NNPDF21"); // or any other PDF set
+        edm::InputTag pdfWeightTag_nnpdf("pdfWeights:NNPDF23"); // or any other PDF set
         edm::Handle<std::vector<double> > weightHandle_nnpdf;
         iEvent.getByLabel(pdfWeightTag_nnpdf, weightHandle_nnpdf);
         weights_nnpdf = (*weightHandle_nnpdf);
