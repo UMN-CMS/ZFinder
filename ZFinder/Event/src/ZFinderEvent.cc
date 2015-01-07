@@ -551,6 +551,15 @@ namespace zf {
             reco_z.phistar = ReturnPhistar(e0->eta(), e0->phi(), e1->eta(), e1->phi());
             reco_z.eta = zlv.eta();
             reco_z.deltaR = deltaR(e0->eta(), e0->phi(), e1->eta(), e1->phi());
+
+            // Set the SC phi*
+            // sc_eta and sec_phi are set to -10 to indicate they don't exist
+            // for an object
+            const bool E0_GOOD = e0->sc_eta() >= -9 && e0->sc_phi() >= -9;
+            const bool E1_GOOD = e1->sc_eta() >= -9 && e1->sc_phi() >= -9;
+            if (E0_GOOD && E1_GOOD) {
+                reco_z.scPhistar = ReturnPhistar(e0->sc_eta(), e0->sc_phi(), e1->sc_eta(), e1->sc_phi());
+            }
         }
     }
 
@@ -582,6 +591,7 @@ namespace zf {
         reco_z.phistar = -1;
         reco_z.bornPhistar = -1;
         reco_z.nakedPhistar = -1;
+        reco_z.scPhistar = -1;
         reco_z.eta = -1000;
         reco_z.deltaR = -1;
         reco_z.other_y = -1000;
@@ -593,6 +603,7 @@ namespace zf {
         truth_z.phistar = -1;
         truth_z.bornPhistar = -1;
         truth_z.nakedPhistar = -1;
+        truth_z.scPhistar = -1;
         truth_z.eta = -1000;
         truth_z.deltaR = -1;
         truth_z.other_y = -1000;

@@ -70,6 +70,8 @@ namespace zf {
             double nakedPhi() const { return nakedPhi_; }
             int charge() const { return charge_; }
             double r9() const { return r9_; }
+            double sc_eta() const { return sc_eta_; }
+            double sc_phi() const { return sc_phi_; }
 
             //Setters
             void set_phi(double new_phi) { phi_ = new_phi; }
@@ -109,6 +111,10 @@ namespace zf {
 
             // Other physical properties
             int charge_;
+
+            // Supercluster quantities
+            double sc_eta_;
+            double sc_phi_;
     };
 }  // namespace zfe
 #endif  // ZFINDER_ZFINDERELECTRON_H_

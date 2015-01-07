@@ -20,6 +20,8 @@ namespace zf {
         phi_ = input_electron.phi();
         r9_ = input_electron.r9();
         charge_ = input_electron.charge();
+        sc_eta_ = input_electron.superCluster()->eta();
+        sc_phi_ = input_electron.superCluster()->phi();
     }
 
     ZFinderElectron::ZFinderElectron(reco::GenParticle input_electron) {
@@ -34,6 +36,8 @@ namespace zf {
         phi_ = input_electron.phi();
         eta_ = input_electron.eta();
         r9_ = -1;
+        sc_eta_ = -10;
+        sc_phi_ = -10;
         // Using the input_electron Data Group ID Number, determine if the input_electron is an
         // electron or positron
         if (input_electron.pdgId() == PDGID::ELECTRON) {
@@ -60,6 +64,8 @@ namespace zf {
         phi_ = dressed_electron.phi();
         eta_ = dressed_electron.eta();
         r9_ = -1;
+        sc_eta_ = -10;
+        sc_phi_ = -10;
         //born:
         bornPt_ = born_electron.pt();
         bornPhi_ = born_electron.phi();
@@ -89,6 +95,8 @@ namespace zf {
         eta_ = input_electron.eta();
         phi_ = input_electron.phi();
         r9_ = -1;
+        sc_eta_ = -10;
+        sc_phi_ = -10;
         charge_ = input_electron.charge();
         // Add cut result to store parent information
     }
@@ -104,6 +112,8 @@ namespace zf {
         eta_ = input_electron.eta();
         phi_ = input_electron.phi();
         r9_ = input_electron.r9();
+        sc_eta_ = -10;
+        sc_phi_ = -10;
         charge_ = 0;  // No charge because no tracker
     }
 
@@ -118,6 +128,8 @@ namespace zf {
         eta_ = input_electron.eta();
         phi_ = input_electron.phi();
         r9_ = -1;
+        sc_eta_ = -10;
+        sc_phi_ = -10;
         charge_ = 0;  // No charge
     }
 

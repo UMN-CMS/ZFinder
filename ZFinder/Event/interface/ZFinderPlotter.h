@@ -58,6 +58,7 @@ namespace zf {
             TH1D* phistar_;
             TH1D* phistar_born_;
             TH1D* phistar_naked_;
+            TH1D* phistar_supercluster_;
             TH1D* pileup_;
             TH1D* nelectrons_;
             TH1D* baseweights_;

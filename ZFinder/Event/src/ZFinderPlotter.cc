@@ -193,6 +193,12 @@ namespace zf {
         phistar_naked_->GetXaxis()->SetTitle("Naked #phi*");
         phistar_naked_->GetYaxis()->SetTitle("Counts");
 
+        // phistar supercluster
+        const std::string phistar_name_supercluster = "Supercluster #phi*";
+        phistar_supercluster_ = tdir.make<TH1D>(phistar_name_supercluster.c_str(), phistar_name_supercluster.c_str(), ATLAS_PHISTAR_BINNING.size() - 1, &ATLAS_PHISTAR_BINNING[0]);
+        phistar_supercluster_->GetXaxis()->SetTitle("Supercluster #phi*");
+        phistar_supercluster_->GetYaxis()->SetTitle("Counts");
+
         // other_phistar for gen-reco efficiencies
         const std::string other_phistar_name = "Other #phi*";
         other_phistar_ = tdir.make<TH1D>(other_phistar_name.c_str(), other_phistar_name.c_str(), ATLAS_PHISTAR_BINNING.size() - 1, &ATLAS_PHISTAR_BINNING[0]);
@@ -276,6 +282,7 @@ namespace zf {
             z0_pt_->Fill(ZF_EVENT.reco_z.pt, EVENT_WEIGHT);
             phistar_->Fill(ZF_EVENT.reco_z.phistar, EVENT_WEIGHT);
             deltaR_->Fill(ZF_EVENT.reco_z.deltaR, EVENT_WEIGHT);
+            phistar_supercluster_->Fill(ZF_EVENT.reco_z.scPhistar, EVENT_WEIGHT);
             // We only want to plot this if corresponding gen info exists
             if(!ZF_EVENT.is_real_data) {
                 other_phistar_->Fill(ZF_EVENT.reco_z.other_phistar, EVENT_WEIGHT);
@@ -354,6 +361,7 @@ namespace zf {
             phistar_->Fill(ZF_EVENT.truth_z.phistar, EVENT_WEIGHT);
             phistar_born_->Fill(ZF_EVENT.truth_z.bornPhistar, EVENT_WEIGHT);
             phistar_naked_->Fill(ZF_EVENT.truth_z.nakedPhistar, EVENT_WEIGHT);
+            phistar_supercluster_->Fill(ZF_EVENT.truth_z.scPhistar, EVENT_WEIGHT);
             deltaR_->Fill(ZF_EVENT.truth_z.deltaR, EVENT_WEIGHT);
             other_phistar_->Fill(ZF_EVENT.truth_z.other_phistar, EVENT_WEIGHT);
             other_y_->Fill(ZF_EVENT.truth_z.other_y, EVENT_WEIGHT);

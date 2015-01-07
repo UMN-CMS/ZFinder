@@ -46,6 +46,7 @@ namespace zf {
                     z_phistar_born = -1;
                     z_phistar_dressed = -1;
                     z_phistar_naked = -1;
+                    z_phistar_sc = -1;
                     z_pt = -1;
                     z_eta = -10;
                     e_pt[0] = -1;
@@ -68,6 +69,7 @@ namespace zf {
                 double z_phistar_born;
                 double z_phistar_dressed;
                 double z_phistar_naked;
+                double z_phistar_sc;
                 double z_pt;
                 double z_eta;
                 double e_pt[2];
