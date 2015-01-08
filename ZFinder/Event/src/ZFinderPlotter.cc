@@ -175,6 +175,102 @@ namespace zf {
         e1_r9_->GetXaxis()->SetTitle("r9_{e_{1}}");
         e1_r9_->GetYaxis()->SetTitle("counts");
 
+        // e0_sigma_ieta_ieta
+        const std::string e0_sigma_ieta_ieta_name = "sigma_{i #eta i #eta}^{e_{0}}";
+        e0_sigma_ieta_ieta_ = tdir.make<TH1D>(e0_sigma_ieta_ieta_name.c_str(), e0_sigma_ieta_ieta_name.c_str(), 300, 0., 0.3);
+        e0_sigma_ieta_ieta_->GetXaxis()->SetTitle("sigma_{i #eta i #eta}^{e_{0}}");
+        e0_sigma_ieta_ieta_->GetYaxis()->SetTitle("Counts");
+
+        // e1_sigma_ieta_ieta
+        const std::string e1_sigma_ieta_ieta_name = "sigma_{i #eta i #eta}^{e_{1}}";
+        e1_sigma_ieta_ieta_ = tdir.make<TH1D>(e1_sigma_ieta_ieta_name.c_str(), e1_sigma_ieta_ieta_name.c_str(), 300, 0., 0.3);
+        e1_sigma_ieta_ieta_->GetXaxis()->SetTitle("sigma_{i #eta i #eta}^{e_{1}}");
+        e1_sigma_ieta_ieta_->GetYaxis()->SetTitle("Counts");
+
+        // e0_h_over_e
+        const std::string e0_h_over_e_name = "(H/E)_{e_{0}}";
+        e0_h_over_e_ = tdir.make<TH1D>(e0_h_over_e_name.c_str(), e0_h_over_e_name.c_str(), 300, 0., 0.3);
+        e0_h_over_e_->GetXaxis()->SetTitle("(H/E)_{e_{0}}");
+        e0_h_over_e_->GetYaxis()->SetTitle("Counts");
+
+        // e1_h_over_e
+        const std::string e1_h_over_e_name = "(H/E)_{e_{1}}";
+        e1_h_over_e_ = tdir.make<TH1D>(e1_h_over_e_name.c_str(), e1_h_over_e_name.c_str(), 300, 0., 0.3);
+        e1_h_over_e_->GetXaxis()->SetTitle("(H/E)_{e_{1}}");
+        e1_h_over_e_->GetYaxis()->SetTitle("Counts");
+
+        // e0_deta_in
+        const std::string e0_deta_in_name = "d#eta_{e_{0}}";
+        e0_deta_in_ = tdir.make<TH1D>(e0_deta_in_name.c_str(), e0_deta_in_name.c_str(), 1000, 0., 0.1);
+        e0_deta_in_->GetXaxis()->SetTitle("d#eta_{e_{0}}");
+        e0_deta_in_->GetYaxis()->SetTitle("Counts");
+
+        // e1_deta_in
+        const std::string e1_deta_in_name = "d#eta_{e_{1}}";
+        e1_deta_in_ = tdir.make<TH1D>(e1_deta_in_name.c_str(), e1_deta_in_name.c_str(), 1000, 0., 0.1);
+        e1_deta_in_->GetXaxis()->SetTitle("d#eta_{e_{1}}");
+        e1_deta_in_->GetYaxis()->SetTitle("Counts");
+
+        // e0_dphi_in
+        const std::string e0_dphi_in_name = "d#phi_{e_{0}}";
+        e0_dphi_in_ = tdir.make<TH1D>(e0_dphi_in_name.c_str(), e0_dphi_in_name.c_str(), 1000, 0., 0.1);
+        e0_dphi_in_->GetXaxis()->SetTitle("d#phi_{e_{0}}");
+        e0_dphi_in_->GetYaxis()->SetTitle("Counts");
+
+        // e1_dphi_in
+        const std::string e1_dphi_in_name = "d#phi_{e_{1}}";
+        e1_dphi_in_ = tdir.make<TH1D>(e1_dphi_in_name.c_str(), e1_dphi_in_name.c_str(), 1000, 0., 0.1);
+        e1_dphi_in_->GetXaxis()->SetTitle("d#phi_{e_{1}}");
+        e1_dphi_in_->GetYaxis()->SetTitle("Counts");
+
+        // e0_track_iso_in
+        const std::string e0_track_isoname = "Track ISO_{e_{0}}";
+        e0_track_iso_ = tdir.make<TH1D>(e0_track_isoname.c_str(), e0_track_isoname.c_str(), 300, 0., 3.);
+        e0_track_iso_->GetXaxis()->SetTitle("Track ISO_{e_{0}}");
+        e0_track_iso_->GetYaxis()->SetTitle("Counts");
+
+        // e1_track_iso_in
+        const std::string e1_track_isoname = "Track ISO_{e_{1}}";
+        e1_track_iso_ = tdir.make<TH1D>(e1_track_isoname.c_str(), e1_track_isoname.c_str(), 300, 0., 3.);
+        e1_track_iso_->GetXaxis()->SetTitle("Track ISO_{e_{1}}");
+        e1_track_iso_->GetYaxis()->SetTitle("Counts");
+
+        // e0_ecal_iso_in
+        const std::string e0_ecal_isoname = "ECAL ISO_{e_{0}}";
+        e0_ecal_iso_ = tdir.make<TH1D>(e0_ecal_isoname.c_str(), e0_ecal_isoname.c_str(), 300, 0., 3.);
+        e0_ecal_iso_->GetXaxis()->SetTitle("ECAL ISO_{e_{0}}");
+        e0_ecal_iso_->GetYaxis()->SetTitle("Counts");
+
+        // e1_ecal_iso_in
+        const std::string e1_ecal_isoname = "ECAL ISO_{e_{1}}";
+        e1_ecal_iso_ = tdir.make<TH1D>(e1_ecal_isoname.c_str(), e1_ecal_isoname.c_str(), 300, 0., 3.);
+        e1_ecal_iso_->GetXaxis()->SetTitle("ECAL ISO_{e_{1}}");
+        e1_ecal_iso_->GetYaxis()->SetTitle("Counts");
+
+        // e0_hcal_iso_in
+        const std::string e0_hcal_isoname = "HCAL ISO_{e_{0}}";
+        e0_hcal_iso_ = tdir.make<TH1D>(e0_hcal_isoname.c_str(), e0_hcal_isoname.c_str(), 300, 0., 3.);
+        e0_hcal_iso_->GetXaxis()->SetTitle("HCAL ISO_{e_{0}}");
+        e0_hcal_iso_->GetYaxis()->SetTitle("Counts");
+
+        // e1_hcal_iso_in
+        const std::string e1_hcal_isoname = "HCAL ISO_{e_{1}}";
+        e1_hcal_iso_ = tdir.make<TH1D>(e1_hcal_isoname.c_str(), e1_hcal_isoname.c_str(), 300, 0., 1.);
+        e1_hcal_iso_->GetXaxis()->SetTitle("HCAL ISO_{e_{1}}");
+        e1_hcal_iso_->GetYaxis()->SetTitle("Counts");
+
+        // e0_one_over_e_mins_one_over_p
+        const std::string e0_one_over_e_mins_one_over_pname = "1/E - 1/P e_{0}";
+        e0_one_over_e_mins_one_over_p_ = tdir.make<TH1D>(e0_one_over_e_mins_one_over_pname.c_str(), e0_one_over_e_mins_one_over_pname.c_str(), 1000, -1., 1.);
+        e0_one_over_e_mins_one_over_p_->GetXaxis()->SetTitle("1/E - 1/P e_{0}");
+        e0_one_over_e_mins_one_over_p_->GetYaxis()->SetTitle("Counts");
+
+        // e1_one_over_e_mins_one_over_p
+        const std::string e1_one_over_e_mins_one_over_pname = "1/E - 1/P e_{1}";
+        e1_one_over_e_mins_one_over_p_ = tdir.make<TH1D>(e1_one_over_e_mins_one_over_pname.c_str(), e1_one_over_e_mins_one_over_pname.c_str(), 1000, -1., 1.);
+        e1_one_over_e_mins_one_over_p_->GetXaxis()->SetTitle("1/E - 1/P e_{1}");
+        e1_one_over_e_mins_one_over_p_->GetYaxis()->SetTitle("Counts");
+
         // phistar (dressed)
         const std::string phistar_name = "#phi*";
         phistar_ = tdir.make<TH1D>(phistar_name.c_str(), phistar_name.c_str(), ATLAS_PHISTAR_BINNING.size() - 1, &ATLAS_PHISTAR_BINNING[0]);
@@ -299,6 +395,14 @@ namespace zf {
                     e0_phi_->Fill(ZF_EVENT.e0->phi(), EVENT_WEIGHT);
                     e0_charge_->Fill(ZF_EVENT.e0->charge(), EVENT_WEIGHT);
                     e0_r9_->Fill(ZF_EVENT.e0->r9(), EVENT_WEIGHT);
+                    e0_sigma_ieta_ieta_->Fill(ZF_EVENT.e0->sigma_ieta_ieta(), EVENT_WEIGHT);
+                    e0_h_over_e_->Fill(ZF_EVENT.e0->h_over_e(), EVENT_WEIGHT);
+                    e0_deta_in_->Fill(ZF_EVENT.e0->deta_in(), EVENT_WEIGHT);
+                    e0_dphi_in_->Fill(ZF_EVENT.e0->dphi_in(), EVENT_WEIGHT);
+                    e0_track_iso_->Fill(ZF_EVENT.e0->track_iso(), EVENT_WEIGHT);
+                    e0_ecal_iso_->Fill(ZF_EVENT.e0->ecal_iso(), EVENT_WEIGHT);
+                    e0_hcal_iso_->Fill(ZF_EVENT.e0->hcal_iso(), EVENT_WEIGHT);
+                    e0_one_over_e_mins_one_over_p_->Fill(ZF_EVENT.e0->one_over_e_mins_one_over_p(), EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e1 != nullptr) {
                     e1_pt_->Fill(ZF_EVENT.e1->pt(), EVENT_WEIGHT);
@@ -306,6 +410,14 @@ namespace zf {
                     e1_phi_->Fill(ZF_EVENT.e1->phi(), EVENT_WEIGHT);
                     e1_charge_->Fill(ZF_EVENT.e1->charge(), EVENT_WEIGHT);
                     e1_r9_->Fill(ZF_EVENT.e1->r9(), EVENT_WEIGHT);
+                    e1_sigma_ieta_ieta_->Fill(ZF_EVENT.e1->sigma_ieta_ieta(), EVENT_WEIGHT);
+                    e1_h_over_e_->Fill(ZF_EVENT.e1->h_over_e(), EVENT_WEIGHT);
+                    e1_deta_in_->Fill(ZF_EVENT.e1->deta_in(), EVENT_WEIGHT);
+                    e1_dphi_in_->Fill(ZF_EVENT.e1->dphi_in(), EVENT_WEIGHT);
+                    e1_track_iso_->Fill(ZF_EVENT.e1->track_iso(), EVENT_WEIGHT);
+                    e1_ecal_iso_->Fill(ZF_EVENT.e1->ecal_iso(), EVENT_WEIGHT);
+                    e1_hcal_iso_->Fill(ZF_EVENT.e1->hcal_iso(), EVENT_WEIGHT);
+                    e1_one_over_e_mins_one_over_p_->Fill(ZF_EVENT.e1->one_over_e_mins_one_over_p(), EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e0_trig != nullptr && ZF_EVENT.e0 != nullptr) {
                     e0_pt_vs_trig_->Fill(
@@ -327,6 +439,14 @@ namespace zf {
                     e0_phi_->Fill(ZF_EVENT.e1->phi(), EVENT_WEIGHT);
                     e0_charge_->Fill(ZF_EVENT.e1->charge(), EVENT_WEIGHT);
                     e0_r9_->Fill(ZF_EVENT.e1->r9(), EVENT_WEIGHT);
+                    e0_sigma_ieta_ieta_->Fill(ZF_EVENT.e1->sigma_ieta_ieta(), EVENT_WEIGHT);
+                    e0_h_over_e_->Fill(ZF_EVENT.e1->h_over_e(), EVENT_WEIGHT);
+                    e0_deta_in_->Fill(ZF_EVENT.e1->deta_in(), EVENT_WEIGHT);
+                    e0_dphi_in_->Fill(ZF_EVENT.e1->dphi_in(), EVENT_WEIGHT);
+                    e0_track_iso_->Fill(ZF_EVENT.e1->track_iso(), EVENT_WEIGHT);
+                    e0_ecal_iso_->Fill(ZF_EVENT.e1->ecal_iso(), EVENT_WEIGHT);
+                    e0_hcal_iso_->Fill(ZF_EVENT.e1->hcal_iso(), EVENT_WEIGHT);
+                    e0_one_over_e_mins_one_over_p_->Fill(ZF_EVENT.e1->one_over_e_mins_one_over_p(), EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e0 != nullptr) {
                     e1_pt_->Fill(ZF_EVENT.e0->pt(), EVENT_WEIGHT);
@@ -334,6 +454,14 @@ namespace zf {
                     e1_phi_->Fill(ZF_EVENT.e0->phi(), EVENT_WEIGHT);
                     e1_charge_->Fill(ZF_EVENT.e0->charge(), EVENT_WEIGHT);
                     e1_r9_->Fill(ZF_EVENT.e0->r9(), EVENT_WEIGHT);
+                    e1_sigma_ieta_ieta_->Fill(ZF_EVENT.e0->sigma_ieta_ieta(), EVENT_WEIGHT);
+                    e1_h_over_e_->Fill(ZF_EVENT.e0->h_over_e(), EVENT_WEIGHT);
+                    e1_deta_in_->Fill(ZF_EVENT.e0->deta_in(), EVENT_WEIGHT);
+                    e1_dphi_in_->Fill(ZF_EVENT.e0->dphi_in(), EVENT_WEIGHT);
+                    e1_track_iso_->Fill(ZF_EVENT.e0->track_iso(), EVENT_WEIGHT);
+                    e1_ecal_iso_->Fill(ZF_EVENT.e0->ecal_iso(), EVENT_WEIGHT);
+                    e1_hcal_iso_->Fill(ZF_EVENT.e0->hcal_iso(), EVENT_WEIGHT);
+                    e1_one_over_e_mins_one_over_p_->Fill(ZF_EVENT.e0->one_over_e_mins_one_over_p(), EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e1_trig != nullptr && ZF_EVENT.e1 != nullptr) {
                     e0_pt_vs_trig_->Fill(
@@ -380,6 +508,14 @@ namespace zf {
                     e0_phi_born_->Fill(ZF_EVENT.e0_truth->bornPhi(), EVENT_WEIGHT);
                     e0_charge_->Fill(ZF_EVENT.e0_truth->charge(), EVENT_WEIGHT);
                     e0_r9_->Fill(ZF_EVENT.e0_truth->r9(), EVENT_WEIGHT);
+                    e0_sigma_ieta_ieta_->Fill(ZF_EVENT.e0_truth->sigma_ieta_ieta(), EVENT_WEIGHT);
+                    e0_h_over_e_->Fill(ZF_EVENT.e0_truth->h_over_e(), EVENT_WEIGHT);
+                    e0_deta_in_->Fill(ZF_EVENT.e0_truth->deta_in(), EVENT_WEIGHT);
+                    e0_dphi_in_->Fill(ZF_EVENT.e0_truth->dphi_in(), EVENT_WEIGHT);
+                    e0_track_iso_->Fill(ZF_EVENT.e0_truth->track_iso(), EVENT_WEIGHT);
+                    e0_ecal_iso_->Fill(ZF_EVENT.e0_truth->ecal_iso(), EVENT_WEIGHT);
+                    e0_hcal_iso_->Fill(ZF_EVENT.e0_truth->hcal_iso(), EVENT_WEIGHT);
+                    e0_one_over_e_mins_one_over_p_->Fill(ZF_EVENT.e0_truth->one_over_e_mins_one_over_p(), EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e1_truth != nullptr) {
                     e1_pt_->Fill(ZF_EVENT.e1_truth->pt(), EVENT_WEIGHT);
@@ -393,6 +529,14 @@ namespace zf {
                     e1_phi_born_->Fill(ZF_EVENT.e1_truth->bornPhi(), EVENT_WEIGHT);
                     e1_charge_->Fill(ZF_EVENT.e1_truth->charge(), EVENT_WEIGHT);
                     e1_r9_->Fill(ZF_EVENT.e1_truth->r9(), EVENT_WEIGHT);
+                    e1_sigma_ieta_ieta_->Fill(ZF_EVENT.e1_truth->sigma_ieta_ieta(), EVENT_WEIGHT);
+                    e1_h_over_e_->Fill(ZF_EVENT.e1_truth->h_over_e(), EVENT_WEIGHT);
+                    e1_deta_in_->Fill(ZF_EVENT.e1_truth->deta_in(), EVENT_WEIGHT);
+                    e1_dphi_in_->Fill(ZF_EVENT.e1_truth->dphi_in(), EVENT_WEIGHT);
+                    e1_track_iso_->Fill(ZF_EVENT.e1_truth->track_iso(), EVENT_WEIGHT);
+                    e1_ecal_iso_->Fill(ZF_EVENT.e1_truth->ecal_iso(), EVENT_WEIGHT);
+                    e1_hcal_iso_->Fill(ZF_EVENT.e1_truth->hcal_iso(), EVENT_WEIGHT);
+                    e1_one_over_e_mins_one_over_p_->Fill(ZF_EVENT.e1_truth->one_over_e_mins_one_over_p(), EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e0_trig != nullptr && ZF_EVENT.e0_truth != nullptr) {
                     e0_pt_vs_trig_->Fill(
@@ -420,6 +564,14 @@ namespace zf {
                     e0_phi_born_->Fill(ZF_EVENT.e1_truth->bornPhi(), EVENT_WEIGHT);
                     e0_charge_->Fill(ZF_EVENT.e1_truth->charge(), EVENT_WEIGHT);
                     e0_r9_->Fill(ZF_EVENT.e1_truth->r9(), EVENT_WEIGHT);
+                    e0_sigma_ieta_ieta_->Fill(ZF_EVENT.e1_truth->sigma_ieta_ieta(), EVENT_WEIGHT);
+                    e0_h_over_e_->Fill(ZF_EVENT.e1_truth->h_over_e(), EVENT_WEIGHT);
+                    e0_deta_in_->Fill(ZF_EVENT.e1_truth->deta_in(), EVENT_WEIGHT);
+                    e0_dphi_in_->Fill(ZF_EVENT.e1_truth->dphi_in(), EVENT_WEIGHT);
+                    e0_track_iso_->Fill(ZF_EVENT.e1_truth->track_iso(), EVENT_WEIGHT);
+                    e0_ecal_iso_->Fill(ZF_EVENT.e1_truth->ecal_iso(), EVENT_WEIGHT);
+                    e0_hcal_iso_->Fill(ZF_EVENT.e1_truth->hcal_iso(), EVENT_WEIGHT);
+                    e0_one_over_e_mins_one_over_p_->Fill(ZF_EVENT.e1_truth->one_over_e_mins_one_over_p(), EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e0_truth != nullptr) {
                     e1_pt_->Fill(ZF_EVENT.e0_truth->pt(), EVENT_WEIGHT);
@@ -433,6 +585,14 @@ namespace zf {
                     e1_phi_born_->Fill(ZF_EVENT.e0_truth->bornPhi(), EVENT_WEIGHT);
                     e1_charge_->Fill(ZF_EVENT.e0_truth->charge(), EVENT_WEIGHT);
                     e1_r9_->Fill(ZF_EVENT.e0_truth->r9(), EVENT_WEIGHT);
+                    e1_sigma_ieta_ieta_->Fill(ZF_EVENT.e0_truth->sigma_ieta_ieta(), EVENT_WEIGHT);
+                    e1_h_over_e_->Fill(ZF_EVENT.e0_truth->h_over_e(), EVENT_WEIGHT);
+                    e1_deta_in_->Fill(ZF_EVENT.e0_truth->deta_in(), EVENT_WEIGHT);
+                    e1_dphi_in_->Fill(ZF_EVENT.e0_truth->dphi_in(), EVENT_WEIGHT);
+                    e1_track_iso_->Fill(ZF_EVENT.e0_truth->track_iso(), EVENT_WEIGHT);
+                    e1_ecal_iso_->Fill(ZF_EVENT.e0_truth->ecal_iso(), EVENT_WEIGHT);
+                    e1_hcal_iso_->Fill(ZF_EVENT.e0_truth->hcal_iso(), EVENT_WEIGHT);
+                    e1_one_over_e_mins_one_over_p_->Fill(ZF_EVENT.e0_truth->one_over_e_mins_one_over_p(), EVENT_WEIGHT);
                 }
                 if (ZF_EVENT.e1_trig != nullptr && ZF_EVENT.e1_truth != nullptr) {
                     e0_pt_vs_trig_->Fill(

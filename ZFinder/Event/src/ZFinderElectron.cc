@@ -19,6 +19,14 @@ namespace zf {
         eta_ = input_electron.eta();
         phi_ = input_electron.phi();
         r9_ = input_electron.r9();
+        sigma_ieta_ieta_ = input_electron.sigmaIetaIeta();
+        h_over_e_ = input_electron.hadronicOverEm();
+        deta_in_ = input_electron.deltaEtaSuperClusterTrackAtVtx();
+        dphi_in_ = input_electron.deltaPhiSuperClusterTrackAtVtx();
+        track_iso_ = input_electron.dr03TkSumPt();
+        ecal_iso_ = input_electron.dr03EcalRecHitSumEt();
+        hcal_iso_ = input_electron.dr03HcalTowerSumEt();
+        one_over_e_mins_one_over_p_ = (1.0/input_electron.ecalEnergy() - input_electron.eSuperClusterOverP()/input_electron.ecalEnergy());
         charge_ = input_electron.charge();
         sc_eta_ = input_electron.superCluster()->eta();
         sc_phi_ = input_electron.superCluster()->phi();
@@ -38,6 +46,14 @@ namespace zf {
         r9_ = -1;
         sc_eta_ = -10;
         sc_phi_ = -10;
+        sigma_ieta_ieta_ = -1;
+        h_over_e_ = -1;
+        deta_in_ = -1;
+        dphi_in_ = -1;
+        track_iso_ = -1;
+        ecal_iso_ = -1;
+        hcal_iso_ = -1;
+        one_over_e_mins_one_over_p_ = -1;
         // Using the input_electron Data Group ID Number, determine if the input_electron is an
         // electron or positron
         if (input_electron.pdgId() == PDGID::ELECTRON) {
@@ -64,6 +80,14 @@ namespace zf {
         phi_ = dressed_electron.phi();
         eta_ = dressed_electron.eta();
         r9_ = -1;
+        sigma_ieta_ieta_ = -1;
+        h_over_e_ = -1;
+        deta_in_ = -1;
+        dphi_in_ = -1;
+        track_iso_ = -1;
+        ecal_iso_ = -1;
+        hcal_iso_ = -1;
+        one_over_e_mins_one_over_p_ = -1;
         sc_eta_ = -10;
         sc_phi_ = -10;
         //born:
@@ -95,6 +119,14 @@ namespace zf {
         eta_ = input_electron.eta();
         phi_ = input_electron.phi();
         r9_ = -1;
+        sigma_ieta_ieta_ = -1;
+        h_over_e_ = -1;
+        deta_in_ = -1;
+        dphi_in_ = -1;
+        track_iso_ = -1;
+        ecal_iso_ = -1;
+        hcal_iso_ = -1;
+        one_over_e_mins_one_over_p_ = -1;
         sc_eta_ = -10;
         sc_phi_ = -10;
         charge_ = input_electron.charge();
@@ -112,6 +144,14 @@ namespace zf {
         eta_ = input_electron.eta();
         phi_ = input_electron.phi();
         r9_ = input_electron.r9();
+        sigma_ieta_ieta_ = -1;
+        h_over_e_ = -1;
+        deta_in_ = -1;
+        dphi_in_ = -1;
+        track_iso_ = -1;
+        ecal_iso_ = -1;
+        hcal_iso_ = -1;
+        one_over_e_mins_one_over_p_ = -1;
         sc_eta_ = -10;
         sc_phi_ = -10;
         charge_ = 0;  // No charge because no tracker
@@ -128,6 +168,14 @@ namespace zf {
         eta_ = input_electron.eta();
         phi_ = input_electron.phi();
         r9_ = -1;
+        sigma_ieta_ieta_ = -1;
+        h_over_e_ = -1;
+        deta_in_ = -1;
+        dphi_in_ = -1;
+        track_iso_ = -1;
+        ecal_iso_ = -1;
+        hcal_iso_ = -1;
+        one_over_e_mins_one_over_p_ = -1;
         sc_eta_ = -10;
         sc_phi_ = -10;
         charge_ = 0;  // No charge

@@ -72,6 +72,14 @@ namespace zf {
             double r9() const { return r9_; }
             double sc_eta() const { return sc_eta_; }
             double sc_phi() const { return sc_phi_; }
+            double sigma_ieta_ieta() const { return sigma_ieta_ieta_; }
+            double h_over_e() const { return h_over_e_; }
+            double deta_in() const { return deta_in_; }
+            double dphi_in() const { return dphi_in_; }
+            double track_iso() const { return track_iso_; }
+            double ecal_iso() const { return ecal_iso_; }
+            double hcal_iso() const { return hcal_iso_; }
+            double one_over_e_mins_one_over_p() { return one_over_e_mins_one_over_p_; }
 
             //Setters
             void set_phi(double new_phi) { phi_ = new_phi; }
@@ -106,8 +114,19 @@ namespace zf {
             double nakedEta_;
             double nakedPhi_;
 
-            // Other interesting quantities
+            // Shower shape variables
             double r9_;
+
+            // Variables used by EGamma POG cuts
+            // https://github.com/cms-sw/cmssw/blob/CMSSW_5_3_X/EgammaAnalysis/ElectronTools/src/EGammaCutBasedEleId.cc#L47-L55
+            double sigma_ieta_ieta_;
+            double h_over_e_;
+            double deta_in_;
+            double dphi_in_;
+            double track_iso_;
+            double ecal_iso_;
+            double hcal_iso_;
+            double one_over_e_mins_one_over_p_;
 
             // Other physical properties
             int charge_;
