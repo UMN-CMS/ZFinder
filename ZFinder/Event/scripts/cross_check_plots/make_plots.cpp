@@ -30,7 +30,7 @@ int main() {
             mc_tfile,
             "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
             "DY to ee",
-            1966.7,  // cross section in pb, from https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV
+            1177.3,  // cross section in pb, from https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV
             "ZFinder/unweighted_counter",  // TDir from before any cut
             SIGNAL_MC
             );
