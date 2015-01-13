@@ -128,7 +128,7 @@ namespace zf {
         // http://lovedeep.web.cern.ch/lovedeep/WORK13/TnPRun2012ReReco_2013Oct28/effiTable.html
         table_map_["eg_medium"] = &ecal_medium_scale_factors_;
         ecal_medium_scale_factors_.AddEfficiency(10.00, 15.00, 0.00, 0.80, 0.863, 0.020, 0.008);
-        ecal_medium_scale_factors_.AddEfficiency(5.00, 20.00, 0.00, 0.80, 0.956, 0.009, 0.009);
+        ecal_medium_scale_factors_.AddEfficiency(15.00, 20.00, 0.00, 0.80, 0.956, 0.009, 0.009);
         ecal_medium_scale_factors_.AddEfficiency(20.00, 30.00, 0.00, 0.80, 0.986, 0.001, 0.002);
         ecal_medium_scale_factors_.AddEfficiency(30.00, 40.00, 0.00, 0.80, 1.002, 0.001, 0.001);
         ecal_medium_scale_factors_.AddEfficiency(40.00, 50.00, 0.00, 0.80, 1.005, 0.001, 0.001);
