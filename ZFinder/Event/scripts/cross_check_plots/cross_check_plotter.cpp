@@ -370,7 +370,7 @@ void CrossCheckPlotter::plot(
     ratio_histo->GetYaxis()->SetTitle("Data/MC");
     ratio_histo->GetYaxis()->SetLabelSize(0.1);
     ratio_histo->GetYaxis()->SetTitleSize(0.1);
-    ratio_histo->GetYaxis()->SetNdivisions(14, 0, 0);  // Set 10 major ticks, 0 minor
+    ratio_histo->GetYaxis()->SetNdivisions(7, 0, 0);  // Set 10 major ticks, 0 minor
     ratio_histo->GetYaxis()->SetTickLength(0.01);  // Make the ticks smaller
     data_histo->GetXaxis()->SetTitle(0);  // We use the ratio_histo to draw these
     data_histo->GetXaxis()->SetLabelSize(0);  // Remove numbers
@@ -480,6 +480,7 @@ void CrossCheckPlotter::plot(
     histo_stack->Draw("HIST SAME");
     data_histo->Draw("E SAME");
     legend.Draw();
+    histo_stack->Draw("HIST SAME");
     if (plot_title != nullptr) {
         plot_title->Draw();
     }
@@ -500,15 +501,18 @@ void CrossCheckPlotter::plot(
     ratio_line.SetLineColor(kRed);
     // Make the ratio
     ratio_histo->Divide(data_histo, histo_sum);
-    ratio_histo->SetMaximum(1.3);
-    ratio_histo->SetMinimum(0.7);
+    const double RATIO_OFFSET_FROM_1 = 0.3;
+    ratio_histo->SetMaximum(1. + RATIO_OFFSET_FROM_1);
+    ratio_histo->SetMinimum(1. - RATIO_OFFSET_FROM_1);
 
     ratio_histo->Draw("E");  // Draw first for Axis labels
     ratio_line.Draw("SAME");
     ratio_histo->Draw("E SAME");
 
     // Save the plot as a png
-    canvas.Print(FILE_NAME.c_str(), "png");
+    canvas.Print(FILE_NAME.c_str(), "pdf");
+    const std::string C_FILE_NAME = FILE_NAME + ".C";
+    canvas.Print(C_FILE_NAME.c_str(), "cxx");
 
     // Clean up
     delete ratio_histo;
@@ -651,7 +655,7 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",        // y_label
                     "",              // title
                     "Z0 Mass: All",  // histogram name (for reading in)
-                    true,            // log Y axis
+                    false,           // log Y axis
                     false,           // log X axis
                     {}               // Desired new binning
                     // DY Group Binning
@@ -670,7 +674,7 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "Z0 Mass: Coarse",
-                    true,
+                    false,
                     false,
                     {}
                     // DY Group Binning
@@ -689,7 +693,7 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "Z0 Mass: Fine",
-                    true,
+                    false,
                     false,
                     {}
                     // DY Group Binning
@@ -877,7 +881,12 @@ void CrossCheckPlotter::init_config_map() {
                     "N_{Vertices}",
                     true,
                     false,
-                    {}
+                    { 0., 1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12.,
+                    13., 14., 15., 16., 17., 18., 19., 20., 21., 22., 23., 24.,
+                    25., 26., 27., 28., 29., 30., 31., 32., 33., 34., 35., 36.,
+                    37., 38., 39., 40., 41., 42., 43., 44., 45., 46., 47., 48.,
+                    49., 50.
+                    }
                     )
                 )
             );

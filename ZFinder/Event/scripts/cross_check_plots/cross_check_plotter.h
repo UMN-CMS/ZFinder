@@ -132,6 +132,7 @@ struct DataConfig{
         const int N_BINS = tmp_histo->GetNbinsX();
         // Integrate from the underflow bin (0) to the overflow (N+1)
         const double EVENTS = tmp_histo->Integral(0, N_BINS + 1);
+        //std::cout << name << " Events: " << EVENTS << std::endl;
         // Compute the luminosity
         luminosity = EVENTS / cross_section;
     }

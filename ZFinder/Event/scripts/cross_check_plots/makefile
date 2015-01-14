@@ -6,7 +6,10 @@ ROOT_ALL=`root-config --cflags --libs`
 CC=g++ -O2 -g -std=c++0x -Wall
 CCC=${CC} -c
 
-all: make_plots.exe
+all: plots
+
+plots: make_plots.exe
+	./make_plots.exe
 
 make_plots.exe: make_plots.cpp cross_check_plotter.o
 	${CC} ${ROOT_ALL} -o make_plots.exe \

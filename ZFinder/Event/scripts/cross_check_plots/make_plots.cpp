@@ -13,114 +13,115 @@
 int main() {
     // Data
     TFile* data_tfile = new TFile(
-            "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20141010_SingleElectron_2012ALL/20141010_SingleElectron_2012ALL_hadded.root"
+            "/data/whybee0a/user/gude_2/Data/20140111_SingleElectron_2012ALL/20140111_SingleElectron_2012ALL_hadded.root"
             , "READ");
     DataConfig data_config(
             data_tfile,
-            "ZFinder/Combined Single Reco/6 60 < M_{ee} < 120",
+            "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
             "Data",
             -1.,  // -1 means area normalize all MC to match under the signal peak
             DATA
             );
     // Signal MC
     TFile* mc_tfile = new TFile(
-            "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20141126_regressed_and_smeared_MC/madgraph_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150111_MC_NNPDF23_MSTW2008_CT10/MadGraph_hadded.root"
             , "READ");
     DataConfig mc_config(
             mc_tfile,
             "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
             "DY to ee",
-            1177.3,  // cross section in pb, from https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV
-            "ZFinder/unweighted_counter",  // TDir from before any cut
+            // * 3 because 1177.3 is to a single flavor, but the MC has all 3
+            1177.3 * 3.,  // cross section in pb, from https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV
+            "ZFinder/weighted_counter",  // TDir from before any cut
             SIGNAL_MC
             );
     // BG
     TFile* bg_tfile_0 = new TFile(
-            "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20141110_Summer12_DR53X_TTJets_FullLeptMGDecays_8TeV-madgraph_2012ABCD_tuples/20141110_Summer12_DR53X_TTJets_FullLeptMGDecays_8TeV-madgraph_2012ABCD_tuples_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150111_MC_NNPDF23_MSTW2008_CT10/BG_ttbar_hadded.root"
             , "READ");
     DataConfig bg_config_0(
             bg_tfile_0,
             "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
             "t#bar{t}",
             23.64,  // TTBar Inclusive is 245.8 Pb, T->Wq is 0.9621, W->lnu is 0.3257
-            "ZFinder/unweighted_counter",
+            "ZFinder/weighted_counter",
             BG_MC
             );
     TFile* bg_tfile_1 = new TFile(
-            "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20141126_regressed_and_smeared_MC/bg_ditau_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150111_MC_NNPDF23_MSTW2008_CT10/BG_Ditau_hadded.root"
             , "READ");
     DataConfig bg_config_1(
             bg_tfile_1,
             "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
             "DY to #tau#tau",
             1966.7,
-            "ZFinder/unweighted_counter",
+            "ZFinder/weighted_counter",
             BG_MC
             );
     TFile* bg_tfile_2 = new TFile(
-            "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20141126_regressed_and_smeared_MC/bg_single_t_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150111_MC_NNPDF23_MSTW2008_CT10/BG_singlet_tw_hadded.root"
             , "READ");
     DataConfig bg_config_2(
             bg_tfile_2,
             "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
             "Single t",
             11.1,
-            "ZFinder/unweighted_counter",
+            "ZFinder/weighted_counter",
             BG_MC
             );
     TFile* bg_tfile_3 = new TFile(
-            "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20141126_regressed_and_smeared_MC/bg_single_tbar_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150111_MC_NNPDF23_MSTW2008_CT10/BG_singlet_tbarw_hadded.root"
             , "READ");
     DataConfig bg_config_3(
             bg_tfile_3,
             "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
-            "single #bar{t}",
+            "Single #bar{t}",
             11.1,
-            "ZFinder/unweighted_counter",
+            "ZFinder/weighted_counter",
             BG_MC
             );
     TFile* bg_tfile_4 = new TFile(
-            "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20141126_regressed_and_smeared_MC/bg_wz_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150111_MC_NNPDF23_MSTW2008_CT10/BG_wz_hadded.root"
             , "READ");
     DataConfig bg_config_4(
             bg_tfile_4,
             "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
             "WZ",
             33.21,
-            "ZFinder/unweighted_counter",
+            "ZFinder/weighted_counter",
             BG_MC
             );
     TFile* bg_tfile_5 = new TFile(
-            "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20141126_regressed_and_smeared_MC/bg_ww_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150111_MC_NNPDF23_MSTW2008_CT10/BG_ww_hadded.root"
             , "READ");
     DataConfig bg_config_5(
             bg_tfile_5,
             "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
             "WW",
             54.84,
-            "ZFinder/unweighted_counter",
+            "ZFinder/weighted_counter",
             BG_MC
             );
     TFile* bg_tfile_6 = new TFile(
-            "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20141126_regressed_and_smeared_MC/bg_zz_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150111_MC_NNPDF23_MSTW2008_CT10/BG_zz_hadded.root"
             , "READ");
     DataConfig bg_config_6(
             bg_tfile_6,
             "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
             "ZZ",
             17.7,
-            "ZFinder/unweighted_counter",
+            "ZFinder/weighted_counter",
             BG_MC
             );
     TFile* bg_tfile_7 = new TFile(
-            "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20141126_regressed_and_smeared_MC/bg_w_jets_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150111_MC_NNPDF23_MSTW2008_CT10/BG_w_jets_hadded.root"
             , "READ");
     DataConfig bg_config_7(
             bg_tfile_7,
             "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
             "W + Jets",
             37509.,
-            "ZFinder/unweighted_counter",
+            "ZFinder/weighted_counter",
             BG_MC
             );
     // BG Map, the names are used for sort ordering alphabetically, so adding
@@ -143,22 +144,22 @@ int main() {
             );
 
     // Make a plot
-    plotter->plot(Z_MASS_ALL, "z_mass_all.png");
-    plotter->plot(Z_MASS_COARSE, "z_mass_coarse.png");
-    plotter->plot(Z_MASS_FINE, "z_mass_fine.png");
-    plotter->plot(Z_RAPIDITY, "z_rapidity.png");
-    plotter->plot(Z_PT, "z_pt.png");
-    plotter->plot(E0_PT, "e0_pt.png");
-    plotter->plot(E0_ETA, "e0_eta.png");
-    //plotter->plot(E0_PHI, "e0_phi.png");
-    //plotter->plot(E0_CHARGE, "e0_charge.png");
-    plotter->plot(E1_PT, "e1_pt.png");
-    plotter->plot(E1_ETA, "e1_eta.png");
-    //plotter->plot(E1_PHI, "e1_phi.png");
-    //plotter->plot(E1_CHARGE, "e1_charge.png");
-    plotter->plot(PHISTAR, "phistar.png");
-    plotter->plot(N_VERTS, "n_verts.png");
-    plotter->plot(N_E, "n_e.png");
+    plotter->plot(Z_MASS_ALL, "z_mass_all.pdf");
+    plotter->plot(Z_MASS_COARSE, "z_mass_coarse.pdf");
+    plotter->plot(Z_MASS_FINE, "z_mass_fine.pdf");
+    plotter->plot(Z_RAPIDITY, "z_rapidity.pdf");
+    plotter->plot(Z_PT, "z_pt.pdf");
+    plotter->plot(E0_PT, "e0_pt.pdf");
+    plotter->plot(E0_ETA, "e0_eta.pdf");
+    //plotter->plot(E0_PHI, "e0_phi.pdf");
+    //plotter->plot(E0_CHARGE, "e0_charge.pdf");
+    plotter->plot(E1_PT, "e1_pt.pdf");
+    plotter->plot(E1_ETA, "e1_eta.pdf");
+    //plotter->plot(E1_PHI, "e1_phi.pdf");
+    //plotter->plot(E1_CHARGE, "e1_charge.pdf");
+    plotter->plot(PHISTAR, "phistar.pdf");
+    plotter->plot(N_VERTS, "n_verts.pdf");
+    plotter->plot(N_E, "n_e.pdf");
 
     // Clean up
     delete plotter;
