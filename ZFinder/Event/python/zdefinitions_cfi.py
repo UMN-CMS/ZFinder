@@ -15,16 +15,6 @@ all_electrons = cms.untracked.PSet(
         use_truth_mass = cms.untracked.bool(False),
         )
 
-# Definition to look at trigger efficiency
-trigger_efficiency_cuts = cms.untracked.PSet(
-        name = cms.untracked.string("Trigger Efficiency Cuts"),
-        cuts0 = cms.untracked.vstring("type_gsf", "acc(MUON_TIGHT)", "pt>30", "eg_tight", "trig(single_ele)", "acc(ALL)"),
-        cuts1 = cms.untracked.vstring("type_gsf", "acc(MUON_TIGHT)", "pt>30", "eg_tight", "acc(ALL)",         "trig(single_ele)"),
-        min_mz = MIN_MZ,
-        max_mz = MAX_MZ,
-        use_truth_mass = cms.untracked.bool(False),
-        )
-
 # Only the kinematic cuts for the combined muon result, using generator
 # quantities
 combined_gen_cuts = cms.untracked.PSet(
@@ -60,6 +50,16 @@ combined_single_no_trigger = combined_single.clone(
         name = cms.untracked.string("Combined Single No Trigger"),
         cuts0 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_TIGHT)", "pt>30", "eg_tight"),
         cuts1 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_LOOSE)", "pt>20", "eg_medium"),
+        )
+
+# Cuts for the combined muon result assuming a double electron trigger
+combined_double = cms.untracked.PSet(
+        name = cms.untracked.string("Combined Double"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_TIGHT)", "trig(et_et_tight)", "pt>30", "eg_tight"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_LOOSE)", "acc(et_et_loose)",  "pt>20", "eg_medium"),
+        min_mz = MIN_MZ,
+        max_mz = MAX_MZ,
+        use_truth_mass = cms.untracked.bool(False),
         )
 
 # Cuts for the electron only analysis
@@ -155,7 +155,7 @@ sequence_plots_3_double_trigger = cms.untracked.PSet(
         )
 
 # Regression Checks
-regression_r9_lt_eta_lt = cms.untracked.PSet(
+regression_r9_lt_eta_10 = cms.untracked.PSet(
         name = cms.untracked.string("Regression Check R9<0.94 |eta|<1"),
         cuts0 = cms.untracked.vstring("aeta<1", "r9<0.94"),
         cuts1 = cms.untracked.vstring("aeta<1", "r9<0.94"),
@@ -164,22 +164,46 @@ regression_r9_lt_eta_lt = cms.untracked.PSet(
         use_truth_mass = cms.untracked.bool(False),
         )
 
-regression_r9_lt_eta_gt = regression_r9_lt_eta_lt.clone(
-        name = cms.untracked.string("Regression Check R9<0.94 |eta|>1"),
-        cuts0 = cms.untracked.vstring("aeta>1", "r9<0.94"),
-        cuts1 = cms.untracked.vstring("aeta>1", "r9<0.94"),
+regression_r9_lt_eta_14 = regression_r9_lt_eta_10.clone(
+        name = cms.untracked.string("Regression Check R9<0.94 |eta|<1.4"),
+        cuts0 = cms.untracked.vstring("aeta>1", "aeta<1.4442", "r9<0.94"),
+        cuts1 = cms.untracked.vstring("aeta>1", "aeta<1.4442", "r9<0.94"),
         )
 
-regression_r9_gt_eta_lt = regression_r9_lt_eta_lt.clone(
-        name = cms.untracked.string("Regression Check R9>0.94 |eta|<1"),
-        cuts0 = cms.untracked.vstring("aeta<1", "r9>0.94"),
-        cuts1 = cms.untracked.vstring("aeta<1", "r9>0.94"),
+regression_r9_lt_eta_20 = regression_r9_lt_eta_10.clone(
+        name = cms.untracked.string("Regression Check R9<0.94 |eta|<2"),
+        cuts0 = cms.untracked.vstring("aeta>1.566", "aeta<2", "r9<0.94"),
+        cuts1 = cms.untracked.vstring("aeta>1.566", "aeta<2", "r9<0.94"),
         )
 
-regression_r9_gt_eta_gt = regression_r9_lt_eta_lt.clone(
+regression_r9_lt_eta_25 = regression_r9_lt_eta_10.clone(
+        name = cms.untracked.string("Regression Check R9<0.94 |eta|<2.5"),
+        cuts0 = cms.untracked.vstring("aeta>2", "aeta<2.5", "r9<0.94"),
+        cuts1 = cms.untracked.vstring("aeta>2", "aeta<2.5", "r9<0.94"),
+        )
+
+regression_r9_gt_eta_10 = regression_r9_lt_eta_10.clone(
         name = cms.untracked.string("Regression Check R9>0.94 |eta|>1"),
-        cuts0 = cms.untracked.vstring("aeta>1", "r9>0.94"),
-        cuts1 = cms.untracked.vstring("aeta>1", "r9>0.94"),
+        cuts0 = cms.untracked.vstring("aeta<1", "r9<0.94"),
+        cuts1 = cms.untracked.vstring("aeta<1", "r9<0.94"),
+        )
+
+regression_r9_gt_eta_14 = regression_r9_lt_eta_10.clone(
+        name = cms.untracked.string("Regression Check R9>0.94 |eta|<1.4"),
+        cuts0 = cms.untracked.vstring("aeta>1", "aeta<1.4442", "r9<0.94"),
+        cuts1 = cms.untracked.vstring("aeta>1", "aeta<1.4442", "r9<0.94"),
+        )
+
+regression_r9_gt_eta_20 = regression_r9_lt_eta_10.clone(
+        name = cms.untracked.string("Regression Check R9>0.94 |eta|<2"),
+        cuts0 = cms.untracked.vstring("aeta>1.566", "aeta<2", "r9<0.94"),
+        cuts1 = cms.untracked.vstring("aeta>1.566", "aeta<2", "r9<0.94"),
+        )
+
+regression_r9_gt_eta_25 = regression_r9_lt_eta_10.clone(
+        name = cms.untracked.string("Regression Check R9>0.94 |eta|<2.5"),
+        cuts0 = cms.untracked.vstring("aeta>2", "aeta<2.5", "r9<0.94"),
+        cuts1 = cms.untracked.vstring("aeta>2", "aeta<2.5", "r9<0.94"),
         )
 
 
@@ -204,11 +228,15 @@ zdefs_combined_data = cms.untracked.VPSet(
         all_electrons,
         combined_reco_cuts,
         combined_single,
-        trigger_efficiency_cuts,
-        regression_r9_lt_eta_lt,
-        regression_r9_lt_eta_gt,
-        regression_r9_gt_eta_lt,
-        regression_r9_gt_eta_gt,
+        combined_double,
+        #regression_r9_lt_eta_10,
+        #regression_r9_lt_eta_14,
+        #regression_r9_lt_eta_20,
+        #regression_r9_lt_eta_25,
+        #regression_r9_gt_eta_10,
+        #regression_r9_gt_eta_14,
+        #regression_r9_gt_eta_20,
+        #regression_r9_gt_eta_25,
         )
 
 # The ZDefinition for use on MC for the combined result
@@ -218,13 +246,18 @@ zdefs_combined_mc = cms.untracked.VPSet(
         combined_reco_cuts,
         combined_single,
         combined_single_no_trigger,
+        combined_double,
         sequence_plots_0_gen_mass,
         sequence_plots_1_acceptance,
         sequence_plots_2_id,
         sequence_plots_3_single_trigger,
         sequence_plots_3_double_trigger,
-        regression_r9_lt_eta_lt,
-        regression_r9_lt_eta_gt,
-        regression_r9_gt_eta_lt,
-        regression_r9_gt_eta_gt,
+        #regression_r9_lt_eta_10,
+        #regression_r9_lt_eta_14,
+        #regression_r9_lt_eta_20,
+        #regression_r9_lt_eta_25,
+        #regression_r9_gt_eta_10,
+        #regression_r9_gt_eta_14,
+        #regression_r9_gt_eta_20,
+        #regression_r9_gt_eta_25,
         )
