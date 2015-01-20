@@ -905,4 +905,265 @@ void CrossCheckPlotter::init_config_map() {
                     )
                 )
             );
+    // Supercluster R9
+    conf_map_.insert(
+            config_pair(
+                E0_R9,
+                PlotConfig(
+                    "R9",
+                    "Events",
+                    "",
+                    "r9_{e_{0}}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    conf_map_.insert(
+            config_pair(
+                E1_R9,
+                PlotConfig(
+                    "R9",
+                    "Events",
+                    "",
+                    "r9_{e_{1}}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    // Supercluster sigma ieta sigma ieta
+    conf_map_.insert(
+            config_pair(
+                E0_SIGMAIETA,
+                PlotConfig(
+                    "#sigma_{i #eta i #eta}^{e_{0}}",
+                    "Events",
+                    "",
+                    "sigma_{i #eta i #eta}^{e_{0}}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    conf_map_.insert(
+            config_pair(
+                E1_SIGMAIETA,
+                PlotConfig(
+                    "#sigma_{i #eta i #eta}^{e_{1}}",
+                    "Events",
+                    "",
+                    "sigma_{i #eta i #eta}^{e_{1}}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    // Supercluster H/E
+    conf_map_.insert(
+            config_pair(
+                E0_HE,
+                PlotConfig(
+                    "H/E",
+                    "Events",
+                    "",
+                    "(H\/E)_{e_{0}}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    conf_map_.insert(
+            config_pair(
+                E1_HE,
+                PlotConfig(
+                    "H/E",
+                    "Events",
+                    "",
+                    "(H\/E)_{e_{1}}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    // Supercluster dEta
+    conf_map_.insert(
+            config_pair(
+                E0_DETA,
+                PlotConfig(
+                    "d#eta",
+                    "Events",
+                    "",
+                    "d#eta_{e_{0}}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    conf_map_.insert(
+            config_pair(
+                E1_DETA,
+                PlotConfig(
+                    "d#eta",
+                    "Events",
+                    "",
+                    "d#eta_{e_{1}}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    // Supercluster dPhi
+    conf_map_.insert(
+            config_pair(
+                E0_DPHI,
+                PlotConfig(
+                    "d#phi",
+                    "Events",
+                    "",
+                    "d#phi_{e_{0}}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    conf_map_.insert(
+            config_pair(
+                E1_DPHI,
+                PlotConfig(
+                    "d#phi",
+                    "Events",
+                    "",
+                    "d#phi_{e_{1}}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    // Supercluster Track ISO
+    conf_map_.insert(
+            config_pair(
+                E0_TRACKISO,
+                PlotConfig(
+                    "Track ISO",
+                    "Events",
+                    "",
+                    "Track ISO_{e_{0}}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    conf_map_.insert(
+            config_pair(
+                E1_TRACKISO,
+                PlotConfig(
+                    "Track ISO",
+                    "Events",
+                    "",
+                    "Track ISO_{e_{1}}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    // Supercluster ECAL ISO
+    conf_map_.insert(
+            config_pair(
+                E0_ECALISO,
+                PlotConfig(
+                    "ECAL ISO",
+                    "Events",
+                    "",
+                    "ECAL ISO_{e_{0}}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    conf_map_.insert(
+            config_pair(
+                E1_ECALISO,
+                PlotConfig(
+                    "ECAL ISO",
+                    "Events",
+                    "",
+                    "ECAL ISO_{e_{1}}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    // Supercluster HCAL ISO
+    conf_map_.insert(
+            config_pair(
+                E0_HCALISO,
+                PlotConfig(
+                    "HCAL ISO",
+                    "Events",
+                    "",
+                    "HCAL ISO_{e_{0}}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    conf_map_.insert(
+            config_pair(
+                E1_HCALISO,
+                PlotConfig(
+                    "HCAL ISO",
+                    "Events",
+                    "",
+                    "HCAL ISO_{e_{1}}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    // Supercluster 1/E - 1/P
+    conf_map_.insert(
+            config_pair(
+                E0_1OEM1OP,
+                PlotConfig(
+                    "1/E - 1/P",
+                    "Events",
+                    "",
+                    "1\/E - 1\/P e_{0}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
+    conf_map_.insert(
+            config_pair(
+                E1_1OEM1OP,
+                PlotConfig(
+                    "1/E - 1/P",
+                    "Events",
+                    "",
+                    "1//E - 1//P e_{1}",
+                    true,
+                    false,
+                    {}
+                    )
+                )
+            );
 }

@@ -42,7 +42,25 @@ enum PlotType{
     E1_CHARGE,
     PHISTAR,
     N_VERTS,
-    N_E
+    N_E,
+    E0_R9,
+    E1_R9,
+    E0_SIGMAIETA,
+    E1_SIGMAIETA,
+    E0_HE,
+    E1_HE,
+    E0_DETA,
+    E1_DETA,
+    E0_DPHI,
+    E1_DPHI,
+    E0_TRACKISO,
+    E1_TRACKISO,
+    E0_ECALISO,
+    E1_ECALISO,
+    E0_HCALISO,
+    E1_HCALISO,
+    E0_1OEM1OP,
+    E1_1OEM1OP
 };
 
 struct PlotConfig{

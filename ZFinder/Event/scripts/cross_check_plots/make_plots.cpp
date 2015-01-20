@@ -160,6 +160,24 @@ int main() {
     plotter->plot(PHISTAR, "phistar.pdf");
     plotter->plot(N_VERTS, "n_verts.pdf");
     plotter->plot(N_E, "n_e.pdf");
+    plotter->plot(E0_R9, "e0_r9.pdf");
+    plotter->plot(E1_R9, "e1_r9.pdf");
+    plotter->plot(E0_SIGMAIETA, "e0_sigmaieta.pdf");
+    plotter->plot(E1_SIGMAIETA, "e1_sigmaieta.pdf");
+    //plotter->plot(E0_HE, "e0_HE.pdf");
+    //plotter->plot(E1_HE, "e1_HE.pdf");
+    plotter->plot(E0_DETA, "e0_deta.pdf");
+    plotter->plot(E1_DETA, "e1_deta.pdf");
+    plotter->plot(E0_DPHI, "e0_dphi.pdf");
+    plotter->plot(E1_DPHI, "e1_dphi.pdf");
+    plotter->plot(E0_TRACKISO, "e0_track_iso.pdf");
+    plotter->plot(E1_TRACKISO, "e1_track_iso.pdf");
+    plotter->plot(E0_ECALISO, "e0_ecal_iso.pdf");
+    plotter->plot(E1_ECALISO, "e1_ecal_iso.pdf");
+    plotter->plot(E0_HCALISO, "e0_hcal_iso.pdf");
+    plotter->plot(E1_HCALISO, "e1_hcal_iso.pdf");
+    //plotter->plot(E0_1OEM1OP, "e0_1oe_1op_iso.pdf");
+    //plotter->plot(E1_1OEM1OP, "e1_1oe_1op_iso.pdf");
 
     // Clean up
     delete plotter;
