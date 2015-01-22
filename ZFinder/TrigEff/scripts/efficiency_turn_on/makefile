@@ -6,7 +6,10 @@ ROOT_ALL=`root-config --cflags --libs`
 CC=g++ -O2 -g -std=c++0x -Wall
 CCC=${CC} -c
 
-all: efficiency_turn_on.exe
+all: plot
+
+plot: efficiency_turn_on.exe
+	./efficiency_turn_on.exe
 
 efficiency_turn_on.exe: efficiency_turn_on.cpp
 	${CC} ${ROOT_ALL} -o efficiency_turn_on.exe \

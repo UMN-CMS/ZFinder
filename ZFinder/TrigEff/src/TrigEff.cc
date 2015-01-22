@@ -111,8 +111,9 @@ TrigEff::TrigEff(const edm::ParameterSet& iConfig) {
     //now do what ever initialization is needed
     edm::Service<TFileService> fs;
 
-    const std::vector<double> ETA_BINS = {-2.1, -1.478, -0.8, 0., 0.8, 1.478, 2.1};
-    const std::vector<double> PT_BINS = {30., 40., 50., 200., 2000.};
+    // Bins for the 2D histogram
+    const std::vector<double> ETA_BINS = {0., 0.8, 1.442, 1.556, 2.0, 2.5}; // AN-14-050 rejects in 1.442-1.556
+    const std::vector<double> PT_BINS = {30., 40., 50., 70., 250., 2000.};
 
     numerator_ = fs->make<TH2D>("numerator", "numerator", PT_BINS.size() - 1, &PT_BINS[0], ETA_BINS.size() - 1, &ETA_BINS[0]);
     numerator_->GetYaxis()->SetTitle("Probe #eta");
@@ -150,14 +151,13 @@ TrigEff::~TrigEff() {
 // ------------ method called for each event  ------------
 void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-    // Find the lumi reweighting weight and the natural weight
 
-    edm::Handle<std::vector<PileupSummaryInfo> > pileup_info;
-    iEvent.getByLabel("addPileupInfo", pileup_info);
-
-    // Must be a float because weight() below takes float or int
     double weight = 1;
     if (!iEvent.isRealData()) {
+        // Find the lumi reweighting weight and the natural weight
+        edm::Handle<std::vector<PileupSummaryInfo> > pileup_info;
+        iEvent.getByLabel("addPileupInfo", pileup_info);
+
         // Lumi Weight
         float true_number_of_pileup = -1.;
         std::vector<PileupSummaryInfo>::const_iterator PILEUP_ELEMENT;
@@ -214,10 +214,6 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     for (unsigned int i = 0; i < els_h->size(); ++i) {
         // Get the electron and set put it into the electrons vector
         reco::GsfElectron electron = els_h->at(i);
-        // We enforce a minimum quality cut
-        if (electron.pt() < 30 || fabs(electron.eta()) > 2.1) {
-            continue;
-        }
 
         // get reference to electron and the electron
         reco::GsfElectronRef ele_ref(els_h, i);
@@ -235,22 +231,33 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         const bool TIGHT = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::TIGHT, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
         //const bool TRIGWP70 = EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERWP70, ele_ref);
 
-        bool save_electron = false;
-        // Use only tight
+        // Use only tight electrons
         if (TIGHT) {
-            save_electron = true;
-        }
-
-        // Save the electron if it passes our cuts
-        if (save_electron) {
             our_electrons.push_back(electron);
         }
     }
 
-    // Number of electrons
+    // Number of electrons, reject if 3 or more
     if (our_electrons.size() == 2) {
+        // Reject if sign isn't opposite
+        if (our_electrons[0].charge() * our_electrons[1].charge() > 0) {
+            std::cout << "Charge FAIL: " << our_electrons[0].charge() << " " << our_electrons[1].charge() << std::endl;
+            return;
+        }
 
-        // Apply GSF scale factors
+        // Reject if the mass is outside our window
+        const double ELECTRON_MASS = 5.109989e-4;
+        math::PtEtaPhiMLorentzVector e0lv(our_electrons[0].pt(), our_electrons[0].eta(), our_electrons[0].phi(), ELECTRON_MASS);
+        math::PtEtaPhiMLorentzVector e1lv(our_electrons[1].pt(), our_electrons[1].eta(), our_electrons[1].phi(), ELECTRON_MASS);
+        math::PtEtaPhiMLorentzVector zlv;
+        zlv = e0lv + e1lv;
+        const double MASS = zlv.mass();
+        if (MASS < 80 || 100 < MASS) {
+            std::cout << "Mass FAIL: " << MASS << std::endl;
+            return;
+        }
+
+        // Apply GSF scale factors to MC
         if (!iEvent.isRealData()) {
             const std::string GSF_STR = "type_gsf";
             weight *= scale_factors_.GetEfficiency(GSF_STR, our_electrons[0].pt(), our_electrons[0].eta());
@@ -270,6 +277,7 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
             return;
         }
 
+        // Match the electrons to the HLT
         bool match_hlt_0 = false;
         bool match_hlt_1 = false;
         int trig_size = 0;
@@ -283,49 +291,27 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
             for (auto& i_key : trig_keys) {
                 const trigger::TriggerObject* trig_obj = &trig_obj_collection[i_key];
                 const double DR_0 = deltaR(our_electrons[0].eta(), our_electrons[0].phi(), trig_obj->eta(), trig_obj->phi());
-                if (DR_0 < 0.3) {
+                if (DR_0 < 0.2) {
                     match_hlt_0 = true;
                 }
                 const double DR_1 = deltaR(our_electrons[1].eta(), our_electrons[1].phi(), trig_obj->eta(), trig_obj->phi());
-                if (DR_1 < 0.3) {
+                if (DR_1 < 0.2) {
                     match_hlt_1 = true;
                 }
             }
         }
 
-        //const int N_HLT = trig_size;
-
-        // L1 objects match
-        //bool match_0 = false;
-        //bool match_1 = false;
-        //edm::Handle<l1extra::L1EmParticleCollection> l1ems;
-        //edm::InputTag l1em_tag("l1extraParticles", "Isolated", "RECO");
-        //iEvent.getByLabel(l1em_tag, l1ems);
-        ////std::cout << "Found " << l1ems->size() << " L1 EM Objects" << std::endl;
-        //for(unsigned int i = 0; i < l1ems->size(); ++i) {
-        //    l1extra::L1EmParticle l1_particle = l1ems->at(i);
-        //    //std::cout << l1_particle.pt() << std::endl;
-        //    const double DR_0 = deltaR(our_electrons[0].eta(), our_electrons[0].phi(), l1_particle.eta(), l1_particle.phi());
-        //    const double DR_1 = deltaR(our_electrons[1].eta(), our_electrons[1].phi(), l1_particle.eta(), l1_particle.phi());
-        //    if (DR_0 < 0.3) {
-        //        match_0 = true;
-        //    }
-        //    if (DR_1 < 0.3) {
-        //        match_1 = true;
-        //    }
-        //}
-
         // Fill historgrams
         if (match_hlt_0) {
-            denominator_->Fill(our_electrons[0].pt(), our_electrons[0].eta(), weight);
+            denominator_->Fill(our_electrons[1].pt(), fabs(our_electrons[1].eta()), weight);
             if (match_hlt_1) {
-                numerator_->Fill(our_electrons[0].pt(), our_electrons[0].eta(), weight);
+                numerator_->Fill(our_electrons[1].pt(), fabs(our_electrons[1].eta()), weight);
             }
         }
         if (match_hlt_1) {
-            denominator_->Fill(our_electrons[1].pt(), our_electrons[1].eta(), weight);
+            denominator_->Fill(our_electrons[0].pt(), fabs(our_electrons[0].eta()), weight);
             if (match_hlt_0) {
-                numerator_->Fill(our_electrons[1].pt(), our_electrons[1].eta(), weight);
+                numerator_->Fill(our_electrons[0].pt(), fabs(our_electrons[0].eta()), weight);
             }
         }
     }
