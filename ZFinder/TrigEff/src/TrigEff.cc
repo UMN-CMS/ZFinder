@@ -90,7 +90,9 @@ class TrigEff : public edm::EDAnalyzer {
 
         // ----------member data ---------------------------
         TH2D* numerator_;
+        TH2D* numerator_fine_;
         TH2D* denominator_;
+        TH2D* denominator_fine_;
         edm::InputTag ecal_electron_;
         edm::LumiReWeighting* lumi_weights_;
         zf::ZEfficiencies scale_factors_;
@@ -114,6 +116,7 @@ TrigEff::TrigEff(const edm::ParameterSet& iConfig) {
     // Bins for the 2D histogram
     const std::vector<double> ETA_BINS = {0., 0.8, 1.442, 1.556, 2.0, 2.5}; // AN-14-050 rejects in 1.442-1.556
     const std::vector<double> PT_BINS = {30., 40., 50., 70., 250., 2000.};
+    const std::vector<double> PT_BINS_FINE = {0., 5., 10., 15., 20., 25., 30., 35., 40., 45., 50., 60., 70., 80., 90., 100., 110., 120., 130., 140., 150.};
 
     numerator_ = fs->make<TH2D>("numerator", "numerator", PT_BINS.size() - 1, &PT_BINS[0], ETA_BINS.size() - 1, &ETA_BINS[0]);
     numerator_->GetYaxis()->SetTitle("Probe #eta");
@@ -121,6 +124,12 @@ TrigEff::TrigEff(const edm::ParameterSet& iConfig) {
     denominator_ = fs->make<TH2D>("denominator", "denominator", PT_BINS.size() - 1, &PT_BINS[0], ETA_BINS.size() - 1, &ETA_BINS[0]);
     denominator_->GetYaxis()->SetTitle("Probe #eta");
     denominator_->GetXaxis()->SetTitle("Probe p_{T}");
+    numerator_fine_ = fs->make<TH2D>("numerator_fine", "numerator_fine", PT_BINS_FINE.size() - 1, &PT_BINS_FINE[0], ETA_BINS.size() - 1, &ETA_BINS[0]);
+    numerator_fine_->GetYaxis()->SetTitle("Probe #eta");
+    numerator_fine_->GetXaxis()->SetTitle("Probe p_{T}");
+    denominator_fine_ = fs->make<TH2D>("denominator_fine", "denominator_fine", PT_BINS_FINE.size() - 1, &PT_BINS_FINE[0], ETA_BINS.size() - 1, &ETA_BINS[0]);
+    denominator_fine_->GetYaxis()->SetTitle("Probe #eta");
+    denominator_fine_->GetXaxis()->SetTitle("Probe p_{T}");
 
     // Get config variables
     ecal_electron_ = iConfig.getParameter<edm::InputTag>("ecalElectronsInputTag");
@@ -304,14 +313,18 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         // Fill historgrams
         if (match_hlt_0) {
             denominator_->Fill(our_electrons[1].pt(), fabs(our_electrons[1].eta()), weight);
+            denominator_fine_->Fill(our_electrons[1].pt(), fabs(our_electrons[1].eta()), weight);
             if (match_hlt_1) {
                 numerator_->Fill(our_electrons[1].pt(), fabs(our_electrons[1].eta()), weight);
+                numerator_fine_->Fill(our_electrons[1].pt(), fabs(our_electrons[1].eta()), weight);
             }
         }
         if (match_hlt_1) {
             denominator_->Fill(our_electrons[0].pt(), fabs(our_electrons[0].eta()), weight);
+            denominator_fine_->Fill(our_electrons[0].pt(), fabs(our_electrons[0].eta()), weight);
             if (match_hlt_0) {
                 numerator_->Fill(our_electrons[0].pt(), fabs(our_electrons[0].eta()), weight);
+                numerator_fine_->Fill(our_electrons[0].pt(), fabs(our_electrons[0].eta()), weight);
             }
         }
     }
