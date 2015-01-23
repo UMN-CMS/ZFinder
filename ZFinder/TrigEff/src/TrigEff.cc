@@ -96,6 +96,13 @@ class TrigEff : public edm::EDAnalyzer {
         edm::InputTag ecal_electron_;
         edm::LumiReWeighting* lumi_weights_;
         zf::ZEfficiencies scale_factors_;
+
+        double MIN_MASS_;
+        double MAX_MASS_;
+        double MAX_ETA_;
+        double MIN_PT_;
+        double MAX_DR_;
+
 };
 
 //
@@ -113,8 +120,16 @@ TrigEff::TrigEff(const edm::ParameterSet& iConfig) {
     //now do what ever initialization is needed
     edm::Service<TFileService> fs;
 
+    // Hard coded variables
+    MIN_MASS_ = 60.;
+    MAX_MASS_ = 120.;
+    MAX_ETA_ = 2.1;
+    MIN_PT_ = 30;
+    MAX_DR_ = 0.3;
+
     // Bins for the 2D histogram
-    const std::vector<double> ETA_BINS = {0., 0.8, 1.442, 1.556, 2.0, 2.5}; // AN-14-050 rejects in 1.442-1.556
+    //const std::vector<double> ETA_BINS = {0., 0.8, 1.442, 1.556, 2.0, 2.1};
+    const std::vector<double> ETA_BINS = {-2.1, -2.0, -1.556, -1.442, -0.8, 0., 0.8, 1.442, 1.556, 2.0, 2.1};
     const std::vector<double> PT_BINS = {30., 40., 50., 70., 250., 2000.};
     const std::vector<double> PT_BINS_FINE = {0., 5., 10., 15., 20., 25., 30., 35., 40., 45., 50., 60., 70., 80., 90., 100., 110., 120., 130., 140., 150.};
 
@@ -133,11 +148,6 @@ TrigEff::TrigEff(const edm::ParameterSet& iConfig) {
 
     // Get config variables
     ecal_electron_ = iConfig.getParameter<edm::InputTag>("ecalElectronsInputTag");
-    //conversion_ = iConfig.getParameter<edm::InputTag>("conversionsInputTag");
-    //beamspot_ = iConfig.getParameter<edm::InputTag>("beamSpotInputTag");
-    //rho_iso_ = iConfig.getParameter<edm::InputTag>("rhoIsoInputTag");
-    //vertex_ = iConfig.getParameter<edm::InputTag>("primaryVertexInputTag");
-    //iso_vals_ = iConfig.getParameter<std::vector<edm::InputTag> >("isoValInputTags");
 
     // Lumi reweighting
     lumi_weights_ = new edm::LumiReWeighting(
@@ -224,6 +234,11 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         // Get the electron and set put it into the electrons vector
         reco::GsfElectron electron = els_h->at(i);
 
+        // Check the pt and eta
+        if (electron.pt() < MIN_PT_ || fabs(electron.eta()) > MAX_ETA_) {
+            continue;
+        }
+
         // get reference to electron and the electron
         reco::GsfElectronRef ele_ref(els_h, i);
 
@@ -232,13 +247,8 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         const double ISO_EM = (*IsoDepositVals_EM)[ele_ref];
         const double ISO_NH = (*IsoDepositVals_NH)[ele_ref];
 
-        // test ID
-        // working points
-        //const bool VETO = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::VETO, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
-        //const bool LOOSE = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::LOOSE, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
-        //const bool MEDIUM = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
+        // Check ID working points
         const bool TIGHT = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::TIGHT, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
-        //const bool TRIGWP70 = EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERWP70, ele_ref);
 
         // Use only tight electrons
         if (TIGHT) {
@@ -248,12 +258,6 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
     // Number of electrons, reject if 3 or more
     if (our_electrons.size() == 2) {
-        // Reject if sign isn't opposite
-        if (our_electrons[0].charge() * our_electrons[1].charge() > 0) {
-            std::cout << "Charge FAIL: " << our_electrons[0].charge() << " " << our_electrons[1].charge() << std::endl;
-            return;
-        }
-
         // Reject if the mass is outside our window
         const double ELECTRON_MASS = 5.109989e-4;
         math::PtEtaPhiMLorentzVector e0lv(our_electrons[0].pt(), our_electrons[0].eta(), our_electrons[0].phi(), ELECTRON_MASS);
@@ -261,7 +265,7 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         math::PtEtaPhiMLorentzVector zlv;
         zlv = e0lv + e1lv;
         const double MASS = zlv.mass();
-        if (MASS < 80 || 100 < MASS) {
+        if (MASS < MIN_MASS_ || MAX_MASS_ < MASS) {
             std::cout << "Mass FAIL: " << MASS << std::endl;
             return;
         }
@@ -300,11 +304,11 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
             for (auto& i_key : trig_keys) {
                 const trigger::TriggerObject* trig_obj = &trig_obj_collection[i_key];
                 const double DR_0 = deltaR(our_electrons[0].eta(), our_electrons[0].phi(), trig_obj->eta(), trig_obj->phi());
-                if (DR_0 < 0.2) {
+                if (DR_0 < MAX_DR_) {
                     match_hlt_0 = true;
                 }
                 const double DR_1 = deltaR(our_electrons[1].eta(), our_electrons[1].phi(), trig_obj->eta(), trig_obj->phi());
-                if (DR_1 < 0.2) {
+                if (DR_1 < MAX_DR_) {
                     match_hlt_1 = true;
                 }
             }
