@@ -316,19 +316,19 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
         // Fill historgrams
         if (match_hlt_0) {
-            denominator_->Fill(our_electrons[1].pt(), fabs(our_electrons[1].eta()), weight);
-            denominator_fine_->Fill(our_electrons[1].pt(), fabs(our_electrons[1].eta()), weight);
+            denominator_->Fill(our_electrons[1].pt(), our_electrons[1].eta(), weight);
+            denominator_fine_->Fill(our_electrons[1].pt(), our_electrons[1].eta(), weight);
             if (match_hlt_1) {
-                numerator_->Fill(our_electrons[1].pt(), fabs(our_electrons[1].eta()), weight);
-                numerator_fine_->Fill(our_electrons[1].pt(), fabs(our_electrons[1].eta()), weight);
+                numerator_->Fill(our_electrons[1].pt(), our_electrons[1].eta(), weight);
+                numerator_fine_->Fill(our_electrons[1].pt(), our_electrons[1].eta(), weight);
             }
         }
         if (match_hlt_1) {
-            denominator_->Fill(our_electrons[0].pt(), fabs(our_electrons[0].eta()), weight);
-            denominator_fine_->Fill(our_electrons[0].pt(), fabs(our_electrons[0].eta()), weight);
+            denominator_->Fill(our_electrons[0].pt(), our_electrons[0].eta(), weight);
+            denominator_fine_->Fill(our_electrons[0].pt(), our_electrons[0].eta(), weight);
             if (match_hlt_0) {
-                numerator_->Fill(our_electrons[0].pt(), fabs(our_electrons[0].eta()), weight);
-                numerator_fine_->Fill(our_electrons[0].pt(), fabs(our_electrons[0].eta()), weight);
+                numerator_->Fill(our_electrons[0].pt(), our_electrons[0].eta(), weight);
+                numerator_fine_->Fill(our_electrons[0].pt(), our_electrons[0].eta(), weight);
             }
         }
     }
