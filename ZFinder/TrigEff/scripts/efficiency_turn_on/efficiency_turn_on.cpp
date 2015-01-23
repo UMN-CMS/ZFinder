@@ -30,6 +30,10 @@ int main() {
         }
     }
 
+    // Open an output root file for saving
+    TFile* out_file = new TFile("output.root", "RECREATE");
+    out_file->cd();
+
     // set up the canvas
     TCanvas canvas("canvas", "canvas", X_SIZE, Y_SIZE);
     gPad->SetLogx(true);
@@ -39,10 +43,15 @@ int main() {
     // Save the output file
     canvas.Print(OUTPUT_FILE.c_str(), "png");
 
+    final_histo->Draw("TEXT");
+    out_file->Write();
+
     // Print bins and errors
     for (int bin_number = 0; bin_number <= 60; ++bin_number) {
         std::cout << "Bin: " << bin_number << " SF: " << final_histo->GetBinContent(bin_number) << " +- " << final_histo->GetBinError(bin_number) << std::endl;
     }
+
+    out_file->Close();
 
     return 0;
 }

@@ -90,10 +90,19 @@ class TrigEff : public edm::EDAnalyzer {
 
         // ----------member data ---------------------------
         TH2D* numerator_;
+        TH2D* numerator_fine_;
         TH2D* denominator_;
+        TH2D* denominator_fine_;
         edm::InputTag ecal_electron_;
         edm::LumiReWeighting* lumi_weights_;
         zf::ZEfficiencies scale_factors_;
+
+        double MIN_MASS_;
+        double MAX_MASS_;
+        double MAX_ETA_;
+        double MIN_PT_;
+        double MAX_DR_;
+
 };
 
 //
@@ -111,8 +120,18 @@ TrigEff::TrigEff(const edm::ParameterSet& iConfig) {
     //now do what ever initialization is needed
     edm::Service<TFileService> fs;
 
-    const std::vector<double> ETA_BINS = {-2.1, -1.478, -0.8, 0., 0.8, 1.478, 2.1};
-    const std::vector<double> PT_BINS = {30., 40., 50., 200., 2000.};
+    // Hard coded variables
+    MIN_MASS_ = 60.;
+    MAX_MASS_ = 120.;
+    MAX_ETA_ = 2.1;
+    MIN_PT_ = 30;
+    MAX_DR_ = 0.3;
+
+    // Bins for the 2D histogram
+    //const std::vector<double> ETA_BINS = {0., 0.8, 1.442, 1.556, 2.0, 2.1};
+    const std::vector<double> ETA_BINS = {-2.1, -2.0, -1.556, -1.442, -0.8, 0., 0.8, 1.442, 1.556, 2.0, 2.1};
+    const std::vector<double> PT_BINS = {30., 40., 50., 70., 250., 2000.};
+    const std::vector<double> PT_BINS_FINE = {0., 5., 10., 15., 20., 25., 30., 35., 40., 45., 50., 60., 70., 80., 90., 100., 110., 120., 130., 140., 150.};
 
     numerator_ = fs->make<TH2D>("numerator", "numerator", PT_BINS.size() - 1, &PT_BINS[0], ETA_BINS.size() - 1, &ETA_BINS[0]);
     numerator_->GetYaxis()->SetTitle("Probe #eta");
@@ -120,14 +139,15 @@ TrigEff::TrigEff(const edm::ParameterSet& iConfig) {
     denominator_ = fs->make<TH2D>("denominator", "denominator", PT_BINS.size() - 1, &PT_BINS[0], ETA_BINS.size() - 1, &ETA_BINS[0]);
     denominator_->GetYaxis()->SetTitle("Probe #eta");
     denominator_->GetXaxis()->SetTitle("Probe p_{T}");
+    numerator_fine_ = fs->make<TH2D>("numerator_fine", "numerator_fine", PT_BINS_FINE.size() - 1, &PT_BINS_FINE[0], ETA_BINS.size() - 1, &ETA_BINS[0]);
+    numerator_fine_->GetYaxis()->SetTitle("Probe #eta");
+    numerator_fine_->GetXaxis()->SetTitle("Probe p_{T}");
+    denominator_fine_ = fs->make<TH2D>("denominator_fine", "denominator_fine", PT_BINS_FINE.size() - 1, &PT_BINS_FINE[0], ETA_BINS.size() - 1, &ETA_BINS[0]);
+    denominator_fine_->GetYaxis()->SetTitle("Probe #eta");
+    denominator_fine_->GetXaxis()->SetTitle("Probe p_{T}");
 
     // Get config variables
     ecal_electron_ = iConfig.getParameter<edm::InputTag>("ecalElectronsInputTag");
-    //conversion_ = iConfig.getParameter<edm::InputTag>("conversionsInputTag");
-    //beamspot_ = iConfig.getParameter<edm::InputTag>("beamSpotInputTag");
-    //rho_iso_ = iConfig.getParameter<edm::InputTag>("rhoIsoInputTag");
-    //vertex_ = iConfig.getParameter<edm::InputTag>("primaryVertexInputTag");
-    //iso_vals_ = iConfig.getParameter<std::vector<edm::InputTag> >("isoValInputTags");
 
     // Lumi reweighting
     lumi_weights_ = new edm::LumiReWeighting(
@@ -150,14 +170,13 @@ TrigEff::~TrigEff() {
 // ------------ method called for each event  ------------
 void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
 
-    // Find the lumi reweighting weight and the natural weight
 
-    edm::Handle<std::vector<PileupSummaryInfo> > pileup_info;
-    iEvent.getByLabel("addPileupInfo", pileup_info);
-
-    // Must be a float because weight() below takes float or int
     double weight = 1;
     if (!iEvent.isRealData()) {
+        // Find the lumi reweighting weight and the natural weight
+        edm::Handle<std::vector<PileupSummaryInfo> > pileup_info;
+        iEvent.getByLabel("addPileupInfo", pileup_info);
+
         // Lumi Weight
         float true_number_of_pileup = -1.;
         std::vector<PileupSummaryInfo>::const_iterator PILEUP_ELEMENT;
@@ -214,8 +233,9 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     for (unsigned int i = 0; i < els_h->size(); ++i) {
         // Get the electron and set put it into the electrons vector
         reco::GsfElectron electron = els_h->at(i);
-        // We enforce a minimum quality cut
-        if (electron.pt() < 30 || fabs(electron.eta()) > 2.1) {
+
+        // Check the pt and eta
+        if (electron.pt() < MIN_PT_ || fabs(electron.eta()) > MAX_ETA_) {
             continue;
         }
 
@@ -227,30 +247,30 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
         const double ISO_EM = (*IsoDepositVals_EM)[ele_ref];
         const double ISO_NH = (*IsoDepositVals_NH)[ele_ref];
 
-        // test ID
-        // working points
-        //const bool VETO = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::VETO, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
-        //const bool LOOSE = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::LOOSE, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
-        //const bool MEDIUM = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::MEDIUM, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
+        // Check ID working points
         const bool TIGHT = EgammaCutBasedEleId::PassWP(EgammaCutBasedEleId::TIGHT, ele_ref, conversions_h, beamSpot, vtx_h, ISO_CH, ISO_EM, ISO_NH, RHO_ISO);
-        //const bool TRIGWP70 = EgammaCutBasedEleId::PassTriggerCuts(EgammaCutBasedEleId::TRIGGERWP70, ele_ref);
 
-        bool save_electron = false;
-        // Use only tight
+        // Use only tight electrons
         if (TIGHT) {
-            save_electron = true;
-        }
-
-        // Save the electron if it passes our cuts
-        if (save_electron) {
             our_electrons.push_back(electron);
         }
     }
 
-    // Number of electrons
+    // Number of electrons, reject if 3 or more
     if (our_electrons.size() == 2) {
+        // Reject if the mass is outside our window
+        const double ELECTRON_MASS = 5.109989e-4;
+        math::PtEtaPhiMLorentzVector e0lv(our_electrons[0].pt(), our_electrons[0].eta(), our_electrons[0].phi(), ELECTRON_MASS);
+        math::PtEtaPhiMLorentzVector e1lv(our_electrons[1].pt(), our_electrons[1].eta(), our_electrons[1].phi(), ELECTRON_MASS);
+        math::PtEtaPhiMLorentzVector zlv;
+        zlv = e0lv + e1lv;
+        const double MASS = zlv.mass();
+        if (MASS < MIN_MASS_ || MAX_MASS_ < MASS) {
+            std::cout << "Mass FAIL: " << MASS << std::endl;
+            return;
+        }
 
-        // Apply GSF scale factors
+        // Apply GSF scale factors to MC
         if (!iEvent.isRealData()) {
             const std::string GSF_STR = "type_gsf";
             weight *= scale_factors_.GetEfficiency(GSF_STR, our_electrons[0].pt(), our_electrons[0].eta());
@@ -270,6 +290,7 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
             return;
         }
 
+        // Match the electrons to the HLT
         bool match_hlt_0 = false;
         bool match_hlt_1 = false;
         int trig_size = 0;
@@ -283,49 +304,31 @@ void TrigEff::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
             for (auto& i_key : trig_keys) {
                 const trigger::TriggerObject* trig_obj = &trig_obj_collection[i_key];
                 const double DR_0 = deltaR(our_electrons[0].eta(), our_electrons[0].phi(), trig_obj->eta(), trig_obj->phi());
-                if (DR_0 < 0.3) {
+                if (DR_0 < MAX_DR_) {
                     match_hlt_0 = true;
                 }
                 const double DR_1 = deltaR(our_electrons[1].eta(), our_electrons[1].phi(), trig_obj->eta(), trig_obj->phi());
-                if (DR_1 < 0.3) {
+                if (DR_1 < MAX_DR_) {
                     match_hlt_1 = true;
                 }
             }
         }
 
-        //const int N_HLT = trig_size;
-
-        // L1 objects match
-        //bool match_0 = false;
-        //bool match_1 = false;
-        //edm::Handle<l1extra::L1EmParticleCollection> l1ems;
-        //edm::InputTag l1em_tag("l1extraParticles", "Isolated", "RECO");
-        //iEvent.getByLabel(l1em_tag, l1ems);
-        ////std::cout << "Found " << l1ems->size() << " L1 EM Objects" << std::endl;
-        //for(unsigned int i = 0; i < l1ems->size(); ++i) {
-        //    l1extra::L1EmParticle l1_particle = l1ems->at(i);
-        //    //std::cout << l1_particle.pt() << std::endl;
-        //    const double DR_0 = deltaR(our_electrons[0].eta(), our_electrons[0].phi(), l1_particle.eta(), l1_particle.phi());
-        //    const double DR_1 = deltaR(our_electrons[1].eta(), our_electrons[1].phi(), l1_particle.eta(), l1_particle.phi());
-        //    if (DR_0 < 0.3) {
-        //        match_0 = true;
-        //    }
-        //    if (DR_1 < 0.3) {
-        //        match_1 = true;
-        //    }
-        //}
-
         // Fill historgrams
         if (match_hlt_0) {
-            denominator_->Fill(our_electrons[0].pt(), our_electrons[0].eta(), weight);
+            denominator_->Fill(our_electrons[1].pt(), fabs(our_electrons[1].eta()), weight);
+            denominator_fine_->Fill(our_electrons[1].pt(), fabs(our_electrons[1].eta()), weight);
             if (match_hlt_1) {
-                numerator_->Fill(our_electrons[0].pt(), our_electrons[0].eta(), weight);
+                numerator_->Fill(our_electrons[1].pt(), fabs(our_electrons[1].eta()), weight);
+                numerator_fine_->Fill(our_electrons[1].pt(), fabs(our_electrons[1].eta()), weight);
             }
         }
         if (match_hlt_1) {
-            denominator_->Fill(our_electrons[1].pt(), our_electrons[1].eta(), weight);
+            denominator_->Fill(our_electrons[0].pt(), fabs(our_electrons[0].eta()), weight);
+            denominator_fine_->Fill(our_electrons[0].pt(), fabs(our_electrons[0].eta()), weight);
             if (match_hlt_0) {
-                numerator_->Fill(our_electrons[1].pt(), our_electrons[1].eta(), weight);
+                numerator_->Fill(our_electrons[0].pt(), fabs(our_electrons[0].eta()), weight);
+                numerator_fine_->Fill(our_electrons[0].pt(), fabs(our_electrons[0].eta()), weight);
             }
         }
     }
