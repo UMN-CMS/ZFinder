@@ -42,7 +42,7 @@ namespace zf {
         // z0_mass_fine_
         const std::string z0_mass_fine_name = "Z0 Mass: Fine";
         const std::string z0_mass_fine_file = "z_mass_fine";
-        z0_mass_fine_ = tdir.make<TH1D>(z0_mass_fine_file.c_str(), z0_mass_fine_name.c_str(), 80, 80., 100.);
+        z0_mass_fine_ = tdir.make<TH1D>(z0_mass_fine_file.c_str(), z0_mass_fine_name.c_str(), 120, 60., 120.);
         z0_mass_fine_->GetXaxis()->SetTitle("m_{ee} [GeV]");
         z0_mass_fine_->GetYaxis()->SetTitle("Counts / 0.25 GeV");
 
