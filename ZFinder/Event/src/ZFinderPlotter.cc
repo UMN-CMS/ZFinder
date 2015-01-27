@@ -423,6 +423,16 @@ namespace zf {
         deltaR_ = tdir.make<TH1D>(deltaR_file.c_str(), deltaR_name.c_str(), 100, 0., 10.);
         deltaR_->GetXaxis()->SetTitle("#DeltaR(e_{0},e_{1})");
         deltaR_->GetYaxis()->SetTitle("Counts");
+
+        //phi* vs phi* with superclusters
+        const std::string phistar_vs_name = "#phi* vs. #phi*_{SC}";
+        const std::string phistar_vs_file = "phistar_vs_sc_phistar";
+        phistar_vs_sc_phistar_ = tdir.make<TH2D>(phistar_vs_file.c_str(), phistar_vs_name.c_str(),
+                ATLAS_PHISTAR_BINNING.size() - 1, &ATLAS_PHISTAR_BINNING[0],
+                ATLAS_PHISTAR_BINNING.size() - 1, &ATLAS_PHISTAR_BINNING[0]
+                );
+        phistar_vs_sc_phistar_->GetXaxis()->SetTitle("#phi*");
+        phistar_vs_sc_phistar_->GetYaxis()->SetTitle("#phi*_{SC}");
     }
 
     void ZFinderPlotter::Fill(
@@ -448,6 +458,7 @@ namespace zf {
             phistar_->Fill(ZF_EVENT.reco_z.phistar, EVENT_WEIGHT);
             deltaR_->Fill(ZF_EVENT.reco_z.deltaR, EVENT_WEIGHT);
             phistar_supercluster_->Fill(ZF_EVENT.reco_z.scPhistar, EVENT_WEIGHT);
+            phistar_vs_sc_phistar_->Fill(ZF_EVENT.reco_z.phistar, ZF_EVENT.reco_z.scPhistar, EVENT_WEIGHT);
             // We only want to plot this if corresponding gen info exists
             if(!ZF_EVENT.is_real_data) {
                 other_phistar_->Fill(ZF_EVENT.reco_z.other_phistar, EVENT_WEIGHT);
@@ -559,6 +570,7 @@ namespace zf {
             phistar_born_->Fill(ZF_EVENT.truth_z.bornPhistar, EVENT_WEIGHT);
             phistar_naked_->Fill(ZF_EVENT.truth_z.nakedPhistar, EVENT_WEIGHT);
             phistar_supercluster_->Fill(ZF_EVENT.truth_z.scPhistar, EVENT_WEIGHT);
+            phistar_vs_sc_phistar_->Fill(ZF_EVENT.truth_z.phistar, ZF_EVENT.truth_z.scPhistar, EVENT_WEIGHT);
             deltaR_->Fill(ZF_EVENT.truth_z.deltaR, EVENT_WEIGHT);
             other_phistar_->Fill(ZF_EVENT.truth_z.other_phistar, EVENT_WEIGHT);
             other_y_->Fill(ZF_EVENT.truth_z.other_y, EVENT_WEIGHT);
