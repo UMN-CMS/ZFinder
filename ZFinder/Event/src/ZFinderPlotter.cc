@@ -217,14 +217,14 @@ namespace zf {
         // e0_sigma_ieta_ieta
         const std::string e0_sigma_ieta_ieta_name = "sigma_{i #eta i #eta}^{e_{0}}";
         const std::string e0_sigma_ieta_ieta_file = "e0_siesie";
-        e0_sigma_ieta_ieta_ = tdir.make<TH1D>(e0_sigma_ieta_ieta_file.c_str(), e0_sigma_ieta_ieta_name.c_str(), 300, 0., 0.3);
+        e0_sigma_ieta_ieta_ = tdir.make<TH1D>(e0_sigma_ieta_ieta_file.c_str(), e0_sigma_ieta_ieta_name.c_str(), 150, 0., 0.15);
         e0_sigma_ieta_ieta_->GetXaxis()->SetTitle("sigma_{i #eta i #eta}^{e_{0}}");
         e0_sigma_ieta_ieta_->GetYaxis()->SetTitle("Counts");
 
         // e1_sigma_ieta_ieta
         const std::string e1_sigma_ieta_ieta_name = "sigma_{i #eta i #eta}^{e_{1}}";
         const std::string e1_sigma_ieta_ieta_file = "e1_siesie";
-        e1_sigma_ieta_ieta_ = tdir.make<TH1D>(e1_sigma_ieta_ieta_file.c_str(), e1_sigma_ieta_ieta_name.c_str(), 300, 0., 0.3);
+        e1_sigma_ieta_ieta_ = tdir.make<TH1D>(e1_sigma_ieta_ieta_file.c_str(), e1_sigma_ieta_ieta_name.c_str(), 150, 0., 0.15);
         e1_sigma_ieta_ieta_->GetXaxis()->SetTitle("sigma_{i #eta i #eta}^{e_{1}}");
         e1_sigma_ieta_ieta_->GetYaxis()->SetTitle("Counts");
 
@@ -245,14 +245,14 @@ namespace zf {
         // e0_deta_in
         const std::string e0_deta_in_name = "d#eta_{e_{0}}";
         const std::string e0_deta_in_file = "e0_deta";
-        e0_deta_in_ = tdir.make<TH1D>(e0_deta_in_file.c_str(), e0_deta_in_name.c_str(), 1000, 0., 0.1);
+        e0_deta_in_ = tdir.make<TH1D>(e0_deta_in_file.c_str(), e0_deta_in_name.c_str(), 300, 0., 0.03);
         e0_deta_in_->GetXaxis()->SetTitle("d#eta_{e_{0}}");
         e0_deta_in_->GetYaxis()->SetTitle("Counts");
 
         // e1_deta_in
         const std::string e1_deta_in_name = "d#eta_{e_{1}}";
         const std::string e1_deta_in_file = "e1_deta";
-        e1_deta_in_ = tdir.make<TH1D>(e1_deta_in_file.c_str(), e1_deta_in_name.c_str(), 1000, 0., 0.1);
+        e1_deta_in_ = tdir.make<TH1D>(e1_deta_in_file.c_str(), e1_deta_in_name.c_str(), 300, 0., 0.03);
         e1_deta_in_->GetXaxis()->SetTitle("d#eta_{e_{1}}");
         e1_deta_in_->GetYaxis()->SetTitle("Counts");
 
@@ -273,42 +273,42 @@ namespace zf {
         // e0_track_iso_in
         const std::string e0_track_isoname = "Track ISO_{e_{0}}";
         const std::string e0_track_isofile = "e0_track_iso";
-        e0_track_iso_ = tdir.make<TH1D>(e0_track_isofile.c_str(), e0_track_isoname.c_str(), 300, 0., 3.);
+        e0_track_iso_ = tdir.make<TH1D>(e0_track_isofile.c_str(), e0_track_isoname.c_str(), 1000, 0., 10.);
         e0_track_iso_->GetXaxis()->SetTitle("Track ISO_{e_{0}}");
         e0_track_iso_->GetYaxis()->SetTitle("Counts");
 
         // e1_track_iso_in
         const std::string e1_track_isoname = "Track ISO_{e_{1}}";
         const std::string e1_track_isofile = "e1_track_iso";
-        e1_track_iso_ = tdir.make<TH1D>(e1_track_isofile.c_str(), e1_track_isoname.c_str(), 300, 0., 3.);
+        e1_track_iso_ = tdir.make<TH1D>(e1_track_isofile.c_str(), e1_track_isoname.c_str(), 1000, 0., 10.);
         e1_track_iso_->GetXaxis()->SetTitle("Track ISO_{e_{1}}");
         e1_track_iso_->GetYaxis()->SetTitle("Counts");
 
         // e0_ecal_iso_in
         const std::string e0_ecal_isoname = "ECAL ISO_{e_{0}}";
         const std::string e0_ecal_isofile = "e0_ecal_iso";
-        e0_ecal_iso_ = tdir.make<TH1D>(e0_ecal_isofile.c_str(), e0_ecal_isoname.c_str(), 300, 0., 3.);
+        e0_ecal_iso_ = tdir.make<TH1D>(e0_ecal_isofile.c_str(), e0_ecal_isoname.c_str(), 1000, 0., 10.);
         e0_ecal_iso_->GetXaxis()->SetTitle("ECAL ISO_{e_{0}}");
         e0_ecal_iso_->GetYaxis()->SetTitle("Counts");
 
         // e1_ecal_iso_in
         const std::string e1_ecal_isoname = "ECAL ISO_{e_{1}}";
         const std::string e1_ecal_isofile = "e1_ecal_iso";
-        e1_ecal_iso_ = tdir.make<TH1D>(e1_ecal_isofile.c_str(), e1_ecal_isoname.c_str(), 300, 0., 3.);
+        e1_ecal_iso_ = tdir.make<TH1D>(e1_ecal_isofile.c_str(), e1_ecal_isoname.c_str(), 1000, 0., 10.);
         e1_ecal_iso_->GetXaxis()->SetTitle("ECAL ISO_{e_{1}}");
         e1_ecal_iso_->GetYaxis()->SetTitle("Counts");
 
         // e0_hcal_iso_in
         const std::string e0_hcal_isoname = "HCAL ISO_{e_{0}}";
         const std::string e0_hcal_isofile = "e0_hcal_iso";
-        e0_hcal_iso_ = tdir.make<TH1D>(e0_hcal_isofile.c_str(), e0_hcal_isoname.c_str(), 300, 0., 3.);
+        e0_hcal_iso_ = tdir.make<TH1D>(e0_hcal_isofile.c_str(), e0_hcal_isoname.c_str(), 1000, 0., 10.);
         e0_hcal_iso_->GetXaxis()->SetTitle("HCAL ISO_{e_{0}}");
         e0_hcal_iso_->GetYaxis()->SetTitle("Counts");
 
         // e1_hcal_iso_in
         const std::string e1_hcal_isoname = "HCAL ISO_{e_{1}}";
         const std::string e1_hcal_isofile = "e1_hcal_iso";
-        e1_hcal_iso_ = tdir.make<TH1D>(e1_hcal_isofile.c_str(), e1_hcal_isoname.c_str(), 300, 0., 1.);
+        e1_hcal_iso_ = tdir.make<TH1D>(e1_hcal_isofile.c_str(), e1_hcal_isoname.c_str(), 1000, 0., 10.);
         e1_hcal_iso_->GetXaxis()->SetTitle("HCAL ISO_{e_{1}}");
         e1_hcal_iso_->GetYaxis()->SetTitle("Counts");
 
