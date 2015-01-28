@@ -654,7 +654,7 @@ void CrossCheckPlotter::init_config_map() {
                     "m_{ee} [GeV]",  // x_label
                     "Events",        // y_label
                     "",              // title
-                    "Z0 Mass: All",  // histogram name (for reading in)
+                    "z_mass_all",  // histogram name (for reading in)
                     false,           // log Y axis
                     false,           // log X axis
                     {}               // Desired new binning
@@ -673,7 +673,7 @@ void CrossCheckPlotter::init_config_map() {
                     "m_{ee} [GeV]",
                     "Events",
                     "",
-                    "Z0 Mass: Coarse",
+                    "z_mass_coarse",
                     false,
                     false,
                     {}
@@ -692,7 +692,7 @@ void CrossCheckPlotter::init_config_map() {
                     "m_{ee} [GeV]",
                     "Events",
                     "",
-                    "Z0 Mass: Fine",
+                    "z_mass_fine",
                     false,
                     false,
                     {}
@@ -712,7 +712,7 @@ void CrossCheckPlotter::init_config_map() {
                     "Y_{Z}",
                     "Events",
                     "",
-                    "Z0 Rapidity",
+                    "z_rapidity",
                     true,
                     false,
                     {}
@@ -727,7 +727,7 @@ void CrossCheckPlotter::init_config_map() {
                     "Z p_{T} [GeV]",
                     "Events",
                     "",
-                    "Z0 p_{T}",
+                    "z_pt",
                     true,
                     false,
                     {5}  // with one entry, just calls histo->Rebin(5);
@@ -741,7 +741,7 @@ void CrossCheckPlotter::init_config_map() {
                     "e_{0} p_{T} [GeV]",
                     "Events",
                     "",
-                    "p_{T,e_{0}}",
+                    "e0_pt",
                     true,
                     false,
                     {5}
@@ -755,7 +755,7 @@ void CrossCheckPlotter::init_config_map() {
                     "e_{1} p_{T} [GeV]",
                     "Events",
                     "",
-                    "p_{T,e_{1}}",
+                    "e1_pt",
                     true,
                     false,
                     {5}
@@ -770,7 +770,7 @@ void CrossCheckPlotter::init_config_map() {
                     "#eta_{e_{0}}",
                     "Events",
                     "",
-                    "#eta_{e_{0}}",
+                    "e0_eta",
                     true,
                     false,
                     {}
@@ -784,7 +784,7 @@ void CrossCheckPlotter::init_config_map() {
                     "#eta_{e_{1}}",
                     "Events",
                     "",
-                    "#eta_{e_{1}}",
+                    "e1_eta",
                     true,
                     false,
                     {}
@@ -799,7 +799,7 @@ void CrossCheckPlotter::init_config_map() {
                     "#phi_{e_{0}}",
                     "Events",
                     "",
-                    "#phi_{e_{0}}",
+                    "e0_phi",
                     false,
                     false,
                     {}
@@ -813,7 +813,7 @@ void CrossCheckPlotter::init_config_map() {
                     "#phi_{e_{1}}",
                     "Events",
                     "",
-                    "#phi_{e_{1}}",
+                    "e1_phi",
                     false,
                     false,
                     {}
@@ -828,7 +828,7 @@ void CrossCheckPlotter::init_config_map() {
                     "q_{e_{0}}",
                     "Events",
                     "",
-                    "charge_{e_{0}}",
+                    "e0_charge",
                     false,
                     false,
                     {}
@@ -842,7 +842,7 @@ void CrossCheckPlotter::init_config_map() {
                     "q_{e_{1}}",
                     "Events",
                     "",
-                    "charge_{e_{1}}",
+                    "e1_charge",
                     false,
                     false,
                     {}
@@ -857,12 +857,12 @@ void CrossCheckPlotter::init_config_map() {
                     "#phi*",
                     "Events",
                     "",
-                    "#phi*",
+                    "phistar",
                     true,
                     true,
                     // multiple entries means these are new bin edges
                     //{0.0, 0.05, 0.1, 0.2, 0.3, 0.4, 0.6, 1.0}
-                    {0.000, 0.004, 0.008, 0.012, 0.016, 0.020, 0.024, 0.029,
+                    {0.004, 0.008, 0.012, 0.016, 0.020, 0.024, 0.029,
                     0.034, 0.039, 0.045, 0.052, 0.057, 0.064, 0.072, 0.081,
                     0.091, 0.102, 0.114, 0.128, 0.145, 0.165, 0.189, 0.219,
                     0.258, 0.312, 0.391, 0.524, 0.695, 0.918, 1.153, 1.496,
@@ -878,7 +878,7 @@ void CrossCheckPlotter::init_config_map() {
                     "Number of Vertexes",
                     "Events",
                     "",
-                    "N_{Vertices}",
+                    "n_verts",
                     true,
                     false,
                     { 0., 1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12.,
@@ -898,7 +898,7 @@ void CrossCheckPlotter::init_config_map() {
                     "Number of Electrons",
                     "Events",
                     "",
-                    "N_{e}",
+                    "n_electrons",
                     true,
                     false,
                     {}
@@ -913,7 +913,7 @@ void CrossCheckPlotter::init_config_map() {
                     "R9",
                     "Events",
                     "",
-                    "r9_{e_{0}}",
+                    "e0_r9",
                     true,
                     false,
                     {}
@@ -927,7 +927,7 @@ void CrossCheckPlotter::init_config_map() {
                     "R9",
                     "Events",
                     "",
-                    "r9_{e_{1}}",
+                    "e1_r9",
                     true,
                     false,
                     {}
@@ -942,7 +942,7 @@ void CrossCheckPlotter::init_config_map() {
                     "#sigma_{i #eta i #eta}^{e_{0}}",
                     "Events",
                     "",
-                    "sigma_{i #eta i #eta}^{e_{0}}",
+                    "e0_siesie",
                     true,
                     false,
                     {}
@@ -956,7 +956,7 @@ void CrossCheckPlotter::init_config_map() {
                     "#sigma_{i #eta i #eta}^{e_{1}}",
                     "Events",
                     "",
-                    "sigma_{i #eta i #eta}^{e_{1}}",
+                    "e1_siesie",
                     true,
                     false,
                     {}
@@ -971,7 +971,7 @@ void CrossCheckPlotter::init_config_map() {
                     "H/E",
                     "Events",
                     "",
-                    "(H\/E)_{e_{0}}",
+                    "e0_he",
                     true,
                     false,
                     {}
@@ -985,7 +985,7 @@ void CrossCheckPlotter::init_config_map() {
                     "H/E",
                     "Events",
                     "",
-                    "(H\/E)_{e_{1}}",
+                    "e1_he",
                     true,
                     false,
                     {}
@@ -1000,7 +1000,7 @@ void CrossCheckPlotter::init_config_map() {
                     "d#eta",
                     "Events",
                     "",
-                    "d#eta_{e_{0}}",
+                    "e0_deta",
                     true,
                     false,
                     {}
@@ -1014,7 +1014,7 @@ void CrossCheckPlotter::init_config_map() {
                     "d#eta",
                     "Events",
                     "",
-                    "d#eta_{e_{1}}",
+                    "e1_deta",
                     true,
                     false,
                     {}
@@ -1029,7 +1029,7 @@ void CrossCheckPlotter::init_config_map() {
                     "d#phi",
                     "Events",
                     "",
-                    "d#phi_{e_{0}}",
+                    "e0_dphi",
                     true,
                     false,
                     {}
@@ -1043,7 +1043,7 @@ void CrossCheckPlotter::init_config_map() {
                     "d#phi",
                     "Events",
                     "",
-                    "d#phi_{e_{1}}",
+                    "e1_dphi",
                     true,
                     false,
                     {}
@@ -1058,7 +1058,7 @@ void CrossCheckPlotter::init_config_map() {
                     "Track ISO",
                     "Events",
                     "",
-                    "Track ISO_{e_{0}}",
+                    "e0_track_iso",
                     true,
                     false,
                     {}
@@ -1072,7 +1072,7 @@ void CrossCheckPlotter::init_config_map() {
                     "Track ISO",
                     "Events",
                     "",
-                    "Track ISO_{e_{1}}",
+                    "e1_track_iso",
                     true,
                     false,
                     {}
@@ -1087,7 +1087,7 @@ void CrossCheckPlotter::init_config_map() {
                     "ECAL ISO",
                     "Events",
                     "",
-                    "ECAL ISO_{e_{0}}",
+                    "e0_ecal_iso",
                     true,
                     false,
                     {}
@@ -1101,7 +1101,7 @@ void CrossCheckPlotter::init_config_map() {
                     "ECAL ISO",
                     "Events",
                     "",
-                    "ECAL ISO_{e_{1}}",
+                    "e1_ecal_iso",
                     true,
                     false,
                     {}
@@ -1116,7 +1116,7 @@ void CrossCheckPlotter::init_config_map() {
                     "HCAL ISO",
                     "Events",
                     "",
-                    "HCAL ISO_{e_{0}}",
+                    "e0_hcal_iso",
                     true,
                     false,
                     {}
@@ -1130,7 +1130,7 @@ void CrossCheckPlotter::init_config_map() {
                     "HCAL ISO",
                     "Events",
                     "",
-                    "HCAL ISO_{e_{1}}",
+                    "e1_hcal_iso",
                     true,
                     false,
                     {}
@@ -1145,7 +1145,7 @@ void CrossCheckPlotter::init_config_map() {
                     "1/E - 1/P",
                     "Events",
                     "",
-                    "1\/E - 1\/P e_{0}",
+                    "e0_1oe_1op",
                     true,
                     false,
                     {}
@@ -1159,7 +1159,7 @@ void CrossCheckPlotter::init_config_map() {
                     "1/E - 1/P",
                     "Events",
                     "",
-                    "1//E - 1//P e_{1}",
+                    "e1_1oe_1op",
                     true,
                     false,
                     {}
