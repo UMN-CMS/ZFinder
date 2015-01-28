@@ -1,0 +1,100 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 9.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       157,          7]
+NotebookDataLength[      3620,         91]
+NotebookOptionsPosition[      3346,         77]
+NotebookOutlinePosition[      3684,         92]
+CellTagsIndexPosition[      3641,         89]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Define", " ", "the", " ", "background", " ", "function"}], " ", 
+   "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"Phistar", " ", "[", 
+    RowBox[{"dphi_", ",", "deta_"}], "]"}], ":=", " ", 
+   RowBox[{
+    RowBox[{"Cot", "[", 
+     RowBox[{"dphi", "/", "2"}], "]"}], " ", "*", 
+    RowBox[{"Sech", "[", 
+     RowBox[{"deta", "/", "2"}], "]"}]}]}]}]], "Input",
+ CellChangeTimes->{{3.588612323422504*^9, 3.5886123510666313`*^9}, {
+  3.588612400714691*^9, 3.5886124757273903`*^9}, {3.5886125245764713`*^9, 
+  3.58861257813273*^9}, {3.588612644069669*^9, 3.588612645359964*^9}, {
+  3.588612955464342*^9, 3.5886129760586967`*^9}, {3.6314495257697983`*^9, 
+  3.631449580269084*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"Visualize", " ", "the", " ", "functions"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"ContourPlot", "[", 
+   RowBox[{
+    RowBox[{"Phistar", "[", 
+     RowBox[{"dphi", ",", " ", "deta"}], "]"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"dphi", ",", " ", "0", ",", " ", "Pi"}], "}"}], ",", " ", 
+    RowBox[{"{", 
+     RowBox[{"deta", ",", " ", "0", ",", " ", "10"}], "}"}], ",", " ", 
+    RowBox[{"PlotLegends", "\[Rule]", "Automatic"}], ",", " ", 
+    RowBox[{"ContourStyle", "\[Rule]", "None"}], ",", 
+    RowBox[{"ColorFunction", "\[Rule]", 
+     RowBox[{"ColorData", "[", "\"\<SolarColors\>\"", "]"}]}]}], 
+   "]"}]}]], "Input",
+ CellChangeTimes->{{3.5886126086764603`*^9, 3.588612653759693*^9}, {
+   3.588612700305109*^9, 3.588612858159418*^9}, {3.5886129885623617`*^9, 
+   3.588612989154001*^9}, 3.588613032594881*^9, {3.588613093827681*^9, 
+   3.588613094131114*^9}, {3.588613130532246*^9, 3.58861314394027*^9}, {
+   3.588613236438506*^9, 3.588613257927289*^9}, {3.5886134531939573`*^9, 
+   3.5886135363005457`*^9}, 3.588613784608601*^9, {3.588614310008898*^9, 
+   3.588614348460096*^9}, {3.588614453466704*^9, 3.588614453609748*^9}, {
+   3.588614895504636*^9, 3.588614908305677*^9}, {3.588614990498704*^9, 
+   3.5886150005784492`*^9}, 3.588673837897202*^9, {3.588673892842087*^9, 
+   3.588674095146758*^9}, {3.588674170812887*^9, 3.5886742254066153`*^9}, {
+   3.58867425556784*^9, 3.588674278735133*^9}, {3.588674358930347*^9, 
+   3.588674388002265*^9}, {3.5886744475371428`*^9, 3.588674454386581*^9}, {
+   3.588674553430379*^9, 3.5886745831915703`*^9}, 3.588674615730749*^9, {
+   3.588674665303458*^9, 3.588674665619993*^9}, {3.588674715016253*^9, 
+   3.588674764313423*^9}, {3.5886748058817387`*^9, 3.588674892134083*^9}, {
+   3.5886787031428967`*^9, 3.588678745080299*^9}, {3.631449595543912*^9, 
+   3.6314496055365*^9}, {3.631449800333988*^9, 3.63144989234459*^9}, {
+   3.631450082402327*^9, 3.63145011565598*^9}, {3.631450171908128*^9, 
+   3.63145022710668*^9}}]
+},
+WindowSize->{1590, 1171},
+WindowMargins->{{0, Automatic}, {Automatic, -25}},
+FrontEndVersion->"9.0 for Linux x86 (64-bit) (February 7, 2013)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[557, 20, 744, 17, 55, "Input"],
+Cell[1304, 39, 2038, 36, 55, "Input"]
+}
+]
+*)
+
+(* End of internal cache information *)
