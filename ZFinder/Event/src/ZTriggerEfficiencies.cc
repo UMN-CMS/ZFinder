@@ -125,60 +125,94 @@ namespace zf {
          * Here we set up the hard coded variables
          */
 
-        // For the single electron trigger, ZFinder/TrigEff is used to calculate them.
+        // For the single electron trigger, ZFinder/TrigEff is used to
+        // calculate them, and convert.py is used to write the code to insure
+        // accurate transcription.
 
         // Reco Efficiency, uncertainties are statistical only
-        single_electron_efficiency_reco_.AddEfficiency(30,    40,   -2.1, -1.478, 0.915, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(40,    50,   -2.1, -1.478, 0.878, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(50,   200,   -2.1, -1.478, 0.850, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(200, 2000,   -2.1, -1.478, 0.895, 0.021, 0.021);
-        single_electron_efficiency_reco_.AddEfficiency(30,    40, -1.478,   -0.8, 0.912, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(40,    50, -1.478,   -0.8, 0.907, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(50,   200, -1.478,   -0.8, 0.894, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(200, 2000, -1.478,   -0.8, 0.920, 0.010, 0.010);
-        single_electron_efficiency_reco_.AddEfficiency(30,    40,   -0.8,      0, 0.899, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(40,    50,   -0.8,      0, 0.931, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(50,   200,   -0.8,      0, 0.919, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(200, 2000,   -0.8,      0, 0.962, 0.006, 0.006);
-        single_electron_efficiency_reco_.AddEfficiency(30,    40,      0,    0.8, 0.902, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(40,    50,      0,    0.8, 0.931, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(50,   200,      0,    0.8, 0.920, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(200, 2000,      0,    0.8, 0.939, 0.007, 0.007);
-        single_electron_efficiency_reco_.AddEfficiency(30,    40,    0.8,  1.478, 0.917, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(40,    50,    0.8,  1.478, 0.912, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(50,   200,    0.8,  1.478, 0.898, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(200, 2000,    0.8,  1.478, 0.923, 0.010, 0.010);
-        single_electron_efficiency_reco_.AddEfficiency(30,    40,  1.478,    2.1, 0.918, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(40,    50,  1.478,    2.1, 0.886, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(50,   200,  1.478,    2.1, 0.856, 0.001, 0.001);
-        single_electron_efficiency_reco_.AddEfficiency(200, 2000,  1.478,    2.1, 0.896, 0.019, 0.019);
+        single_electron_efficiency_reco_.AddEfficiency(30, 40, -0.8, 0, 0.9193, 0.0003, 0.0003);
+        single_electron_efficiency_reco_.AddEfficiency(30, 40, -1.442, -0.8, 0.9106, 0.0003, 0.0003);
+        single_electron_efficiency_reco_.AddEfficiency(30, 40, -1.556, -1.442, 0.8838, 0.0005, 0.0005);
+        single_electron_efficiency_reco_.AddEfficiency(30, 40, -2, -1.556, 0.733, 0.001, 0.001);
+        single_electron_efficiency_reco_.AddEfficiency(30, 40, -2.1, -2, 0.735, 0.001, 0.001);
+        single_electron_efficiency_reco_.AddEfficiency(30, 40, 0, 0.8, 0.9095, 0.0003, 0.0003);
+        single_electron_efficiency_reco_.AddEfficiency(30, 40, 0.8, 1.442, 0.8866, 0.0005, 0.0005);
+        single_electron_efficiency_reco_.AddEfficiency(30, 40, 1.442, 1.556, 0.752, 0.001, 0.001);
+        single_electron_efficiency_reco_.AddEfficiency(30, 40, 1.556, 2, 0.759, 0.001, 0.001);
+        single_electron_efficiency_reco_.AddEfficiency(30, 40, 2, 2.1, 0.764, 0.003, 0.003);
+        single_electron_efficiency_reco_.AddEfficiency(40, 50, -0.8, 0, 0.9500, 0.0002, 0.0002);
+        single_electron_efficiency_reco_.AddEfficiency(40, 50, -1.442, -0.8, 0.9478, 0.0002, 0.0002);
+        single_electron_efficiency_reco_.AddEfficiency(40, 50, -1.556, -1.442, 0.9332, 0.0004, 0.0004);
+        single_electron_efficiency_reco_.AddEfficiency(40, 50, -2, -1.556, 0.7793, 0.0010, 0.0010);
+        single_electron_efficiency_reco_.AddEfficiency(40, 50, -2.1, -2, 0.772, 0.001, 0.001);
+        single_electron_efficiency_reco_.AddEfficiency(40, 50, 0, 0.8, 0.9455, 0.0002, 0.0002);
+        single_electron_efficiency_reco_.AddEfficiency(40, 50, 0.8, 1.442, 0.9360, 0.0003, 0.0004);
+        single_electron_efficiency_reco_.AddEfficiency(40, 50, 1.442, 1.556, 0.8034, 0.0009, 0.0009);
+        single_electron_efficiency_reco_.AddEfficiency(40, 50, 1.556, 2, 0.7987, 0.0009, 0.0010);
+        single_electron_efficiency_reco_.AddEfficiency(40, 50, 2, 2.1, 0.792, 0.002, 0.002);
+        single_electron_efficiency_reco_.AddEfficiency(50, 70, -0.8, 0, 0.9581, 0.0003, 0.0003);
+        single_electron_efficiency_reco_.AddEfficiency(50, 70, -1.442, -0.8, 0.9566, 0.0003, 0.0004);
+        single_electron_efficiency_reco_.AddEfficiency(50, 70, -1.556, -1.442, 0.9411, 0.0006, 0.0006);
+        single_electron_efficiency_reco_.AddEfficiency(50, 70, -2, -1.556, 0.790, 0.002, 0.002);
+        single_electron_efficiency_reco_.AddEfficiency(50, 70, -2.1, -2, 0.785, 0.002, 0.002);
+        single_electron_efficiency_reco_.AddEfficiency(50, 70, 0, 0.8, 0.9550, 0.0004, 0.0004);
+        single_electron_efficiency_reco_.AddEfficiency(50, 70, 0.8, 1.442, 0.9449, 0.0006, 0.0006);
+        single_electron_efficiency_reco_.AddEfficiency(50, 70, 1.442, 1.556, 0.814, 0.002, 0.002);
+        single_electron_efficiency_reco_.AddEfficiency(50, 70, 1.556, 2, 0.809, 0.002, 0.002);
+        single_electron_efficiency_reco_.AddEfficiency(50, 70, 2, 2.1, 0.797, 0.005, 0.005);
+        single_electron_efficiency_reco_.AddEfficiency(70, 250, -0.8, 0, 0.9660, 0.0007, 0.0007);
+        single_electron_efficiency_reco_.AddEfficiency(70, 250, -1.442, -0.8, 0.9679, 0.0008, 0.0008);
+        single_electron_efficiency_reco_.AddEfficiency(70, 250, -1.556, -1.442, 0.958, 0.001, 0.001);
+        single_electron_efficiency_reco_.AddEfficiency(70, 250, -2, -1.556, 0.802, 0.005, 0.005);
+        single_electron_efficiency_reco_.AddEfficiency(70, 250, -2.1, -2, 0.792, 0.005, 0.005);
+        single_electron_efficiency_reco_.AddEfficiency(70, 250, 0, 0.8, 0.9641, 0.0008, 0.0008);
+        single_electron_efficiency_reco_.AddEfficiency(70, 250, 0.8, 1.442, 0.959, 0.001, 0.001);
+        single_electron_efficiency_reco_.AddEfficiency(70, 250, 1.442, 1.556, 0.830, 0.004, 0.004);
+        single_electron_efficiency_reco_.AddEfficiency(70, 250, 1.556, 2, 0.822, 0.004, 0.005);
+        single_electron_efficiency_reco_.AddEfficiency(70, 250, 2, 2.1, 0.82, 0.01, 0.01);
 
         // Madgraph is used for the MC
         // MC Efficiency, uncertainties are statistical only
-        single_electron_efficiency_mc_.AddEfficiency(30,    40,   -2.1, -1.478, 0.939, 0.001, 0.001);
-        single_electron_efficiency_mc_.AddEfficiency(40,    50,   -2.1, -1.478, 0.892, 0.001, 0.001);
-        single_electron_efficiency_mc_.AddEfficiency(50,   200,   -2.1, -1.478, 0.866, 0.002, 0.002);
-        single_electron_efficiency_mc_.AddEfficiency(200, 2000,   -2.1, -1.478, 0.863, 0.036, 0.036);
-        single_electron_efficiency_mc_.AddEfficiency(30,    40, -1.478,   -0.8, 0.930, 0.001, 0.001);
-        single_electron_efficiency_mc_.AddEfficiency(40,    50, -1.478,   -0.8, 0.920, 0.001, 0.001);
-        single_electron_efficiency_mc_.AddEfficiency(50,   200, -1.478,   -0.8, 0.913, 0.001, 0.001);
-        single_electron_efficiency_mc_.AddEfficiency(200, 2000, -1.478,   -0.8, 0.916, 0.016, 0.016);
-        single_electron_efficiency_mc_.AddEfficiency(30,    40,   -0.8,      0, 0.918, 0.001, 0.001);
-        single_electron_efficiency_mc_.AddEfficiency(40,    50,   -0.8,      0, 0.950, 0.001, 0.001);
-        single_electron_efficiency_mc_.AddEfficiency(50,   200,   -0.8,      0, 0.943, 0.001, 0.001);
-        single_electron_efficiency_mc_.AddEfficiency(200, 2000,   -0.8,      0, 0.980, 0.007, 0.007);
-        single_electron_efficiency_mc_.AddEfficiency(30,    40,      0,    0.8, 0.920, 0.001, 0.001);
-        single_electron_efficiency_mc_.AddEfficiency(40,    50,      0,    0.8, 0.951, 0.001, 0.001);
-        single_electron_efficiency_mc_.AddEfficiency(50,   200,      0,    0.8, 0.945, 0.001, 0.001);
-        single_electron_efficiency_mc_.AddEfficiency(200, 2000,      0,    0.8, 0.979, 0.007, 0.007);
-        single_electron_efficiency_mc_.AddEfficiency(30,    40,    0.8,  1.478, 0.932, 0.001, 0.001);
-        single_electron_efficiency_mc_.AddEfficiency(40,    50,    0.8,  1.478, 0.922, 0.001, 0.001);
-        single_electron_efficiency_mc_.AddEfficiency(50,   200,    0.8,  1.478, 0.915, 0.001, 0.001);
-        single_electron_efficiency_mc_.AddEfficiency(200, 2000,    0.8,  1.478, 0.917, 0.015, 0.015);
-        single_electron_efficiency_mc_.AddEfficiency(30,    40,  1.478,    2.1, 0.937, 0.001, 0.001);
-        single_electron_efficiency_mc_.AddEfficiency(40,    50,  1.478,    2.1, 0.894, 0.001, 0.001);
-        single_electron_efficiency_mc_.AddEfficiency(50,   200,  1.478,    2.1, 0.871, 0.002, 0.002);
-        single_electron_efficiency_mc_.AddEfficiency(200, 2000,  1.478,    2.1, 0.956, 0.022, 0.022);
+        single_electron_efficiency_mc_.AddEfficiency(30, 40, -0.8, 0, 0.9467, 0.0003, 0.0003);
+        single_electron_efficiency_mc_.AddEfficiency(30, 40, -1.442, -0.8, 0.9441, 0.0004, 0.0004);
+        single_electron_efficiency_mc_.AddEfficiency(30, 40, -1.556, -1.442, 0.9306, 0.0007, 0.0007);
+        single_electron_efficiency_mc_.AddEfficiency(30, 40, -2, -1.556, 0.744, 0.002, 0.002);
+        single_electron_efficiency_mc_.AddEfficiency(30, 40, -2.1, -2, 0.736, 0.002, 0.002);
+        single_electron_efficiency_mc_.AddEfficiency(30, 40, 0, 0.8, 0.9428, 0.0004, 0.0004);
+        single_electron_efficiency_mc_.AddEfficiency(30, 40, 0.8, 1.442, 0.9272, 0.0007, 0.0007);
+        single_electron_efficiency_mc_.AddEfficiency(30, 40, 1.442, 1.556, 0.753, 0.002, 0.002);
+        single_electron_efficiency_mc_.AddEfficiency(30, 40, 1.556, 2, 0.747, 0.002, 0.002);
+        single_electron_efficiency_mc_.AddEfficiency(30, 40, 2, 2.1, 0.737, 0.004, 0.004);
+        single_electron_efficiency_mc_.AddEfficiency(40, 50, -0.8, 0, 0.9667, 0.0002, 0.0002);
+        single_electron_efficiency_mc_.AddEfficiency(40, 50, -1.442, -0.8, 0.9648, 0.0003, 0.0003);
+        single_electron_efficiency_mc_.AddEfficiency(40, 50, -1.556, -1.442, 0.9548, 0.0004, 0.0005);
+        single_electron_efficiency_mc_.AddEfficiency(40, 50, -2, -1.556, 0.780, 0.001, 0.001);
+        single_electron_efficiency_mc_.AddEfficiency(40, 50, -2.1, -2, 0.768, 0.001, 0.001);
+        single_electron_efficiency_mc_.AddEfficiency(40, 50, 0, 0.8, 0.9639, 0.0003, 0.0003);
+        single_electron_efficiency_mc_.AddEfficiency(40, 50, 0.8, 1.442, 0.9531, 0.0005, 0.0005);
+        single_electron_efficiency_mc_.AddEfficiency(40, 50, 1.442, 1.556, 0.794, 0.001, 0.001);
+        single_electron_efficiency_mc_.AddEfficiency(40, 50, 1.556, 2, 0.783, 0.001, 0.001);
+        single_electron_efficiency_mc_.AddEfficiency(40, 50, 2, 2.1, 0.769, 0.004, 0.004);
+        single_electron_efficiency_mc_.AddEfficiency(50, 70, -0.8, 0, 0.9742, 0.0004, 0.0004);
+        single_electron_efficiency_mc_.AddEfficiency(50, 70, -1.442, -0.8, 0.9723, 0.0004, 0.0004);
+        single_electron_efficiency_mc_.AddEfficiency(50, 70, -1.556, -1.442, 0.9614, 0.0008, 0.0008);
+        single_electron_efficiency_mc_.AddEfficiency(50, 70, -2, -1.556, 0.791, 0.003, 0.003);
+        single_electron_efficiency_mc_.AddEfficiency(50, 70, -2.1, -2, 0.778, 0.003, 0.003);
+        single_electron_efficiency_mc_.AddEfficiency(50, 70, 0, 0.8, 0.9711, 0.0004, 0.0005);
+        single_electron_efficiency_mc_.AddEfficiency(50, 70, 0.8, 1.442, 0.9594, 0.0008, 0.0008);
+        single_electron_efficiency_mc_.AddEfficiency(50, 70, 1.442, 1.556, 0.805, 0.003, 0.003);
+        single_electron_efficiency_mc_.AddEfficiency(50, 70, 1.556, 2, 0.795, 0.003, 0.003);
+        single_electron_efficiency_mc_.AddEfficiency(50, 70, 2, 2.1, 0.779, 0.007, 0.008);
+        single_electron_efficiency_mc_.AddEfficiency(70, 250, -0.8, 0, 0.9820, 0.0008, 0.0009);
+        single_electron_efficiency_mc_.AddEfficiency(70, 250, -1.442, -0.8, 0.9814, 0.0009, 0.0010);
+        single_electron_efficiency_mc_.AddEfficiency(70, 250, -1.556, -1.442, 0.974, 0.002, 0.002);
+        single_electron_efficiency_mc_.AddEfficiency(70, 250, -2, -1.556, 0.802, 0.007, 0.007);
+        single_electron_efficiency_mc_.AddEfficiency(70, 250, -2.1, -2, 0.784, 0.007, 0.008);
+        single_electron_efficiency_mc_.AddEfficiency(70, 250, 0, 0.8, 0.9806, 0.0010, 0.0010);
+        single_electron_efficiency_mc_.AddEfficiency(70, 250, 0.8, 1.442, 0.971, 0.002, 0.002);
+        single_electron_efficiency_mc_.AddEfficiency(70, 250, 1.442, 1.556, 0.817, 0.007, 0.007);
+        single_electron_efficiency_mc_.AddEfficiency(70, 250, 1.556, 2, 0.811, 0.007, 0.007);
+        single_electron_efficiency_mc_.AddEfficiency(70, 250, 2, 2.1, 0.82, 0.02, 0.02);
     }
 
 }  // namespace zf;
