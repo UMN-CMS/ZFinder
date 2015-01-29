@@ -108,7 +108,7 @@ double CrossCheckPlotter::set_area_rescale_factor() {
     const double UPPER = 120.;
     // Open the histograms
     const bool DO_RESCALING = true;
-    HistoStore histo_store = open_histos("Z0 Mass: All", DO_RESCALING);
+    HistoStore histo_store = open_histos("z_mass_all", DO_RESCALING);
     TH1D* data_histo = histo_store.data_histo;
     TH1D* mc_histo = histo_store.mc_histo;
     std::vector<std::pair<std::string, TH1D*>> bg_histos = histo_store.bg_histos;
@@ -213,6 +213,7 @@ HistoStore CrossCheckPlotter::open_histos(
     data_config_.tfile->GetObject(DATA_HISTO_NAME.c_str(), tmp_histo);
     if (!tmp_histo) {
         std::cout << "Can not open the Data Histogram!" << std::endl;
+        std::cout << DATA_HISTO_NAME << std::endl;
         return HistoStore(nullptr, nullptr, {});
     }
     TH1D* data_histo = dynamic_cast<TH1D*>(tmp_histo->Clone());
@@ -221,6 +222,7 @@ HistoStore CrossCheckPlotter::open_histos(
     mc_config_.tfile->GetObject(MC_HISTO_NAME.c_str(), tmp_histo);
     if (!tmp_histo) {
         std::cout << "Can not open the MC Histogram!" << std::endl;
+        std::cout << MC_HISTO_NAME << std::endl;
         return HistoStore(nullptr, nullptr, {});
     }
     TH1D* mc_histo = dynamic_cast<TH1D*>(tmp_histo->Clone());
@@ -483,7 +485,7 @@ void CrossCheckPlotter::plot(
 
     // Add CMS text inside the plot on the top left
     const std::string CMS_STRING = "CMS Preliminary";
-    TLatex* cms_latex = new TLatex(LEFT_EDGE_ + 0.025, TOP_EDGE_ - 0.05,  CMS_STRING.c_str());
+    TLatex* cms_latex = new TLatex(LEFT_EDGE_ + 0.035, TOP_EDGE_ - 0.055,  CMS_STRING.c_str());
     cms_latex->SetNDC(kTRUE);  // Use pad coordinates, not Axis
     cms_latex->SetTextSize(0.035);
 
@@ -670,8 +672,8 @@ void CrossCheckPlotter::init_config_map() {
                     "m_{ee} [GeV]",  // x_label
                     "Events",        // y_label
                     "",              // title
-                    "z_mass_all",  // histogram name (for reading in)
-                    false,           // log Y axis
+                    "z_mass_all",    // histogram name (for reading in)
+                    true,            // log Y axis
                     false,           // log X axis
                     {}               // Desired new binning
                     // DY Group Binning
@@ -690,7 +692,7 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "z_mass_coarse",
-                    false,
+                    true,
                     false,
                     {}
                     // DY Group Binning
@@ -709,7 +711,7 @@ void CrossCheckPlotter::init_config_map() {
                     "Events",
                     "",
                     "z_mass_fine",
-                    false,
+                    true,
                     false,
                     {}
                     // DY Group Binning
@@ -990,7 +992,7 @@ void CrossCheckPlotter::init_config_map() {
                     "e0_he",
                     true,
                     false,
-                    {}
+                    {10}
                     )
                 )
             );
@@ -1004,7 +1006,7 @@ void CrossCheckPlotter::init_config_map() {
                     "e1_he",
                     true,
                     false,
-                    {}
+                    {10}
                     )
                 )
             );
@@ -1019,7 +1021,7 @@ void CrossCheckPlotter::init_config_map() {
                     "e0_deta",
                     true,
                     false,
-                    {}
+                    {5}
                     )
                 )
             );
@@ -1033,7 +1035,7 @@ void CrossCheckPlotter::init_config_map() {
                     "e1_deta",
                     true,
                     false,
-                    {}
+                    {5}
                     )
                 )
             );
@@ -1048,7 +1050,7 @@ void CrossCheckPlotter::init_config_map() {
                     "e0_dphi",
                     true,
                     false,
-                    {}
+                    {10}
                     )
                 )
             );
@@ -1062,7 +1064,7 @@ void CrossCheckPlotter::init_config_map() {
                     "e1_dphi",
                     true,
                     false,
-                    {}
+                    {10}
                     )
                 )
             );
@@ -1077,7 +1079,7 @@ void CrossCheckPlotter::init_config_map() {
                     "e0_track_iso",
                     true,
                     false,
-                    {}
+                    {10}
                     )
                 )
             );
@@ -1091,7 +1093,7 @@ void CrossCheckPlotter::init_config_map() {
                     "e1_track_iso",
                     true,
                     false,
-                    {}
+                    {10}
                     )
                 )
             );
@@ -1106,7 +1108,7 @@ void CrossCheckPlotter::init_config_map() {
                     "e0_ecal_iso",
                     true,
                     false,
-                    {}
+                    {10}
                     )
                 )
             );
@@ -1120,7 +1122,7 @@ void CrossCheckPlotter::init_config_map() {
                     "e1_ecal_iso",
                     true,
                     false,
-                    {}
+                    {10}
                     )
                 )
             );
@@ -1135,7 +1137,7 @@ void CrossCheckPlotter::init_config_map() {
                     "e0_hcal_iso",
                     true,
                     false,
-                    {}
+                    {10}
                     )
                 )
             );
@@ -1149,7 +1151,7 @@ void CrossCheckPlotter::init_config_map() {
                     "e1_hcal_iso",
                     true,
                     false,
-                    {}
+                    {10}
                     )
                 )
             );
@@ -1164,7 +1166,7 @@ void CrossCheckPlotter::init_config_map() {
                     "e0_1oe_1op",
                     true,
                     false,
-                    {}
+                    {10}
                     )
                 )
             );
@@ -1178,7 +1180,7 @@ void CrossCheckPlotter::init_config_map() {
                     "e1_1oe_1op",
                     true,
                     false,
-                    {}
+                    {10}
                     )
                 )
             );
