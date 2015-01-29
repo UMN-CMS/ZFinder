@@ -475,6 +475,18 @@ void CrossCheckPlotter::plot(
     gPad->SetLogx(plot_config.logx);
     gPad->SetBottomMargin(0.01);  // Remove the margin, we'll put it under the ratio
 
+    // Add luminosity text outside the plot on the top right
+    const std::string LUMI_STRING = "19.789 fb^{-1} (8 TeV)";
+    TLatex* lumi_latex = new TLatex(RIGHT_EDGE_ - 0.195, TOP_EDGE_ + 0.007,  LUMI_STRING.c_str());
+    lumi_latex->SetNDC(kTRUE);  // Use pad coordinates, not Axis
+    lumi_latex->SetTextSize(0.035);
+
+    // Add CMS text inside the plot on the top left
+    const std::string CMS_STRING = "CMS Preliminary";
+    TLatex* cms_latex = new TLatex(LEFT_EDGE_ + 0.025, TOP_EDGE_ - 0.05,  CMS_STRING.c_str());
+    cms_latex->SetNDC(kTRUE);  // Use pad coordinates, not Axis
+    cms_latex->SetTextSize(0.035);
+
     // Draw the histograms
     data_histo->Draw("E");  // Set axis titles
     histo_stack->Draw("HIST SAME");
@@ -484,6 +496,8 @@ void CrossCheckPlotter::plot(
     if (plot_title != nullptr) {
         plot_title->Draw();
     }
+    lumi_latex->Draw();
+    cms_latex->Draw();
 
     // Make the ratio plot
     canvas.cd(2);
@@ -518,6 +532,8 @@ void CrossCheckPlotter::plot(
     delete ratio_histo;
     delete plot_title;
     delete histo_stack;
+    delete lumi_latex;
+    delete cms_latex;
 }
 
 void CrossCheckPlotter::set_plot_style() {
