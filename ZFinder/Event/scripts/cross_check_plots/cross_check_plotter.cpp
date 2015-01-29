@@ -436,7 +436,7 @@ void CrossCheckPlotter::plot(
     const double DATA_MAX = data_histo->GetMaximum();
     const double STACK_MAX = histo_stack->GetMaximum();
 
-    const double MAX_CONST = 1.2;
+    const double MAX_CONST = 5;
     if (DATA_MAX > STACK_MAX) {
         data_histo->SetMaximum(DATA_MAX * MAX_CONST);
     } else {
@@ -492,9 +492,8 @@ void CrossCheckPlotter::plot(
     // Draw the histograms
     data_histo->Draw("E");  // Set axis titles
     histo_stack->Draw("HIST SAME");
-    data_histo->Draw("E SAME");
+    data_histo->Draw("E SAME"); // Make point cover histogram
     legend.Draw();
-    histo_stack->Draw("HIST SAME");
     if (plot_title != nullptr) {
         plot_title->Draw();
     }
@@ -525,7 +524,13 @@ void CrossCheckPlotter::plot(
     ratio_line.Draw("SAME");
     ratio_histo->Draw("E SAME");
 
-    // Save the plot as a png
+    // Redraw axises so tick marks show over the histograms
+    canvas.cd(1);
+    redraw_border();
+    canvas.cd(2);
+    redraw_border();
+
+    // Save the plot to a file
     canvas.Print(FILE_NAME.c_str(), "pdf");
     const std::string C_FILE_NAME = FILE_NAME + ".C";
     canvas.Print(C_FILE_NAME.c_str(), "cxx");
@@ -536,6 +541,16 @@ void CrossCheckPlotter::plot(
     delete histo_stack;
     delete lumi_latex;
     delete cms_latex;
+}
+
+void CrossCheckPlotter::redraw_border() {
+    // https://root.cern.ch/drupal/content/how-redraw-axis-and-plot-borders
+    // this little macro redraws the axis tick marks and the pad border lines.
+   gPad->Update();
+   gPad->RedrawAxis();
+   //TLine l;
+   //l.DrawLine(gPad->GetUxmin(), gPad->GetUymax(), gPad->GetUxmax(), gPad->GetUymax());
+   //l.DrawLine(gPad->GetUxmax(), gPad->GetUymin(), gPad->GetUxmax(), gPad->GetUymax());
 }
 
 void CrossCheckPlotter::set_plot_style() {

@@ -226,6 +226,7 @@ class CrossCheckPlotter{
 
         // Set the plotting style
         void set_plot_style();
+        void redraw_border();
         TStyle* style_;
 
         // Input TFiles
