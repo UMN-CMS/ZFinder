@@ -14,7 +14,8 @@
 
 int main() {
     const std::string INPUT_FILE =
-        "/data/whybee0a/user/gude_2/trigeff/20150123_madgraph_hadded.root";
+        //"/data/whybee0a/user/gude_2/trigeff/20150123_madgraph_hadded.root";
+        "/data/whybee0a/user/gude_2/trigeff/20150123_hadded.root";
     TFile* input_tfile = new TFile(INPUT_FILE.c_str());
 
     const int NUMBER_OF_HISTOGRAMS = 2;
@@ -37,15 +38,19 @@ int main() {
     // Eta bin, but multiple PT bins)
     std::vector<std::pair<TGraphAsymmErrors*, std::string>> ratios;
     for (int i = 0; i < histograms[0]->GetNbinsY(); ++i) {
+        const int ROOT_BIN = i+1;
         // Make the TGraphAsymmErrors from projections of the TH2D
-        TH1D* num = histograms[0]->ProjectionX(Form("num_bin%d", i + 1), i + 1, i + 2);
-        TH1D* den = histograms[1]->ProjectionX(Form("den_bin%d", i + 1), i + 1, i + 2);
+        TH1D* num = histograms[0]->ProjectionX(Form("num_bin%d", ROOT_BIN), ROOT_BIN, ROOT_BIN);
+        TH1D* den = histograms[1]->ProjectionX(Form("den_bin%d", ROOT_BIN), ROOT_BIN, ROOT_BIN);
         // cl=0.683 b(1,1) mode is the option needed for Bayes divide
         TGraphAsymmErrors* tg = new TGraphAsymmErrors(num, den, "cl=0.683 b(1,1) mode");
 
         // Get the eta bin
-        const double low_edge = histograms[0]->GetYaxis()->GetBinLowEdge(i + 1);
-        const double high_edge = low_edge + histograms[0]->GetYaxis()->GetBinWidth(i + 1);
+        const double low_edge = histograms[0]->GetYaxis()->GetBinLowEdge(ROOT_BIN);
+        const double high_edge = low_edge + histograms[0]->GetYaxis()->GetBinWidth(ROOT_BIN);
+        //std::cout << low_edge << " " << high_edge << " ";
+        //std::cout << num->GetBinContent(1) << " ";
+        //std::cout << den->GetBinContent(1) << std::endl;
         std::stringstream s;
         s << low_edge << ", " << high_edge;
         const std::string eta = s.str();
@@ -53,10 +58,6 @@ int main() {
         std::pair<TGraphAsymmErrors*, std::string> p = make_pair(tg, eta);
         ratios.push_back(p);
     }
-
-    // Open an output root file for saving
-    TFile* out_file = new TFile("output.root", "RECREATE");
-    out_file->cd();
 
     for (auto& i_pair : ratios) {
         TGraphAsymmErrors* tgraph = i_pair.first;
@@ -73,6 +74,17 @@ int main() {
             std::cout << " - " << tgraph->GetErrorYlow(i) << std::endl;
         }
     }
+
+    // Open an output root file for saving
+    TFile* out_file = new TFile("output.root", "RECREATE");
+    out_file->cd();
+
+    TH2D* ratio = dynamic_cast<TH2D*>(histograms[0]->Clone("Ratio"));
+    ratio->Divide(histograms[0], histograms[1]);
+    ratio->Draw();
+
+    out_file->Write();
+    out_file->Close();
 
     return 0;
 }

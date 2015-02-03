@@ -139,3 +139,4 @@ class EfficiencyFormatter:
 if __name__ == "__main__":
     formatter = EfficiencyFormatter(argv[1])
     print '\n'.join(formatter.to_cpp())
+    #print '\n'.join(formatter.to_tex())
