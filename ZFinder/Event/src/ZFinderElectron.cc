@@ -2,6 +2,10 @@
 
 // Standard Library
 #include <iostream>  // std::cout, std::endl;
+#include <cmath>  // asin
+
+// ROOT
+#include "Math/VectorUtil.h"  // Phi_mpi_pi
 
 // ZFinder
 #include "ZFinder/Event/interface/PDGID.h"  // PDGID enum (ELECTRON, POSITRON, etc.)
@@ -29,7 +33,12 @@ namespace zf {
         one_over_e_mins_one_over_p_ = (1.0/input_electron.ecalEnergy() - input_electron.eSuperClusterOverP()/input_electron.ecalEnergy());
         charge_ = input_electron.charge();
         sc_eta_ = input_electron.superCluster()->eta();
-        sc_phi_ = input_electron.superCluster()->phi();
+        // Get SC phi and correct for the magnetic field
+        using ROOT::Math::VectorUtil::Phi_mpi_pi;
+        const double SC_PHI = input_electron.superCluster()->phi();
+        const double EFFECTIVE_ECAL_RADIUS = EffectiveRadius(eta_);
+        const double SC_PHI_CORRECTION = GetSCDeltaPhi(pt_, charge_, EFFECTIVE_ECAL_RADIUS);
+        sc_phi_ = Phi_mpi_pi(SC_PHI - SC_PHI_CORRECTION);
     }
 
     ZFinderElectron::ZFinderElectron(reco::GenParticle input_electron) {
@@ -261,5 +270,82 @@ namespace zf {
             }
         }
         return tmp_vec;
+    }
+
+    double ZFinderElectron::GetSCDeltaPhi(
+            const double PT, // GeV
+            const int CHARGE, // 1 or -1
+            const double DETECTOR_RADIUS, // meters
+            const int B_FIELD // Tesla
+            )
+    {
+        /*
+         * From Green's "The Physics of Particle Detectors" Equations 7.20 and
+         * 7.21. The Factor of 3.33 comes from 1/q when p is given in GeV and
+         * the magnetic field is given in Tesla as given by Green on page 133.
+         *
+         * 7.20 gives:
+         *
+         *      a_T = p_T / (q B)
+         *
+         * 7.21 gives:
+         *
+         *      sin(phi_at_radius - phi_0) = - r / (2 a_T)
+         *
+         * Where q is the charge, B is the field, r is the detector radius,
+         * phi_0 is the angle the particle left the interaction point at, and
+         * phi_at_radius is the angle of the location of the detector where the
+         * particle impacted.
+         *
+         * We _assume_ that all particles have charge of 1, 0, or -1.
+         *
+         * Then we can solve and find:
+         *
+         *      phi_at_radius - phi_0 = asin( - r q B / (2 p_T))
+         *
+         *  In units where B is in Tesla and p_T is in GeV, 1/q = 3.33.
+         */
+        const double ONE_OVER_Q = 3.33;
+        const double AT = PT * ONE_OVER_Q / B_FIELD;
+        // Get the sign of the charge.
+        const double SIGN = int(0 < CHARGE) - int(CHARGE < 0);
+        const double INTERNAL = -SIGN * DETECTOR_RADIUS / (2 * AT);
+        const double DELTA_PHI = std::asin(INTERNAL);
+
+        return DELTA_PHI;
+    }
+
+    double ZFinderElectron::EffectiveRadius(const double ETA) {
+        /*
+         * Get the effective radius of ECAL, assuming it is a cylinder.
+         */
+        // Eta values of the end of EB and the start of EE
+        const double MAX_EB = 1.4442;
+        //const double MIN_EE = 1.56;
+        // The radius of the barrel and the distance of the endcap from the
+        // interaction point, in meters.
+        const double EB_RADIUS = 1.29;
+        const double EE_DISTANCE = 3.14;
+        // If we're in the barrel, then the radius is just the radius of the
+        // barrel.
+        const double FETA = fabs(ETA);
+        if (FETA < MAX_EB) {
+            return EB_RADIUS;
+        }
+        /*
+         * Otherwise we're in the endcap. This means that we have to calculate:
+         *
+         *  EE_DISTANCE * tan(theta)
+         *
+         * Where theta is the angle relative to the beam. In terms of eta:
+         *
+         *  exp(-eta) = tan(theta/2)
+         *
+         * We then use the double angle formula to get tan(theta) without
+         * needing an atan.
+         */
+        const double TTOT = std::exp(-FETA);  // Tan(theta/2)
+        const double TAN_THETA = (2 * TTOT) / (1 - (TTOT * TTOT));
+        return EE_DISTANCE * TAN_THETA;
     }
 }

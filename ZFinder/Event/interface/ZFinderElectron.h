@@ -134,6 +134,16 @@ namespace zf {
             // Supercluster quantities
             double sc_eta_;
             double sc_phi_;
+
+            // Correction for supercluster phi based on the field
+            double GetSCDeltaPhi(
+                    const double PT, // GeV
+                    const int CHARGE, // 1 or -1
+                    const double DETECTOR_RADIUS, // meters
+                    const int B_FIELD = 3.8 // Tesla
+                    );
+
+            double EffectiveRadius(const double ETA);
     };
 }  // namespace zfe
 #endif  // ZFINDER_ZFINDERELECTRON_H_
