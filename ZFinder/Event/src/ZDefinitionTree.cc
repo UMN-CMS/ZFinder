@@ -151,9 +151,8 @@ namespace zf {
         event_.is_mc = !zf_event.is_real_data;
         event_.event_number = zf_event.id.event_num;
 
-        // Now that the right values have been set, fill the tuple, but only if
-        // we have a z candidate
-        if (reco_.z_m >= 0) {
+        // Fill if there is a good Z in either truth or reco
+        if (zf_event.truth_z.m > -1 || zf_event.reco_z.m > -1) {
             tree_->Fill();
         }
     }
