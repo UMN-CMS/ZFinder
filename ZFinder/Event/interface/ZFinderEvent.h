@@ -82,10 +82,11 @@ namespace zf {
                 double other_phistar;
             } reco_z, truth_z;
 
-            // Event weight, used for things like pileup reweighting. Most
-            // other weights are cut dependent (efficiencies for example) and
-            // so are store with the cuts in each electron, with a combined
-            // efficiency calculated in ZDefinition.
+            // Event weight, used for things like pileup reweighting and the
+            // natural weight of the MC event. Most other weights are cut
+            // dependent (efficiencies for example) and so are store with the
+            // cuts in each electron, with a combined efficiency calculated in
+            // ZDefinition.
             double event_weight;
             double weight_fsr;
             double weight_vertex;

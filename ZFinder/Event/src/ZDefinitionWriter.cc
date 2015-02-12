@@ -67,18 +67,25 @@ namespace zf {
                 // Check if cut fails, if it does break, otherwise fill the
                 // histogram associated with the cut
                 if (cont) {
-                    double weight = 1.;
-                    if (i_cutlevel.second.t0p1_pass) {
-                        weight = i_cutlevel.second.t0p1_eff;
-                    } else if (i_cutlevel.second.t1p0_pass) {
-                        weight = i_cutlevel.second.t1p0_eff;
+                    // We only want to apply the weights to reco events. For
+                    // gen level (when USE_MC_ is set to true, we only want the
+                    // "natural weight" of the MC events, which is the GEN_WEIGHT.
+                    double weight = GEN_WEIGHT;
+                    if (!USE_MC_) {
+                        if (i_cutlevel.second.t0p1_pass) {
+                            weight = i_cutlevel.second.t0p1_eff;
+                        }
+                        else if (i_cutlevel.second.t1p0_pass) {
+                            weight = i_cutlevel.second.t1p0_eff;
+                        }
                     }
                     // Fill the plot
                     auto i_map_plotter = zf_plotters.find(CUT_NAME);
                     if (i_map_plotter != zf_plotters.end()) {
                         i_map_plotter->second.Fill(zf_event, electron_0, electron_1, weight);
                     }
-                } else {  // We stop at the first failed cut
+                }
+                else {  // We stop at the first failed cut
                     break;
                 }
             }
