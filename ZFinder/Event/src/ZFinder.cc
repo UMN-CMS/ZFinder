@@ -217,9 +217,9 @@ void ZFinder::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     weighted_counter_->Fill(1, zfe.weight_natural_mc);
 
     // If the even has a good Z, process further
-    if ( (zfe.reco_z.m > -1 && zfe.e0 != nullptr && zfe.e1 != nullptr)
-            || (zfe.truth_z.m > -1 && zfe.e0_truth != nullptr && zfe.e1_truth != nullptr)
-       ) {  // We have a good Z in Reco OR Truth
+    const bool GOOD_RECO_Z = (zfe.reco_z.m > -1 && zfe.e0 != nullptr && zfe.e1 != nullptr);
+    const bool GOOD_TRUTH_Z = (zfe.truth_z.m > -1 && zfe.e0_truth != nullptr && zfe.e1_truth != nullptr);
+    if (GOOD_RECO_Z || GOOD_TRUTH_Z) {
         // Set all cuts
         for (auto& i_set : setters_) {
             i_set->SetCuts(&zfe);
