@@ -10,23 +10,23 @@
 int main() {
     // Input Files
     const std::string MC_FILE =
-        "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20141126_regressed_and_smeared_MC/madgraph_hadded.root";
+        "/data/whybee0a/user/gude_2/MC/20150211_MC_CTEQ6LL/MadGraph_hadded.root";
     const std::string DATA_FILE =
-        "/local/cms/user/gude/alex_thesis/ZFinder_RooWorkspaces/20141010_SingleElectron_2012ALL/20141010_SingleElectron_2012ALL_hadded.root";
+        "/data/whybee0a/user/gude_2/Data/20140210_SingleElectron_2012ALL/hadded.root";
 
     // Histograms
     // The Histogram containing the full event count with no acceptance or
     // efficiency limits.
     const std::string MC_HISTO_ALL =
-        "ZFinder/0 Gen Mass Only MC/0 All Events/Z0 Mass: All";
+        "ZFinder/0 Gen Mass Only MC/0 All Events/z_mass_all";
     // The Histogram containing MC events, but with the full analysis cuts
     // applied. This is used in a ratio with MC_HISTO_ALL to correct for
     // efficiency and acceptance.
     const std::string MC_HISTO_ACC =
-        "ZFinder/3 Single Trigger Cuts Reco/7 60 < M_{ee} < 120/Z0 Mass: All";
+        "ZFinder/3 Single Trigger Cuts Reco/7 60 < M_{ee} < 120/z_mass_all";
     // The data after all cuts.
     const std::string DATA_HISTO =
-        "ZFinder/Combined Single Reco/6 60 < M_{ee} < 120/Z0 Mass: All";
+        "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120/z_mass_all";
 
     // From src/Metadata/lumi_json/total_luminosity.md
     // These should be in 1/fb.
@@ -94,6 +94,7 @@ int main() {
                                  * (DATA_COUNT / LUMI);
 
     // Report, and exit
+    //std::cout << "Correction factor: " << MC_COUNT_ALL / MC_COUNT_ACC << std::endl;
     std::cout << "(" << MC_COUNT_ALL << " / " << MC_COUNT_ACC << ") * (";
     std::cout << DATA_COUNT << " / " << LUMI << " fb^(-1) ) = ";
     std::cout << CROSS_SECTION / 1e6 << " nanobarns" << std::endl;
