@@ -36,7 +36,8 @@ int main() {
         "/data/whybee0a/user/gude_2/MC/20150211_MC_CTEQ6LL/MadGraph_hadded.root";
 
     // Tree
-    const std::string TREE_NAME = "ZFinder/Combined Gen Cuts Reco/Combined Gen Cuts Reco";
+    const std::string TREE_NAME =
+        "ZFinder/Combined Gen Cuts Reco/Combined Gen Cuts Reco";
 
     // Open the TFiles
     TFile* mc_tfile = new TFile(MC_FILE.c_str(), "READ");
@@ -57,4 +58,37 @@ int main() {
     tree->SetBranchAddress("truth", &truth_branch);
     tree->SetBranchAddress("event_info", &event_branch);
 
+    // Text file
+    std::cout << "#event_number" << ", ";
+    std::cout << "e_pt[0]" << ", ";
+    std::cout << "e_eta[0]" << ", ";
+    std::cout << "e_phi[0]" << ", ";
+    std::cout << "e_charge[0]" << ", ";
+    std::cout << "e_pt[1]" << ", ";
+    std::cout << "e_eta[1]" << ", ";
+    std::cout << "e_phi[1]" << ", ";
+    std::cout << "e_charge[1]" << ", ";
+    std::cout << "z_m" << ", ";
+    std::cout << "z_y" << ", ";
+    std::cout << "z_phistar_dressed";
+    std::cout << std::endl;
+    for (int i = 0; i < tree->GetEntries(); i++) {
+        tree->GetEntry(i);
+        // Make the text file
+        std::cout << event_branch.event_number << ", ";
+        std::cout << truth_branch.e_pt[0] << ", ";
+        std::cout << truth_branch.e_eta[0] << ", ";
+        std::cout << truth_branch.e_phi[0] << ", ";
+        std::cout << truth_branch.e_charge[0] << ", ";
+        std::cout << truth_branch.e_pt[1] << ", ";
+        std::cout << truth_branch.e_eta[1] << ", ";
+        std::cout << truth_branch.e_phi[1] << ", ";
+        std::cout << truth_branch.e_charge[1] << ", ";
+        std::cout << truth_branch.z_m << ", ";
+        std::cout << truth_branch.z_y << ", ";
+        std::cout << truth_branch.z_phistar_dressed;
+        std::cout << std::endl;
+    }
+
+    return EXIT_SUCCESS;
 }
