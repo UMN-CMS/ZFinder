@@ -53,7 +53,8 @@ namespace zf {
 
             // Primary vertexes
             struct Vertexes{
-                unsigned int num;
+                int num;
+                double true_num;
                 double x;
                 double y;
                 double z;

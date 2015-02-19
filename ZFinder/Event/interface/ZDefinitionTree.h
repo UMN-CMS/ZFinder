@@ -58,6 +58,7 @@ namespace zf {
                     e_charge[0] = -2;
                     e_charge[1] = -2;
                     n_verts = -1;
+                    n_true_pileup = -1;
                 }
                 // Constructor
                 branch_struct() {
@@ -75,8 +76,9 @@ namespace zf {
                 double e_pt[2];
                 double e_eta[2];
                 double e_phi[2];
+                double n_true_pileup;
                 int e_charge[2];
-                unsigned int n_verts;
+                int n_verts;
             } reco_, truth_;
 
             struct event_branch {

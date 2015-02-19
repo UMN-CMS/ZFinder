@@ -200,6 +200,7 @@ namespace zf {
                 break;
             }
         }
+        truth_vert.true_num = true_number_of_pileup;
         weight_vertex = lumi_weights_->weight(true_number_of_pileup);
         event_weight *= weight_vertex;
 
@@ -571,10 +572,12 @@ namespace zf {
 
         // Vertexes
         reco_vert.num = -1;
+        reco_vert.true_num = -1;
         reco_vert.x = -1000;
         reco_vert.y = -1000;
         reco_vert.z = -1000;
         truth_vert.num = -1;
+        truth_vert.true_num = -1;
         truth_vert.x = -1000;
         truth_vert.y = -1000;
         truth_vert.z = -1000;
