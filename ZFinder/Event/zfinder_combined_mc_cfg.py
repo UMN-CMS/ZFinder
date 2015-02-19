@@ -57,6 +57,7 @@ process.pdfWeights = cms.EDProducer("PdfWeightProducer",
             "NNPDF23_nlo_as_0118.LHgrid",
             "MSTW2008nlo68cl.LHgrid",
             "CT10.LHgrid",
+            #"cteq6ll.LHpdf",
             ),
         )
 

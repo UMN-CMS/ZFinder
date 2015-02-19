@@ -216,6 +216,7 @@ namespace zf {
         weight_natural_mc = gen_event_info->weight();
         event_weight *= weight_natural_mc;
 
+        //edm::InputTag pdfWeightTag_cteq("pdfWeights:cteq6ll"); // or any other PDF set
         edm::InputTag pdfWeightTag_cteq("pdfWeights:CT10"); // or any other PDF set
         edm::Handle<std::vector<double> > weightHandle_cteq;
         iEvent.getByLabel(pdfWeightTag_cteq, weightHandle_cteq);
