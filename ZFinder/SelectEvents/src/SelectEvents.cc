@@ -49,7 +49,7 @@ class SelectEvents : public edm::EDFilter {
         virtual bool endLuminosityBlock(edm::LuminosityBlock&, edm::EventSetup const&);
 
         // ----------member data ---------------------------
-        std::vector<unsigned int> good_runs_;
+        std::vector<unsigned int> good_events_;
 };
 
 //
@@ -65,10 +65,10 @@ class SelectEvents : public edm::EDFilter {
 //
 SelectEvents::SelectEvents(const edm::ParameterSet& iConfig) {
     //now do what ever initialization is needed
-    good_runs_ = iConfig.getUntrackedParameter<std::vector<unsigned int> >("runs_to_save");
+    good_events_ = iConfig.getUntrackedParameter<std::vector<unsigned int> >("events_to_save");
 
     // Sort for faster lookup
-    std::sort(good_runs_.begin(), good_runs_.end());
+    std::sort(good_events_.begin(), good_events_.end());
 }
 
 
@@ -88,7 +88,7 @@ bool SelectEvents::filter(edm::Event& iEvent, const edm::EventSetup& iSetup) {
     const unsigned int EVENT_NUMBER = iEvent.id().event();
 
     // Binary search the good runs, reject if we don't find it
-    return std::binary_search(good_runs_.begin(), good_runs_.end(), EVENT_NUMBER);
+    return std::binary_search(good_events_.begin(), good_events_.end(), EVENT_NUMBER);
 }
 
 // ------------ method called once each job just before starting event loop  ------------

@@ -8,5 +8,5 @@ nick_events = cms.untracked.vuint32(
     )
 
 EventFilter = cms.EDFilter('SelectEvents',
-    runs_to_save = nick_events,
+    events_to_save = nick_events,
     )

@@ -10,7 +10,7 @@ Add the following to your python configuration:
 # Event Number Filter
 from ZFinder.SelectEvents.event_filter_cfi import EventFilter
 process.EventFilter = EventFilter.clone(
-    runs_to_save = cms.untracked.vuint32(
+    events_to_save = cms.untracked.vuint32(
         2291311,
         2291312,
         2291313,
