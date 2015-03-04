@@ -829,8 +829,14 @@ namespace zf {
             const reco::GenParticle * const NAKED_ELECTRON,
             const double MAX_DELTA_R
             ) {
-        const double ELECTRON_MASS = 5.109989e-4;
+        // If the two particles are the same, then no photons were emitted and
+        // we don't have to dress
+        if (BORN_ELECTRON == NAKED_ELECTRON) {
+            return NAKED_ELECTRON;
+        }
+
         // Make a 4 vector for the dressed electron
+        const double ELECTRON_MASS = 5.109989e-4;
         math::PtEtaPhiMLorentzVector dressed_p4(NAKED_ELECTRON->pt(), NAKED_ELECTRON->eta(), NAKED_ELECTRON->phi(), ELECTRON_MASS);
 
         // Dive down the decay tree from the born electron until we hit the
