@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 # Import ZDefinitions
-from ZFinder.Event.zdefinitions_cfi import zdefs_extended_data
+from ZFinder.Event.zdefinitions_cfi import zdefs_combined_data
 
 # ZFinder
 ZFinder = cms.EDAnalyzer('ZFinder',
@@ -23,7 +23,7 @@ ZFinder = cms.EDAnalyzer('ZFinder',
         pileupInputTag = cms.InputTag("addPileupInfo"),
         generatorInputTag = cms.InputTag("genParticles"),
         # ZDefinitions from ZFinder.ZFinder.zdefinitions_cfi
-        ZDefinitions = zdefs_extended_data,
+        ZDefinitions = zdefs_combined_data,
         # Run on MC or not. If true, every ZDefinition is included twice: once
         # plotting reco quantities, and once plotting generator quantities. If
         # false, only the reco quantities are plotted.

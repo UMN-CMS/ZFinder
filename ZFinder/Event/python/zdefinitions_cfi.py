@@ -62,52 +62,6 @@ combined_double = cms.untracked.PSet(
         use_truth_mass = cms.untracked.bool(False),
         )
 
-# Cuts for the electron only analysis
-ecal_ecal = cms.untracked.PSet(
-        name = cms.untracked.string("ET-ET Rapidity"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "trig(single_ele)", "pt>30", "eg_medium"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "acc(ALL)",         "pt>20", "eg_loose"),
-        min_mz = MIN_MZ,
-        max_mz = MAX_MZ,
-        use_truth_mass = cms.untracked.bool(False),
-        )
-
-ecal_ecal_no_trigger = ecal_ecal.clone(
-        name = cms.untracked.string("ET-ET Rapidity No Trigger"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>30", "eg_medium"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>20", "eg_loose"),
-        )
-
-ecal_nt = cms.untracked.PSet(
-        name = cms.untracked.string("ET-NT Rapidity"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "trig(single_ele)", "pt>30", "eg_medium"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(NT)", "acc(ALL)",         "pt>20", "nt_loose"),
-        min_mz = MIN_MZ,
-        max_mz = MAX_MZ,
-        use_truth_mass = cms.untracked.bool(False),
-        )
-
-ecal_nt_no_trigger = ecal_nt.clone(
-        name = cms.untracked.string("ET-NT Rapidity No Trigger"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>30", "eg_medium"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(NT)", "pt>20", "nt_loose"),
-        )
-
-ecal_hf = cms.untracked.PSet(
-        name = cms.untracked.string("ET-HF Rapidity"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "trig(single_ele)", "pt>30", "eg_medium"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(HF)", "acc(ALL)",         "pt>20", "hf_2dloose"),
-        min_mz = MIN_MZ,
-        max_mz = MAX_MZ,
-        use_truth_mass = cms.untracked.bool(False),
-        )
-
-ecal_hf_no_trigger = ecal_hf.clone(
-        name = cms.untracked.string("ET-HF Rapidity No Trigger"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "acc(ET)", "pt>30", "eg_medium"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "acc(HF)", "pt>20", "hf_2dloose"),
-        )
-
 # Cuts needed for "phi* by cut" plot
 sequence_plots_0_gen_mass = cms.untracked.PSet(
         name = cms.untracked.string("0 Gen Mass Only"),
@@ -204,23 +158,6 @@ regression_r9_gt_eta_25 = regression_r9_lt_eta_10.clone(
         name = cms.untracked.string("Regression Check R9>0.94 |eta|<2.5"),
         cuts0 = cms.untracked.vstring("aeta>2", "aeta<2.5", "r9<0.94"),
         cuts1 = cms.untracked.vstring("aeta>2", "aeta<2.5", "r9<0.94"),
-        )
-
-
-# The ZDefinition for use on data for the extended electron result
-zdefs_extended_data = cms.untracked.VPSet(
-        all_electrons,
-        ecal_ecal,
-        ecal_nt,
-        ecal_hf,
-        )
-
-# The ZDefinition for use on MC for the extended electron result
-zdefs_extended_mc = cms.untracked.VPSet(
-        all_electrons,
-        ecal_ecal_no_trigger,
-        ecal_nt_no_trigger,
-        ecal_hf_no_trigger,
         )
 
 # The ZDefinition for use on data for the combined result
