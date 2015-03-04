@@ -38,7 +38,9 @@ process.source.lumisToProcess = untracked(VLuminosityBlockRange(run_2012abcd_lum
 # Energy and calibrations for electrons
 process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-process.GlobalTag.globaltag = 'GR_P_V42_AN3::All'
+# Tag from: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions?redirectedfrom=CMS.SWGuideFrontierConditions
+# Based on the FT_R_53_V18 tag
+process.GlobalTag.globaltag = 'FT_53_V21_AN6::All'
 
 from ZFinder.Event.electron_regression_cfi import CalibratedElectrons, RandomNumberGeneratorService, ElectronEnergyRegressions
 process.RandomNumberGeneratorService = RandomNumberGeneratorService

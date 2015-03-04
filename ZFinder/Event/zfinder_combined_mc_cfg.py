@@ -29,7 +29,9 @@ process.TFileService = cms.Service("TFileService",
 # Energy and calibrations for electrons
 process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-process.GlobalTag.globaltag = 'GR_P_V42_AN3::All'
+# Tag from: https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFrontierConditions?redirectedfrom=CMS.SWGuideFrontierConditions
+# Based on the FT_R_53_V18 tag
+process.GlobalTag.globaltag = 'START53_V27::All'
 
 from ZFinder.Event.electron_regression_cfi import CalibratedElectrons_MC, RandomNumberGeneratorService, ElectronEnergyRegressions_MC
 process.RandomNumberGeneratorService = RandomNumberGeneratorService
