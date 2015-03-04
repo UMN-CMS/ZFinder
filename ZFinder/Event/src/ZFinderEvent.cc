@@ -686,38 +686,25 @@ namespace zf {
             if (gen_particle->pdgId() == PDGID::ZBOSON && z_boson == nullptr) {
                 for (size_t j = 0; j < gen_particle->numberOfDaughters(); ++j) {
                     if (gen_particle->daughter(j)->pdgId() == PDGID::ELECTRON) {
-                        z_boson = gen_particle;
-                        break;
-                    }
-                }
-            }
-            // Is an electron
-            else if (fabs(gen_particle->pdgId()) == PDGID::ELECTRON  // In pdgId, fabs(POSITRON) == ELECTRON
-                    && (electron_0 == nullptr || electron_1 == nullptr)
-                    ) {
-                for (size_t j = 0; j < gen_particle->numberOfMothers(); ++j) {
-                    if (gen_particle->mother(j)->pdgId() == PDGID::ZBOSON && gen_particle->status() == 3) {
-                        // If we haven't filled the first electron
+                        if (z_boson == nullptr) {
+                            z_boson = gen_particle;
+                        }
+                        // Assign the first daughter to our electron pointer
                         if (bornElectron_0 == nullptr) {
-                            //WARNING: this funciton uses a POINTER to a
-                            //POINTER to make gen_particle point at the NAKED
-                            //electron at the end of the decay chain
-                            bornElectron_0 = gen_particle;
+                            bornElectron_0 = dynamic_cast<const reco::GenParticle*>(gen_particle->daughter(j));
                             nakedElectron_0 = GetNakedElectron(bornElectron_0);
-
-                            //now we DRESS it:
                             if (bornElectron_0 && nakedElectron_0) {
                                 electron_0 = GetDressedElectron(bornElectron_0, nakedElectron_0);
                             }
                         }
-                        // We have filled the first electron, so fill the second
-                        else {
-                            bornElectron_1 = gen_particle;
+                        // Assign the second and break, because we already have two electrons
+                        else if (bornElectron_1 == nullptr) {
+                            bornElectron_1 = dynamic_cast<const reco::GenParticle*>(gen_particle->daughter(j));
                             nakedElectron_1 = GetNakedElectron(bornElectron_1);
-                            //now we DRESS it:
                             if (bornElectron_1 && nakedElectron_1) {
                                 electron_1 = GetDressedElectron(bornElectron_1, nakedElectron_1);
                             }
+                            break;
                         }
                     }
                 }
