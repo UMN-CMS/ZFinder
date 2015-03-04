@@ -1,5 +1,6 @@
 # C plot files
-ZFinder/Event/scripts/cross_check_plots/*.pdf.C
+*.pdf.C
+*.png.C
 
 #Binary and Image
 *.exe
