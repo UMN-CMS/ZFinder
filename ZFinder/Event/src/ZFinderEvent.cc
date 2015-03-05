@@ -814,7 +814,7 @@ namespace zf {
             // Otherwise look through the daughters and find an electron
             for (size_t i = 0; i < naked_electron->numberOfDaughters(); ++i) {
                 const reco::Candidate* test_particle = naked_electron->daughter(i);
-                if (fabs(test_particle->pdgId()) == ELECTRON) {
+                if (fabs(test_particle->pdgId()) == PDGID::ELECTRON) {
                     naked_electron = dynamic_cast<const reco::GenParticle*>(test_particle);
                     break;
                 }
@@ -854,12 +854,12 @@ namespace zf {
             for (size_t i = 0; i < tmp_electron->numberOfDaughters(); ++i) {
                 const reco::Candidate* test_particle = tmp_electron->daughter(i);
                 // If we find electron, we save it as the next item to recurse over
-                if (fabs(test_particle->pdgId()) == ELECTRON) {
+                if (fabs(test_particle->pdgId()) == PDGID::ELECTRON) {
                     swap_electron = dynamic_cast<const reco::GenParticle*>(test_particle);
                 }
                 // If we find a photon, add its 4 vector if it is within some
                 // distance of the naked electron
-                else if (fabs(test_particle->pdgId()) == PHOTON) {
+                else if (fabs(test_particle->pdgId()) == PDGID::PHOTON) {
                     const double DELTA_R = deltaR(test_particle->eta(), test_particle->phi(), NAKED_ELECTRON->eta(), NAKED_ELECTRON->phi());
                     if (DELTA_R < MAX_DELTA_R) {
                         dressed_p4 += math::PtEtaPhiMLorentzVector(
