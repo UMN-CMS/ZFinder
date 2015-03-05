@@ -2,11 +2,13 @@
 
 You will need to modify the file the tells CMSSW where to find pdfs:
 
-    vi $CMSSW_BASE/config/toolbox/$SCRAM_ARCH/tools/selected/lhapdffull.xml
+```bash
+vi $CMSSW_BASE/config/toolbox/$SCRAM_ARCH/tools/selected/lhapdffull.xml
+```
 
 Change it to read as follows (for CMSSW_5_3):
 
-```
+```xml
 <tool name="lhapdffull" version="5.9.1"> <!-- Note the new version: 5.9.1 -->
   <lib name="LHAPDF"/>
   <client>
@@ -39,8 +41,8 @@ The twiki states:
 > Jobs should run via CRAB if you are using the "lhapdffull" libraries. But as
 > of today, CRAB does not pass properly the necessary environment. We have
 > checked that a way to circumvent this is to add the following two commands to
-> the CMSSW.sh executable in the local crab_.../job/ subdirectory before
-> submitting the jobs: 
+> the CMSSW.sh executable in the local crab.../job/ subdirectory before
+> submitting the jobs:
 >
 > scramv1 setup lhapdffull
 > scramv1 b
@@ -48,4 +50,15 @@ The twiki states:
 > You can add them for instance after the 'eval `scramv1 runtime -sh ...`'
 > command.
 
-This works fine.
+This **does not** actually work, instead, place the following on line 534 of
+the `job/CMSSW.sh` file:
+
+```bash
+export LHAPATH=/cvmfs/cms.cern.ch/slc5_amd64_gcc462/external/lhapdf/5.9.1/share/lhapdf/PDFsets
+scramv1 setup lhapdffull
+export LHAPATH=/cvmfs/cms.cern.ch/slc5_amd64_gcc462/external/lhapdf/5.9.1/share/lhapdf/PDFsets
+scramv1 b
+export LHAPATH=/cvmfs/cms.cern.ch/slc5_amd64_gcc462/external/lhapdf/5.9.1/share/lhapdf/PDFsets
+```
+
+It's probable that you don't need all those exports, but this snippet works.
