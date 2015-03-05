@@ -693,17 +693,15 @@ namespace zf {
                         if (bornElectron_0 == nullptr) {
                             bornElectron_0 = dynamic_cast<const reco::GenParticle*>(gen_particle->daughter(j));
                             nakedElectron_0 = GetNakedElectron(bornElectron_0);
-                            if (bornElectron_0 && nakedElectron_0) {
-                                electron_0 = GetDressedElectron(bornElectron_0, nakedElectron_0);
-                            }
+                            bornElectron_0 = nakedElectron_0;
+                            electron_0 = nakedElectron_0;
                         }
                         // Assign the second and break, because we already have two electrons
                         else if (bornElectron_1 == nullptr) {
                             bornElectron_1 = dynamic_cast<const reco::GenParticle*>(gen_particle->daughter(j));
                             nakedElectron_1 = GetNakedElectron(bornElectron_1);
-                            if (bornElectron_1 && nakedElectron_1) {
-                                electron_1 = GetDressedElectron(bornElectron_1, nakedElectron_1);
-                            }
+                            bornElectron_1 = nakedElectron_1;
+                            electron_1 = nakedElectron_1;
                             break;
                         }
                     }
