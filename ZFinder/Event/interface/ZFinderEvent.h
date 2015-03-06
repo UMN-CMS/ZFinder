@@ -245,6 +245,9 @@ namespace zf {
             // Allow turning off of PDF weight vectors
             bool run_pdf_weights_;
 
+            // Allow turning off of fsr weight calculation
+            bool run_fsr_weight_;
+
             // NT Bending Correction
             void ApplyNTBendingCorrection();
     };

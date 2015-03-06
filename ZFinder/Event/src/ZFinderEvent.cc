@@ -85,6 +85,9 @@ namespace zf {
         // Allow turning off of PDF weight vectors
         run_pdf_weights_ = iConfig.getParameter<bool>("run_pdf_weights");
 
+        // Allow turning off of fsr weight calculation
+        run_fsr_weight_ = iConfig.getParameter<bool>("run_fsr_weight");
+
         // Set up the lumi reweighting, but only if it is MC.
         if (!is_real_data
             && lumi_weights_ == nullptr
@@ -219,10 +222,7 @@ namespace zf {
         weight_natural_mc = gen_event_info->weight();
         event_weight *= weight_natural_mc;
 
-
-        edm::Handle<double > weightHandle_fsr;
-        iEvent.getByLabel("fsrWeight", weightHandle_fsr);
-        weight_fsr = (*weightHandle_fsr);
+        // Calcuate weights for different PDF sets
         if (run_pdf_weights_) {
             //edm::InputTag pdfWeightTag_cteq("pdfWeights:cteq6ll"); // or any other PDF set
             edm::InputTag pdfWeightTag_cteq("pdfWeights:CT10"); // or any other PDF set
@@ -246,6 +246,15 @@ namespace zf {
            weights_nnpdf = {0};
         }
 
+        // Calculate the FSR weight
+        if (run_fsr_weight_) {
+            edm::Handle<double> weightHandle_fsr;
+            iEvent.getByLabel("fsrWeight", weightHandle_fsr);
+            weight_fsr = (*weightHandle_fsr);
+        }
+        else {
+            weight_fsr = 0.;
+        }
     }
 
     void ZFinderEvent::InitReco(const edm::Event& iEvent, const edm::EventSetup& iSetup) {

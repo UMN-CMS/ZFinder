@@ -39,4 +39,6 @@ ZFinder = cms.EDAnalyzer('ZFinder',
         pileup_era = cms.string("ABCD"),  # defaults to ABCD if not given
         # Turn on/off the PDF weight vectors in MC
         run_pdf_weights = cms.bool(False),
+        # Turn on/off the FSR weight calculation in MC
+        run_fsr_weight = cms.bool(False),
         )

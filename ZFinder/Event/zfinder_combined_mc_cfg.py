@@ -79,6 +79,7 @@ process.ZFinder = ZFinder.clone(
         use_muon_acceptance = cms.bool(True),
         require_gen_z = cms.bool(False),
         run_pdf_weights = cms.bool(False),
+        run_fsr_weight = cms.bool(False),
         )
 
 # RUN
