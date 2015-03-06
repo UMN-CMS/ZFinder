@@ -36,5 +36,7 @@ ZFinder = cms.EDAnalyzer('ZFinder',
         require_gen_z = cms.bool(False),
         # Pileup Era to correct MC to. Valid values are A, B, C, D. Anything
         # else will default to the full 2012.
-        pileup_era = cms.string("ABCD"),  # defaults to ABCD
+        pileup_era = cms.string("ABCD"),  # defaults to ABCD if not given
+        # Turn on/off the PDF weight vectors in MC
+        run_pdf_weights = cms.bool(False),
         )

@@ -242,6 +242,9 @@ namespace zf {
             // Reject events that do not have a generator Z->ee event
             bool require_gen_z_;
 
+            // Allow turning off of PDF weight vectors
+            bool run_pdf_weights_;
+
             // NT Bending Correction
             void ApplyNTBendingCorrection();
     };

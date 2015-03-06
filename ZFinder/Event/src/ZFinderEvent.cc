@@ -82,6 +82,9 @@ namespace zf {
         // Reject events that do not have a generator Z->ee event
         require_gen_z_ = iConfig.getParameter<bool>("require_gen_z");
 
+        // Allow turning off of PDF weight vectors
+        run_pdf_weights_ = iConfig.getParameter<bool>("run_pdf_weights");
+
         // Set up the lumi reweighting, but only if it is MC.
         if (!is_real_data
             && lumi_weights_ == nullptr
@@ -216,25 +219,32 @@ namespace zf {
         weight_natural_mc = gen_event_info->weight();
         event_weight *= weight_natural_mc;
 
-        //edm::InputTag pdfWeightTag_cteq("pdfWeights:cteq6ll"); // or any other PDF set
-        edm::InputTag pdfWeightTag_cteq("pdfWeights:CT10"); // or any other PDF set
-        edm::Handle<std::vector<double> > weightHandle_cteq;
-        iEvent.getByLabel(pdfWeightTag_cteq, weightHandle_cteq);
-        weights_cteq = (*weightHandle_cteq);
-
-        edm::InputTag pdfWeightTag_mstw("pdfWeights:MSTW2008nlo68cl"); // or any other PDF set
-        edm::Handle<std::vector<double> > weightHandle_mstw;
-        iEvent.getByLabel(pdfWeightTag_mstw, weightHandle_mstw);
-        weights_mstw = (*weightHandle_mstw);
-
-        edm::InputTag pdfWeightTag_nnpdf("pdfWeights:NNPDF23"); // or any other PDF set
-        edm::Handle<std::vector<double> > weightHandle_nnpdf;
-        iEvent.getByLabel(pdfWeightTag_nnpdf, weightHandle_nnpdf);
-        weights_nnpdf = (*weightHandle_nnpdf);
 
         edm::Handle<double > weightHandle_fsr;
         iEvent.getByLabel("fsrWeight", weightHandle_fsr);
         weight_fsr = (*weightHandle_fsr);
+        if (run_pdf_weights_) {
+            //edm::InputTag pdfWeightTag_cteq("pdfWeights:cteq6ll"); // or any other PDF set
+            edm::InputTag pdfWeightTag_cteq("pdfWeights:CT10"); // or any other PDF set
+            edm::Handle<std::vector<double> > weightHandle_cteq;
+            iEvent.getByLabel(pdfWeightTag_cteq, weightHandle_cteq);
+            weights_cteq = (*weightHandle_cteq);
+
+            edm::InputTag pdfWeightTag_mstw("pdfWeights:MSTW2008nlo68cl"); // or any other PDF set
+            edm::Handle<std::vector<double> > weightHandle_mstw;
+            iEvent.getByLabel(pdfWeightTag_mstw, weightHandle_mstw);
+            weights_mstw = (*weightHandle_mstw);
+
+            edm::InputTag pdfWeightTag_nnpdf("pdfWeights:NNPDF23"); // or any other PDF set
+            edm::Handle<std::vector<double> > weightHandle_nnpdf;
+            iEvent.getByLabel(pdfWeightTag_nnpdf, weightHandle_nnpdf);
+            weights_nnpdf = (*weightHandle_nnpdf);
+        }
+        else {
+           weights_cteq = {0};
+           weights_mstw = {0};
+           weights_nnpdf = {0};
+        }
 
     }
 
