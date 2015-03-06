@@ -12,6 +12,7 @@
 
 // ZFinder
 #include "../../interface/WeightID.h"
+#include "../../interface/ATLASBins.h"  // ATLAS_PHISTAR_BINNING
 
 
 TTree* GetTTree(const std::string TFILE, const std::string TTREE) {
@@ -79,15 +80,15 @@ double GetWeight(
 std::map<std::string, TH1D*> GetHistoMap() {
     // The list of files
     std::map<std::string, std::string> files_to_open = {
-        {"Data", "/data/whybee0a/user/gude_2/Data/20140210_SingleElectron_2012ALL/hadded.root"},
-        {"Signal", "/data/whybee0a/user/gude_2/MC/20150211_MC_NNPDF23_MSTW2008_CT10/MadGraph_hadded.root"},
-        {"BG_Ditau", "/data/whybee0a/user/gude_2/MC/20150204_MC_NNPDF23_MSTW2008_CT10/BG_Ditau_hadded.root"},
-        {"BG_TTBar", "/data/whybee0a/user/gude_2/MC/20150204_MC_NNPDF23_MSTW2008_CT10/BG_TTBar_hadded.root"},
-        {"BG_single_t", "/data/whybee0a/user/gude_2/MC/20150204_MC_NNPDF23_MSTW2008_CT10/BG_singlet_tw_hadded.root"},
-        {"BG_single_tbar", "/data/whybee0a/user/gude_2/MC/20150204_MC_NNPDF23_MSTW2008_CT10/BG_singlet_tbarw_hadded.root"},
-        {"BG_ww", "/data/whybee0a/user/gude_2/MC/20150204_MC_NNPDF23_MSTW2008_CT10/BG_ww_hadded.root"},
-        {"BG_wz", "/data/whybee0a/user/gude_2/MC/20150204_MC_NNPDF23_MSTW2008_CT10/BG_wz_hadded.root"},
-        {"BG_zz", "/data/whybee0a/user/gude_2/MC/20150204_MC_NNPDF23_MSTW2008_CT10/BG_zz_hadded.root"},
+        {"Data", "/data/whybee0a/user/gude_2/Data/20140220_SingleElectron_2012_same_sign_ALL/hadded.root"},
+        {"Signal", "/data/whybee0a/user/gude_2/MC/20150219_MC_CTEQ6LL_same_sign_no_mass_cut/MadGraph_hadded.root"},
+        {"BG_Ditau", "/data/whybee0a/user/gude_2/MC/20150219_MC_CTEQ6LL_same_sign_no_mass_cut/BG_Ditau_hadded.root"},
+        {"BG_TTBar", "/data/whybee0a/user/gude_2/MC/20150219_MC_CTEQ6LL_same_sign_no_mass_cut/BG_TTBar_hadded.root"},
+        {"BG_single_t", "/data/whybee0a/user/gude_2/MC/20150219_MC_CTEQ6LL_same_sign_no_mass_cut/BG_singlet_tw_hadded.root"},
+        {"BG_single_tbar", "/data/whybee0a/user/gude_2/MC/20150219_MC_CTEQ6LL_same_sign_no_mass_cut/BG_singlet_tbarw_hadded.root"},
+        {"BG_ww", "/data/whybee0a/user/gude_2/MC/20150219_MC_CTEQ6LL_same_sign_no_mass_cut/BG_ww_hadded.root"},
+        {"BG_wz", "/data/whybee0a/user/gude_2/MC/20150219_MC_CTEQ6LL_same_sign_no_mass_cut/BG_wz_hadded.root"},
+        {"BG_zz", "/data/whybee0a/user/gude_2/MC/20150219_MC_CTEQ6LL_same_sign_no_mass_cut/BG_zz_hadded.root"},
     };
 
     // The Tree to access
@@ -124,26 +125,31 @@ std::map<std::string, TH1D*> GetHistoMap() {
         }
 
         // Pack into a hitogram
-        TH1D* histo = new TH1D(data_type.c_str(), data_type.c_str(), 60, 60, 120);
+        TH1D* phistar_histo = new TH1D("phistar", "Phi*:#phi*:Counts", zf::ATLAS_PHISTAR_BINNING.size() - 1, &zf::ATLAS_PHISTAR_BINNING[0]);
         for (int i = 0; i < tree->GetEntries(); i++) {
             tree->GetEntry(i);
 
-            const int CHARGE0 = reco_branch.e_charge[0];
-            const int CHARGE1 = reco_branch.e_charge[1];
-            const bool SAME_SIGN = (CHARGE0 * CHARGE1) > 0;
-            if (SAME_SIGN) {
+            // We have a bug in our tuples where the charge is often set wrong.
+            // Instead we selected the events from the beinging to be be same
+            // sign, so we run on all of them.
+            //const int CHARGE0 = reco_branch.e_charge[0];
+            //const int CHARGE1 = reco_branch.e_charge[1];
+            //const bool SAME_SIGN = (CHARGE0 * CHARGE1) > 0;
+            //const bool NOT_Z = (reco_branch.z_m < 60 || reco_branch.z_m > 120);
+            const bool NOT_Z = (reco_branch.z_m < 60);
+            if (NOT_Z) {
                 double weight = 1;
                 if (!is_real_data) {
                     weight = GetOverallNormalization(data_type);
                     weight *= GetWeight(nweights, weights, weightid);
                 }
 
-                const double MASS = reco_branch.z_m;
-                histo->Fill(MASS, weight);
+                const double PHISTAR = reco_branch.z_phistar_dressed;
+                phistar_histo->Fill(PHISTAR, weight);
             }
         }
         // Put the histogram into the map
-        output_map[data_type] = histo;
+        output_map[data_type] = phistar_histo;
 
         delete tree;
     }
@@ -206,24 +212,24 @@ int main() {
     TH1D* qcd_histo = GetSubstractedHistogram(histo_map);
 
     // Get the ratio of data to background
-    TH1D* ratio_histo = GetRatioHistogram(histo_map);
+    //TH1D* ratio_histo = GetRatioHistogram(histo_map);
 
     // Fit the qcd histogram
-    TF1* gaus_and_line = FitGaussAndLine(qcd_histo);
+    //TF1* gaus_and_line = FitGaussAndLine(qcd_histo);
 
     // Open a tfile to save our histos
     TFile output_file("output.root", "RECREATE");
     output_file.cd();
 
-    for (auto iter : histo_map) {
-        iter.second->Write();
-    }
+    //for (auto iter : histo_map) {
+    //    iter.second->Write();
+    //}
     qcd_histo->Write();
-    ratio_histo->Write();
+    //ratio_histo->Write();
 
     // Draw the fit
     qcd_histo->Draw();
-    gaus_and_line->Draw("same");
+    //gaus_and_line->Draw("same");
 
     output_file.Write();
     output_file.Close();
