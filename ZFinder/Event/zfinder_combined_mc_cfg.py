@@ -68,12 +68,6 @@ process.fsrWeight = cms.EDProducer("FSRWeightProducer",
         GenTag = cms.untracked.InputTag("genParticles"),
         )
 
-# Get the python string from the file name, and use it set up the name of the
-# tuple output file. Note that pythonValue() returns the string with literal '
-# on either end, so we need to strip those.
-output_name = process.TFileService.fileName.pythonValue().strip("'")
-tuple_names = cms.untracked.string(output_name.split('.root')[0] + "_tuples.root")
-
 # ZFinder
 from ZFinder.Event.zdefinitions_cfi import zdefs_combined_mc
 from ZFinder.Event.zfinder_cfi import ZFinder
@@ -84,7 +78,6 @@ process.ZFinder = ZFinder.clone(
         is_mc = cms.bool(True),
         use_muon_acceptance = cms.bool(True),
         require_gen_z = cms.bool(False),
-        tuple_output_file = tuple_names,
         )
 
 # RUN

@@ -37,7 +37,4 @@ ZFinder = cms.EDAnalyzer('ZFinder',
         # Pileup Era to correct MC to. Valid values are A, B, C, D. Anything
         # else will default to the full 2012.
         pileup_era = cms.string("ABCD"),  # defaults to ABCD
-        # Output file to save the tuples to. If "NONE", then no tuples are
-        # written
-        tuple_output_file = cms.untracked.string("NONE"),
         )
