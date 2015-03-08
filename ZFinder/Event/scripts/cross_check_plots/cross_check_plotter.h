@@ -260,7 +260,7 @@ class CrossCheckPlotter{
         static constexpr double RIGHT_EDGE_ = 0.96;
         static constexpr double LEFT_EDGE_ = 0.10;
         static constexpr double TOP_EDGE_ = 0.95;
-        static constexpr double BOTTOM_EDGE_ = 0.10;
+        static constexpr double BOTTOM_EDGE_ = 0.27;
         // Size of the ratio plot (0-1, as a fraction of the total height)
         static constexpr double RATIO_HEIGHT = 0.25;
         // Colors and styles for backgrounds

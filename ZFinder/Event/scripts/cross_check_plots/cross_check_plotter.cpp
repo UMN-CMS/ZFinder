@@ -367,8 +367,8 @@ void CrossCheckPlotter::plot(
     // Axis labels
     ratio_histo->GetXaxis()->SetTitle(plot_config.x_label.c_str());
     ratio_histo->GetXaxis()->SetLabelSize(0.1);
-    ratio_histo->GetXaxis()->SetTitleSize(0.2);
-    ratio_histo->GetXaxis()->SetTitleOffset(0.7);
+    ratio_histo->GetXaxis()->SetTitleSize(0.15);
+    ratio_histo->GetXaxis()->SetTitleOffset(0.8);
     ratio_histo->GetYaxis()->SetTitle("Data/MC");
     ratio_histo->GetYaxis()->SetLabelSize(0.1);
     ratio_histo->GetYaxis()->SetTitleSize(0.1);
@@ -516,7 +516,7 @@ void CrossCheckPlotter::plot(
     ratio_line.SetLineColor(kRed);
     // Make the ratio
     ratio_histo->Divide(data_histo, histo_sum);
-    const double RATIO_OFFSET_FROM_1 = 0.3;
+    const double RATIO_OFFSET_FROM_1 = 0.22;
     ratio_histo->SetMaximum(1. + RATIO_OFFSET_FROM_1);
     ratio_histo->SetMinimum(1. - RATIO_OFFSET_FROM_1);
 
