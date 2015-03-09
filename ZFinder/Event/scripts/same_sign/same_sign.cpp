@@ -200,6 +200,10 @@ int main() {
     // Get the same "scale factor"
     const double AMPLITUDE = function->GetParameter(0);
 
+    // Subtract the template Phi* from the data
+    TH1D* qcd_phistar = dynamic_cast<TH1D*>(data_phi->Clone("qcd_phistar"));
+    qcd_phistar->Add(template_phi, -AMPLITUDE);
+
     // Open a tfile to save our histos
     TFile output_file("output.root", "RECREATE");
     output_file.cd();
@@ -209,11 +213,13 @@ int main() {
     data_phi->Write();
     template_mass->Write();
     data_mass->Write();
+    qcd_phistar->Write();
 
     template_phi->Draw();
     data_phi->Draw("E SAME");
     template_mass->Draw();
     data_mass->Draw("E SAME");
+    qcd_phistar->Draw();
 
     output_file.Write();
     output_file.Close();
