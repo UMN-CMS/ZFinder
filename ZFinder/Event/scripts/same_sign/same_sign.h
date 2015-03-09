@@ -4,6 +4,7 @@
 // Standard Library
 #include <map>
 #include <string>
+#include <utility>  // std::pair
 
 // ROOT
 #include <TH1D.h>
@@ -40,9 +41,9 @@ double GetWeight(
 
 double GetOverallNormalization(const std::string NAME);
 
-std::map<std::string, TH1D*> GetHistoMap();
+std::map<std::string, std::pair<TH1D*, TH1D*>> GetHistoMap();
 
-TH1D* GetSubstractedHistogram(std::map<std::string, TH1D*> histo_map);
+std::pair<TH1D*, TH1D*> GetTemplates(std::map<std::string, std::pair<TH1D*, TH1D*>> histo_map);
 TH1D* GetRatioHistogram(std::map<std::string, TH1D*> histo_map);
 
 #endif  // SAME_SIGN_H_

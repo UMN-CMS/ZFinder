@@ -1,6 +1,9 @@
 // Interface
 #include "same_sign.h"  // branch_struct
 
+// Fit Function
+#include "FitFunction.h"
+
 // Standard Library
 #include <stdexcept>
 #include <iostream>
@@ -77,10 +80,10 @@ double GetWeight(
     return weight;
 }
 
-std::map<std::string, TH1D*> GetHistoMap() {
+std::map<std::string, std::pair<TH1D*, TH1D*>> GetHistoMap() {
     // The list of files
     std::map<std::string, std::string> files_to_open = {
-        {"Data", "/data/whybee0a/user/gude_2/Data/20140220_SingleElectron_2012_same_sign_ALL/hadded.root"},
+        {"Data", "/data/whybee0a/user/gude_2/Data/20150306_SingleElectron_2012ALL_same_sign/20150306_SingleElectron_2012ALL_same_sign.root"},
         {"Signal", "/data/whybee0a/user/gude_2/MC/20150219_MC_CTEQ6LL_same_sign_no_mass_cut/MadGraph_hadded.root"},
         {"BG_Ditau", "/data/whybee0a/user/gude_2/MC/20150219_MC_CTEQ6LL_same_sign_no_mass_cut/BG_Ditau_hadded.root"},
         {"BG_TTBar", "/data/whybee0a/user/gude_2/MC/20150219_MC_CTEQ6LL_same_sign_no_mass_cut/BG_TTBar_hadded.root"},
@@ -96,7 +99,7 @@ std::map<std::string, TH1D*> GetHistoMap() {
         "ZFinder/Combined Single Reco/Combined Single Reco";
 
     // Open the files and fill the file map
-    std::map<std::string, TH1D*> output_map;
+    std::map<std::string, std::pair<TH1D*, TH1D*>> output_map;
     for (auto iter : files_to_open) {
         std::string data_type = iter.first;
         std::string file_name = iter.second;
@@ -126,6 +129,7 @@ std::map<std::string, TH1D*> GetHistoMap() {
 
         // Pack into a hitogram
         TH1D* phistar_histo = new TH1D("phistar", "Phi*:#phi*:Counts", zf::ATLAS_PHISTAR_BINNING.size() - 1, &zf::ATLAS_PHISTAR_BINNING[0]);
+        TH1D* z_mass_histo = new TH1D("z_mass", "m_{ee}:m_{ee}:Counts", 300, 0, 300);
         for (int i = 0; i < tree->GetEntries(); i++) {
             tree->GetEntry(i);
 
@@ -136,20 +140,19 @@ std::map<std::string, TH1D*> GetHistoMap() {
             //const int CHARGE1 = reco_branch.e_charge[1];
             //const bool SAME_SIGN = (CHARGE0 * CHARGE1) > 0;
             //const bool NOT_Z = (reco_branch.z_m < 60 || reco_branch.z_m > 120);
-            const bool NOT_Z = (reco_branch.z_m < 60);
-            if (NOT_Z) {
-                double weight = 1;
-                if (!is_real_data) {
-                    weight = GetOverallNormalization(data_type);
-                    weight *= GetWeight(nweights, weights, weightid);
-                }
-
-                const double PHISTAR = reco_branch.z_phistar_dressed;
-                phistar_histo->Fill(PHISTAR, weight);
+            double weight = 1;
+            if (!is_real_data) {
+                weight = GetOverallNormalization(data_type);
+                weight *= GetWeight(nweights, weights, weightid);
             }
+
+            const double PHISTAR = reco_branch.z_phistar_dressed;
+            phistar_histo->Fill(PHISTAR, weight);
+            const double MEE = reco_branch.z_m;
+            z_mass_histo->Fill(MEE, weight);
         }
         // Put the histogram into the map
-        output_map[data_type] = phistar_histo;
+        output_map[data_type] = {phistar_histo, z_mass_histo};
 
         delete tree;
     }
@@ -157,82 +160,63 @@ std::map<std::string, TH1D*> GetHistoMap() {
     return output_map;
 }
 
-TH1D* GetSubstractedHistogram(std::map<std::string, TH1D*> histo_map) {
-    TH1D* data_histo = histo_map["Data"];
-    TH1D* qcd_histo = new TH1D();
-    qcd_histo = dynamic_cast<TH1D*>(data_histo->Clone("qcd_histo"));
-    // Subtract the backgrounds (but not that data) from our cloned data
-    // histogram to get the histogram of just the events unaccounted for in our
-    // MC
+std::pair<TH1D*, TH1D*> GetTemplates(std::map<std::string, std::pair<TH1D*, TH1D*>> histo_map) {
+    TH1D* data_phi_histo = histo_map["Data"].first;
+    TH1D* summed_phi = new TH1D();
+    summed_phi = dynamic_cast<TH1D*>(data_phi_histo->Clone("template_phi"));
+    TH1D* data_mass_histo = histo_map["Data"].second;
+    TH1D* summed_mass = new TH1D();
+    summed_mass = dynamic_cast<TH1D*>(data_mass_histo->Clone("template_mass"));
+    // Add the backgrounds and signal
     for (auto iter : histo_map) {
         if (iter.first != "Data") {
-            qcd_histo->Add(iter.second, -1.);
+            summed_phi->Add(iter.second.first, 1.);
+            summed_mass->Add(iter.second.second, 1.);
         }
     }
 
-    return qcd_histo;
-}
-
-TH1D* GetRatioHistogram(std::map<std::string, TH1D*> histo_map) {
-    // Add all the backgrounds together
-    TH1D* signal_histo = histo_map["Signal"];
-    TH1D* backgrounds_histos = dynamic_cast<TH1D*>(signal_histo->Clone("bgs"));
-    for (auto iter : histo_map) {
-        if (iter.first != "Data" && iter.first != "Signal") {
-            backgrounds_histos->Add(iter.second, 1.);
-        }
-    }
-    // Take the ratio
-    TH1D* data_histo = histo_map["Data"];
-    TH1D* ratio_histo = new TH1D();
-    ratio_histo = dynamic_cast<TH1D*>(data_histo->Clone("ratio_histo"));
-
-    ratio_histo->Divide(data_histo, backgrounds_histos);
-
-    return ratio_histo;
-
-}
-
-TF1* FitGaussAndLine(TH1D* qcd_histo) {
-    TF1* gaus_and_line = new TF1("gaus_and_line", "gaus(0) + pol1(3)", 60, 120);
-
-    gaus_and_line->SetParameter(0, 300.); // Gauss amplitude
-    gaus_and_line->SetParameter(1, 91.);  // Gauss center
-    gaus_and_line->SetParameter(2, 4.);   // Gauss width
-
-    qcd_histo->Fit("gaus_and_line", "LLEMR");
-    return gaus_and_line;
+    return {summed_phi, summed_mass};
 }
 
 int main() {
     // Get a map of the histograms of the Z Masses
-    std::map<std::string, TH1D*> histo_map = GetHistoMap();
+    std::map<std::string, std::pair<TH1D*, TH1D*>> histo_map = GetHistoMap();
 
-    // Get a background subtracted histogram
-    TH1D* qcd_histo = GetSubstractedHistogram(histo_map);
+    // Get a templates
+    std::pair<TH1D*, TH1D*> template_histos = GetTemplates(histo_map);
+    TH1D* template_phi = template_histos.first;
+    TH1D* template_mass = template_histos.second;
 
-    // Get the ratio of data to background
-    //TH1D* ratio_histo = GetRatioHistogram(histo_map);
+    // Get the data
+    TH1D* data_phi = histo_map["Data"].first;
+    TH1D* data_mass = histo_map["Data"].second;
 
-    // Fit the qcd histogram
-    //TF1* gaus_and_line = FitGaussAndLine(qcd_histo);
+    // Make our fit function
+    FitFunction ff(*template_mass);
+    TF1* function = new TF1("function", ff, 50., 130., ff.nparms());
+
+    data_mass->Fit("function", "LLEMR");
 
     // Open a tfile to save our histos
     TFile output_file("output.root", "RECREATE");
     output_file.cd();
 
-    //for (auto iter : histo_map) {
-    //    iter.second->Write();
-    //}
-    qcd_histo->Write();
-    //ratio_histo->Write();
+    // Write and draw the histos
+    template_phi->Write();
+    data_phi->Write();
+    template_mass->Write();
+    data_mass->Write();
 
-    // Draw the fit
-    qcd_histo->Draw();
-    //gaus_and_line->Draw("same");
+    template_phi->Draw();
+    data_phi->Draw("E SAME");
+    template_mass->Draw();
+    data_mass->Draw("E SAME");
 
     output_file.Write();
     output_file.Close();
+
+    // Clean up
+    delete function;
 
     return EXIT_SUCCESS;
 }
