@@ -14,7 +14,7 @@ class FitFunction {
 
         // Information about the class needed by fitter functions
         int nparms() {
-            return 1;
+            return 2;
         }
 
     private:

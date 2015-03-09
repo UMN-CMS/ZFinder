@@ -193,9 +193,12 @@ int main() {
 
     // Make our fit function
     FitFunction ff(*template_mass);
-    TF1* function = new TF1("function", ff, 50., 130., ff.nparms());
+    TF1* function = new TF1("function", ff, 0., 300., ff.nparms());
 
     data_mass->Fit("function", "LLEMR");
+
+    // Get the same "scale factor"
+    const double AMPLITUDE = function->GetParameter(0);
 
     // Open a tfile to save our histos
     TFile output_file("output.root", "RECREATE");

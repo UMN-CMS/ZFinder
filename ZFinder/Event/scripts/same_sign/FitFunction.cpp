@@ -5,5 +5,7 @@ FitFunction::FitFunction(TH1D histogram) {
 }
 
 double FitFunction::operator()(const double* x, const double* par) {
-    return par[0] * histogram_.GetBinContent(histogram_.FindBin(x[0]));
+    const double hist_val = par[0] * histogram_.GetBinContent(histogram_.FindBin(x[0]));
+    const double constant = par[1];
+    return hist_val + constant;
 }
