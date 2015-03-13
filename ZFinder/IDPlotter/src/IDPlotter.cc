@@ -124,48 +124,48 @@ IDPlotter::IDPlotter(const edm::ParameterSet& iConfig) {
     const std::string sigma_ieta_ieta_name = "sigma_{i #eta i #eta}";
     const std::string sigma_ieta_ieta_file = "siesie";
     sigma_ieta_ieta_ = fs->make<TH1D>(sigma_ieta_ieta_file.c_str(), sigma_ieta_ieta_name.c_str(), 150, 0., 0.15);
-    sigma_ieta_ieta_->GetXaxis()->SetTitle("sigma_{i #eta i #eta}");
+    sigma_ieta_ieta_->GetXaxis()->SetTitle("#sigma_{i #eta i #eta}");
     sigma_ieta_ieta_->GetYaxis()->SetTitle("Counts");
 
     // h_over_e
     const std::string h_over_e_name = "(H/E)";
     const std::string h_over_e_file = "he";
-    h_over_e_ = fs->make<TH1D>(h_over_e_file.c_str(), h_over_e_name.c_str(), 300, 0., 0.3);
+    h_over_e_ = fs->make<TH1D>(h_over_e_file.c_str(), h_over_e_name.c_str(), 30000, 0., 30.);
     h_over_e_->GetXaxis()->SetTitle("(H/E)");
     h_over_e_->GetYaxis()->SetTitle("Counts");
 
     // deta_in
     const std::string deta_in_name = "d#eta";
     const std::string deta_in_file = "deta";
-    deta_in_ = fs->make<TH1D>(deta_in_file.c_str(), deta_in_name.c_str(), 300, 0., 0.03);
-    deta_in_->GetXaxis()->SetTitle("d#eta_{#text{in}}");
+    deta_in_ = fs->make<TH1D>(deta_in_file.c_str(), deta_in_name.c_str(), 3000, 0., 0.3);
+    deta_in_->GetXaxis()->SetTitle("d#eta_{in}");
     deta_in_->GetYaxis()->SetTitle("Counts");
 
     // dphi_in
     const std::string dphi_in_name = "d#phi";
     const std::string dphi_in_file = "dphi";
-    dphi_in_ = fs->make<TH1D>(dphi_in_file.c_str(), dphi_in_name.c_str(), 1000, 0., 0.1);
-    dphi_in_->GetXaxis()->SetTitle("d#phi_{#text{in}}");
+    dphi_in_ = fs->make<TH1D>(dphi_in_file.c_str(), dphi_in_name.c_str(), 10000, 0., 1.);
+    dphi_in_->GetXaxis()->SetTitle("d#phi_{in}");
     dphi_in_->GetYaxis()->SetTitle("Counts");
 
     // track_iso_in
     const std::string track_isoname = "Track ISO";
     const std::string track_isofile = "track_iso";
-    track_iso_ = fs->make<TH1D>(track_isofile.c_str(), track_isoname.c_str(), 1000, 0., 10.);
+    track_iso_ = fs->make<TH1D>(track_isofile.c_str(), track_isoname.c_str(), 10000, 0., 100.);
     track_iso_->GetXaxis()->SetTitle("Track ISO");
     track_iso_->GetYaxis()->SetTitle("Counts");
 
     // ecal_iso_in
     const std::string ecal_isoname = "ECAL ISO";
     const std::string ecal_isofile = "ecal_iso";
-    ecal_iso_ = fs->make<TH1D>(ecal_isofile.c_str(), ecal_isoname.c_str(), 1000, 0., 10.);
+    ecal_iso_ = fs->make<TH1D>(ecal_isofile.c_str(), ecal_isoname.c_str(), 10000, 0., 100.);
     ecal_iso_->GetXaxis()->SetTitle("ECAL ISO");
     ecal_iso_->GetYaxis()->SetTitle("Counts");
 
     // hcal_iso_in
     const std::string hcal_isoname = "HCAL ISO";
     const std::string hcal_isofile = "hcal_iso";
-    hcal_iso_ = fs->make<TH1D>(hcal_isofile.c_str(), hcal_isoname.c_str(), 1000, 0., 10.);
+    hcal_iso_ = fs->make<TH1D>(hcal_isofile.c_str(), hcal_isoname.c_str(), 10000, 0., 100.);
     hcal_iso_->GetXaxis()->SetTitle("HCAL ISO");
     hcal_iso_->GetYaxis()->SetTitle("Counts");
 
