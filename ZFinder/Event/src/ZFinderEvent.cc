@@ -88,6 +88,9 @@ namespace zf {
         // Allow turning off of fsr weight calculation
         run_fsr_weight_ = iConfig.getParameter<bool>("run_fsr_weight");
 
+        // Select the type of GEN electrons to use
+        gen_electron_type_ = iConfig.getParameter<std::string>("gen_electrons");
+
         // Set up the lumi reweighting, but only if it is MC.
         if (!is_real_data
             && lumi_weights_ == nullptr
@@ -712,7 +715,14 @@ namespace zf {
                         if (bornElectron_0 == nullptr) {
                             bornElectron_0 = dynamic_cast<const reco::GenParticle*>(gen_particle->daughter(j));
                             nakedElectron_0 = GetNakedElectron(bornElectron_0);
-                            if (bornElectron_0 && nakedElectron_0) {
+                            // Use the right gen electron based on gen_electron_type_
+                            if (gen_electron_type_ == "Naked" || gen_electron_type_ == "Bare") {
+                                electron_0 = nakedElectron_0;
+                            }
+                            else if (gen_electron_type_ == "Born") {
+                                electron_0 = bornElectron_0;
+                            }
+                            else if (bornElectron_0 && nakedElectron_0) {
                                 electron_0 = GetDressedElectron(bornElectron_0, nakedElectron_0);
                             }
                         }
@@ -720,7 +730,14 @@ namespace zf {
                         else if (bornElectron_1 == nullptr) {
                             bornElectron_1 = dynamic_cast<const reco::GenParticle*>(gen_particle->daughter(j));
                             nakedElectron_1 = GetNakedElectron(bornElectron_1);
-                            if (bornElectron_1 && nakedElectron_1) {
+                            // Use the right gen electron based on gen_electron_type_
+                            if (gen_electron_type_ == "Naked" || gen_electron_type_ == "Bare") {
+                                electron_1 = nakedElectron_1;
+                            }
+                            else if (gen_electron_type_ == "Born") {
+                                electron_1 = bornElectron_1;
+                            }
+                            else if (bornElectron_1 && nakedElectron_1) {
                                 electron_1 = GetDressedElectron(bornElectron_1, nakedElectron_1);
                             }
                             break;

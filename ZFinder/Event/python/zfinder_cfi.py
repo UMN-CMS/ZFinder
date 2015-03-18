@@ -41,4 +41,11 @@ ZFinder = cms.EDAnalyzer('ZFinder',
         run_pdf_weights = cms.bool(False),
         # Turn on/off the FSR weight calculation in MC
         run_fsr_weight = cms.bool(False),
+        # Pick the GEN level electrons to use. Select one of:
+        #    - "Dressed"
+        #    - "Born"
+        #    - "Bare" or "Naked"
+        # Dressed is the default if no answer is provided, or an incorrect one
+        # is used.
+        gen_electrons = cms.string("Dressed"),
         )

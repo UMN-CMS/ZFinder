@@ -80,6 +80,7 @@ process.ZFinder = ZFinder.clone(
         require_gen_z = cms.bool(False),
         run_pdf_weights = cms.bool(False),
         run_fsr_weight = cms.bool(False),
+        gen_electrons = cms.string("Dressed"),
         )
 
 # RUN

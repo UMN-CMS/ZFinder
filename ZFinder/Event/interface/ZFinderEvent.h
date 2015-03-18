@@ -248,6 +248,9 @@ namespace zf {
             // Allow turning off of fsr weight calculation
             bool run_fsr_weight_;
 
+            // Select the type of GEN electrons to use
+            std::string gen_electron_type_;
+
             // NT Bending Correction
             void ApplyNTBendingCorrection();
     };
