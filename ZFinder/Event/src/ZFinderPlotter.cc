@@ -369,6 +369,13 @@ namespace zf {
         pileup_->GetXaxis()->SetTitle("Number of Vertices");
         pileup_->GetYaxis()->SetTitle("Counts");
 
+        // true_vert
+        const std::string true_vert_name = "N_{True Vertices}";
+        const std::string true_vert_file = "n_true_verts";
+        true_vert_ = tdir.make<TH1D>(true_vert_file.c_str(), true_vert_name.c_str(), 100, 0., 100.);
+        true_vert_->GetXaxis()->SetTitle("Number of True Vertices");
+        true_vert_->GetYaxis()->SetTitle("Counts");
+
         // nelectrons
         const std::string nelectrons_name = "N_{e}";
         const std::string nelectrons_file = "n_electrons";
@@ -552,6 +559,7 @@ namespace zf {
             }
             // Event Info
             pileup_->Fill(ZF_EVENT.reco_vert.num, EVENT_WEIGHT);
+            true_vert_->Fill(ZF_EVENT.reco_vert.true_num, EVENT_WEIGHT);
             nelectrons_->Fill(ZF_EVENT.n_reco_electrons, EVENT_WEIGHT);
         }
         else if (USE_MC_ && !ZF_EVENT.is_real_data) {
@@ -684,6 +692,7 @@ namespace zf {
             }
             // Event Info
             pileup_->Fill(ZF_EVENT.truth_vert.num, EVENT_WEIGHT);
+            true_vert_->Fill(ZF_EVENT.truth_vert.true_num, EVENT_WEIGHT);
             nelectrons_->Fill(2, EVENT_WEIGHT);  // We only ever grab the two electrons from the Z
         }
         // Event weights, they are of course, unweighted
