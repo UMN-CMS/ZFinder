@@ -244,9 +244,9 @@ namespace zf {
             weights_nnpdf = (*weightHandle_nnpdf);
         }
         else {
-           weights_cteq = {0};
-           weights_mstw = {0};
-           weights_nnpdf = {0};
+            weights_cteq = {0};
+            weights_mstw = {0};
+            weights_nnpdf = {0};
         }
 
         // Calculate the FSR weight
