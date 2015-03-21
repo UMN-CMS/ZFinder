@@ -140,11 +140,15 @@ std::unique_ptr<TH1D> get_histogram(
         throw std::runtime_error("Could not load histogram " + HISTOGRAM_NAME);
     }
 
+    // Set weights
+    histo->Sumw2();
+
     return histo;
 }
 
 void write_plot(
     const std::unique_ptr<TH1D>& HISTO,
+    const std::unique_ptr<TH1D>& HISTO_MC,
     const std::string OUTPUT_NAME,
     const int REBIN = 10,
     const std::string AXIS_TITLE = ""
@@ -158,15 +162,35 @@ void write_plot(
     if (AXIS_TITLE != "") {
         HISTO->GetXaxis()->SetTitle(AXIS_TITLE.c_str());
     }
+
+    const double MARKER_SIZE = 1.;
+
+    const double DATA_AREA = HISTO->Integral(0, HISTO->GetNbinsX()-1);
+    HISTO->Scale(1. / DATA_AREA);
+    const double MC_AREA = HISTO_MC->Integral(0, HISTO_MC->GetNbinsX()-1);
+    HISTO_MC->Scale(1. / MC_AREA);
+
     HISTO->GetYaxis()->SetNdivisions(7, 0, 0);  // Set 10 major ticks, 0 minor
     HISTO->GetYaxis()->SetTickLength(0.02);  // Make the ticks smaller
     HISTO->GetXaxis()->SetTickLength(0.02);
     HISTO->GetYaxis()->SetTitleOffset(1.2);
     HISTO->SetMarkerColor(kBlue);
     HISTO->SetLineColor(kBlue);
-    HISTO->SetLineWidth(2);
+    HISTO->SetMarkerStyle(kFullCircle);
+    HISTO->SetMarkerSize(MARKER_SIZE);
     HISTO->Rebin(REBIN);
-    HISTO->Draw();
+    // Set the Y max
+    const double Y_MAX = std::max(HISTO->GetMaximum(), HISTO_MC->GetMaximum());
+    HISTO->SetMaximum(Y_MAX * 7.);
+
+    HISTO->Draw("E");
+    HISTO_MC->SetMarkerColor(kRed);
+    HISTO_MC->SetLineColor(kRed);
+    HISTO_MC->SetMarkerStyle(kFullTriangleUp);
+    HISTO_MC->SetMarkerSize(MARKER_SIZE);
+    HISTO_MC->Rebin(REBIN);
+    HISTO_MC->Draw("E SAME");
+    HISTO->Draw("E SAME");
     canvas.cd();
     redraw_border();
 
@@ -183,6 +207,8 @@ int main() {
     // Get the histograms
     const std::string INPUT_FILE =
         "/data/whybee0a/user/gude_2/Data/20150312_singlemu/all_hadded.root";
+    const std::string INPUT_MC_FILE =
+        "/data/whybee0a/user/gude_2/MC/20150321_id_plots_mc/MadGraph_hadded.root";
 
     // Load the histograms
     std::unique_ptr<TH1D> h_sigma_ieta_ieta = get_histogram(INPUT_FILE, "IDPlotter/siesie");
@@ -197,20 +223,32 @@ int main() {
     std::unique_ptr<TH1D> h_dz = get_histogram(INPUT_FILE, "IDPlotter/dz");
     std::unique_ptr<TH1D> h_mhits = get_histogram(INPUT_FILE, "IDPlotter/mhits");
     std::unique_ptr<TH1D> h_iso = get_histogram(INPUT_FILE, "IDPlotter/iso");
+    std::unique_ptr<TH1D> h_sigma_ieta_ieta_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/siesie");
+    std::unique_ptr<TH1D> h_he_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/he");
+    std::unique_ptr<TH1D> h_deta_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/deta");
+    std::unique_ptr<TH1D> h_dphi_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/dphi");
+    std::unique_ptr<TH1D> h_track_iso_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/track_iso");
+    std::unique_ptr<TH1D> h_ecal_iso_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/ecal_iso");
+    std::unique_ptr<TH1D> h_hcal_iso_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/hcal_iso");
+    std::unique_ptr<TH1D> h_1oe_1op_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/1oe_1op");
+    std::unique_ptr<TH1D> h_d0_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/d0");
+    std::unique_ptr<TH1D> h_dz_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/dz");
+    std::unique_ptr<TH1D> h_mhits_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/mhits");
+    std::unique_ptr<TH1D> h_iso_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/iso");
 
     // Write pdfs
-    write_plot(h_sigma_ieta_ieta, "sigma_ieta_ieta.pdf", 3, "#sigma_{i #eta i #eta}");
-    write_plot(h_he, "he.pdf", 600, "H / E");
-    write_plot(h_deta, "deta.pdf", 60);
-    write_plot(h_dphi, "dphi.pdf", 200);
-    write_plot(h_track_iso, "track_iso.pdf", 200);
-    write_plot(h_ecal_iso, "ecal_iso.pdf", 200);
-    write_plot(h_hcal_iso, "hcal_iso.pdf", 200);
-    write_plot(h_1oe_1op, "1oe_1op.pdf", 20);
-    write_plot(h_d0, "d0.pdf", 20);
-    write_plot(h_dz, "dz.pdf", 20);
-    write_plot(h_mhits, "mhits.pdf", 1);
-    write_plot(h_iso, "iso.pdf", 2);
+    write_plot(h_sigma_ieta_ieta, h_sigma_ieta_ieta_mc, "sigma_ieta_ieta.pdf", 3, "#sigma_{i #eta i #eta}");
+    write_plot(h_he, h_he_mc, "he.pdf", 600, "H / E");
+    write_plot(h_deta, h_deta_mc, "deta.pdf", 60);
+    write_plot(h_dphi, h_dphi_mc, "dphi.pdf", 200);
+    write_plot(h_track_iso, h_track_iso_mc, "track_iso.pdf", 200);
+    write_plot(h_ecal_iso, h_ecal_iso_mc, "ecal_iso.pdf", 200);
+    write_plot(h_hcal_iso, h_hcal_iso_mc, "hcal_iso.pdf", 200);
+    write_plot(h_1oe_1op, h_1oe_1op_mc, "1oe_1op.pdf", 20);
+    write_plot(h_d0, h_d0_mc, "d0.pdf", 20);
+    write_plot(h_dz, h_dz_mc, "dz.pdf", 20);
+    write_plot(h_mhits, h_mhits_mc, "mhits.pdf", 1);
+    write_plot(h_iso, h_iso_mc, "iso.pdf", 2);
 
     return EXIT_SUCCESS;
 }
