@@ -190,7 +190,6 @@ void write_plot(
     HISTO_MC->SetMarkerSize(MARKER_SIZE);
     HISTO_MC->Rebin(REBIN);
     HISTO_MC->Draw("E SAME");
-    HISTO->Draw("E SAME");
     canvas.cd();
     redraw_border();
 
@@ -241,13 +240,13 @@ int main() {
     write_plot(h_he, h_he_mc, "he.pdf", 600, "H / E");
     write_plot(h_deta, h_deta_mc, "deta.pdf", 60);
     write_plot(h_dphi, h_dphi_mc, "dphi.pdf", 200);
-    write_plot(h_track_iso, h_track_iso_mc, "track_iso.pdf", 200);
+    //write_plot(h_track_iso, h_track_iso_mc, "track_iso.pdf", 200);
     write_plot(h_ecal_iso, h_ecal_iso_mc, "ecal_iso.pdf", 200);
     write_plot(h_hcal_iso, h_hcal_iso_mc, "hcal_iso.pdf", 200);
     write_plot(h_1oe_1op, h_1oe_1op_mc, "1oe_1op.pdf", 20);
     write_plot(h_d0, h_d0_mc, "d0.pdf", 20);
     write_plot(h_dz, h_dz_mc, "dz.pdf", 20);
-    write_plot(h_mhits, h_mhits_mc, "mhits.pdf", 1);
+    //write_plot(h_mhits, h_mhits_mc, "mhits.pdf", 1);
     write_plot(h_iso, h_iso_mc, "iso.pdf", 2);
 
     return EXIT_SUCCESS;
