@@ -10,6 +10,14 @@
 #include <TH1D.h>
 #include <TTree.h>
 
+struct histogram_container{
+    TH1D* mass;
+    TH1D* low_side_phistar;
+    TH1D* high_side_phistar;
+};
+
+typedef std::map<std::string, histogram_container> histogram_map;
+
 struct branch_struct {
     double z_m;
     double z_y;
@@ -41,9 +49,9 @@ double GetWeight(
 
 double GetOverallNormalization(const std::string NAME);
 
-std::map<std::string, std::pair<TH1D*, TH1D*>> GetHistoMap();
+histogram_map GetHistoMap();
 
-std::pair<TH1D*, TH1D*> GetTemplates(std::map<std::string, std::pair<TH1D*, TH1D*>> histo_map);
+histogram_container GetTemplates(std::map<std::string, std::pair<TH1D*, TH1D*>> histo_map);
 TH1D* GetRatioHistogram(std::map<std::string, TH1D*> histo_map);
 
 #endif  // SAME_SIGN_H_

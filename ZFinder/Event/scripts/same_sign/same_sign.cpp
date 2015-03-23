@@ -80,7 +80,7 @@ double GetWeight(
     return weight;
 }
 
-std::map<std::string, std::pair<TH1D*, TH1D*>> GetHistoMap() {
+histogram_map GetHistoMap() {
     // The list of files
     std::map<std::string, std::string> files_to_open = {
         {"Data", "/data/whybee0a/user/gude_2/Data/20150306_SingleElectron_2012ALL_same_sign/20150306_SingleElectron_2012ALL_same_sign.root"},
@@ -99,7 +99,7 @@ std::map<std::string, std::pair<TH1D*, TH1D*>> GetHistoMap() {
         "ZFinder/Combined Single Reco/Combined Single Reco";
 
     // Open the files and fill the file map
-    std::map<std::string, std::pair<TH1D*, TH1D*>> output_map;
+    histogram_map output_map;
     for (auto iter : files_to_open) {
         std::string data_type = iter.first;
         std::string file_name = iter.second;
@@ -128,31 +128,34 @@ std::map<std::string, std::pair<TH1D*, TH1D*>> GetHistoMap() {
         }
 
         // Pack into a hitogram
-        TH1D* phistar_histo = new TH1D("phistar", "Phi*:#phi*:Counts", zf::ATLAS_PHISTAR_BINNING.size() - 1, &zf::ATLAS_PHISTAR_BINNING[0]);
-        TH1D* z_mass_histo = new TH1D("z_mass", "m_{ee}:m_{ee}:Counts", 300, 0, 300);
+        TH1D* z_mass_histo = new TH1D("z_mass", "m_{ee};m_{ee};Counts", 300, 0, 300);
+        TH1D* low_phistar_histo = new TH1D("low_phistar", "Phi*;#phi*;Counts", zf::ATLAS_PHISTAR_BINNING.size() - 1, &zf::ATLAS_PHISTAR_BINNING[0]);
+        TH1D* high_phistar_histo = new TH1D("high_phistar", "Phi*;#phi*;Counts", zf::ATLAS_PHISTAR_BINNING.size() - 1, &zf::ATLAS_PHISTAR_BINNING[0]);
         for (int i = 0; i < tree->GetEntries(); i++) {
             tree->GetEntry(i);
 
             // We have a bug in our tuples where the charge is often set wrong.
             // Instead we selected the events from the beinging to be be same
             // sign, so we run on all of them.
-            //const int CHARGE0 = reco_branch.e_charge[0];
-            //const int CHARGE1 = reco_branch.e_charge[1];
-            //const bool SAME_SIGN = (CHARGE0 * CHARGE1) > 0;
-            //const bool NOT_Z = (reco_branch.z_m < 60 || reco_branch.z_m > 120);
             double weight = 1;
             if (!is_real_data) {
                 weight = GetOverallNormalization(data_type);
                 weight *= GetWeight(nweights, weights, weightid);
             }
 
-            const double PHISTAR = reco_branch.z_phistar_dressed;
-            phistar_histo->Fill(PHISTAR, weight);
             const double MEE = reco_branch.z_m;
             z_mass_histo->Fill(MEE, weight);
+            const double PHISTAR = reco_branch.z_phistar_dressed;
+            // If we have a sideband event, fill the phistar histrograms
+            if (MEE < 60) {
+                low_phistar_histo->Fill(PHISTAR, weight);
+            }
+            else if (MEE > 120) {
+                high_phistar_histo->Fill(PHISTAR, weight);
+            }
         }
         // Put the histogram into the map
-        output_map[data_type] = {phistar_histo, z_mass_histo};
+        output_map[data_type] = {z_mass_histo, low_phistar_histo, high_phistar_histo};
 
         delete tree;
     }
@@ -160,72 +163,78 @@ std::map<std::string, std::pair<TH1D*, TH1D*>> GetHistoMap() {
     return output_map;
 }
 
-std::pair<TH1D*, TH1D*> GetTemplates(std::map<std::string, std::pair<TH1D*, TH1D*>> histo_map) {
-    TH1D* data_phi_histo = histo_map["Data"].first;
-    TH1D* summed_phi = new TH1D();
-    summed_phi = dynamic_cast<TH1D*>(data_phi_histo->Clone("template_phi"));
-    TH1D* data_mass_histo = histo_map["Data"].second;
+histogram_container GetTemplates(histogram_map histo_map) {
+    // Clone the histograms to make new ones to fill.
+    TH1D* data_mass_histo = histo_map["Data"].mass;
     TH1D* summed_mass = new TH1D();
     summed_mass = dynamic_cast<TH1D*>(data_mass_histo->Clone("template_mass"));
+
+    TH1D* data_low_histo = histo_map["Data"].low_side_phistar;
+    TH1D* data_high_histo = histo_map["Data"].high_side_phistar;
+    TH1D* low_phistar = new TH1D();
+    TH1D* high_phistar = new TH1D();
+    low_phistar = dynamic_cast<TH1D*>(data_low_histo->Clone("low_phistar_template"));
+    high_phistar = dynamic_cast<TH1D*>(data_high_histo->Clone("high_phistar_template"));
     // Add the backgrounds and signal
     for (auto iter : histo_map) {
         if (iter.first != "Data") {
-            summed_phi->Add(iter.second.first, 1.);
-            summed_mass->Add(iter.second.second, 1.);
+            summed_mass->Add(iter.second.mass, 1.);
+            low_phistar->Add(iter.second.low_side_phistar, 1.);
+            high_phistar->Add(iter.second.high_side_phistar, 1.);
         }
     }
 
-    return {summed_phi, summed_mass};
+    return {summed_mass, low_phistar, high_phistar};
 }
 
 int main() {
     // Get a map of the histograms of the Z Masses
-    std::map<std::string, std::pair<TH1D*, TH1D*>> histo_map = GetHistoMap();
+    histogram_map histo_map = GetHistoMap();
 
     // Get a templates
-    std::pair<TH1D*, TH1D*> template_histos = GetTemplates(histo_map);
-    TH1D* template_phi = template_histos.first;
-    TH1D* template_mass = template_histos.second;
+    histogram_container templates = GetTemplates(histo_map);
+    TH1D* template_mass = templates.mass;
+    TH1D* template_low_phistar = templates.low_side_phistar;
+    TH1D* template_high_phistar = templates.high_side_phistar;
 
     // Get the data
-    TH1D* data_phi = histo_map["Data"].first;
-    TH1D* data_mass = histo_map["Data"].second;
+    TH1D* data_mass = histo_map["Data"].mass;
+    TH1D* data_low_phistar = histo_map["Data"].low_side_phistar;
+    TH1D* data_high_phistar = histo_map["Data"].high_side_phistar;
 
     // Make our fit function
     FitFunction ff(*template_mass);
-    TF1* function = new TF1("function", ff, 0., 300., ff.nparms());
-
+    TF1* fit_function = new TF1("function", ff, 0., 300., ff.nparms());
     data_mass->Fit("function", "LLEMR");
 
-    // Get the same "scale factor"
-    const double AMPLITUDE = function->GetParameter(0);
+    FitFunction low_ff(*template_low_phistar);
+    TF1* low_fit_function = new TF1("low_function", low_ff, 0., 10., low_ff.nparms());
+    data_low_phistar->Fit("low_function", "LLEMR");
 
-    // Subtract the template Phi* from the data
-    TH1D* qcd_phistar = dynamic_cast<TH1D*>(data_phi->Clone("qcd_phistar"));
-    qcd_phistar->Add(template_phi, -AMPLITUDE);
+    FitFunction high_ff(*template_high_phistar);
+    TF1* high_fit_function = new TF1("high_function", high_ff, 0., 10., high_ff.nparms());
+    data_high_phistar->Fit("high_function", "LLEMR");
+
+    // Get the same "scale factor"
+    //const double AMPLITUDE = fit_function->GetParameter(0);
 
     // Open a tfile to save our histos
     TFile output_file("output.root", "RECREATE");
     output_file.cd();
 
     // Write and draw the histos
-    template_phi->Write();
-    data_phi->Write();
     template_mass->Write();
     data_mass->Write();
-    qcd_phistar->Write();
+    template_low_phistar->Write();
+    data_low_phistar->Write();
+    template_high_phistar->Write();
+    data_high_phistar->Write();
 
-    template_phi->Draw();
-    data_phi->Draw("E SAME");
     template_mass->Draw();
     data_mass->Draw("E SAME");
-    qcd_phistar->Draw();
 
     output_file.Write();
     output_file.Close();
-
-    // Clean up
-    delete function;
 
     return EXIT_SUCCESS;
 }
