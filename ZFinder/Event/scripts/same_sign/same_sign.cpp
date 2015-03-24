@@ -12,10 +12,111 @@
 #include <TFile.h>
 #include <TBranch.h>
 #include <TF1.h>
+#include <TCanvas.h>
+#include <TStyle.h>
 
 // ZFinder
 #include "../../interface/WeightID.h"
 #include "../../interface/ATLASBins.h"  // ATLAS_PHISTAR_BINNING
+
+void set_plot_style() {
+    TStyle* style = new TStyle("style","Style for P-TDR");
+
+    // For the canvas:
+    style->SetCanvasBorderMode(0);
+    style->SetCanvasColor(kWhite);
+    style->SetCanvasDefX(0);  //Position on screen
+    style->SetCanvasDefY(0);
+
+    // For the Pad:
+    style->SetPadBorderMode(0);
+    style->SetPadColor(kWhite);
+    style->SetPadGridX(false);
+    style->SetPadGridY(false);
+    style->SetGridColor(kBlack);
+    style->SetGridStyle(3);
+    style->SetGridWidth(1);
+
+    // For the frame:
+    style->SetFrameBorderMode(0);
+    style->SetFrameBorderSize(1);
+    style->SetFrameFillColor(kWhite);
+    style->SetFrameFillStyle(0);
+    style->SetFrameLineColor(kBlack);
+    style->SetFrameLineStyle(1);
+    style->SetFrameLineWidth(1);
+
+    // For the histo:
+    // style->SetHistFillColor(1);
+    style->SetHistFillStyle(0); //
+    style->SetHistLineColor(kBlack);
+    style->SetHistLineStyle(0);
+    style->SetHistLineWidth(1);
+
+    style->SetEndErrorSize(2);
+    style->SetErrorX(0.);
+
+    style->SetMarkerStyle(20);
+
+    //For the fit/function:
+    style->SetOptFit(1);
+    style->SetFitFormat("5.4g");
+    style->SetFuncColor(kRed);
+    style->SetFuncStyle(1);
+    style->SetFuncWidth(1);
+
+    //For the date:
+    style->SetOptDate(0);
+
+    // For the statistics box:
+    style->SetOptFile(0);
+    style->SetOptStat(0);  // To display the mean and RMS: SetOptStat("mr");
+    style->SetStatColor(kWhite);
+    style->SetStatFont(42);
+    style->SetStatFontSize(0.025);
+    style->SetStatTextColor(kBlack);
+    style->SetStatFormat("6.4g");
+    style->SetStatBorderSize(1);
+    style->SetStatH(0.1);
+    style->SetStatW(0.15);
+
+    // For the Global title:
+    style->SetOptTitle(0);
+    style->SetTitleFont(42);
+    style->SetTitleColor(kBlack);
+    style->SetTitleTextColor(kBlack);
+    style->SetTitleFillColor(kWhite);  //10 is roughly kWhite, 10% grey?
+    style->SetTitleFontSize(0.05);
+
+    // For the axis titles:
+    style->SetTitleColor(kBlack, "XYZ");
+    style->SetTitleFont(42, "XYZ");
+    style->SetTitleSize(0.06, "XYZ");
+    style->SetTitleXOffset(0.9);
+    style->SetTitleYOffset(1.25);
+
+    // For the axis labels:
+    style->SetLabelColor(kBlack, "XYZ");
+    style->SetLabelFont(42, "XYZ");
+    style->SetLabelOffset(0.007, "XYZ");
+    style->SetLabelSize(0.05, "XYZ");
+
+    // For the axis:
+    style->SetAxisColor(kBlack, "XYZ");
+    style->SetStripDecimals(true);
+    style->SetTickLength(0.03, "XYZ");
+    style->SetNdivisions(510, "XYZ");
+    style->SetPadTickX(true);  // To get tick marks on the opposite side of the frame
+    style->SetPadTickY(true);
+
+    // Change for log plots:
+    style->SetOptLogx(false);
+    style->SetOptLogy(false);
+    style->SetOptLogz(false);
+
+    // Set the style
+    style->cd();
+}
 
 
 TTree* GetTTree(const std::string TFILE, const std::string TTREE) {
@@ -48,7 +149,7 @@ double GetOverallNormalization(const std::string NAME) {
         {"BG_zz", 17.0 / 9799908.},
     };
 
-    return DATA_LUMI * NORM[NAME];
+    return DATA_LUMI * NORM.at(NAME);
 }
 
 double GetWeight(
@@ -128,7 +229,7 @@ histogram_map GetHistoMap() {
         }
 
         // Pack into a hitogram
-        TH1D* z_mass_histo = new TH1D("z_mass", "m_{ee};m_{ee};Counts", 300, 0, 300);
+        TH1D* z_mass_histo = new TH1D("z_mass", "m_{ee};m_{ee};Counts", 50, 0, 300);
         TH1D* low_phistar_histo = new TH1D("low_phistar", "Phi*;#phi*;Counts", zf::ATLAS_PHISTAR_BINNING.size() - 1, &zf::ATLAS_PHISTAR_BINNING[0]);
         TH1D* high_phistar_histo = new TH1D("high_phistar", "Phi*;#phi*;Counts", zf::ATLAS_PHISTAR_BINNING.size() - 1, &zf::ATLAS_PHISTAR_BINNING[0]);
         for (int i = 0; i < tree->GetEntries(); i++) {
@@ -194,6 +295,66 @@ histogram_container GetTemplates(histogram_map histo_map) {
     return {summed_mass, low_phistar, high_phistar};
 }
 
+void WritePNG(
+        const std::string OUTPUT_NAME,
+        TH1D* data_histo,
+        TH1D* template_histo,
+        TF1* fit_function,
+        const bool LOGY = true,
+        const bool LOGX = false
+        ) {
+    // Make some plots
+    set_plot_style();
+    const int X_SIZE = 1000;
+    const int Y_SIZE = 1000;
+    TCanvas canvas("canvas", "canvas", X_SIZE, Y_SIZE);
+    canvas.cd();
+    gPad->SetLogy(LOGY);
+    gPad->SetLogx(LOGX);
+
+    data_histo->SetMarkerColor(kBlack);
+    data_histo->SetLineColor(kBlack);
+    data_histo->SetMarkerStyle(kFullCircle);
+
+    //data_histo->Rebin(5);
+    //data_histo->Scale(1/5.);
+    data_histo->Draw("E");
+    //fit_function->Draw("SAME");
+
+    template_histo->Scale(fit_function->GetParameter(0));
+    //template_histo->Rebin(5);
+    //template_histo->Scale(1/5.);
+    template_histo->SetLineColor(kBlue);
+    template_histo->SetLineStyle(kDashed);
+    template_histo->SetLineWidth(2.);
+    template_histo->Draw("hist SAME");
+
+    // Draw a line for the QCD background
+    TF1 line("line", "pol0", template_histo->GetBinLowEdge(1), template_histo->GetBinLowEdge(template_histo->GetNbinsX()) + template_histo->GetBinWidth(template_histo->GetNbinsX()));
+    line.SetParameter(0, fit_function->GetParameter(1));
+    line.SetLineColor(kRed);
+    line.SetLineStyle(kDashed);
+    line.Draw("SAME");
+
+    // Combine the line and the histogram
+    TH1D* combined_histo = new TH1D();
+    combined_histo = dynamic_cast<TH1D*>(template_histo->Clone("combined_histo"));
+    for (int bin_num = 1; bin_num <= combined_histo->GetNbinsX(); ++bin_num) {
+        const double OLD_CONT = combined_histo->GetBinContent(bin_num);
+        combined_histo->SetBinContent(bin_num, OLD_CONT + fit_function->GetParameter(1));
+    }
+    combined_histo->SetLineColor(kBlack);
+    combined_histo->SetLineWidth(3.);
+    combined_histo->SetLineStyle(kSolid);
+    combined_histo->Draw("HIST SAME");
+
+    data_histo->Draw("SAME");
+
+    canvas.Print(OUTPUT_NAME.c_str(), "png");
+
+    delete combined_histo;
+}
+
 int main() {
     // Get a map of the histograms of the Z Masses
     histogram_map histo_map = GetHistoMap();
@@ -201,34 +362,61 @@ int main() {
     // Get a templates
     histogram_container templates = GetTemplates(histo_map);
     TH1D* template_mass = templates.mass;
-    //TH1D* template_low_phistar = templates.low_side_phistar;
-    //TH1D* template_high_phistar = templates.high_side_phistar;
+    TH1D* template_low_phistar = templates.low_side_phistar;
+    TH1D* template_high_phistar = templates.high_side_phistar;
 
     // Get the data
     TH1D* data_mass = histo_map["Data"].mass;
-    //TH1D* data_low_phistar = histo_map["Data"].low_side_phistar;
-    //TH1D* data_high_phistar = histo_map["Data"].high_side_phistar;
+    TH1D* data_low_phistar = histo_map["Data"].low_side_phistar;
+    TH1D* data_high_phistar = histo_map["Data"].high_side_phistar;
+
+    // Make our fit function
+    FitFunction ff(*template_mass);
+    TF1* fit_function = new TF1("function", ff, 0., 300., ff.nparms());
+    data_mass->Fit("function", "LLEMR0");
+
+    FitFunction low_ff(*template_low_phistar);
+    TF1* low_fit_function = new TF1("low_function", low_ff, 0., 10., low_ff.nparms());
+    data_low_phistar->Fit("low_function", "LLEMR0");
+
+    FitFunction high_ff(*template_high_phistar);
+    TF1* high_fit_function = new TF1("high_function", high_ff, 0., 10., high_ff.nparms());
+    data_high_phistar->Fit("high_function", "LLEMR0");
+
+    // Get the same "scale factor"
+    //const double AMPLITUDE = fit_function->GetParameter(0);
 
     // Open a tfile to save our histos
     TFile output_file("output.root", "RECREATE");
     output_file.cd();
 
     // Take the ratio of the data and the MC
-    TH1D* data_mass_histo = histo_map["Data"].mass;
-    TH1D* ratio_histogram = new TH1D();
-    const int REBIN = 6;
-    template_mass->Rebin(REBIN);
-    data_mass->Rebin(REBIN);
-    ratio_histogram = dynamic_cast<TH1D*>(data_mass->Clone("ratio"));
-    ratio_histogram->Divide(template_mass);
+    //TH1D* data_mass_histo = histo_map["Data"].mass;
+    //TH1D* ratio_histogram = new TH1D();
+    //const int REBIN = 6;
+    //template_mass->Rebin(REBIN);
+    //data_mass->Rebin(REBIN);
+    //ratio_histogram = dynamic_cast<TH1D*>(data_mass->Clone("ratio"));
+    //ratio_histogram->Divide(template_mass);
 
     // Write and draw the histos
     template_mass->Write();
     data_mass->Write();
-    ratio_histogram->Draw();
+    //ratio_histogram->Draw();
+    template_low_phistar->Write();
+    data_low_phistar->Write();
+    template_high_phistar->Write();
+    data_high_phistar->Write();
+
+    // Make PNGs
+    WritePNG("mass.png", data_mass, template_mass, fit_function);
+    WritePNG("low.png", data_low_phistar, template_low_phistar, low_fit_function, true, true);
+    WritePNG("high.png", data_high_phistar, template_high_phistar, high_fit_function, true, true);
 
     output_file.Write();
     output_file.Close();
+
+    std::cout << "HERE" << std::endl;
 
     return EXIT_SUCCESS;
 }
