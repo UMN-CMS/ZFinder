@@ -37,7 +37,7 @@ TTree* GetTTree(const std::string TFILE, const std::string TTREE) {
 
 double GetOverallNormalization(const std::string NAME) {
     const double DATA_LUMI = 19712;
-    std::map<std::string, double> norm = {
+    const std::map<std::string, double> NORM = {
         {"Signal", 3531.89 / 30459500.},
         {"BG_Ditau", 1966.7 / 47271600.},
         {"BG_TTBar", 23.64 / 4246440},
@@ -48,7 +48,7 @@ double GetOverallNormalization(const std::string NAME) {
         {"BG_zz", 17.0 / 9799908.},
     };
 
-    return DATA_LUMI * norm[NAME];
+    return DATA_LUMI * NORM[NAME];
 }
 
 double GetWeight(
@@ -155,6 +155,9 @@ histogram_map GetHistoMap() {
             }
         }
         // Put the histogram into the map
+        z_mass_histo->Sumw2();
+        low_phistar_histo->Sumw2();
+        high_phistar_histo->Sumw2();
         output_map[data_type] = {z_mass_histo, low_phistar_histo, high_phistar_histo};
 
         delete tree;
@@ -184,6 +187,10 @@ histogram_container GetTemplates(histogram_map histo_map) {
         }
     }
 
+    summed_mass->Sumw2();
+    low_phistar->Sumw2();
+    high_phistar->Sumw2();
+
     return {summed_mass, low_phistar, high_phistar};
 }
 
@@ -194,44 +201,31 @@ int main() {
     // Get a templates
     histogram_container templates = GetTemplates(histo_map);
     TH1D* template_mass = templates.mass;
-    TH1D* template_low_phistar = templates.low_side_phistar;
-    TH1D* template_high_phistar = templates.high_side_phistar;
+    //TH1D* template_low_phistar = templates.low_side_phistar;
+    //TH1D* template_high_phistar = templates.high_side_phistar;
 
     // Get the data
     TH1D* data_mass = histo_map["Data"].mass;
-    TH1D* data_low_phistar = histo_map["Data"].low_side_phistar;
-    TH1D* data_high_phistar = histo_map["Data"].high_side_phistar;
-
-    // Make our fit function
-    FitFunction ff(*template_mass);
-    TF1* fit_function = new TF1("function", ff, 0., 300., ff.nparms());
-    data_mass->Fit("function", "LLEMR");
-
-    FitFunction low_ff(*template_low_phistar);
-    TF1* low_fit_function = new TF1("low_function", low_ff, 0., 10., low_ff.nparms());
-    data_low_phistar->Fit("low_function", "LLEMR");
-
-    FitFunction high_ff(*template_high_phistar);
-    TF1* high_fit_function = new TF1("high_function", high_ff, 0., 10., high_ff.nparms());
-    data_high_phistar->Fit("high_function", "LLEMR");
-
-    // Get the same "scale factor"
-    //const double AMPLITUDE = fit_function->GetParameter(0);
+    //TH1D* data_low_phistar = histo_map["Data"].low_side_phistar;
+    //TH1D* data_high_phistar = histo_map["Data"].high_side_phistar;
 
     // Open a tfile to save our histos
     TFile output_file("output.root", "RECREATE");
     output_file.cd();
 
+    // Take the ratio of the data and the MC
+    TH1D* data_mass_histo = histo_map["Data"].mass;
+    TH1D* ratio_histogram = new TH1D();
+    const int REBIN = 6;
+    template_mass->Rebin(REBIN);
+    data_mass->Rebin(REBIN);
+    ratio_histogram = dynamic_cast<TH1D*>(data_mass->Clone("ratio"));
+    ratio_histogram->Divide(template_mass);
+
     // Write and draw the histos
     template_mass->Write();
     data_mass->Write();
-    template_low_phistar->Write();
-    data_low_phistar->Write();
-    template_high_phistar->Write();
-    data_high_phistar->Write();
-
-    template_mass->Draw();
-    data_mass->Draw("E SAME");
+    ratio_histogram->Draw();
 
     output_file.Write();
     output_file.Close();
