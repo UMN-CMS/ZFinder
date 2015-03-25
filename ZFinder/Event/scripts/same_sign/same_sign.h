@@ -2,21 +2,16 @@
 #define SAME_SIGN_H_
 
 // Standard Library
-#include <map>
 #include <string>
+#include <map>
 #include <utility>  // std::pair
 
 // ROOT
 #include <TH1D.h>
+#include <TH2D.h>
 #include <TTree.h>
 
-struct histogram_container{
-    TH1D* mass;
-    TH1D* low_side_phistar;
-    TH1D* high_side_phistar;
-};
-
-typedef std::map<std::string, histogram_container> histogram_map;
+typedef std::map<std::string, TH2D*> histogram_map;
 
 struct branch_struct {
     double z_m;
@@ -49,9 +44,12 @@ double GetWeight(
 
 double GetOverallNormalization(const std::string NAME);
 
-histogram_map GetHistoMap();
+histogram_map Get2DHistoMap();
 
-histogram_container GetTemplates(std::map<std::string, std::pair<TH1D*, TH1D*>> histo_map);
-TH1D* GetRatioHistogram(std::map<std::string, TH1D*> histo_map);
+TH2D* GetTemplate(histogram_map histo_map);
+
+TH1D* Get1DFromBin(TH2D* histo, const int BIN);
+
+void WritePNG(TH1D* data_histo, TH1D* template_histo, const std::string FILE_NAME);
 
 #endif  // SAME_SIGN_H_

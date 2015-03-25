@@ -12,9 +12,12 @@ class FitFunction {
         // Operator for fitting
         double operator()(const double* x, const double* par);
 
+        // Background function
+        double Background(const double x, const double alpha, const double gamma, const double delta);
+
         // Information about the class needed by fitter functions
         int nparms() {
-            return 2;
+            return 5;
         }
 
     private:

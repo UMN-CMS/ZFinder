@@ -8,10 +8,11 @@ CCC=${CC} -c
 
 all: same_sign.exe
 
-same_sign.exe: same_sign.cpp same_sign.h FitFunction.o
+same_sign.exe: same_sign.cpp same_sign.h FitFunction.o PlotStyle.o
 	${CC} ${ROOT_ALL} -o same_sign.exe \
 	same_sign.cpp \
-	FitFunction.o
+	FitFunction.o \
+	PlotStyle.o
 
 %.o:%.cpp %.h
 	${CCC} ${ROOT_INCLUDES} $< -o $@
