@@ -15,6 +15,8 @@
 #include <TCanvas.h>
 #include <TStyle.h>
 #include <TMath.h>
+#include <TBranch.h>
+#include <TLeaf.h>
 
 // Style
 #include "PlotStyle.h"
@@ -26,15 +28,17 @@
 TTree* GetTTree(const std::string TFILE, const std::string TTREE) {
     // Open the TFiles
     TFile* mc_tfile = new TFile(TFILE.c_str(), "READ");
-    if (!mc_tfile) {
-        throw std::runtime_error("Could not open the file");
+    if (!mc_tfile || mc_tfile->IsZombie()) {
+        const std::string ERR = "Could not open the file " + TFILE;
+        throw std::runtime_error(ERR);
     }
 
     // Load the tree
     TTree* tree = new TTree();
     mc_tfile->GetObject(TTREE.c_str(), tree);
-    if (!tree) {
-        throw std::runtime_error("Could not open the TTree");
+    if (!tree || tree->IsZombie()) {
+        const std::string ERR = "Could not open the TTree " + TTREE;
+        throw std::runtime_error(ERR);
     }
 
     return tree;
@@ -52,8 +56,8 @@ double GetOverallNormalization(const std::string NAME) {
         {"BG_wz", 33.21 / 10000280.},
         {"BG_zz", 17.0 / 9799908.},
     };
-
-    return DATA_LUMI * NORM.at(NAME);
+    const double WEIGHT = DATA_LUMI * NORM.at(NAME);
+    return WEIGHT;
 }
 
 double GetWeight(
@@ -116,8 +120,11 @@ histogram_map Get2DHistoMap() {
         // Open the file and load the tree
         TTree* tree = GetTTree(file_name, TREE_NAME);
 
-        branch_struct reco_branch;
-        tree->SetBranchAddress("reco", &reco_branch);
+        TBranch* reco_branch = tree->GetBranch("reco");
+        TLeaf* e0_charge = reco_branch->GetLeaf("e_charge0");
+        TLeaf* e1_charge = reco_branch->GetLeaf("e_charge1");
+        TLeaf* mee = reco_branch->GetLeaf("z_m");
+        TLeaf* phistar = reco_branch->GetLeaf("z_phistar_dressed");
 
         // We have to grab the first entry to learn how many weights there are
         int nweights = 0;
@@ -137,6 +144,11 @@ histogram_map Get2DHistoMap() {
         for (int i = 0; i < tree->GetEntries(); i++) {
             tree->GetEntry(i);
 
+            // Reject opposite sign
+            if (e0_charge->GetValue() * e1_charge->GetValue() < 0) {
+                continue;
+            }
+
             // We have a bug in our tuples where the charge is often set wrong.
             // Instead we selected the events from the beinging to be be same
             // sign, so we run on all of them.
@@ -146,8 +158,8 @@ histogram_map Get2DHistoMap() {
                 weight *= GetWeight(nweights, weights, weightid);
             }
 
-            const double MEE = reco_branch.z_m;
-            const double PHISTAR = reco_branch.z_phistar_dressed;
+            const double MEE = mee->GetValue();
+            const double PHISTAR = phistar->GetValue();
             histo->Fill(PHISTAR, MEE, weight);
         }
         histo->Sumw2();
@@ -165,6 +177,9 @@ TH2D* GetTemplate(histogram_map histo_map) {
     TH2D* data_mass_histo = histo_map["Data"];
     TH2D* template_2d = new TH2D();
     template_2d = dynamic_cast<TH2D*>(data_mass_histo->Clone("2d_template"));
+
+    // Empty the histogram
+    template_2d->Reset();
 
     // Add the backgrounds and signal
     for (auto iter : histo_map) {
@@ -267,8 +282,15 @@ int main() {
         delete template_histo;
     }
 
+    // Get the background subtracted MZ
+    TH1D* data_mass = data_histo2d->ProjectionY("data_mass", 1, -1, "e");
+    TH1D* mc_mass = template_histo2d->ProjectionY("mc_mass", 1, -1, "e");
+
+    data_mass->Add(mc_mass, -1);
+
     data_histo2d->Write();
     template_histo2d->Write();
+    data_mass->Write();
 
     output_file.Write();
     output_file.Close();
