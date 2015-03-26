@@ -226,7 +226,7 @@ TH1D* Get1DFromBin(TH2D* histo, const int BIN, const std::string PREFIX) {
     return out_histo;
 }
 
-double FitForQCD(TH1D* data_histo, TH1D* template_histo, const std::string BIN) {
+std::pair<double, double> FitForQCD(TH1D* data_histo, TH1D* template_histo, const std::string BIN) {
     using namespace RooFit;
     // The X value of the histogram
     RooRealVar z_mass("z_mass", "z_mass" , 0, 300, "GeV");
@@ -254,7 +254,7 @@ double FitForQCD(TH1D* data_histo, TH1D* template_histo, const std::string BIN) 
     std::cout << std::endl;
     RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING) ;
     gErrorIgnoreLevel = kWarning;
-    combined_pdf.fitTo(h_data, Verbose(false), PrintLevel(-1));
+    RooFitResult* fit_result = combined_pdf.fitTo(h_data, Verbose(false), PrintLevel(-1), Save(true));
 
     // Plot
     TCanvas canvas("canvas", "canvas", 1200, 800);
@@ -271,20 +271,15 @@ double FitForQCD(TH1D* data_histo, TH1D* template_histo, const std::string BIN) 
     canvas.Print(OUT_NAME.c_str(), "png");
     
     // Find the integral of the background
-    std::cout << "Computing Integral" << std::endl;
+    //std::cout << "Computing Integral" << std::endl;
     RooAbsReal* fracInt = MyBackgroundPdf.createIntegral(z_mass, Range("signal"));
-    std::cout << "BG INT: " << fracInt->getVal() << std::endl;
 
-    return fracInt->getVal();
+    return {fracInt->getVal(), fracInt->getPropagatedError(*fit_result)};
 }
 
 int main() {
     // Get a map of the histograms of the Z Masses
     histogram_map histo2d = Get2DHistoMap();
-
-    // Open a tfile to save our histos
-    TFile output_file("output.root", "RECREATE");
-    output_file.cd();
 
     // Write and draw the histos
     TH2D* data_histo2d = histo2d["Data"];
@@ -299,19 +294,27 @@ int main() {
         TH1D* data_histo = Get1DFromBin(data_histo2d, i, "data_bin_");
         TH1D* template_histo = Get1DFromBin(template_histo2d, i, "template_bin_");
 
-        const double BACKGROUND = FitForQCD(data_histo, template_histo, std::to_string(i));
-        qcd_phistar_histo->SetBinContent(i, BACKGROUND);
+        std::pair<double, double> fit_result = FitForQCD(data_histo, template_histo, std::to_string(i));
+        qcd_phistar_histo->SetBinContent(i, fit_result.first);
+        qcd_phistar_histo->SetBinError(i, fit_result.second);
 
         // Clean up
         delete data_histo;
         delete template_histo;
     }
 
+    // Divide by bin width
+    qcd_phistar_histo->Scale(1/19712., "width");
+
     // Get the background subtracted MZ
     TH1D* data_mass = data_histo2d->ProjectionY("data_mass", 1, -1, "e");
     TH1D* mc_mass = template_histo2d->ProjectionY("mc_mass", 1, -1, "e");
 
     data_mass->Add(mc_mass, -1);
+
+    // Open a tfile to save our histos
+    TFile output_file("output.root", "RECREATE");
+    output_file.cd();
 
     data_histo2d->Write();
     template_histo2d->Write();
