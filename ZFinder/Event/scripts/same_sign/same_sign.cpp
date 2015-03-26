@@ -21,6 +21,29 @@
 #include <TFitResult.h>
 #include <TFitResultPtr.h>
 
+// RooFit
+#include "RooAddPdf.h"
+#include "RooArgSet.h"
+#include "RooBinning.h"
+#include "RooCategory.h"
+#include "RooDataHist.h"
+#include "RooDataSet.h"
+#include "RooFFTConvPdf.h"
+#include "RooFitResult.h"
+#include "RooFormulaVar.h"
+#include "RooGaussian.h"
+#include "RooExponential.h"
+#include "RooVoigtian.h"
+#include "RooCBShape.h"
+#include "RooGaussModel.h"
+#include "RooDecay.h"
+#include "RooKeysPdf.h"
+#include "RooGenericPdf.h"
+#include "RooHistPdf.h"
+#include "RooPlot.h"
+#include "RooRealVar.h"
+#include "RooWorkspace.h"
+
 // Style
 #include "PlotStyle.h"
 
@@ -194,77 +217,6 @@ TH2D* GetTemplate(histogram_map histo_map) {
     return template_2d;
 }
 
-TF1* GetFitFunction(TH1D* template_histo) {
-    FitFunction ff(*template_histo);
-    TF1* fit_function = new TF1("function", ff, 0., 300., ff.nparms());
-    fit_function->SetParName(0, "Histogram Amplitude");
-    fit_function->SetParName(1, "alpha");
-    fit_function->SetParName(2, "gamma");
-    fit_function->SetParName(3, "delta");
-    fit_function->SetParName(4, "beta");
-    // Set limits on the fit
-    fit_function->SetParLimits(0, 0.5, 1.5);
-    fit_function->SetParLimits(1, 1., 90.);
-    fit_function->SetParLimits(2, 0.0001, 0.3);
-    fit_function->SetParLimits(3, 0.1, 80.);
-    fit_function->SetParLimits(4, 0.1, 1000000.);
-    // Set starting value
-    fit_function->SetParameter(0, 1.0);
-    fit_function->SetParameter(1, 50.);
-    fit_function->SetParameter(2, 0.01);
-    fit_function->SetParameter(3, 1.);
-    fit_function->SetParameter(4, 1000.);
-
-    return fit_function;
-}
-
-TF1* GetHauptFunction(TF1 const * const FIT_FUNCTION) {
-    // Make the Haupt function
-    const std::string HF = "[3] * (TMath::Erfc(([0] - x) / [2]) * TMath::Exp(-[1] * x))";
-    TF1* haupt_function = new TF1("haupt", HF.c_str(), 0, 300);
-    // Set Parameters
-    haupt_function->SetParameter(0, FIT_FUNCTION->GetParameter(1));
-    haupt_function->SetParameter(1, FIT_FUNCTION->GetParameter(2));
-    haupt_function->SetParameter(2, FIT_FUNCTION->GetParameter(3));
-    haupt_function->SetParameter(3, FIT_FUNCTION->GetParameter(4));
-    // Set errors
-    haupt_function->SetParError(0, FIT_FUNCTION->GetParError(1));
-    haupt_function->SetParError(1, FIT_FUNCTION->GetParError(2));
-    haupt_function->SetParError(2, FIT_FUNCTION->GetParError(3));
-    haupt_function->SetParError(3, FIT_FUNCTION->GetParError(4));
-    // Style
-    haupt_function->SetLineColor(kGreen);
-    haupt_function->SetLineWidth(2.);
-
-    return haupt_function;
-}
-
-void WritePNG(TH1D* data_histo, TH1D* template_histo, TF1* haupt_function, TF1* fit_function, const std::string FILE_NAME) {
-
-    // Set the style
-    SetPlotStyle();
-
-    // Make a canvas
-    const int EDGE_IN_PIXEL = 1000;
-    TCanvas canvas("canvas", "canvas", EDGE_IN_PIXEL, EDGE_IN_PIXEL);
-    canvas.cd();
-    gPad->SetLogy(true);
-
-    data_histo->SetMarkerColor(kBlack);
-    data_histo->SetLineColor(kBlack);
-    data_histo->SetMarkerStyle(kFullCircle);
-    data_histo->Draw("E");
-
-    fit_function->Draw("Same");
-
-    template_histo->Scale(fit_function->GetParameter(0));
-    template_histo->Draw("Hist Same");
-
-    haupt_function->Draw("Same");
-
-    canvas.Print(FILE_NAME.c_str(), "png");
-}
-
 TH1D* Get1DFromBin(TH2D* histo, const int BIN, const std::string PREFIX) {
     // Project the histogram
     TH1D* out_histo = new TH1D();
@@ -272,6 +224,58 @@ TH1D* Get1DFromBin(TH2D* histo, const int BIN, const std::string PREFIX) {
     out_histo = histo->ProjectionY(NAME.c_str(), BIN, BIN, "e");
 
     return out_histo;
+}
+
+double FitForQCD(TH1D* data_histo, TH1D* template_histo, const std::string BIN) {
+    using namespace RooFit;
+    // The X value of the histogram
+    RooRealVar z_mass("z_mass", "z_mass" , 0, 300, "GeV");
+    z_mass.setRange("signal", 60., 120.);
+    // Data and MC histogram
+    RooDataHist h_data("h_data", "h_data", RooArgSet(z_mass), data_histo);
+    RooDataHist h_mc("h_mc", "h_mc", RooArgSet(z_mass), template_histo);
+    RooHistPdf signalpdf("signalpdf", "signalpdf", z_mass, h_mc);
+    // Background pdf
+    RooRealVar alpha("alpha", "alpha", 50., 10., 90.);
+    RooRealVar gamma("gamma", "gamma", 0.01, 0.0001, 0.03);
+    RooRealVar delta("delta", "delta", 1., 0.01, 80.);
+    RooFormulaVar var1("var1", "(alpha-z_mass)/delta", RooArgSet(alpha, z_mass, delta));
+    RooFormulaVar var2("var2", "-1.0*gamma*z_mass", RooArgSet(gamma, z_mass));
+    RooGenericPdf MyBackgroundPdf("MyBackgroundPdf", "ROOT::Math::erfc(var1)*exp(var2)", RooArgSet(var1, var2));
+    // Make the sum of the histogram and the Haupt function
+    RooRealVar sigratio("sigratio", "sigratio", 0.9, 0.6, 1.0);
+    RooAddPdf combined_pdf("combined_pdf", "combined_pdf", RooArgList(signalpdf, MyBackgroundPdf), RooArgList(sigratio));
+
+    // Fit, but without yelling please
+    std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << "Running on Bin: " << BIN << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl;
+    RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING) ;
+    gErrorIgnoreLevel = kWarning;
+    combined_pdf.fitTo(h_data, Verbose(false), PrintLevel(-1));
+
+    // Plot
+    TCanvas canvas("canvas", "canvas", 1200, 800);
+    canvas.cd();
+    gPad->SetLogy();
+    RooPlot* fitFrame = z_mass.frame(Title("QCD Fit"));
+    h_data.plotOn(fitFrame);
+    combined_pdf.plotOn(fitFrame, Components(MyBackgroundPdf), LineColor(kRed), LineStyle(kDashed));
+    combined_pdf.plotOn(fitFrame, Components(signalpdf), LineColor(kBlack), LineStyle(kDashed));
+    combined_pdf.plotOn(fitFrame, LineColor(kBlue));
+    h_data.plotOn(fitFrame);
+    fitFrame->Draw();
+    const std::string OUT_NAME = BIN + ".png";
+    canvas.Print(OUT_NAME.c_str(), "png");
+    
+    // Find the integral of the background
+    std::cout << "Computing Integral" << std::endl;
+    RooAbsReal* fracInt = MyBackgroundPdf.createIntegral(z_mass, Range("signal"));
+    std::cout << "BG INT: " << fracInt->getVal() << std::endl;
+
+    return fracInt->getVal();
 }
 
 int main() {
@@ -295,26 +299,12 @@ int main() {
         TH1D* data_histo = Get1DFromBin(data_histo2d, i, "data_bin_");
         TH1D* template_histo = Get1DFromBin(template_histo2d, i, "template_bin_");
 
-        // Make a function to fit and do a fit
-        TF1* fit_function = GetFitFunction(template_histo);
-        TFitResultPtr fit_result = data_histo->Fit("function", "LLEMRB0S");
-        TF1* haupt = GetHauptFunction(fit_function);
-
-        std::string OUT_NAME = "fit_from_bin_" + std::to_string(i) + ".png";
-
-        WritePNG(data_histo, template_histo, haupt, fit_function, OUT_NAME);
-
-        // Estimate the background
-        double BACKGROUND = haupt->Integral(60, 120);
-        //double ERROR = haupt->IntegralError(60, 120, fit_result->GetParams(), fit_result->GetCovarianceMatrix().GetMatrixArray());
+        const double BACKGROUND = FitForQCD(data_histo, template_histo, std::to_string(i));
         qcd_phistar_histo->SetBinContent(i, BACKGROUND);
-        //qcd_phistar_histo->SetBinError(i, ERROR);
-        //std::cout << "Bin " << i << ": " << BACKGROUND << " +- " << ERROR << std::endl;
 
+        // Clean up
         delete data_histo;
         delete template_histo;
-        delete haupt;
-        delete fit_function;
     }
 
     // Get the background subtracted MZ
