@@ -17,6 +17,9 @@
 #include <TMath.h>
 #include <TBranch.h>
 #include <TLeaf.h>
+#include <TLeaf.h>
+#include <TFitResult.h>
+#include <TFitResultPtr.h>
 
 // Style
 #include "PlotStyle.h"
@@ -191,8 +194,7 @@ TH2D* GetTemplate(histogram_map histo_map) {
     return template_2d;
 }
 
-void WritePNG(TH1D* data_histo, TH1D* template_histo, const std::string FILE_NAME) {
-    // Make a function to fit
+TF1* GetFitFunction(TH1D* template_histo) {
     FitFunction ff(*template_histo);
     TF1* fit_function = new TF1("function", ff, 0., 300., ff.nparms());
     fit_function->SetParName(0, "Histogram Amplitude");
@@ -201,19 +203,43 @@ void WritePNG(TH1D* data_histo, TH1D* template_histo, const std::string FILE_NAM
     fit_function->SetParName(3, "delta");
     fit_function->SetParName(4, "beta");
     // Set limits on the fit
-    fit_function->SetParLimits(0, 0.1, 1.5);
-    fit_function->SetParLimits(1, 20., 50.);
+    fit_function->SetParLimits(0, 0.5, 1.5);
+    fit_function->SetParLimits(1, 1., 90.);
     fit_function->SetParLimits(2, 0.0001, 0.3);
-    fit_function->SetParLimits(3, 3., 80.);
+    fit_function->SetParLimits(3, 0.1, 80.);
     fit_function->SetParLimits(4, 0.1, 1000000.);
     // Set starting value
-    fit_function->SetParameter(0, 0.5);
-    fit_function->SetParameter(1, 60.);
+    fit_function->SetParameter(0, 1.0);
+    fit_function->SetParameter(1, 50.);
     fit_function->SetParameter(2, 0.01);
-    fit_function->SetParameter(3, 10.);
+    fit_function->SetParameter(3, 1.);
     fit_function->SetParameter(4, 1000.);
 
-    data_histo->Fit("function", "LLEMRB0");
+    return fit_function;
+}
+
+TF1* GetHauptFunction(TF1 const * const FIT_FUNCTION) {
+    // Make the Haupt function
+    const std::string HF = "[3] * (TMath::Erfc(([0] - x) / [2]) * TMath::Exp(-[1] * x))";
+    TF1* haupt_function = new TF1("haupt", HF.c_str(), 0, 300);
+    // Set Parameters
+    haupt_function->SetParameter(0, FIT_FUNCTION->GetParameter(1));
+    haupt_function->SetParameter(1, FIT_FUNCTION->GetParameter(2));
+    haupt_function->SetParameter(2, FIT_FUNCTION->GetParameter(3));
+    haupt_function->SetParameter(3, FIT_FUNCTION->GetParameter(4));
+    // Set errors
+    haupt_function->SetParError(0, FIT_FUNCTION->GetParError(1));
+    haupt_function->SetParError(1, FIT_FUNCTION->GetParError(2));
+    haupt_function->SetParError(2, FIT_FUNCTION->GetParError(3));
+    haupt_function->SetParError(3, FIT_FUNCTION->GetParError(4));
+    // Style
+    haupt_function->SetLineColor(kGreen);
+    haupt_function->SetLineWidth(2.);
+
+    return haupt_function;
+}
+
+void WritePNG(TH1D* data_histo, TH1D* template_histo, TF1* haupt_function, TF1* fit_function, const std::string FILE_NAME) {
 
     // Set the style
     SetPlotStyle();
@@ -234,22 +260,9 @@ void WritePNG(TH1D* data_histo, TH1D* template_histo, const std::string FILE_NAM
     template_histo->Scale(fit_function->GetParameter(0));
     template_histo->Draw("Hist Same");
 
-    // Make the Haupt function
-    const std::string HF = "[3] * (TMath::Erfc(([0] - x) / [2]) * TMath::Exp(-[1] * x))";
-    TF1* haupt_function = new TF1("haupt", HF.c_str(), 0, 300);
-    haupt_function->SetParameter(0, fit_function->GetParameter(1));
-    haupt_function->SetParameter(1, fit_function->GetParameter(2));
-    haupt_function->SetParameter(2, fit_function->GetParameter(3));
-    haupt_function->SetParameter(3, fit_function->GetParameter(4));
-    haupt_function->SetLineColor(kGreen);
-    haupt_function->SetLineWidth(4.);
-
     haupt_function->Draw("Same");
 
     canvas.Print(FILE_NAME.c_str(), "png");
-
-    delete fit_function;
-    delete haupt_function;
 }
 
 TH1D* Get1DFromBin(TH2D* histo, const int BIN, const std::string PREFIX) {
@@ -273,13 +286,35 @@ int main() {
     TH2D* data_histo2d = histo2d["Data"];
     TH2D* template_histo2d = GetTemplate(histo2d);
 
-    for (int i = 1; i < zf::ATLAS_PHISTAR_BINNING.size(); ++i) {
+    // Fit the mass peak from each phistar bin using an MC template and
+    // analytic QCD function
+    TH1D* qcd_phistar_histo = new TH1D("qcd_phistar", "QCD Phistar;#phi*;counts", zf::ATLAS_PHISTAR_BINNING.size() - 1, &zf::ATLAS_PHISTAR_BINNING[0]);
+    qcd_phistar_histo->Sumw2();
+    for (unsigned int i = 1; i < zf::ATLAS_PHISTAR_BINNING.size(); ++i) {
+        // Get histograms for each phistar bin
         TH1D* data_histo = Get1DFromBin(data_histo2d, i, "data_bin_");
         TH1D* template_histo = Get1DFromBin(template_histo2d, i, "template_bin_");
+
+        // Make a function to fit and do a fit
+        TF1* fit_function = GetFitFunction(template_histo);
+        TFitResultPtr fit_result = data_histo->Fit("function", "LLEMRB0S");
+        TF1* haupt = GetHauptFunction(fit_function);
+
         std::string OUT_NAME = "fit_from_bin_" + std::to_string(i) + ".png";
-        WritePNG(data_histo, template_histo, OUT_NAME);
+
+        WritePNG(data_histo, template_histo, haupt, fit_function, OUT_NAME);
+
+        // Estimate the background
+        double BACKGROUND = haupt->Integral(60, 120);
+        //double ERROR = haupt->IntegralError(60, 120, fit_result->GetParams(), fit_result->GetCovarianceMatrix().GetMatrixArray());
+        qcd_phistar_histo->SetBinContent(i, BACKGROUND);
+        //qcd_phistar_histo->SetBinError(i, ERROR);
+        //std::cout << "Bin " << i << ": " << BACKGROUND << " +- " << ERROR << std::endl;
+
         delete data_histo;
         delete template_histo;
+        delete haupt;
+        delete fit_function;
     }
 
     // Get the background subtracted MZ
@@ -291,6 +326,7 @@ int main() {
     data_histo2d->Write();
     template_histo2d->Write();
     data_mass->Write();
+    qcd_phistar_histo->Write();
 
     output_file.Write();
     output_file.Close();

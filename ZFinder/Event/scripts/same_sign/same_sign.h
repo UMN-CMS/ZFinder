@@ -50,6 +50,15 @@ TH2D* GetTemplate(histogram_map histo_map);
 
 TH1D* Get1DFromBin(TH2D* histo, const int BIN);
 
-void WritePNG(TH1D* data_histo, TH1D* template_histo, const std::string FILE_NAME);
+TF1* GetFitFunction(TH1D* template_histo);
+
+TF1* GetHauptFunction(TF1 const * const FIT_FUNCTION);
+
+void WritePNG(TH1D* data_histo,
+        TH1D* template_histo,
+        TF1* haupt_function,
+        TF1* fit_function,
+        const std::string FILE_NAME
+        );
 
 #endif  // SAME_SIGN_H_
