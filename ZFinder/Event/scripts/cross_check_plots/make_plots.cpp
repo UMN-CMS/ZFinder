@@ -11,24 +11,28 @@
 
 
 int main() {
+
+    const std::string CUTLEVEL = "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120";
+    //const std::string CUTLEVEL = "ZFinder/Combined Single Reco/3 acc(MUON_TIGHT) AND acc(MUON_LOOSE)";
+
     // Data
     TFile* data_tfile = new TFile(
-            "/data/whybee0a/user/gude_2/Data/20150304_SingleElectron_2012ALL/20150304_SingleElectron_2012ALL_hadded.root"
+            "/data/whybee0a/user/gude_2/Data/20150324_SingleElectron_2012ALL/hadded.root"
             , "READ");
     DataConfig data_config(
             data_tfile,
-            "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
+            CUTLEVEL,
             "Data",
             -1.,  // -1 means area normalize all MC to match under the signal peak
             DATA
             );
     // Signal MC
     TFile* mc_tfile = new TFile(
-            "/data/whybee0a/user/gude_2/MC/20150305_MC_CTEQ6LL/MadGraph_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150318_MADGRAPH/MadGraph_DRESSED_hadded.root"
             , "READ");
     DataConfig mc_config(
             mc_tfile,
-            "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
+            CUTLEVEL,
             "DY to ee",
             // * 3 because 1177.3 is to a single flavor, but the MC has all 3
             1177.3 * 3.,  // cross section in pb, from https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV
@@ -38,90 +42,79 @@ int main() {
             );
     // BG
     TFile* bg_tfile_0 = new TFile(
-            "/data/whybee0a/user/gude_2/MC/20150305_MC_CTEQ6LL/BG_TTBar_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150318_BGs/BG_TTBar_hadded.root"
             , "READ");
     DataConfig bg_config_0(
             bg_tfile_0,
-            "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
+            CUTLEVEL,
             "t#bar{t}",
             23.64,  // TTBar Inclusive is 245.8 Pb, T->Wq is 0.9621, W->lnu is 0.3257
             "ZFinder/weighted_counter",
             BG_MC
             );
     TFile* bg_tfile_1 = new TFile(
-            "/data/whybee0a/user/gude_2/MC/20150305_MC_CTEQ6LL/BG_Ditau_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150318_BGs/BG_Ditau_hadded.root"
             , "READ");
     DataConfig bg_config_1(
             bg_tfile_1,
-            "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
+            CUTLEVEL,
             "DY to #tau#tau",
             1966.7,
             "ZFinder/weighted_counter",
             BG_MC
             );
     TFile* bg_tfile_2 = new TFile(
-            "/data/whybee0a/user/gude_2/MC/20150305_MC_CTEQ6LL/BG_singlet_tw_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150318_BGs/BG_singlet_tw_hadded.root"
             , "READ");
     DataConfig bg_config_2(
             bg_tfile_2,
-            "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
+            CUTLEVEL,
             "Single t",
             11.1,
             "ZFinder/weighted_counter",
             BG_MC
             );
     TFile* bg_tfile_3 = new TFile(
-            "/data/whybee0a/user/gude_2/MC/20150305_MC_CTEQ6LL/BG_singlet_tbarw_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150318_BGs/BG_singlet_tbarw_hadded.root"
             , "READ");
     DataConfig bg_config_3(
             bg_tfile_3,
-            "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
+            CUTLEVEL,
             "Single #bar{t}",
             11.1,
             "ZFinder/weighted_counter",
             BG_MC
             );
     TFile* bg_tfile_4 = new TFile(
-            "/data/whybee0a/user/gude_2/MC/20150305_MC_CTEQ6LL/BG_wz_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150318_BGs/BG_wz_hadded.root"
             , "READ");
     DataConfig bg_config_4(
             bg_tfile_4,
-            "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
+            CUTLEVEL,
             "WZ",
             33.21,
             "ZFinder/weighted_counter",
             BG_MC
             );
     TFile* bg_tfile_5 = new TFile(
-            "/data/whybee0a/user/gude_2/MC/20150305_MC_CTEQ6LL/BG_ww_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150318_BGs/BG_ww_hadded.root"
             , "READ");
     DataConfig bg_config_5(
             bg_tfile_5,
-            "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
+            CUTLEVEL,
             "WW",
             54.84,
             "ZFinder/weighted_counter",
             BG_MC
             );
     TFile* bg_tfile_6 = new TFile(
-            "/data/whybee0a/user/gude_2/MC/20150305_MC_CTEQ6LL/BG_zz_hadded.root"
+            "/data/whybee0a/user/gude_2/MC/20150318_BGs/BG_zz_hadded.root"
             , "READ");
     DataConfig bg_config_6(
             bg_tfile_6,
-            "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
+            CUTLEVEL,
             "ZZ",
             17.7,
-            "ZFinder/weighted_counter",
-            BG_MC
-            );
-    TFile* bg_tfile_7 = new TFile(
-            "/data/whybee0a/user/gude_2/MC/20150305_MC_CTEQ6LL/BG_w_jets_hadded.root"
-            , "READ");
-    DataConfig bg_config_7(
-            bg_tfile_7,
-            "ZFinder/Combined Single Reco/7 60 < M_{ee} < 120",
-            "W + Jets",
-            37509.,
             "ZFinder/weighted_counter",
             BG_MC
             );
@@ -135,7 +128,6 @@ int main() {
     bg_map["8 WZ"] = bg_config_4;
     bg_map["6 WW"] = bg_config_5;
     bg_map["7 ZZ"] = bg_config_6;
-    //bg_map["2 W + Jets"] = bg_config_7;
 
     // Setup the plotter
     CrossCheckPlotter* plotter = new CrossCheckPlotter(
@@ -191,7 +183,6 @@ int main() {
     delete bg_tfile_4;
     delete bg_tfile_5;
     delete bg_tfile_6;
-    delete bg_tfile_7;
 
     return 0;
 }
