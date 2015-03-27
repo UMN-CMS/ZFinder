@@ -304,7 +304,7 @@ int main() {
     }
 
     // Divide by bin width
-    qcd_phistar_histo->Scale(1/19712., "width");
+    qcd_phistar_histo->Scale(1/19712.);
 
     // Get the background subtracted MZ
     TH1D* data_mass = data_histo2d->ProjectionY("data_mass", 1, -1, "e");
