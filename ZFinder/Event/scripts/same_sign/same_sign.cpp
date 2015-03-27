@@ -1,9 +1,6 @@
 // Interface
 #include "same_sign.h"  // branch_struct
 
-// Fit Function
-#include "FitFunction.h"
-
 // Standard Library
 #include <stdexcept>
 #include <iostream>
@@ -24,25 +21,13 @@
 // RooFit
 #include "RooAddPdf.h"
 #include "RooArgSet.h"
-#include "RooBinning.h"
-#include "RooCategory.h"
 #include "RooDataHist.h"
-#include "RooDataSet.h"
-#include "RooFFTConvPdf.h"
 #include "RooFitResult.h"
 #include "RooFormulaVar.h"
-#include "RooGaussian.h"
-#include "RooExponential.h"
-#include "RooVoigtian.h"
-#include "RooCBShape.h"
-#include "RooGaussModel.h"
-#include "RooDecay.h"
-#include "RooKeysPdf.h"
 #include "RooGenericPdf.h"
 #include "RooHistPdf.h"
 #include "RooPlot.h"
 #include "RooRealVar.h"
-#include "RooWorkspace.h"
 
 // Style
 #include "PlotStyle.h"
