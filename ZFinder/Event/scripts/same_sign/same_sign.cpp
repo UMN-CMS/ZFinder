@@ -8,12 +8,8 @@
 // ROOT
 #include <TFile.h>
 #include <TBranch.h>
-#include <TF1.h>
 #include <TCanvas.h>
-#include <TStyle.h>
 #include <TMath.h>
-#include <TBranch.h>
-#include <TLeaf.h>
 #include <TLeaf.h>
 #include <TFitResult.h>
 #include <TFitResultPtr.h>
@@ -227,7 +223,7 @@ std::pair<double, double> FitForQCD(TH1D* data_histo, TH1D* template_histo, cons
     RooRealVar gamma("gamma", "gamma", 0.01, 0.0001, 0.03);
     // Delta controls the ratio of the slope of the two sides, as well as the
     // smoothness of the peak
-    RooRealVar delta("delta", "delta", 10., 3, 80.);
+    RooRealVar delta("delta", "delta", 40., 10, 80.);
     RooFormulaVar var1("var1", "(alpha-z_mass)/delta", RooArgSet(alpha, z_mass, delta));
     RooFormulaVar var2("var2", "-1.0*gamma*z_mass", RooArgSet(gamma, z_mass));
     RooGenericPdf MyBackgroundPdf("MyBackgroundPdf", "ROOT::Math::erfc(var1)*exp(var2)", RooArgSet(var1, var2));
@@ -237,9 +233,7 @@ std::pair<double, double> FitForQCD(TH1D* data_histo, TH1D* template_histo, cons
 
     // Fit, but without yelling please
     std::cout << std::endl;
-    std::cout << std::endl;
     std::cout << "Running on Bin: " << BIN << std::endl;
-    std::cout << std::endl;
     std::cout << std::endl;
     RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING) ;
     gErrorIgnoreLevel = kWarning;
@@ -256,7 +250,7 @@ std::pair<double, double> FitForQCD(TH1D* data_histo, TH1D* template_histo, cons
     combined_pdf.plotOn(fitFrame, LineColor(kBlue));
     h_data.plotOn(fitFrame);
     fitFrame->Draw();
-    const std::string FILE_TYPE = "pdf";
+    const std::string FILE_TYPE = "png";
     const std::string OUT_NAME = BIN + "." + FILE_TYPE;
     canvas.Print(OUT_NAME.c_str(), FILE_TYPE.c_str());
     
