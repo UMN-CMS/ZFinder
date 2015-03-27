@@ -221,9 +221,13 @@ std::pair<double, double> FitForQCD(TH1D* data_histo, TH1D* template_histo, cons
     RooDataHist h_mc("h_mc", "h_mc", RooArgSet(z_mass), template_histo);
     RooHistPdf signalpdf("signalpdf", "signalpdf", z_mass, h_mc);
     // Background pdf
+    // alpha controls the peak position
     RooRealVar alpha("alpha", "alpha", 50., 10., 90.);
+    // gamma controls the slope of the exponential
     RooRealVar gamma("gamma", "gamma", 0.01, 0.0001, 0.03);
-    RooRealVar delta("delta", "delta", 1., 0.01, 80.);
+    // Delta controls the ratio of the slope of the two sides, as well as the
+    // smoothness of the peak
+    RooRealVar delta("delta", "delta", 10., 3, 80.);
     RooFormulaVar var1("var1", "(alpha-z_mass)/delta", RooArgSet(alpha, z_mass, delta));
     RooFormulaVar var2("var2", "-1.0*gamma*z_mass", RooArgSet(gamma, z_mass));
     RooGenericPdf MyBackgroundPdf("MyBackgroundPdf", "ROOT::Math::erfc(var1)*exp(var2)", RooArgSet(var1, var2));
@@ -252,8 +256,9 @@ std::pair<double, double> FitForQCD(TH1D* data_histo, TH1D* template_histo, cons
     combined_pdf.plotOn(fitFrame, LineColor(kBlue));
     h_data.plotOn(fitFrame);
     fitFrame->Draw();
-    const std::string OUT_NAME = BIN + ".png";
-    canvas.Print(OUT_NAME.c_str(), "png");
+    const std::string FILE_TYPE = "pdf";
+    const std::string OUT_NAME = BIN + "." + FILE_TYPE;
+    canvas.Print(OUT_NAME.c_str(), FILE_TYPE.c_str());
     
     // Find the integral of the background
     //std::cout << "Computing Integral" << std::endl;
