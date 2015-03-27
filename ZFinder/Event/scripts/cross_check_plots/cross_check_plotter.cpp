@@ -217,6 +217,8 @@ HistoStore CrossCheckPlotter::open_histos(
         return HistoStore(nullptr, nullptr, {});
     }
     TH1D* data_histo = dynamic_cast<TH1D*>(tmp_histo->Clone());
+    // We always divide the bins by their width
+    data_histo->Scale(1, "width");
 
     const std::string MC_HISTO_NAME = mc_config_.tdir_name + "/" + HISTO_NAME;
     mc_config_.tfile->GetObject(MC_HISTO_NAME.c_str(), tmp_histo);
@@ -226,6 +228,7 @@ HistoStore CrossCheckPlotter::open_histos(
         return HistoStore(nullptr, nullptr, {});
     }
     TH1D* mc_histo = dynamic_cast<TH1D*>(tmp_histo->Clone());
+    mc_histo->Scale(1, "width");
     if (DO_RESCALE) {
         mc_histo->Scale(mc_config_.scale_factor);
     }
@@ -246,6 +249,7 @@ HistoStore CrossCheckPlotter::open_histos(
             // Clone incase, for some unknown reason (perhaps testing) we want
             // to use the same histogram twice
             TH1D* bg_clone = dynamic_cast<TH1D*>(bg_histo->Clone());
+            bg_clone->Scale(1, "width");
             if (DO_RESCALE) {
                 bg_clone->Scale(i_pair.second.scale_factor);
             }
@@ -685,7 +689,7 @@ void CrossCheckPlotter::init_config_map() {
                 Z_MASS_ALL,
                 PlotConfig(
                     "m_{ee} [GeV]",  // x_label
-                    "Events",        // y_label
+                    "Events/GeV",        // y_label
                     "",              // title
                     "z_mass_all",    // histogram name (for reading in)
                     true,            // log Y axis
@@ -704,7 +708,7 @@ void CrossCheckPlotter::init_config_map() {
                 Z_MASS_COARSE,
                 PlotConfig(
                     "m_{ee} [GeV]",
-                    "Events",
+                    "Events/GeV",
                     "",
                     "z_mass_coarse",
                     true,
@@ -723,7 +727,7 @@ void CrossCheckPlotter::init_config_map() {
                 Z_MASS_FINE,
                 PlotConfig(
                     "m_{ee} [GeV]",
-                    "Events",
+                    "Events/GeV",
                     "",
                     "z_mass_fine",
                     true,
@@ -758,7 +762,7 @@ void CrossCheckPlotter::init_config_map() {
                 Z_PT,
                 PlotConfig(
                     "Z p_{T} [GeV]",
-                    "Events",
+                    "Events/GeV",
                     "",
                     "z_pt",
                     true,
@@ -772,7 +776,7 @@ void CrossCheckPlotter::init_config_map() {
                 E0_PT,
                 PlotConfig(
                     "e_{0} p_{T} [GeV]",
-                    "Events",
+                    "Events/GeV",
                     "",
                     "e0_pt",
                     true,
@@ -786,7 +790,7 @@ void CrossCheckPlotter::init_config_map() {
                 E1_PT,
                 PlotConfig(
                     "e_{1} p_{T} [GeV]",
-                    "Events",
+                    "Events/GeV",
                     "",
                     "e1_pt",
                     true,
