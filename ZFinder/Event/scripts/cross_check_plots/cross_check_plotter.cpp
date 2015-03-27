@@ -520,7 +520,7 @@ void CrossCheckPlotter::plot(
     ratio_line.SetLineColor(kRed);
     // Make the ratio
     ratio_histo->Divide(data_histo, histo_sum);
-    const double RATIO_OFFSET_FROM_1 = 0.22;
+    const double RATIO_OFFSET_FROM_1 = 0.2 + 0.02; // 0.02 is to avoid label clipping
     ratio_histo->SetMaximum(1. + RATIO_OFFSET_FROM_1);
     ratio_histo->SetMinimum(1. - RATIO_OFFSET_FROM_1);
 
