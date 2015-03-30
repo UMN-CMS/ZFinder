@@ -50,6 +50,8 @@ TH2D* GetTemplate(histogram_map histo_map);
 
 TH1D* Get1DFromBin(TH2D* histo, const int BIN);
 
-std::pair<double, double> FitForQCD(TH1D* data_histo, TH1D* template_histo, const std::string BIN);
+std::pair<double, double> FitForQCD(TH1D* data_histo, TH1D* template_histo, const std::string BIN, const std::string PHISTAR_RANGE);
+
+void MakePhistarPlot(TH1D* histo);
 
 #endif  // SAME_SIGN_H_

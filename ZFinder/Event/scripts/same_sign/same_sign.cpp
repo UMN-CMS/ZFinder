@@ -4,6 +4,7 @@
 // Standard Library
 #include <stdexcept>
 #include <iostream>
+#include <sstream>
 
 // ROOT
 #include <TFile.h>
@@ -207,7 +208,7 @@ TH1D* Get1DFromBin(TH2D* histo, const int BIN, const std::string PREFIX) {
     return out_histo;
 }
 
-std::pair<double, double> FitForQCD(TH1D* data_histo, TH1D* template_histo, const std::string BIN) {
+std::pair<double, double> FitForQCD(TH1D* data_histo, TH1D* template_histo, const std::string BIN, const std::string PHISTAR_RANGE) {
     using namespace RooFit;
     // The X value of the histogram
     RooRealVar z_mass("z_mass", "z_mass" , 0, 300, "GeV");
@@ -240,25 +241,48 @@ std::pair<double, double> FitForQCD(TH1D* data_histo, TH1D* template_histo, cons
     RooFitResult* fit_result = combined_pdf.fitTo(h_data, Verbose(false), PrintLevel(-1), Save(true));
 
     // Plot
-    TCanvas canvas("canvas", "canvas", 1200, 800);
+    TCanvas canvas("canvas", "canvas", 600, 600);
     canvas.cd();
     gPad->SetLogy();
-    RooPlot* fitFrame = z_mass.frame(Title("QCD Fit"));
+    const std::string TITLE = "QCD Fit: " + PHISTAR_RANGE;
+    RooPlot* fitFrame = z_mass.frame(Title(TITLE.c_str()));
+    fitFrame->SetTitleOffset(1.25, "Y");
     h_data.plotOn(fitFrame);
     combined_pdf.plotOn(fitFrame, Components(MyBackgroundPdf), LineColor(kRed), LineStyle(kDashed));
     combined_pdf.plotOn(fitFrame, Components(signalpdf), LineColor(kBlack), LineStyle(kDashed));
     combined_pdf.plotOn(fitFrame, LineColor(kBlue));
     h_data.plotOn(fitFrame);
     fitFrame->Draw();
-    const std::string FILE_TYPE = "png";
-    const std::string OUT_NAME = BIN + "." + FILE_TYPE;
+    const std::string FILE_TYPE = "pdf";
+    const std::string OUT_NAME = "qcd_fit_plot_for_" + BIN + "." + FILE_TYPE;
+    const std::string OUT_NAME_C = "qcd_fit_plot_for_" + BIN + "." + FILE_TYPE + ".C";
     canvas.Print(OUT_NAME.c_str(), FILE_TYPE.c_str());
+    canvas.Print(OUT_NAME_C.c_str(), "cxx");
     
     // Find the integral of the background
     //std::cout << "Computing Integral" << std::endl;
     RooAbsReal* fracInt = MyBackgroundPdf.createIntegral(z_mass, Range("signal"));
 
+    delete fitFrame;
+
     return {fracInt->getVal(), fracInt->getPropagatedError(*fit_result)};
+}
+
+void MakePhistarPlot(TH1D* histo) {
+    SetPlotStyle();
+    TCanvas canvas("canvas", "canvas", 1200, 800);
+    canvas.cd();
+    gPad->SetLogy();
+    gPad->SetLogx();
+
+    histo->GetYaxis()->SetTitle("Events");
+    histo->SetMarkerStyle(kFullCircle);
+    histo->SetMarkerColor(kBlack);
+    histo->SetLineColor(kBlack);
+
+    histo->Draw("E");
+
+    canvas.Print("qcd_phistar.pdf", "pdf");
 }
 
 int main() {
@@ -278,7 +302,23 @@ int main() {
         TH1D* data_histo = Get1DFromBin(data_histo2d, i, "data_bin_");
         TH1D* template_histo = Get1DFromBin(template_histo2d, i, "template_bin_");
 
-        std::pair<double, double> fit_result = FitForQCD(data_histo, template_histo, std::to_string(i));
+        // Set up the title for the plot
+        const double MIN_PHISTAR = zf::ATLAS_PHISTAR_BINNING.at(i-1);
+        const double MAX_PHISTAR = zf::ATLAS_PHISTAR_BINNING.at(i);
+        std::ostringstream convert;
+        convert << std::setprecision(3);
+        convert << std::fixed;
+        convert << MIN_PHISTAR;
+        convert << " < #phi* < ";
+        convert << MAX_PHISTAR;
+        const std::string PHISTART_BINNING = convert.str();
+
+        // Run the fit and make the plot
+        std::ostringstream convert2;
+        convert2 << std::setw(2) << std::setfill('0') << i;
+        std::pair<double, double> fit_result = FitForQCD(data_histo, template_histo, convert2.str(), PHISTART_BINNING);
+
+        // Fill the background histogram
         qcd_phistar_histo->SetBinContent(i, fit_result.first);
         qcd_phistar_histo->SetBinError(i, fit_result.second);
 
@@ -288,7 +328,7 @@ int main() {
     }
 
     // Divide by bin width
-    qcd_phistar_histo->Scale(1/19712.);
+    qcd_phistar_histo->Scale(1, "width");
 
     // Get the background subtracted MZ
     TH1D* data_mass = data_histo2d->ProjectionY("data_mass", 1, -1, "e");
@@ -304,6 +344,8 @@ int main() {
     template_histo2d->Write();
     data_mass->Write();
     qcd_phistar_histo->Write();
+
+    MakePhistarPlot(qcd_phistar_histo);
 
     output_file.Write();
     output_file.Close();
