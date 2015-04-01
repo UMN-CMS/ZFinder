@@ -78,6 +78,10 @@ namespace zf {
         // Use the muon acceptance requirements to select electrons before
         // making Zs
         use_muon_acceptance_ = iConfig.getParameter<bool>("use_muon_acceptance");
+        extended_minimum_pt_ = iConfig.getParameter<double>("extended_minimum_pt");
+        extended_maximum_eta_ = iConfig.getParameter<double>("extended_maximum_eta");
+        central_minimum_pt_ = iConfig.getParameter<double>("central_minimum_pt");
+        central_maximum_eta_ = iConfig.getParameter<double>("central_maximum_eta");
 
         // Reject events that do not have a generator Z->ee event
         require_gen_z_ = iConfig.getParameter<bool>("require_gen_z");
@@ -361,10 +365,10 @@ namespace zf {
             // Get the electron and set put it into the electrons vector
             reco::GsfElectron electron = els_h->at(i);
             // We enforce a minimum quality cut
-            if (electron.pt() < 20) {
+            if (electron.pt() < extended_minimum_pt_) {
                 continue;
             }
-            if (use_muon_acceptance_ && fabs(electron.eta()) > 2.4) {
+            if (use_muon_acceptance_ && fabs(electron.eta()) > extended_maximum_eta_) {
                 continue;
             }
             ZFinderElectron* zf_electron = AddRecoElectron(electron);
@@ -549,13 +553,12 @@ namespace zf {
             if (use_muon_acceptance_) {
                 const double FETA0 = fabs(e0->eta());
                 const double FETA1 = fabs(e1->eta());
-                // Both electrons have already passed the looser pt>20 and
-                // |eta|<2.4 selection, so we just need one that passes the
-                // tighter pt>30 and |eta|<2.1 selection
+                // Both electrons have already passed the looser pt and eta
+                // requirement, so now they just need to pass the tighter one
                 if (
                     !(
-                        (FETA0 < 2.1 && e0->pt() > 30)
-                        || (FETA1 < 2.1 && e1->pt() > 30)
+                        (FETA0 < central_maximum_eta_ && e0->pt() > central_minimum_pt_)
+                        || (FETA1 < central_maximum_eta_ && e1->pt() > central_minimum_pt_)
                     )
                 ) {
                     return;
