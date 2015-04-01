@@ -46,6 +46,15 @@ combined_single = cms.untracked.PSet(
         use_truth_mass = cms.untracked.bool(False),
         )
 
+combined_single_low = cms.untracked.PSet(
+        name = cms.untracked.string("Combined Single Lowered Threshold"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_TIGHT)", "trig(single_ele)", "pt>28", "eg_tight"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_LOOSE)", "acc(ALL)",         "pt>18", "eg_medium"),
+        min_mz = MIN_MZ,
+        max_mz = MAX_MZ,
+        use_truth_mass = cms.untracked.bool(False),
+        )
+
 combined_single_no_trigger = combined_single.clone(
         name = cms.untracked.string("Combined Single No Trigger"),
         cuts0 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_TIGHT)", "pt>30", "eg_tight"),
@@ -166,6 +175,7 @@ zdefs_combined_data = cms.untracked.VPSet(
         combined_reco_cuts,
         combined_single,
         combined_double,
+        combined_single_low,
         #regression_r9_lt_eta_10,
         #regression_r9_lt_eta_14,
         #regression_r9_lt_eta_20,
@@ -182,6 +192,7 @@ zdefs_combined_mc = cms.untracked.VPSet(
         combined_gen_cuts,
         #combined_reco_cuts,
         combined_single,
+        combined_single_low,
         #combined_single_no_trigger,
         #combined_double,
         #sequence_plots_0_gen_mass,
