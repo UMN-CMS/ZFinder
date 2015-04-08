@@ -49,10 +49,9 @@ int main() {
   TLeaf* EVNumbH = event_infoH->GetLeaf("event_number");
   // Pack into a hitogram
   std::set<int> eventnumber;
+  std::set<int> eventnumberLow;
   for (int i = 0; i < treeH->GetEntries(); i++) {
     treeH->GetEntry(i);
-    
-    //if (i < 100)cout << "entry number High " << EVNumbH->GetValue() << endl;
     eventnumber.insert(EVNumbH->GetValue());
 
   }
@@ -76,6 +75,7 @@ int main() {
     TreeLow->GetEntry(i);
 
     if (!(i % 50000))cout << " still going :" << i << endl;
+    eventnumberLow.insert(EVNumbLow->GetValue());
     if (eventnumber.find(EVNumbLow->GetValue()) == eventnumber.end()) {
       EPt0Hist->Fill(EPt0->GetValue());
       EPt1Hist->Fill(EPt1->GetValue());
@@ -97,7 +97,9 @@ int main() {
   EEta0Hist->Delete();
   EEta1Hist->Delete();
   cout<<" NUMBER IN THE HIGH :"<<treeH->GetEntries()<<endl;
+  cout<<"Number of things in High :"<<eventnumber.size()<<endl;
   cout<<"NUmber in Low :"<<TreeLow->GetEntries()<<endl;
+  cout<<"NUMBER THAT is in low :"<<eventnumberLow.size()<<endl;
   cout<<"NUMBER THAT WE SHOULD HAVE :"<<TreeLow->GetEntries()-treeH->GetEntries()<<endl;
   cout<<"HOW MANY DO WE HAVE :"<<j<<endl;
   return EXIT_SUCCESS;
