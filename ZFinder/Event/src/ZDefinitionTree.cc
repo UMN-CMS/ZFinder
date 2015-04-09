@@ -19,7 +19,7 @@ namespace zf {
 
         // Make the Tree to write to
         tree_ = new TTree(zdef.NAME.c_str(), zdef.NAME.c_str());
-        const std::string CODE = "z_m/D:z_y:z_phistar_born:z_phistar_dressed:z_phistar_naked:z_phistar_sc:z_pt:z_eta:e_pt0:e_pt1:e_eta0:e_eta1:e_phi0:e_phi1:n_true_pileup:e_charge0/I:e_charge1:n_verts";
+        const std::string CODE = "z_m/D:z_y:z_phistar_born:z_phistar_dressed:z_phistar_naked:z_phistar_sc:z_pt:z_eta:e_pt0:e_pt1:e_eta0:e_eta1:e_phi0:e_phi1:e_rnine0:e_rnine1:n_true_pileup:e_charge0/I:e_charge1:n_verts";
         tree_->Branch("reco", &reco_, CODE.c_str());
         if (IS_MC_) {
             tree_->Branch("truth", &truth_, CODE.c_str());
@@ -115,12 +115,14 @@ namespace zf {
             reco_.e_pt[0] = zf_event.e0->pt();
             reco_.e_eta[0] = zf_event.e0->eta();
             reco_.e_phi[0] = zf_event.e0->phi();
+            reco_.e_rnine[0] = zf_event.e0->r9();
             reco_.e_charge[0] = zf_event.e0->charge();
         }
         if (zf_event.e1 != nullptr) {
             reco_.e_pt[1] = zf_event.e1->pt();
             reco_.e_eta[1] = zf_event.e1->eta();
             reco_.e_phi[1] = zf_event.e1->phi();
+            reco_.e_rnine[1] = zf_event.e1->r9();
             reco_.e_charge[1] = zf_event.e1->charge();
         }
         // Truth
@@ -139,12 +141,14 @@ namespace zf {
                 truth_.e_pt[0] = zf_event.e0_truth->pt();
                 truth_.e_eta[0] = zf_event.e0_truth->eta();
                 truth_.e_phi[0] = zf_event.e0_truth->phi();
+                reco_.e_rnine[0] = zf_event.e0_truth->r9();
                 truth_.e_charge[0] = zf_event.e0_truth->charge();
             }
             if (zf_event.e1_truth != nullptr) {
                 truth_.e_pt[1] = zf_event.e1_truth->pt();
                 truth_.e_eta[1] = zf_event.e1_truth->eta();
                 truth_.e_phi[1] = zf_event.e1_truth->phi();
+                reco_.e_rnine[1] = zf_event.e1_truth->r9();
                 truth_.e_charge[1] = zf_event.e1_truth->charge();
             }
         }

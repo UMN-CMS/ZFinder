@@ -76,6 +76,7 @@ namespace zf {
                 double e_pt[2];
                 double e_eta[2];
                 double e_phi[2];
+                double e_rnine[2];
                 double n_true_pileup;
                 int e_charge[2];
                 int n_verts;
