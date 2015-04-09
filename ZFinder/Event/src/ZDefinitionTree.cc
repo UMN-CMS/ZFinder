@@ -24,7 +24,7 @@ namespace zf {
         if (IS_MC_) {
             tree_->Branch("truth", &truth_, CODE.c_str());
         }
-        const std::string EVENT_CODE = "event_number/i:is_mc/O";
+        const std::string EVENT_CODE = "event_number/i:run_number:is_mc/O";
         tree_->Branch("event_info", &event_, EVENT_CODE.c_str());
         if (IS_MC_) {
             tree_->Branch("weight_size", &weight_size_, "weight_size/I");
@@ -151,6 +151,7 @@ namespace zf {
         // General Event info
         event_.is_mc = !zf_event.is_real_data;
         event_.event_number = zf_event.id.event_num;
+        event_.run_number = zf_event.id.run_num;
 
         // Fill if there is a good Z in either truth or reco
         if (zf_event.truth_z.m > -1 || zf_event.reco_z.m > -1) {
