@@ -48,8 +48,18 @@ combined_single = cms.untracked.PSet(
 
 combined_single_low = cms.untracked.PSet(
         name = cms.untracked.string("Combined Single Lowered Threshold"),
-        cuts0 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_TIGHT)", "trig(single_ele)", "pt>28", "eg_tight"),
-        cuts1 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_LOOSE)", "acc(ALL)",         "pt>18", "eg_medium"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_TIGHT)", "trig(single_ele)", "pt>29.1", "eg_tight"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_LOOSE)", "acc(ALL)",         "pt>19.4", "eg_medium"),
+        min_mz = MIN_MZ,
+        max_mz = MAX_MZ,
+        use_truth_mass = cms.untracked.bool(False),
+        )
+
+
+combined_single_high = cms.untracked.PSet(
+        name = cms.untracked.string("Combined Single Higher Threshold"),
+        cuts0 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_TIGHT)", "trig(single_ele)", "pt>30.9", "eg_tight"),
+        cuts1 = cms.untracked.vstring("acc(ALL)", "type_gsf", "acc(MUON_LOOSE)", "acc(ALL)",         "pt>20.6", "eg_medium"),
         min_mz = MIN_MZ,
         max_mz = MAX_MZ,
         use_truth_mass = cms.untracked.bool(False),
@@ -176,6 +186,7 @@ zdefs_combined_data = cms.untracked.VPSet(
         combined_single,
         combined_double,
         combined_single_low,
+        combined_single_high,
         #regression_r9_lt_eta_10,
         #regression_r9_lt_eta_14,
         #regression_r9_lt_eta_20,
@@ -193,6 +204,7 @@ zdefs_combined_mc = cms.untracked.VPSet(
         #combined_reco_cuts,
         combined_single,
         combined_single_low,
+        combined_single_high,
         #combined_single_no_trigger,
         #combined_double,
         #sequence_plots_0_gen_mass,

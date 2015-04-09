@@ -84,6 +84,7 @@ namespace zf {
             struct event_branch {
                 void clear_values() {
                     event_number = 0;
+                    run_number = 0;
                     is_mc = false;
                 }
 
@@ -92,6 +93,7 @@ namespace zf {
                     clear_values();
                 }
                 unsigned int event_number;
+                unsigned int run_number;
                 bool is_mc;
             } event_;
 

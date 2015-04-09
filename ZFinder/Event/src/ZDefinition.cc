@@ -122,7 +122,7 @@ namespace zf {
         for (auto& i_cutlevel : clv) {
             i_cutlevel.second.pass = false;
             i_cutlevel.second.t0p1_pass = false;
-            i_cutlevel.second.t0p1_pass = false;
+            i_cutlevel.second.t1p0_pass = false;
             i_cutlevel.second.t0p1_eff = 1.;
             i_cutlevel.second.t1p0_eff = 1.;
             i_cutlevel.second.event_weight = 1.;
