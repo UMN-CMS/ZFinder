@@ -10,6 +10,8 @@
 #include <TH1D.h>
 #include <TH1.h>
 #include <TStyle.h>
+#include <TLatex.h>
+#include <TLegend.h>
 
 
 void redraw_border() {
@@ -162,6 +164,7 @@ void write_plot(
     if (AXIS_TITLE != "") {
         HISTO->GetXaxis()->SetTitle(AXIS_TITLE.c_str());
     }
+    HISTO->GetYaxis()->SetTitle("Normalized Counts");
 
     const double MARKER_SIZE = 1.;
 
@@ -173,7 +176,7 @@ void write_plot(
     HISTO->GetYaxis()->SetNdivisions(7, 0, 0);  // Set 10 major ticks, 0 minor
     HISTO->GetYaxis()->SetTickLength(0.02);  // Make the ticks smaller
     HISTO->GetXaxis()->SetTickLength(0.02);
-    HISTO->GetYaxis()->SetTitleOffset(1.2);
+    HISTO->GetYaxis()->SetTitleOffset(1.4);
     HISTO->SetMarkerColor(kBlue);
     HISTO->SetLineColor(kBlue);
     HISTO->SetMarkerStyle(kFullCircle);
@@ -182,6 +185,37 @@ void write_plot(
     // Set the Y max
     const double Y_MAX = std::max(HISTO->GetMaximum(), HISTO_MC->GetMaximum());
     HISTO->SetMaximum(Y_MAX * 7.);
+    //HISTO->SetMaximum(Y_MAX * 1.2);
+
+    // Add CMS text inside the plot on the top left
+    const std::string CMS_STRING = "CMS Preliminary";
+    const double TOP_EDGE = 0.95;
+    const double LEFT_EDGE = 0.10;
+    TLatex* cms_latex = new TLatex(LEFT_EDGE + 0.035, TOP_EDGE - 0.055,  CMS_STRING.c_str());
+    cms_latex->SetNDC(kTRUE);  // Use pad coordinates, not Axis
+    cms_latex->SetTextSize(0.035);
+
+    // Add luminosity text outside the plot on the top right
+    const std::string LUMI_STRING = "19.789 fb^{-1} (8 TeV)";
+    const double RIGHT_EDGE = 0.90;
+    TLatex* lumi_latex = new TLatex(RIGHT_EDGE - 0.195, TOP_EDGE + 0.01,  LUMI_STRING.c_str());
+    lumi_latex->SetNDC(kTRUE);  // Use pad coordinates, not Axis
+    lumi_latex->SetTextSize(0.035);
+
+    // Set up the legend using the plot edges to set its location
+    const double LEG_HEIGHT = 0.10;
+    const double LEG_LENGTH = 0.30;
+    TLegend legend(
+            RIGHT_EDGE - LEG_LENGTH,
+            (TOP_EDGE - 0.025) - LEG_HEIGHT,  // 0.025 offset to avoid ticks
+            RIGHT_EDGE,
+            TOP_EDGE - 0.025  // 0.025 offset to avoid the ticks
+            );
+    legend.SetFillColor(kWhite);
+    legend.AddEntry(HISTO.get(), "Minum-bias Electrons", "p");
+    legend.AddEntry(HISTO_MC.get(), "Signal MC", "p");
+    legend.SetBorderSize(0);  // Remove drop shadow and border
+    legend.SetFillStyle(0);  // Transparent
 
     HISTO->Draw("E");
     HISTO_MC->SetMarkerColor(kRed);
@@ -190,10 +224,14 @@ void write_plot(
     HISTO_MC->SetMarkerSize(MARKER_SIZE);
     HISTO_MC->Rebin(REBIN);
     HISTO_MC->Draw("E SAME");
+    cms_latex->Draw();
+    lumi_latex->Draw();
+    legend.Draw();
     canvas.cd();
     redraw_border();
 
-    canvas.Print(OUTPUT_NAME.c_str(), "pdf");
+    const std::string FINAL_NAME = "e_reco_var_" + OUTPUT_NAME;
+    canvas.Print(FINAL_NAME.c_str(), "pdf");
 }
 
 int main() {
