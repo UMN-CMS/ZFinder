@@ -118,16 +118,27 @@ int main() {
             "ZFinder/weighted_counter",
             BG_MC
             );
+    TFile* bg_tfile_7 = new TFile(
+            "/home/user1/gude/CMS/src/CMSSW_5_3_13_UNSTABLE/src/ZFinder/Event/scripts/same_sign/output.root"
+            , "READ");
+    DataConfig bg_config_7(
+            bg_tfile_7,
+            "qcd/",
+            "QCD",
+            19712,
+            BG_MC
+            );
     // BG Map, the names are used for sort ordering alphabetically, so adding
     // numbers to the front can be used to change the order.
     data_config_map bg_map;
     bg_map["9 TTBAR"] = bg_config_0;
-    bg_map["5 DY to #tau#tau"] = bg_config_1;
-    bg_map["3 Single Top"] = bg_config_2;
-    bg_map["4 Single TBar"] = bg_config_3;
-    bg_map["8 WZ"] = bg_config_4;
-    bg_map["6 WW"] = bg_config_5;
-    bg_map["7 ZZ"] = bg_config_6;
+    bg_map["6 DY to #tau#tau"] = bg_config_1;
+    bg_map["2 Single Top"] = bg_config_2;
+    bg_map["3 Single TBar"] = bg_config_3;
+    bg_map["7 WZ"] = bg_config_4;
+    bg_map["5 WW"] = bg_config_5;
+    bg_map["8 ZZ"] = bg_config_6;
+    //bg_map["4 QCD"] = bg_config_7;
 
     // Setup the plotter
     CrossCheckPlotter* plotter = new CrossCheckPlotter(
@@ -137,40 +148,40 @@ int main() {
             );
 
     // Make a plot
-//    plotter->plot(Z_MASS_ALL, "z_mass_all.pdf");
-//    plotter->plot(Z_MASS_COARSE, "z_mass_coarse.pdf");
+    //plotter->plot(Z_MASS_ALL, "z_mass_all.pdf");
+    //plotter->plot(Z_MASS_COARSE, "z_mass_coarse.pdf");
     plotter->plot(Z_MASS_FINE, "z_mass_fine.pdf");
     plotter->plot(Z_RAPIDITY, "z_rapidity.pdf");
     plotter->plot(Z_PT, "z_pt.pdf");
     plotter->plot(E0_PT, "e0_pt.pdf");
     plotter->plot(E0_ETA, "e0_eta.pdf");
-//    //plotter->plot(E0_PHI, "e0_phi.pdf");
-//    //plotter->plot(E0_CHARGE, "e0_charge.pdf");
+    //plotter->plot(E0_PHI, "e0_phi.pdf");
+    //plotter->plot(E0_CHARGE, "e0_charge.pdf");
     plotter->plot(E1_PT, "e1_pt.pdf");
     plotter->plot(E1_ETA, "e1_eta.pdf");
-//    //plotter->plot(E1_PHI, "e1_phi.pdf");
-//    //plotter->plot(E1_CHARGE, "e1_charge.pdf");
-//    plotter->plot(PHISTAR, "phistar.pdf");
-//    plotter->plot(N_VERTS, "n_verts.pdf");
-//    plotter->plot(N_E, "n_e.pdf");
-//    plotter->plot(E0_R9, "e0_r9.pdf");
-//    plotter->plot(E1_R9, "e1_r9.pdf");
-//    plotter->plot(E0_SIGMAIETA, "e0_sigmaieta.pdf");
-//    plotter->plot(E1_SIGMAIETA, "e1_sigmaieta.pdf");
-//    plotter->plot(E0_HE, "e0_HE.pdf");
-//    plotter->plot(E1_HE, "e1_HE.pdf");
-//    plotter->plot(E0_DETA, "e0_deta.pdf");
-//    plotter->plot(E1_DETA, "e1_deta.pdf");
-//    plotter->plot(E0_DPHI, "e0_dphi.pdf");
-//    plotter->plot(E1_DPHI, "e1_dphi.pdf");
-//    plotter->plot(E0_TRACKISO, "e0_track_iso.pdf");
-//    plotter->plot(E1_TRACKISO, "e1_track_iso.pdf");
-//    plotter->plot(E0_ECALISO, "e0_ecal_iso.pdf");
-//    plotter->plot(E1_ECALISO, "e1_ecal_iso.pdf");
-//    plotter->plot(E0_HCALISO, "e0_hcal_iso.pdf");
-//    plotter->plot(E1_HCALISO, "e1_hcal_iso.pdf");
-//    plotter->plot(E0_1OEM1OP, "e0_1oe_1op_iso.pdf");
-//    plotter->plot(E1_1OEM1OP, "e1_1oe_1op_iso.pdf");
+    //plotter->plot(E1_PHI, "e1_phi.pdf");
+    //plotter->plot(E1_CHARGE, "e1_charge.pdf");
+    plotter->plot(PHISTAR, "phistar.pdf");
+    plotter->plot(N_VERTS, "n_verts.pdf");
+    //plotter->plot(N_E, "n_e.pdf");
+    //plotter->plot(E0_R9, "e0_r9.pdf");
+    //plotter->plot(E1_R9, "e1_r9.pdf");
+    //plotter->plot(E0_SIGMAIETA, "e0_sigmaieta.pdf");
+    //plotter->plot(E1_SIGMAIETA, "e1_sigmaieta.pdf");
+    //plotter->plot(E0_HE, "e0_HE.pdf");
+    //plotter->plot(E1_HE, "e1_HE.pdf");
+    //plotter->plot(E0_DETA, "e0_deta.pdf");
+    //plotter->plot(E1_DETA, "e1_deta.pdf");
+    //plotter->plot(E0_DPHI, "e0_dphi.pdf");
+    //plotter->plot(E1_DPHI, "e1_dphi.pdf");
+    //plotter->plot(E0_TRACKISO, "e0_track_iso.pdf");
+    //plotter->plot(E1_TRACKISO, "e1_track_iso.pdf");
+    //plotter->plot(E0_ECALISO, "e0_ecal_iso.pdf");
+    //plotter->plot(E1_ECALISO, "e1_ecal_iso.pdf");
+    //plotter->plot(E0_HCALISO, "e0_hcal_iso.pdf");
+    //plotter->plot(E1_HCALISO, "e1_hcal_iso.pdf");
+    //plotter->plot(E0_1OEM1OP, "e0_1oe_1op_iso.pdf");
+    //plotter->plot(E1_1OEM1OP, "e1_1oe_1op_iso.pdf");
 
     // Clean up
     delete plotter;
