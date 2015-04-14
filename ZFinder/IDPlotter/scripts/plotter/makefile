@@ -6,11 +6,14 @@ ROOT_ALL=`root-config --cflags --libs`
 CC=g++ -O2 -g -std=c++0x -Wall
 CCC=${CC} -c
 
-all: plotter.exe
+all: makeplots
 
 plotter.exe: plotter.cpp
 	${CC} ${ROOT_ALL} -o plotter.exe \
 	plotter.cpp
+
+makeplots: plotter.exe
+	./plotter.exe
 
 clean:
 	rm -f plotter.exe
