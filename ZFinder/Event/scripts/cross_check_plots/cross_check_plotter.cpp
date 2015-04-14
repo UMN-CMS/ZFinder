@@ -427,11 +427,17 @@ void CrossCheckPlotter::plot(
         i_pair.second->SetFillStyle(style_pair.first);
         i_pair.second->SetLineColor(style_pair.second);
         i_pair.second->SetFillColor(style_pair.second);
-        // Add to the stack and legend
+        // Add to the stack
         histo_stack->Add(i_pair.second);
         const std::string BG_NAME = bg_configs_[i_pair.first].name;
-        legend.AddEntry(i_pair.second, BG_NAME.c_str(),"f");
     }
+    // Now add the legends. The stack fills from bottom up, and the legend from
+    // top down, so we have to do a reverse loop for them to match.
+    for (auto rit = bg_histos.rbegin(); rit != bg_histos.rend(); ++rit) {
+        const std::string BG_NAME = bg_configs_[rit->first].name;
+        legend.AddEntry(rit->second, BG_NAME.c_str(),"f");
+    }
+    // Added last because we added the legend entry first
     histo_stack->Add(mc_histo);
 
     // Set the plot range maximum and minimum based on the highest peak in
@@ -482,8 +488,8 @@ void CrossCheckPlotter::plot(
     gPad->SetBottomMargin(0.01);  // Remove the margin, we'll put it under the ratio
 
     // Add luminosity text outside the plot on the top right
-    const std::string LUMI_STRING = "19.789 fb^{-1} (8 TeV)";
-    TLatex* lumi_latex = new TLatex(RIGHT_EDGE_ - 0.195, TOP_EDGE_ + 0.007,  LUMI_STRING.c_str());
+    const std::string LUMI_STRING = "19.8 fb^{-1} (8 TeV)";
+    TLatex* lumi_latex = new TLatex(RIGHT_EDGE_ - 0.175, TOP_EDGE_ + 0.007,  LUMI_STRING.c_str());
     lumi_latex->SetNDC(kTRUE);  // Use pad coordinates, not Axis
     lumi_latex->SetTextSize(0.035);
 
@@ -689,7 +695,7 @@ void CrossCheckPlotter::init_config_map() {
                 Z_MASS_ALL,
                 PlotConfig(
                     "m_{ee} [GeV]",  // x_label
-                    "Events/GeV",        // y_label
+                    "Events / GeV",        // y_label
                     "",              // title
                     "z_mass_all",    // histogram name (for reading in)
                     true,            // log Y axis
@@ -708,7 +714,7 @@ void CrossCheckPlotter::init_config_map() {
                 Z_MASS_COARSE,
                 PlotConfig(
                     "m_{ee} [GeV]",
-                    "Events/GeV",
+                    "Events / GeV",
                     "",
                     "z_mass_coarse",
                     true,
@@ -727,7 +733,7 @@ void CrossCheckPlotter::init_config_map() {
                 Z_MASS_FINE,
                 PlotConfig(
                     "m_{ee} [GeV]",
-                    "Events/GeV",
+                    "Events / GeV",
                     "",
                     "z_mass_fine",
                     true,
@@ -747,7 +753,7 @@ void CrossCheckPlotter::init_config_map() {
                 Z_RAPIDITY,
                 PlotConfig(
                     "Y_{Z}",
-                    "Events",
+                    "Events / Unit Y",
                     "",
                     "z_rapidity",
                     true,
@@ -762,7 +768,7 @@ void CrossCheckPlotter::init_config_map() {
                 Z_PT,
                 PlotConfig(
                     "Z p_{T} [GeV]",
-                    "Events/GeV",
+                    "Events / GeV",
                     "",
                     "z_pt",
                     true,
@@ -776,7 +782,7 @@ void CrossCheckPlotter::init_config_map() {
                 E0_PT,
                 PlotConfig(
                     "e_{0} p_{T} [GeV]",
-                    "Events/GeV",
+                    "Events / GeV",
                     "",
                     "e0_pt",
                     true,
@@ -790,7 +796,7 @@ void CrossCheckPlotter::init_config_map() {
                 E1_PT,
                 PlotConfig(
                     "e_{1} p_{T} [GeV]",
-                    "Events/GeV",
+                    "Events / GeV",
                     "",
                     "e1_pt",
                     true,
@@ -805,7 +811,7 @@ void CrossCheckPlotter::init_config_map() {
                 E0_ETA,
                 PlotConfig(
                     "#eta_{e_{0}}",
-                    "Events",
+                    "Events / Unit #eta",
                     "",
                     "e0_eta",
                     true,
@@ -819,7 +825,7 @@ void CrossCheckPlotter::init_config_map() {
                 E1_ETA,
                 PlotConfig(
                     "#eta_{e_{1}}",
-                    "Events",
+                    "Events / Unit #eta",
                     "",
                     "e1_eta",
                     true,
@@ -834,7 +840,7 @@ void CrossCheckPlotter::init_config_map() {
                 E0_PHI,
                 PlotConfig(
                     "#phi_{e_{0}}",
-                    "Events",
+                    "Events / Unit #phi",
                     "",
                     "e0_phi",
                     false,
@@ -848,7 +854,7 @@ void CrossCheckPlotter::init_config_map() {
                 E1_PHI,
                 PlotConfig(
                     "#phi_{e_{1}}",
-                    "Events",
+                    "Events / Unit #phi",
                     "",
                     "e1_phi",
                     false,
@@ -892,7 +898,7 @@ void CrossCheckPlotter::init_config_map() {
                 PHISTAR,
                 PlotConfig(
                     "#phi*",
-                    "Events",
+                    "Events / Unit #phi*",
                     "",
                     "phistar",
                     true,
@@ -903,7 +909,7 @@ void CrossCheckPlotter::init_config_map() {
                     0.034, 0.039, 0.045, 0.052, 0.057, 0.064, 0.072, 0.081,
                     0.091, 0.102, 0.114, 0.128, 0.145, 0.165, 0.189, 0.219,
                     0.258, 0.312, 0.391, 0.524, 0.695, 0.918, 1.153, 1.496,
-                    1.947, 2.522, 3.277, 10.}
+                    1.947, 2.522, 3.277}
                     )
                 )
             );
