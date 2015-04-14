@@ -22,3 +22,6 @@ make_plots.exe: make_plots.cpp cross_check_plotter.o
 
 clean:
 	rm -f make_plots.exe *.o
+
+clean-plots:
+	rm -f *pdf *pdf.C
