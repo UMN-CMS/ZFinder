@@ -238,9 +238,7 @@ namespace zf {
 
             // Use the muon acceptance requirements to select electrons
             bool use_muon_acceptance_;
-            double extended_minimum_pt_;
             double extended_maximum_eta_;
-            double central_minimum_pt_;
             double central_maximum_eta_;
 
             // Reject events that do not have a generator Z->ee event
