@@ -37,6 +37,7 @@
 #include "DataFormats/Common/interface/ValueMap.h"  // edm:ValueMap
 #include "EgammaAnalysis/ElectronTools/interface/ElectronEffectiveArea.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"  // reco::GenParticle
 
 // Electrons
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"  // GsfElectron
@@ -116,35 +117,35 @@ IDPlotter::IDPlotter(const edm::ParameterSet& iConfig) {
     // r9
     const std::string r9_name = "r9";
     const std::string r9_file = "r9";
-    r9_ = fs->make<TH1D>(r9_file.c_str(), r9_name.c_str(), 100, 0., 1.);
+    r9_ = fs->make<TH1D>(r9_file.c_str(), r9_name.c_str(), 10000, 0., 1.);
     r9_->GetXaxis()->SetTitle("r9");
     r9_->GetYaxis()->SetTitle("Counts");
 
     // sigma_ieta_ieta
     const std::string sigma_ieta_ieta_name = "sigma_{i #eta i #eta}";
     const std::string sigma_ieta_ieta_file = "siesie";
-    sigma_ieta_ieta_ = fs->make<TH1D>(sigma_ieta_ieta_file.c_str(), sigma_ieta_ieta_name.c_str(), 150, 0., 0.15);
+    sigma_ieta_ieta_ = fs->make<TH1D>(sigma_ieta_ieta_file.c_str(), sigma_ieta_ieta_name.c_str(), 12000, 0., 0.12);
     sigma_ieta_ieta_->GetXaxis()->SetTitle("#sigma_{i #eta i #eta}");
     sigma_ieta_ieta_->GetYaxis()->SetTitle("Counts");
 
     // h_over_e
     const std::string h_over_e_name = "(H/E)";
     const std::string h_over_e_file = "he";
-    h_over_e_ = fs->make<TH1D>(h_over_e_file.c_str(), h_over_e_name.c_str(), 30000, 0., 30.);
+    h_over_e_ = fs->make<TH1D>(h_over_e_file.c_str(), h_over_e_name.c_str(), 10000, 0., 1.);
     h_over_e_->GetXaxis()->SetTitle("(H/E)");
     h_over_e_->GetYaxis()->SetTitle("Counts");
 
     // deta_in
     const std::string deta_in_name = "d#eta";
     const std::string deta_in_file = "deta";
-    deta_in_ = fs->make<TH1D>(deta_in_file.c_str(), deta_in_name.c_str(), 3000, 0., 0.3);
+    deta_in_ = fs->make<TH1D>(deta_in_file.c_str(), deta_in_name.c_str(), 40000, -0.2, 0.2);
     deta_in_->GetXaxis()->SetTitle("d#eta_{in}");
     deta_in_->GetYaxis()->SetTitle("Counts");
 
     // dphi_in
     const std::string dphi_in_name = "d#phi";
     const std::string dphi_in_file = "dphi";
-    dphi_in_ = fs->make<TH1D>(dphi_in_file.c_str(), dphi_in_name.c_str(), 10000, 0., 1.);
+    dphi_in_ = fs->make<TH1D>(dphi_in_file.c_str(), dphi_in_name.c_str(), 20000, -1., 1.);
     dphi_in_->GetXaxis()->SetTitle("d#phi_{in}");
     dphi_in_->GetYaxis()->SetTitle("Counts");
 
@@ -158,35 +159,35 @@ IDPlotter::IDPlotter(const edm::ParameterSet& iConfig) {
     // ecal_iso_in
     const std::string ecal_isoname = "ECAL ISO";
     const std::string ecal_isofile = "ecal_iso";
-    ecal_iso_ = fs->make<TH1D>(ecal_isofile.c_str(), ecal_isoname.c_str(), 10000, 0., 100.);
+    ecal_iso_ = fs->make<TH1D>(ecal_isofile.c_str(), ecal_isoname.c_str(), 100000, 0., 10.);
     ecal_iso_->GetXaxis()->SetTitle("ECAL ISO");
     ecal_iso_->GetYaxis()->SetTitle("Counts");
 
     // hcal_iso_in
     const std::string hcal_isoname = "HCAL ISO";
     const std::string hcal_isofile = "hcal_iso";
-    hcal_iso_ = fs->make<TH1D>(hcal_isofile.c_str(), hcal_isoname.c_str(), 10000, 0., 100.);
+    hcal_iso_ = fs->make<TH1D>(hcal_isofile.c_str(), hcal_isoname.c_str(), 10000, 0., 1.);
     hcal_iso_->GetXaxis()->SetTitle("HCAL ISO");
     hcal_iso_->GetYaxis()->SetTitle("Counts");
 
     // one_over_e_mins_one_over_p
     const std::string one_over_e_mins_one_over_pname = "1/E - 1/P";
     const std::string one_over_e_mins_one_over_pfile = "1oe_1op";
-    one_over_e_mins_one_over_p_ = fs->make<TH1D>(one_over_e_mins_one_over_pfile.c_str(), one_over_e_mins_one_over_pname.c_str(), 1000, -1., 1.);
+    one_over_e_mins_one_over_p_ = fs->make<TH1D>(one_over_e_mins_one_over_pfile.c_str(), one_over_e_mins_one_over_pname.c_str(), 60000, -0.3, 0.3);
     one_over_e_mins_one_over_p_->GetXaxis()->SetTitle("1/E - 1/P");
     one_over_e_mins_one_over_p_->GetYaxis()->SetTitle("Counts");
 
     // d0
     const std::string d0name = "d_{0}";
     const std::string d0file = "d0";
-    d0_ = fs->make<TH1D>(d0file.c_str(), d0name.c_str(), 1000, -10., 10.);
+    d0_ = fs->make<TH1D>(d0file.c_str(), d0name.c_str(), 240000, -0.12, 0.12);
     d0_->GetXaxis()->SetTitle("d_{0}");
     d0_->GetYaxis()->SetTitle("Counts");
 
     // dz
     const std::string dzname = "d_{z}";
     const std::string dzfile = "dz";
-    dz_ = fs->make<TH1D>(dzfile.c_str(), dzname.c_str(), 1000, -10., 10.);
+    dz_ = fs->make<TH1D>(dzfile.c_str(), dzname.c_str(), 20000, -1., 1.);
     dz_->GetXaxis()->SetTitle("d_{z}");
     dz_->GetYaxis()->SetTitle("Counts");
 
@@ -200,7 +201,7 @@ IDPlotter::IDPlotter(const edm::ParameterSet& iConfig) {
     // iso
     const std::string isoname = "PF Isolation";
     const std::string isofile = "iso";
-    iso_ = fs->make<TH1D>(isofile.c_str(), isoname.c_str(), 100, 0., 10.);
+    iso_ = fs->make<TH1D>(isofile.c_str(), isoname.c_str(), 15000, 0., 1.5);
     iso_->GetXaxis()->SetTitle("PF Isolation");
     iso_->GetYaxis()->SetTitle("Counts");
 
@@ -225,6 +226,35 @@ IDPlotter::~IDPlotter() {
 void
 IDPlotter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     using namespace edm;
+
+    // Only check for a truth Z in MC
+    if (!iEvent.isRealData()){
+        // Must be Z->ee
+        const int ZBOSON = 23;
+        const int ELECTRON = 11;
+        bool has_z = false;
+        edm::Handle<reco::GenParticleCollection> mc_particles;
+        iEvent.getByLabel("genParticles", mc_particles);
+        for (unsigned int i = 0; i < mc_particles->size(); ++i) {
+            const reco::GenParticle* gen_particle = &mc_particles->at(i);
+            // Is a Z
+            if (gen_particle->pdgId() == ZBOSON) {
+                for (size_t j = 0; j < gen_particle->numberOfDaughters(); ++j) {
+                    if (fabs(gen_particle->daughter(j)->pdgId()) == ELECTRON) {
+                        has_z = true;
+                        break;
+                    }
+                }
+            }
+            if (has_z) {
+                break;
+            }
+        }
+
+        if (!has_z) {
+            return;
+        }
+    }
 
     // Get the electrons
     edm::Handle<reco::GsfElectronCollection> els_h;
