@@ -12,6 +12,7 @@
 #include <TStyle.h>
 #include <TLatex.h>
 #include <TLegend.h>
+#include <TLine.h>
 
 
 void redraw_border() {
@@ -85,7 +86,7 @@ void set_plot_style() {
     // Margins:
     style->SetPadTopMargin(1 - 0.95);
     style->SetPadBottomMargin(0.1);
-    style->SetPadLeftMargin(0.10);
+    style->SetPadLeftMargin(0.12);
     style->SetPadRightMargin(1 - 0.96);
 
     // For the Global title:
@@ -153,13 +154,15 @@ void write_plot(
     const std::unique_ptr<TH1D>& HISTO_MC,
     const std::string OUTPUT_NAME,
     const int REBIN = 10,
-    const std::string AXIS_TITLE = ""
+    const std::string AXIS_TITLE = "",
+    const double CUT_0 = -100,
+    const double CUT_1 = -100,
+    const double START_X = -1,
+    const double END_X = -1
 ) {
     // Make a canvas to control writing of the pdf file
     TCanvas canvas("canvas", "canvas", 500, 500);
     canvas.cd();
-
-    gPad->SetLogy(true);
 
     if (AXIS_TITLE != "") {
         HISTO->GetXaxis()->SetTitle(AXIS_TITLE.c_str());
@@ -173,25 +176,69 @@ void write_plot(
     const double MC_AREA = HISTO_MC->Integral(0, HISTO_MC->GetNbinsX()-1);
     HISTO_MC->Scale(1. / MC_AREA);
 
-    HISTO->GetYaxis()->SetNdivisions(7, 0, 0);  // Set 10 major ticks, 0 minor
+    //HISTO->GetYaxis()->SetNdivisions(7, 5, 0);  // Set 10 major ticks, 0 minor
+    //HISTO->GetXaxis()->SetNdivisions(7, 5, 0);  // Set 10 major ticks, 0 minor
     HISTO->GetYaxis()->SetTickLength(0.02);  // Make the ticks smaller
     HISTO->GetXaxis()->SetTickLength(0.02);
-    HISTO->GetYaxis()->SetTitleOffset(1.4);
+    HISTO->GetYaxis()->SetTitleOffset(1.8);
+
+    const int FORWARD_HATCH = 3004;
+    const int BACKWARD_HATCH = 3005;
+
     HISTO->SetMarkerColor(kBlue);
     HISTO->SetLineColor(kBlue);
-    HISTO->SetMarkerStyle(kFullCircle);
+    HISTO->SetLineWidth(2);
+    HISTO->SetFillColor(kBlue);
+    HISTO->SetFillStyle(FORWARD_HATCH);
+    HISTO->SetMarkerStyle(kFullTriangleDown);
     HISTO->SetMarkerSize(MARKER_SIZE);
     HISTO->Rebin(REBIN);
+
+    HISTO_MC->SetMarkerColor(kRed);
+    HISTO_MC->SetLineColor(kRed);
+    HISTO_MC->SetLineWidth(2);
+    HISTO_MC->SetFillColor(kRed);
+    HISTO_MC->SetFillStyle(BACKWARD_HATCH);
+    HISTO_MC->SetMarkerStyle(kFullTriangleUp);
+    HISTO_MC->SetMarkerSize(MARKER_SIZE);
+    HISTO_MC->Rebin(REBIN);
     // Set the Y max
-    const double Y_MAX = std::max(HISTO->GetMaximum(), HISTO_MC->GetMaximum());
-    HISTO->SetMaximum(Y_MAX * 7.);
-    //HISTO->SetMaximum(Y_MAX * 1.2);
+    const double Y_MAX = std::max(HISTO->GetMaximum(), HISTO_MC->GetMaximum()) * 1.2;
+    HISTO->SetMaximum(Y_MAX);
+    HISTO->SetMinimum(0);
+
+    // Set the X Axis range
+    if (START_X != -1 && END_X != -1) {
+        HISTO->GetXaxis()->SetRangeUser(START_X, END_X);
+    }
+
+    // Cut Line
+    TLine* cut_line_0 = nullptr;
+    if (CUT_0 != -100) {
+        const double X1 = CUT_0;
+        const double X2 = X1;
+        const double Y1 = 0;
+        const double Y2 = Y_MAX;
+        cut_line_0 = new TLine(X1, Y1, X2, Y2);
+        cut_line_0->SetLineStyle(kDashed);
+        cut_line_0->SetLineWidth(2);
+    }
+    TLine* cut_line_1 = nullptr;
+    if (CUT_1 != -100) {
+        const double X1 = CUT_1;
+        const double X2 = X1;
+        const double Y1 = 0;
+        const double Y2 = Y_MAX;
+        cut_line_1 = new TLine(X1, Y1, X2, Y2);
+        cut_line_1->SetLineStyle(kDashed);
+        cut_line_1->SetLineWidth(2);
+    }
 
     // Add CMS text inside the plot on the top left
     const std::string CMS_STRING = "CMS Preliminary";
     const double TOP_EDGE = 0.95;
-    const double LEFT_EDGE = 0.10;
-    TLatex* cms_latex = new TLatex(LEFT_EDGE + 0.035, TOP_EDGE - 0.055,  CMS_STRING.c_str());
+    const double LEFT_EDGE = 0.12;
+    TLatex* cms_latex = new TLatex(LEFT_EDGE + 0.0, TOP_EDGE + 0.01,  CMS_STRING.c_str());
     cms_latex->SetNDC(kTRUE);  // Use pad coordinates, not Axis
     cms_latex->SetTextSize(0.035);
 
@@ -203,35 +250,46 @@ void write_plot(
     lumi_latex->SetTextSize(0.035);
 
     // Set up the legend using the plot edges to set its location
-    const double LEG_HEIGHT = 0.10;
-    const double LEG_LENGTH = 0.30;
+    const double LEG_HEIGHT = 0.15;
+    const double LEG_LENGTH = 0.40;
     TLegend legend(
-            RIGHT_EDGE - LEG_LENGTH,
-            (TOP_EDGE - 0.025) - LEG_HEIGHT,  // 0.025 offset to avoid ticks
-            RIGHT_EDGE,
-            TOP_EDGE - 0.025  // 0.025 offset to avoid the ticks
+            RIGHT_EDGE + 0.06 - LEG_LENGTH,
+            TOP_EDGE - LEG_HEIGHT,  // 0.025 offset to avoid ticks
+            RIGHT_EDGE + 0.06,
+            TOP_EDGE  // 0.025 offset to avoid the ticks
             );
     legend.SetFillColor(kWhite);
-    legend.AddEntry(HISTO.get(), "Minum-bias Electrons", "p");
-    legend.AddEntry(HISTO_MC.get(), "Signal MC", "p");
-    legend.SetBorderSize(0);  // Remove drop shadow and border
-    legend.SetFillStyle(0);  // Transparent
+    legend.AddEntry(HISTO.get(), "Minum-bias Electrons", "f");
+    legend.AddEntry(HISTO_MC.get(), "Signal MC", "f");
+    legend.SetBorderSize(1);  // Remove drop shadow and border
+    //legend.SetFillStyle(0);  // Transparent
 
-    HISTO->Draw("E");
-    HISTO_MC->SetMarkerColor(kRed);
-    HISTO_MC->SetLineColor(kRed);
-    HISTO_MC->SetMarkerStyle(kFullTriangleUp);
-    HISTO_MC->SetMarkerSize(MARKER_SIZE);
-    HISTO_MC->Rebin(REBIN);
-    HISTO_MC->Draw("E SAME");
+    HISTO->Draw("HIST");
+    HISTO_MC->Draw("HIST SAME");
+    HISTO->Draw("HIST SAME");
+    if (cut_line_0 != nullptr) {
+        legend.AddEntry(cut_line_0, "Selection Requirement", "l");
+        cut_line_0->Draw("SAME");
+    }
+    if (cut_line_1 != nullptr) {
+        cut_line_1->Draw("SAME");
+    }
     cms_latex->Draw();
     lumi_latex->Draw();
-    legend.Draw();
     canvas.cd();
     redraw_border();
+    legend.Draw();
 
     const std::string FINAL_NAME = "e_reco_var_" + OUTPUT_NAME;
     canvas.Print(FINAL_NAME.c_str(), "pdf");
+
+    // Clean up
+    if (cut_line_0 != nullptr) {
+        delete cut_line_0;
+    }
+    if (cut_line_1 != nullptr) {
+        delete cut_line_1;
+    }
 }
 
 int main() {
@@ -243,9 +301,9 @@ int main() {
 
     // Get the histograms
     const std::string INPUT_FILE =
-        "/data/whybee0a/user/gude_2/Data/20150312_singlemu/all_hadded.root";
+        "/data/whybee0a/user/gude_2/IDPlots/20150414/2012_ALL_hadded.root";
     const std::string INPUT_MC_FILE =
-        "/data/whybee0a/user/gude_2/MC/20150321_id_plots_mc/MadGraph_hadded.root";
+        "/data/whybee0a/user/gude_2/IDPlots/20150414/MadGraph_hadded.root";
 
     // Load the histograms
     std::unique_ptr<TH1D> h_sigma_ieta_ieta = get_histogram(INPUT_FILE, "IDPlotter/siesie");
@@ -274,18 +332,20 @@ int main() {
     std::unique_ptr<TH1D> h_iso_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/iso");
 
     // Write pdfs
-    write_plot(h_sigma_ieta_ieta, h_sigma_ieta_ieta_mc, "sigma_ieta_ieta.pdf", 3, "#sigma_{i #eta i #eta}");
-    write_plot(h_he, h_he_mc, "he.pdf", 600, "H / E");
-    write_plot(h_deta, h_deta_mc, "deta.pdf", 60);
-    write_plot(h_dphi, h_dphi_mc, "dphi.pdf", 200);
+    const std::string NO_CHANGE = "";
+    const double NO_LINE = -100;
+    write_plot(h_sigma_ieta_ieta, h_sigma_ieta_ieta_mc, "sigma_ieta_ieta.pdf", 50, "#sigma_{i #eta i #eta}", 0.03, NO_LINE, 0, 0.06);
+    write_plot(h_he, h_he_mc, "he.pdf", 20, "H / E", 0.12, NO_LINE, 0, 0.2);
+    write_plot(h_deta, h_deta_mc, "deta.pdf", 20, NO_CHANGE, 0.007, -0.007, -0.021, 0.021);
+    write_plot(h_dphi, h_dphi_mc, "dphi.pdf", 20, NO_CHANGE, 0.06, -0.06, -0.18, 0.18);
     //write_plot(h_track_iso, h_track_iso_mc, "track_iso.pdf", 200);
-    write_plot(h_ecal_iso, h_ecal_iso_mc, "ecal_iso.pdf", 200);
-    write_plot(h_hcal_iso, h_hcal_iso_mc, "hcal_iso.pdf", 200);
-    write_plot(h_1oe_1op, h_1oe_1op_mc, "1oe_1op.pdf", 20);
-    write_plot(h_d0, h_d0_mc, "d0.pdf", 20);
-    write_plot(h_dz, h_dz_mc, "dz.pdf", 20);
+    write_plot(h_ecal_iso, h_ecal_iso_mc, "ecal_iso.pdf", 50, NO_CHANGE, 0.15, NO_LINE, 0, 1);
+    write_plot(h_hcal_iso, h_hcal_iso_mc, "hcal_iso.pdf", 50, NO_CHANGE, 0.1, NO_LINE, 0, 0.2);
+    write_plot(h_1oe_1op, h_1oe_1op_mc, "1oe_1op.pdf", 50, NO_CHANGE, 0.05, -0.05, -0.15, 0.15);
+    write_plot(h_d0, h_d0_mc, "d0.pdf", 400, NO_CHANGE, 0.02, -0.02, -0.06, 0.06);
+    write_plot(h_dz, h_dz_mc, "dz.pdf", 20, NO_CHANGE, 0.1, -0.1, -0.3, 0.3);
     //write_plot(h_mhits, h_mhits_mc, "mhits.pdf", 1);
-    write_plot(h_iso, h_iso_mc, "iso.pdf", 2);
+    write_plot(h_iso, h_iso_mc, "iso.pdf", 100, NO_CHANGE, 0.15, NO_LINE, 0, 0.5);
 
     return EXIT_SUCCESS;
 }
