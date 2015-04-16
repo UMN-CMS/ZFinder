@@ -78,9 +78,7 @@ namespace zf {
         // Use the muon acceptance requirements to select electrons before
         // making Zs
         use_muon_acceptance_ = iConfig.getParameter<bool>("use_muon_acceptance");
-//        extended_minimum_pt_ = iConfig.getParameter<double>("extended_minimum_pt");
         extended_maximum_eta_ = iConfig.getParameter<double>("extended_maximum_eta");
-//        central_minimum_pt_ = iConfig.getParameter<double>("central_minimum_pt");
         central_maximum_eta_ = iConfig.getParameter<double>("central_maximum_eta");
 
         // Reject events that do not have a generator Z->ee event
@@ -551,7 +549,7 @@ namespace zf {
                 // requirement, so now they just need to pass the tighter one
                 if (
                     !(
-                        (FETA0 < central_maximum_eta_ _)
+                        (FETA0 < central_maximum_eta_ )
                         || (FETA1 < central_maximum_eta_ )
                     )
                 ) {
