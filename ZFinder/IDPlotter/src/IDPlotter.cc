@@ -84,7 +84,8 @@ double get_iso(
         double min_pt_;
         double max_eta_;
         TH1D* r9_;
-        TH1D* sigma_ieta_ieta_;
+        TH1D* sigma_ieta_ieta_eb_;
+        TH1D* sigma_ieta_ieta_ee_;
         TH1D* h_over_e_;
         TH1D* deta_in_;
         TH1D* dphi_in_;
@@ -123,11 +124,18 @@ IDPlotter::IDPlotter(const edm::ParameterSet& iConfig) {
     r9_->GetYaxis()->SetTitle("Counts");
 
     // sigma_ieta_ieta
-    const std::string sigma_ieta_ieta_name = "sigma_{i #eta i #eta}";
-    const std::string sigma_ieta_ieta_file = "siesie";
-    sigma_ieta_ieta_ = fs->make<TH1D>(sigma_ieta_ieta_file.c_str(), sigma_ieta_ieta_name.c_str(), 12000, 0., 0.12);
-    sigma_ieta_ieta_->GetXaxis()->SetTitle("#sigma_{i #eta i #eta}");
-    sigma_ieta_ieta_->GetYaxis()->SetTitle("Counts");
+    const std::string sigma_ieta_ieta_eb_name = "sigma_{i #eta i #eta} in EB";
+    const std::string sigma_ieta_ieta_eb_file = "sieie_eb";
+    sigma_ieta_ieta_eb_ = fs->make<TH1D>(sigma_ieta_ieta_eb_file.c_str(), sigma_ieta_ieta_eb_name.c_str(), 12000, 0., 0.12);
+    sigma_ieta_ieta_eb_->GetXaxis()->SetTitle("#sigma_{i #eta i #eta} in EB");
+    sigma_ieta_ieta_eb_->GetYaxis()->SetTitle("Counts");
+
+    // sigma_ieta_ieta
+    const std::string sigma_ieta_ieta_ee_name = "sigma_{i #eta i #eta} in EE";
+    const std::string sigma_ieta_ieta_ee_file = "sieie_ee";
+    sigma_ieta_ieta_ee_ = fs->make<TH1D>(sigma_ieta_ieta_ee_file.c_str(), sigma_ieta_ieta_ee_name.c_str(), 12000, 0., 0.12);
+    sigma_ieta_ieta_ee_->GetXaxis()->SetTitle("#sigma_{i #eta i #eta} in EE");
+    sigma_ieta_ieta_ee_->GetYaxis()->SetTitle("Counts");
 
     // h_over_e
     const std::string h_over_e_name = "(H/E)";
@@ -343,7 +351,12 @@ double IDPlotter::get_iso(
 
 void IDPlotter::fill_histograms(const reco::GsfElectron& electron, const double ISO, const double PT, const bool CON_MATCH) {
     r9_->Fill(electron.r9());
-    sigma_ieta_ieta_->Fill(electron.sigmaIetaIeta());
+    if (electron.isEB()) {
+        sigma_ieta_ieta_eb_->Fill(electron.sigmaIetaIeta());
+    }
+    else if (electron.isEE()) {
+        sigma_ieta_ieta_ee_->Fill(electron.sigmaIetaIeta());
+    }
     h_over_e_->Fill(electron.hadronicOverEm());
     deta_in_->Fill(electron.deltaEtaSuperClusterTrackAtVtx());
     dphi_in_->Fill(electron.deltaPhiSuperClusterTrackAtVtx());

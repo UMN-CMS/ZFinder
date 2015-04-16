@@ -327,7 +327,8 @@ int main() {
     // Load the histograms
     // Data
     std::unique_ptr<TH1D> h_r9 = get_histogram(INPUT_FILE, "IDPlotter/r9");
-    std::unique_ptr<TH1D> h_sigma_ieta_ieta = get_histogram(INPUT_FILE, "IDPlotter/siesie");
+    std::unique_ptr<TH1D> h_sigma_ieta_ieta_eb = get_histogram(INPUT_FILE, "IDPlotter/sieie_eb");
+    std::unique_ptr<TH1D> h_sigma_ieta_ieta_ee = get_histogram(INPUT_FILE, "IDPlotter/sieie_ee");
     std::unique_ptr<TH1D> h_he = get_histogram(INPUT_FILE, "IDPlotter/he");
     std::unique_ptr<TH1D> h_deta = get_histogram(INPUT_FILE, "IDPlotter/deta");
     std::unique_ptr<TH1D> h_dphi = get_histogram(INPUT_FILE, "IDPlotter/dphi");
@@ -342,7 +343,8 @@ int main() {
     std::unique_ptr<TH1D> h_nmiss = get_histogram(INPUT_FILE, "IDPlotter/mhits");
     // MC
     std::unique_ptr<TH1D> h_r9_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/r9");
-    std::unique_ptr<TH1D> h_sigma_ieta_ieta_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/siesie");
+    std::unique_ptr<TH1D> h_sigma_ieta_ieta_eb_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/sieie_eb");
+    std::unbque_ptr<TH1D> h_sigma_ieta_ieta_ee_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/sieie_ee");
     std::unique_ptr<TH1D> h_he_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/he");
     std::unique_ptr<TH1D> h_deta_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/deta");
     std::unique_ptr<TH1D> h_dphi_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/dphi");
@@ -360,7 +362,8 @@ int main() {
     const std::string NO_CHANGE = "";
     const double NO_LINE = -100;
     write_plot(h_r9, h_r9_mc, "r9.pdf", 50, "R9", NO_LINE, 0.94, 0, 1);
-    write_plot(h_sigma_ieta_ieta, h_sigma_ieta_ieta_mc, "sigma_ieta_ieta.pdf", 50, "#sigma_{i #eta i #eta} in EB", NO_LINE, 0.01, 0, 0.06);
+    write_plot(h_sigma_ieta_ieta_eb, h_sigma_ieta_ieta_eb_mc, "sigma_ieta_ieta_eb.pdf", 50, "#sigma_{i #eta i #eta} in EB", NO_LINE, 0.01, 0, 0.06);
+    write_plot(h_sigma_ieta_ieta_ee, h_sigma_ieta_ieta_ee_mc, "sigma_ieta_ieta_ee.pdf", 50, "#sigma_{i #eta i #eta} in EB", NO_LINE, 0.03, 0, 0.06);
     write_plot(h_he, h_he_mc, "he.pdf", 20, "H / E", NO_LINE, 0.12, 0, 0.2);
     write_plot(h_deta, h_deta_mc, "deta.pdf", 20, NO_CHANGE, 0.007, 0.005, -0.021, 0.021);
     write_plot(h_dphi, h_dphi_mc, "dphi.pdf", 20, NO_CHANGE, 0.06, 0.03, -0.18, 0.18);
