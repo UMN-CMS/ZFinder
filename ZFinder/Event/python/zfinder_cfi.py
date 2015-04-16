@@ -33,9 +33,7 @@ ZFinder = cms.EDAnalyzer('ZFinder',
         # these electrons will be considered to make Zs.
         use_muon_acceptance = cms.bool(False),
         # The pt and eta cuts that define "muon acceptance" can be set here.
-        extended_minimum_pt = cms.double(20.),
         extended_maximum_eta = cms.double(2.4),
-        central_minimum_pt = cms.double(30.),
         central_maximum_eta = cms.double(2.1),
         # Reject MC events that don't have a generator Z->ee event.
         require_gen_z = cms.bool(False),
