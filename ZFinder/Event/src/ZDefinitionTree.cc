@@ -141,14 +141,14 @@ namespace zf {
                 truth_.e_pt[0] = zf_event.e0_truth->pt();
                 truth_.e_eta[0] = zf_event.e0_truth->eta();
                 truth_.e_phi[0] = zf_event.e0_truth->phi();
-                reco_.e_rnine[0] = zf_event.e0_truth->r9();
+                truth_.e_rnine[0] = zf_event.e0_truth->r9();
                 truth_.e_charge[0] = zf_event.e0_truth->charge();
             }
             if (zf_event.e1_truth != nullptr) {
                 truth_.e_pt[1] = zf_event.e1_truth->pt();
                 truth_.e_eta[1] = zf_event.e1_truth->eta();
                 truth_.e_phi[1] = zf_event.e1_truth->phi();
-                reco_.e_rnine[1] = zf_event.e1_truth->r9();
+                truth_.e_rnine[1] = zf_event.e1_truth->r9();
                 truth_.e_charge[1] = zf_event.e1_truth->charge();
             }
         }
