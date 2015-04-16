@@ -68,7 +68,7 @@ class IDPlotter : public edm::EDAnalyzer {
         virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
         virtual void endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
 
-        void fill_histograms(const reco::GsfElectron& electron, const double ISO);
+        void fill_histograms(const reco::GsfElectron& electron, const double ISO, const double PT, const bool CON_MATCH);
 
 double get_iso(
         const double ISO_CH,
@@ -95,6 +95,7 @@ double get_iso(
         TH1D* d0_;
         TH1D* dz_;
         TH1D* mhits_;
+        TH1D* conversion_match_;
         TH1D* iso_;
         edm::Handle<reco::VertexCollection> reco_vertices_;
 };
@@ -117,8 +118,8 @@ IDPlotter::IDPlotter(const edm::ParameterSet& iConfig) {
     // r9
     const std::string r9_name = "r9";
     const std::string r9_file = "r9";
-    r9_ = fs->make<TH1D>(r9_file.c_str(), r9_name.c_str(), 10000, 0., 1.);
-    r9_->GetXaxis()->SetTitle("r9");
+    r9_ = fs->make<TH1D>(r9_file.c_str(), r9_name.c_str(), 11000, 0., 1.1);
+    r9_->GetXaxis()->SetTitle("R9");
     r9_->GetYaxis()->SetTitle("Counts");
 
     // sigma_ieta_ieta
@@ -197,6 +198,13 @@ IDPlotter::IDPlotter(const edm::ParameterSet& iConfig) {
     mhits_ = fs->make<TH1D>(mhitsfile.c_str(), mhitsname.c_str(), 50, 0., 50.);
     mhits_->GetXaxis()->SetTitle("Missing Hits");
     mhits_->GetYaxis()->SetTitle("Counts");
+
+    // mhits
+    const std::string conversion_matchname = "Conversion Match";
+    const std::string conversion_matchfile = "con_match";
+    conversion_match_ = fs->make<TH1D>(conversion_matchfile.c_str(), conversion_matchname.c_str(), 2, 0., 2.);
+    conversion_match_->GetXaxis()->SetTitle("Conversion Match");
+    conversion_match_->GetYaxis()->SetTitle("Counts");
 
     // iso
     const std::string isoname = "PF Isolation";
@@ -280,7 +288,7 @@ IDPlotter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
     // beam spot
     edm::Handle<reco::BeamSpot> beamspot_h;
     iEvent.getByLabel("offlineBeamSpot", beamspot_h);
-    const reco::BeamSpot &beamSpot = *(beamspot_h.product());
+    const reco::BeamSpot &beamspot = *(beamspot_h.product());
 
     // conversions
     edm::Handle<reco::ConversionCollection> conversions_h;
@@ -307,9 +315,9 @@ IDPlotter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
                     electron.pt(),
                     electron.eta()
                     );
+            bool vtxFitConversion = ConversionTools::hasMatchedConversion(electron, conversions_h, beamspot.position());
 
-            fill_histograms(electron, ISO);
-            //bool vtxFitConversion = ConversionTools::hasMatchedConversion(electron, conversions_h, beamSpot.position());
+            fill_histograms(electron, ISO, electron.pt(), vtxFitConversion);
         }
     }
 }
@@ -333,17 +341,17 @@ double IDPlotter::get_iso(
     return (ISO_N + ISO_CH) / PT;
 }
 
-void IDPlotter::fill_histograms(const reco::GsfElectron& electron, const double ISO) {
+void IDPlotter::fill_histograms(const reco::GsfElectron& electron, const double ISO, const double PT, const bool CON_MATCH) {
     r9_->Fill(electron.r9());
     sigma_ieta_ieta_->Fill(electron.sigmaIetaIeta());
     h_over_e_->Fill(electron.hadronicOverEm());
     deta_in_->Fill(electron.deltaEtaSuperClusterTrackAtVtx());
     dphi_in_->Fill(electron.deltaPhiSuperClusterTrackAtVtx());
-    track_iso_->Fill(electron.dr03TkSumPt());
-    ecal_iso_->Fill(electron.dr03EcalRecHitSumEt());
-    hcal_iso_->Fill(electron.dr03HcalTowerSumEt());
+    track_iso_->Fill(electron.dr03TkSumPt()/PT);
+    ecal_iso_->Fill(electron.dr03EcalRecHitSumEt()/PT);
+    hcal_iso_->Fill(electron.dr03HcalTowerSumEt()/PT);
     one_over_e_mins_one_over_p_->Fill((1.0/electron.ecalEnergy() - electron.eSuperClusterOverP()/electron.ecalEnergy()));
-    // Get the vertex parameter
+    // Get the vertex parameter. Code from: http://cmslxr.fnal.gov/source/EgammaAnalysis/ElectronTools/src/EGammaCutBasedEleId.cc?v=CMSSW_5_3_20#0111
     double d0vtx = 0.0;
     double dzvtx = 0.0;
     if (reco_vertices_->size() > 0) {
@@ -358,7 +366,9 @@ void IDPlotter::fill_histograms(const reco::GsfElectron& electron, const double 
     d0_->Fill(d0vtx);
     dz_->Fill(dzvtx);
     // Missing hits
-    mhits_->Fill(electron.gsfTrack()->hitPattern().numberOfHits());
+    mhits_->Fill(electron.gsfTrack()->hitPattern().numberOfLostTrackerHits());
+    // Conversion prob
+    conversion_match_->Fill(CON_MATCH);
     // ISO
     iso_->Fill(ISO);
 }
