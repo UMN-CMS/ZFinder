@@ -439,9 +439,7 @@ namespace zf {
             // Get the electron and set put it into the electrons vector
             reco::RecoEcalCandidate electron = els_h->at(i);
             // We enforce a minimum quality cut
-            if (electron.pt() < 20) {
-                continue;
-            }
+          
             ZFinderElectron* zf_electron = AddRecoElectron(electron);
 
             reco::SuperClusterRef cluster_ref = electron.superCluster();
@@ -493,9 +491,7 @@ namespace zf {
         for(unsigned int i = 0; i < els_h->size(); ++i) {
             reco::Photon electron = els_h->at(i);
             // We enforce a minimum quality cut
-            if (electron.pt() < 20) {
-                continue;
-            }
+            
             // Because the photon collect is NOT filtered for electrons, we
             // reject photons that are too close to GSF electrons, and only
             // accept photons within 2.5 < |eta| < 2.850.
@@ -548,6 +544,20 @@ namespace zf {
     void ZFinderEvent::InitZ() {
         if (e0 != nullptr && e1 != nullptr) {
             // Sometimes we want to preselect our electrons using the muon acceptance
+            if (use_muon_acceptance_) {
+                const double FETA0 = fabs(e0->eta());
+                const double FETA1 = fabs(e1->eta());
+                // Both electrons have already passed the looser pt and eta
+                // requirement, so now they just need to pass the tighter one
+                if (
+                    !(
+                        (FETA0 < central_maximum_eta_ _)
+                        || (FETA1 < central_maximum_eta_ )
+                    )
+                ) {
+                    return;
+                }
+            }
 
             // Set Z properties
             const double ELECTRON_MASS = 5.109989e-4;
