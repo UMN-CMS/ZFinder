@@ -155,8 +155,8 @@ void write_plot(
     const std::string OUTPUT_NAME,
     const int REBIN = 10,
     const std::string AXIS_TITLE = "",
-    const double CUT_0 = -100,
-    const double CUT_1 = -100,
+    const double MED_CUT = -100,
+    const double TIGHT_CUT = -100,
     const double START_X = -1,
     const double END_X = -1
 ) {
@@ -213,25 +213,33 @@ void write_plot(
     }
 
     // Cut Line
-    TLine* cut_line_0 = nullptr;
-    if (CUT_0 != -100) {
-        const double X1 = CUT_0;
+    TLine* cut_line_0p = nullptr;
+    TLine* cut_line_0m = nullptr;
+    if (MED_CUT != -100) {
+        const double X1 = MED_CUT;
         const double X2 = X1;
         const double Y1 = 0;
         const double Y2 = Y_MAX;
-        cut_line_0 = new TLine(X1, Y1, X2, Y2);
-        cut_line_0->SetLineStyle(kDashed);
-        cut_line_0->SetLineWidth(2);
+        cut_line_0p = new TLine(X1, Y1, X2, Y2);
+        cut_line_0p->SetLineStyle(kDotted);
+        cut_line_0p->SetLineWidth(3);
+        cut_line_0m = new TLine(-X1, Y1, -X2, Y2);
+        cut_line_0m->SetLineStyle(kDotted);
+        cut_line_0m->SetLineWidth(3);
     }
-    TLine* cut_line_1 = nullptr;
-    if (CUT_1 != -100) {
-        const double X1 = CUT_1;
+    TLine* cut_line_1p = nullptr;
+    TLine* cut_line_1m = nullptr;
+    if (TIGHT_CUT != -100) {
+        const double X1 = TIGHT_CUT;
         const double X2 = X1;
         const double Y1 = 0;
         const double Y2 = Y_MAX;
-        cut_line_1 = new TLine(X1, Y1, X2, Y2);
-        cut_line_1->SetLineStyle(kDashed);
-        cut_line_1->SetLineWidth(2);
+        cut_line_1p = new TLine(X1, Y1, X2, Y2);
+        cut_line_1p->SetLineStyle(kDashed);
+        cut_line_1p->SetLineWidth(2);
+        cut_line_1m = new TLine(-X1, Y1, -X2, Y2);
+        cut_line_1m->SetLineStyle(kDashed);
+        cut_line_1m->SetLineWidth(2);
     }
 
     // Add CMS text inside the plot on the top left
@@ -259,7 +267,7 @@ void write_plot(
             TOP_EDGE  // 0.025 offset to avoid the ticks
             );
     legend.SetFillColor(kWhite);
-    legend.AddEntry(HISTO.get(), "Minum-bias Electrons", "f");
+    legend.AddEntry(HISTO.get(), "Minimum-bias Electrons", "f");
     legend.AddEntry(HISTO_MC.get(), "Signal MC", "f");
     legend.SetBorderSize(1);  // Remove drop shadow and border
     //legend.SetFillStyle(0);  // Transparent
@@ -267,12 +275,21 @@ void write_plot(
     HISTO->Draw("HIST");
     HISTO_MC->Draw("HIST SAME");
     HISTO->Draw("HIST SAME");
-    if (cut_line_0 != nullptr) {
-        legend.AddEntry(cut_line_0, "Selection Requirement", "l");
-        cut_line_0->Draw("SAME");
+    if (cut_line_0p != nullptr) {
+        legend.AddEntry(cut_line_0p, "Medium Requirement", "l");
+        cut_line_0p->Draw("SAME");
+        cut_line_0m->Draw("SAME");
     }
-    if (cut_line_1 != nullptr) {
-        cut_line_1->Draw("SAME");
+    if (cut_line_1p != nullptr) {
+        // If no other cut, both are at the same place
+        if (MED_CUT == -100) {
+            legend.AddEntry(cut_line_1p, "Selection Requirement", "l");
+        }
+        else {
+            legend.AddEntry(cut_line_1p, "Tight Requirement", "l");
+        }
+        cut_line_1p->Draw("SAME");
+        cut_line_1m->Draw("SAME");
     }
     cms_latex->Draw();
     lumi_latex->Draw();
@@ -284,11 +301,13 @@ void write_plot(
     canvas.Print(FINAL_NAME.c_str(), "pdf");
 
     // Clean up
-    if (cut_line_0 != nullptr) {
-        delete cut_line_0;
+    if (cut_line_0p != nullptr) {
+        delete cut_line_0p;
+        delete cut_line_0m;
     }
-    if (cut_line_1 != nullptr) {
-        delete cut_line_1;
+    if (cut_line_1p != nullptr) {
+        delete cut_line_1p;
+        delete cut_line_1m;
     }
 }
 
@@ -301,11 +320,13 @@ int main() {
 
     // Get the histograms
     const std::string INPUT_FILE =
-        "/data/whybee0a/user/gude_2/IDPlots/20150414/2012_ALL_hadded.root";
+        "/data/whybee0a/user/gude_2/IDPlots/20150415/2012_ALL_hadded.root";
     const std::string INPUT_MC_FILE =
-        "/data/whybee0a/user/gude_2/IDPlots/20150414/MadGraph_hadded.root";
+        "/data/whybee0a/user/gude_2/IDPlots/20150415/MadGraph_hadded.root";
 
     // Load the histograms
+    // Data
+    std::unique_ptr<TH1D> h_r9 = get_histogram(INPUT_FILE, "IDPlotter/r9");
     std::unique_ptr<TH1D> h_sigma_ieta_ieta = get_histogram(INPUT_FILE, "IDPlotter/siesie");
     std::unique_ptr<TH1D> h_he = get_histogram(INPUT_FILE, "IDPlotter/he");
     std::unique_ptr<TH1D> h_deta = get_histogram(INPUT_FILE, "IDPlotter/deta");
@@ -318,6 +339,9 @@ int main() {
     std::unique_ptr<TH1D> h_dz = get_histogram(INPUT_FILE, "IDPlotter/dz");
     std::unique_ptr<TH1D> h_mhits = get_histogram(INPUT_FILE, "IDPlotter/mhits");
     std::unique_ptr<TH1D> h_iso = get_histogram(INPUT_FILE, "IDPlotter/iso");
+    std::unique_ptr<TH1D> h_nmiss = get_histogram(INPUT_FILE, "IDPlotter/mhits");
+    // MC
+    std::unique_ptr<TH1D> h_r9_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/r9");
     std::unique_ptr<TH1D> h_sigma_ieta_ieta_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/siesie");
     std::unique_ptr<TH1D> h_he_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/he");
     std::unique_ptr<TH1D> h_deta_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/deta");
@@ -330,22 +354,25 @@ int main() {
     std::unique_ptr<TH1D> h_dz_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/dz");
     std::unique_ptr<TH1D> h_mhits_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/mhits");
     std::unique_ptr<TH1D> h_iso_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/iso");
+    std::unique_ptr<TH1D> h_nmiss_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/mhits");
 
     // Write pdfs
     const std::string NO_CHANGE = "";
     const double NO_LINE = -100;
-    write_plot(h_sigma_ieta_ieta, h_sigma_ieta_ieta_mc, "sigma_ieta_ieta.pdf", 50, "#sigma_{i #eta i #eta}", 0.03, NO_LINE, 0, 0.06);
-    write_plot(h_he, h_he_mc, "he.pdf", 20, "H / E", 0.12, NO_LINE, 0, 0.2);
-    write_plot(h_deta, h_deta_mc, "deta.pdf", 20, NO_CHANGE, 0.007, -0.007, -0.021, 0.021);
-    write_plot(h_dphi, h_dphi_mc, "dphi.pdf", 20, NO_CHANGE, 0.06, -0.06, -0.18, 0.18);
+    write_plot(h_r9, h_r9_mc, "r9.pdf", 50, "R9", NO_LINE, 0.94, 0, 1);
+    write_plot(h_sigma_ieta_ieta, h_sigma_ieta_ieta_mc, "sigma_ieta_ieta.pdf", 50, "#sigma_{i #eta i #eta} in EB", NO_LINE, 0.01, 0, 0.06);
+    write_plot(h_he, h_he_mc, "he.pdf", 20, "H / E", NO_LINE, 0.12, 0, 0.2);
+    write_plot(h_deta, h_deta_mc, "deta.pdf", 20, NO_CHANGE, 0.007, 0.005, -0.021, 0.021);
+    write_plot(h_dphi, h_dphi_mc, "dphi.pdf", 20, NO_CHANGE, 0.06, 0.03, -0.18, 0.18);
     //write_plot(h_track_iso, h_track_iso_mc, "track_iso.pdf", 200);
-    write_plot(h_ecal_iso, h_ecal_iso_mc, "ecal_iso.pdf", 50, NO_CHANGE, 0.15, NO_LINE, 0, 1);
-    write_plot(h_hcal_iso, h_hcal_iso_mc, "hcal_iso.pdf", 50, NO_CHANGE, 0.1, NO_LINE, 0, 0.2);
-    write_plot(h_1oe_1op, h_1oe_1op_mc, "1oe_1op.pdf", 50, NO_CHANGE, 0.05, -0.05, -0.15, 0.15);
-    write_plot(h_d0, h_d0_mc, "d0.pdf", 400, NO_CHANGE, 0.02, -0.02, -0.06, 0.06);
-    write_plot(h_dz, h_dz_mc, "dz.pdf", 20, NO_CHANGE, 0.1, -0.1, -0.3, 0.3);
+    write_plot(h_ecal_iso, h_ecal_iso_mc, "ecal_iso.pdf", 50, NO_CHANGE, NO_LINE, 0.15, 0, 1);
+    write_plot(h_hcal_iso, h_hcal_iso_mc, "hcal_iso.pdf", 50, NO_CHANGE, NO_LINE, 0.1, 0, 0.2);
+    write_plot(h_1oe_1op, h_1oe_1op_mc, "1oe_1op.pdf", 50, NO_CHANGE, NO_LINE, 0.05, -0.15, 0.15);
+    write_plot(h_d0, h_d0_mc, "d0.pdf", 400, NO_CHANGE, NO_LINE, 0.02, -0.06, 0.06);
+    write_plot(h_dz, h_dz_mc, "dz.pdf", 20, NO_CHANGE, NO_LINE, 0.1, -0.3, 0.3);
     //write_plot(h_mhits, h_mhits_mc, "mhits.pdf", 1);
-    write_plot(h_iso, h_iso_mc, "iso.pdf", 100, NO_CHANGE, 0.15, NO_LINE, 0, 0.5);
+    write_plot(h_iso, h_iso_mc, "iso.pdf", 100, NO_CHANGE, 0.15, 0.10, 0, 0.5);
+    write_plot(h_nmiss, h_nmiss_mc, "nmiss.pdf", 1, NO_CHANGE, 2, 1, 0, 3);
 
     return EXIT_SUCCESS;
 }
