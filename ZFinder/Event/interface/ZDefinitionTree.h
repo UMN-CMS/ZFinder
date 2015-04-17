@@ -66,6 +66,7 @@ namespace zf {
                 branch_struct() {
                     clear_values();
                 }
+                
                 double z_m;
                 double z_y;
                 double z_phistar_born;

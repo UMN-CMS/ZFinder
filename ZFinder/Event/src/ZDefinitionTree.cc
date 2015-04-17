@@ -59,7 +59,6 @@ namespace zf {
         weight_id_vector_.clear();
 
         // Set the weights
-        //const cutlevel_vector* clv = zf_event.GetZDef(zdef_name_);
         if (IS_MC_) {
             // The weight from the generator
             const double GEN_WEIGHT = zf_event.weight_natural_mc;
