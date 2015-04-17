@@ -59,12 +59,13 @@ namespace zf {
                     e_charge[1] = -2;
                     n_verts = -1;
                     n_true_pileup = -1;
+                    t0tight = false;
+                    t1tight = false;
                 }
                 // Constructor
                 branch_struct() {
                     clear_values();
                 }
-
                 double z_m;
                 double z_y;
                 double z_phistar_born;
@@ -80,6 +81,8 @@ namespace zf {
                 double n_true_pileup;
                 int e_charge[2];
                 int n_verts;
+                bool t0tight;
+                bool t1tight;
             } reco_, truth_;
 
             struct event_branch {
