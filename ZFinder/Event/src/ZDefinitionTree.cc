@@ -1,7 +1,8 @@
 #include "ZFinder/Event/interface/ZDefinitionTree.h"
 
 // Standard Library
-#include <algorithm>  // std::min
+#include <algorithm>
+#include <vector>  // std::min
 
 // ZFinder Code
 #include "ZFinder/Event/interface/CutLevel.h"  // cutlevel_vector
@@ -19,7 +20,7 @@ namespace zf {
 
         // Make the Tree to write to
         tree_ = new TTree(zdef.NAME.c_str(), zdef.NAME.c_str());
-        const std::string CODE = "z_m/D:z_y:z_phistar_born:z_phistar_dressed:z_phistar_naked:z_phistar_sc:z_pt:z_eta:e_pt0:e_pt1:e_eta0:e_eta1:e_phi0:e_phi1:e_rnine0:e_rnine1:n_true_pileup:e_charge0/I:e_charge1:n_verts";
+        const std::string CODE = "z_m/D:z_y:z_phistar_born:z_phistar_dressed:z_phistar_naked:z_phistar_sc:z_pt:z_eta:e_pt0:e_pt1:e_eta0:e_eta1:e_phi0:e_phi1:e_rnine0:e_rnine1:n_true_pileup:e_charge0/I:e_charge1:n_verts:t0tight/O:t1tight";
         tree_->Branch("reco", &reco_, CODE.c_str());
         if (IS_MC_) {
             tree_->Branch("truth", &truth_, CODE.c_str());
@@ -124,6 +125,11 @@ namespace zf {
             reco_.e_phi[1] = zf_event.e1->phi();
             reco_.e_rnine[1] = zf_event.e1->r9();
             reco_.e_charge[1] = zf_event.e1->charge();
+            if (zf_event.GetZDef(zdef_name_) != nullptr) {
+                    const cutlevel_vector* clv = zf_event.GetZDef(zdef_name_);
+                    reco_.t0tight = clv->back().second.t0p1_pass;
+                    reco_.t1tight = clv->back().second.t1p0_pass;
+                }
         }
         // Truth
         if (IS_MC_ && !zf_event.is_real_data) {
@@ -150,6 +156,11 @@ namespace zf {
                 truth_.e_phi[1] = zf_event.e1_truth->phi();
                 truth_.e_rnine[1] = zf_event.e1_truth->r9();
                 truth_.e_charge[1] = zf_event.e1_truth->charge();
+                if (zf_event.GetZDef(zdef_name_) != nullptr) {
+                    const cutlevel_vector* clv = zf_event.GetZDef(zdef_name_);
+                    truth_.t0tight = clv->back().second.t0p1_pass;
+                    truth_.t1tight = clv->back().second.t1p0_pass;
+                }
             }
         }
         // General Event info
