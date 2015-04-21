@@ -251,7 +251,7 @@ void write_plot(
     cms_latex->SetTextSize(0.035);
 
     // Add luminosity text outside the plot on the top right
-    const std::string LUMI_STRING = "19.8 fb^{-1} (8 TeV)";
+    const std::string LUMI_STRING = "19.7 fb^{-1} (8 TeV)";
     const double RIGHT_EDGE = 0.90;
     TLatex* lumi_latex = new TLatex(RIGHT_EDGE - 0.165, TOP_EDGE + 0.01,  LUMI_STRING.c_str());
     lumi_latex->SetNDC(kTRUE);  // Use pad coordinates, not Axis

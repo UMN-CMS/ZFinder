@@ -488,7 +488,7 @@ void CrossCheckPlotter::plot(
     gPad->SetBottomMargin(0.01);  // Remove the margin, we'll put it under the ratio
 
     // Add luminosity text outside the plot on the top right
-    const std::string LUMI_STRING = "19.8 fb^{-1} (8 TeV)";
+    const std::string LUMI_STRING = "19.7 fb^{-1} (8 TeV)";
     TLatex* lumi_latex = new TLatex(RIGHT_EDGE_ - 0.175, TOP_EDGE_ + 0.007,  LUMI_STRING.c_str());
     lumi_latex->SetNDC(kTRUE);  // Use pad coordinates, not Axis
     lumi_latex->SetTextSize(0.035);
