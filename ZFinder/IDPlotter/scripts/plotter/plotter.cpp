@@ -205,7 +205,8 @@ void write_plot(
     // Set the Y max
     const double Y_MAX = std::max(HISTO->GetMaximum(), HISTO_MC->GetMaximum()) * 1.2;
     HISTO->SetMaximum(Y_MAX);
-    HISTO->SetMinimum(0);
+    //HISTO->SetMinimum(0.001);
+    //canvas.SetLogy();
 
     // Set the X Axis range
     if (START_X != -1 && END_X != -1) {
@@ -320,15 +321,15 @@ int main() {
 
     // Get the histograms
     const std::string INPUT_FILE =
-        "/data/whybee0a/user/gude_2/IDPlots/20150415/2012_ALL_hadded.root";
+        "/data/whybee0a/user/gude_2/IDPlots/20150416/2012_ALL_hadded.root";
     const std::string INPUT_MC_FILE =
-        "/data/whybee0a/user/gude_2/IDPlots/20150415/MadGraph_hadded.root";
+        "/data/whybee0a/user/gude_2/IDPlots/20150416/MadGraph_hadded.root";
 
     // Load the histograms
     // Data
     std::unique_ptr<TH1D> h_r9 = get_histogram(INPUT_FILE, "IDPlotter/r9");
-    //std::unique_ptr<TH1D> h_sigma_ieta_ieta_eb = get_histogram(INPUT_FILE, "IDPlotter/sieie_eb");
-    //std::unique_ptr<TH1D> h_sigma_ieta_ieta_ee = get_histogram(INPUT_FILE, "IDPlotter/sieie_ee");
+    std::unique_ptr<TH1D> h_sigma_ieta_ieta_eb = get_histogram(INPUT_FILE, "IDPlotter/sieie_eb");
+    std::unique_ptr<TH1D> h_sigma_ieta_ieta_ee = get_histogram(INPUT_FILE, "IDPlotter/sieie_ee");
     std::unique_ptr<TH1D> h_he = get_histogram(INPUT_FILE, "IDPlotter/he");
     std::unique_ptr<TH1D> h_deta = get_histogram(INPUT_FILE, "IDPlotter/deta");
     std::unique_ptr<TH1D> h_dphi = get_histogram(INPUT_FILE, "IDPlotter/dphi");
@@ -343,8 +344,8 @@ int main() {
     std::unique_ptr<TH1D> h_nmiss = get_histogram(INPUT_FILE, "IDPlotter/mhits");
     // MC
     std::unique_ptr<TH1D> h_r9_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/r9");
-    //std::unique_ptr<TH1D> h_sigma_ieta_ieta_eb_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/sieie_eb");
-    //std::unbque_ptr<TH1D> h_sigma_ieta_ieta_ee_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/sieie_ee");
+    std::unique_ptr<TH1D> h_sigma_ieta_ieta_eb_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/sieie_eb");
+    std::unique_ptr<TH1D> h_sigma_ieta_ieta_ee_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/sieie_ee");
     std::unique_ptr<TH1D> h_he_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/he");
     std::unique_ptr<TH1D> h_deta_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/deta");
     std::unique_ptr<TH1D> h_dphi_mc = get_histogram(INPUT_MC_FILE, "IDPlotter/dphi");
@@ -362,9 +363,9 @@ int main() {
     const std::string NO_CHANGE = "";
     const double NO_LINE = -100;
     write_plot(h_r9, h_r9_mc, "r9.pdf", 50, "R9", NO_LINE, 0.94, 0, 1);
-    //write_plot(h_sigma_ieta_ieta_eb, h_sigma_ieta_ieta_eb_mc, "sigma_ieta_ieta_eb.pdf", 50, "#sigma_{i #eta i #eta} in EB", NO_LINE, 0.01, 0, 0.06);
-    //write_plot(h_sigma_ieta_ieta_ee, h_sigma_ieta_ieta_ee_mc, "sigma_ieta_ieta_ee.pdf", 50, "#sigma_{i #eta i #eta} in EB", NO_LINE, 0.03, 0, 0.06);
-    write_plot(h_he, h_he_mc, "he.pdf", 20, "H / E", NO_LINE, 0.12, 0, 0.2);
+    write_plot(h_sigma_ieta_ieta_eb, h_sigma_ieta_ieta_eb_mc, "sigma_ieta_ieta_eb.pdf", 20, "#sigma_{i #eta i #eta} in EB", NO_LINE, 0.01, 0, 0.03);
+    write_plot(h_sigma_ieta_ieta_ee, h_sigma_ieta_ieta_ee_mc, "sigma_ieta_ieta_ee.pdf", 50, "#sigma_{i #eta i #eta} in EB", NO_LINE, 0.03, 0, 0.09);
+    write_plot(h_he, h_he_mc, "he.pdf", 10, "H / E", NO_LINE, 0.12, 0, 0.14);
     write_plot(h_deta, h_deta_mc, "deta.pdf", 20, NO_CHANGE, 0.007, 0.005, -0.018, 0.018);
     write_plot(h_dphi, h_dphi_mc, "dphi.pdf", 20, NO_CHANGE, 0.06, 0.03, -0.14, 0.14);
     //write_plot(h_track_iso, h_track_iso_mc, "track_iso.pdf", 200);
@@ -373,7 +374,6 @@ int main() {
     write_plot(h_1oe_1op, h_1oe_1op_mc, "1oe_1op.pdf", 50, NO_CHANGE, NO_LINE, 0.05, -0.15, 0.15);
     write_plot(h_d0, h_d0_mc, "d0.pdf", 400, NO_CHANGE, NO_LINE, 0.02, -0.06, 0.06);
     write_plot(h_dz, h_dz_mc, "dz.pdf", 20, NO_CHANGE, NO_LINE, 0.1, -0.3, 0.3);
-    //write_plot(h_mhits, h_mhits_mc, "mhits.pdf", 1);
     write_plot(h_iso, h_iso_mc, "iso.pdf", 100, NO_CHANGE, 0.15, 0.10, 0, 0.5);
     write_plot(h_nmiss, h_nmiss_mc, "nmiss.pdf", 1, NO_CHANGE, 2, 1, 0, 3);
 
