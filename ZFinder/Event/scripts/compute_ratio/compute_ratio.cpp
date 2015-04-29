@@ -9,6 +9,38 @@
 #include <TH1D.h>
 #include <TLeaf.h>
 
+// ZFinder
+#include "../../interface/WeightID.h"
+
+
+double GetWeight(
+        const int& WEIGHT_SIZE,
+        const double WEIGHTS[],
+        const int WEIGHTIDS[]
+        ) {
+    double weight = 1.;
+
+    // Loop over the weights and use it if it is one of correct
+    for (int i = 0; i < WEIGHT_SIZE; ++i) {
+        switch (WEIGHTIDS[i]) {
+            case zf::WeightID::GEN_MC:
+            case zf::WeightID::PILEUP:
+            case zf::WeightID::VETO:
+            case zf::WeightID::LOOSE:
+            case zf::WeightID::MEDIUM:
+            case zf::WeightID::TIGHT:
+            case zf::WeightID::SINGLE_TRIG:
+            case zf::WeightID::DOUBLE_TRIG:
+            case zf::WeightID::GSF_RECO:
+                weight *= WEIGHTS[i];
+                break;
+            default:
+                break;
+        }
+    }
+
+    return weight;
+}
 
 double GetOverallNormalization(const std::string NAME) {
     const double DATA_LUMI = 19712;
@@ -80,11 +112,21 @@ int main() {
         data_histo->Fill(data_variable->GetValue());
     }
 
+    // We have to grab the first entry to learn how many weights there are
+    int nweights = 0;
+    mc_tree->SetBranchAddress("weight_size", &nweights);
+    mc_tree->GetEntry(0);
+
+    double weights[nweights];
+    int weightid[nweights];
+    mc_tree->SetBranchAddress("weights", &weights);
+    mc_tree->SetBranchAddress("weight_ids", &weightid);
+
     // Fill the MC histogram
     TH1D* mc_histo = new TH1D("mc", "mc", 60, -3, 3);
     for (int i = 0; i < mc_tree->GetEntries(); i++) {
         mc_tree->GetEntry(i);
-        const double WEIGHT = GetOverallNormalization("Signal");
+        const double WEIGHT = GetOverallNormalization("Signal") * GetWeight(nweights, weights, weightid);
         mc_histo->Fill(mc_variable->GetValue(), WEIGHT);
     }
 
