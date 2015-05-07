@@ -12,6 +12,9 @@
 #include <TCanvas.h>
 #include <TMath.h>
 #include <TLeaf.h>
+#include <TDirectory.h>
+#include <TLegend.h>
+#include <TLatex.h>
 #include <TFitResult.h>
 #include <TFitResultPtr.h>
 
@@ -211,7 +214,7 @@ TH1D* Get1DFromBin(TH2D* histo, const int BIN, const std::string PREFIX) {
 std::pair<double, double> FitForQCD(TH1D* data_histo, TH1D* template_histo, const std::string BIN, const std::string PHISTAR_RANGE) {
     using namespace RooFit;
     // The X value of the histogram
-    RooRealVar z_mass("z_mass", "z_mass" , 0, 300, "GeV");
+    RooRealVar z_mass("z_mass", "m_{ee}" , 0, 300, "GeV");
     z_mass.setRange("signal", 60., 120.);
     // Data and MC histogram
     RooDataHist h_data("h_data", "h_data", RooArgSet(z_mass), data_histo);
@@ -240,6 +243,21 @@ std::pair<double, double> FitForQCD(TH1D* data_histo, TH1D* template_histo, cons
     gErrorIgnoreLevel = kWarning;
     RooFitResult* fit_result = combined_pdf.fitTo(h_data, Verbose(false), PrintLevel(-1), Save(true));
 
+    // Set up the legend using the plot edges to set its location
+    const double RIGHT_EDGE = 0.90;
+    const double TOP_EDGE = 0.92;
+    const double LEG_HEIGHT = 0.20;
+    const double LEG_LENGTH = 0.40;
+    TLegend legend(
+            RIGHT_EDGE - LEG_LENGTH,
+            (TOP_EDGE - 0.025) - LEG_HEIGHT,  // 0.025 offset to avoid ticks
+            RIGHT_EDGE,
+            TOP_EDGE - 0.025  // 0.025 offset to avoid the ticks
+            );
+    legend.SetFillColor(kWhite);
+    legend.SetBorderSize(0);  // Remove drop shadow and border
+    legend.SetFillStyle(0);  // Transparent
+
     // Plot
     TCanvas canvas("canvas", "canvas", 600, 600);
     canvas.cd();
@@ -247,42 +265,78 @@ std::pair<double, double> FitForQCD(TH1D* data_histo, TH1D* template_histo, cons
     const std::string TITLE = "QCD Fit: " + PHISTAR_RANGE;
     RooPlot* fitFrame = z_mass.frame(Title(TITLE.c_str()));
     fitFrame->SetTitleOffset(1.25, "Y");
-    h_data.plotOn(fitFrame);
-    combined_pdf.plotOn(fitFrame, Components(MyBackgroundPdf), LineColor(kRed), LineStyle(kDashed));
-    combined_pdf.plotOn(fitFrame, Components(signalpdf), LineColor(kBlack), LineStyle(kDashed));
-    combined_pdf.plotOn(fitFrame, LineColor(kBlue));
+
+    // Plot components and add them to the legend
+    h_data.plotOn(fitFrame, Name("data"));
+    legend.AddEntry(fitFrame->findObject("data"), "Data", "p");
+
+    combined_pdf.plotOn(fitFrame, Components(signalpdf), LineColor(kBlack), LineStyle(kDashed), Name("template"));
+    legend.AddEntry(fitFrame->findObject("template"), "MC Template", "l");
+
+    combined_pdf.plotOn(fitFrame, Components(MyBackgroundPdf), LineColor(kRed), LineStyle(kDashed), Name("qcd"));
+    legend.AddEntry(fitFrame->findObject("qcd"), "Analytic Background", "l");
+
+    combined_pdf.plotOn(fitFrame, LineColor(kBlue), Name("fit"));
+    legend.AddEntry(fitFrame->findObject("fit"), "Sum of Fit Components", "l");
+
     h_data.plotOn(fitFrame);
     fitFrame->Draw();
+    legend.Draw();
     const std::string FILE_TYPE = "pdf";
     const std::string OUT_NAME = "qcd_fit_plot_for_" + BIN + "." + FILE_TYPE;
     const std::string OUT_NAME_C = "qcd_fit_plot_for_" + BIN + "." + FILE_TYPE + ".C";
     canvas.Print(OUT_NAME.c_str(), FILE_TYPE.c_str());
     canvas.Print(OUT_NAME_C.c_str(), "cxx");
-    
+
     // Find the integral of the background
     //std::cout << "Computing Integral" << std::endl;
     RooAbsReal* fracInt = MyBackgroundPdf.createIntegral(z_mass, Range("signal"));
 
     delete fitFrame;
 
+    //return {sigratio.getVal() * fracInt->getVal(), fracInt->getPropagatedError(*fit_result)};
     return {fracInt->getVal(), fracInt->getPropagatedError(*fit_result)};
 }
 
 void MakePhistarPlot(TH1D* histo) {
     SetPlotStyle();
-    TCanvas canvas("canvas", "canvas", 1200, 800);
+    TCanvas canvas("canvas", "canvas", 800, 800);
     canvas.cd();
-    gPad->SetLogy();
+    //gPad->SetLogy();
     gPad->SetLogx();
 
-    histo->GetYaxis()->SetTitle("Events");
+    histo->GetYaxis()->SetTitle("Estimated QCD and W+Jet Events");
+    histo->SetTitleOffset(1.3, "Y");
+    histo->SetMinimum(0);
     histo->SetMarkerStyle(kFullCircle);
     histo->SetMarkerColor(kBlack);
     histo->SetLineColor(kBlack);
 
     histo->Draw("E");
 
+    // Add CMS text inside the plot on the top left
+    const std::string CMS_STRING = "CMS Preliminary";
+    const double LEFT_EDGE_ = 0.10;
+    const double TOP_EDGE_ = 0.95;
+    TLatex* cms_latex = new TLatex(LEFT_EDGE_ + 0.035, TOP_EDGE_ - 0.055,  CMS_STRING.c_str());
+    cms_latex->SetNDC(kTRUE);  // Use pad coordinates, not Axis
+    cms_latex->SetTextSize(0.035);
+
     canvas.Print("qcd_phistar.pdf", "pdf");
+    canvas.Print("qcd_phistar.C", "cxx");
+
+    // Print bins for the latex table
+    for (int i = 1; i <= histo->GetNbinsX(); ++i) {
+        const double LOW_EDGE = histo->GetBinLowEdge(i);
+        const double HIGH_EDGE = LOW_EDGE + histo->GetBinWidth(i);
+        const double VALUE = histo->GetBinContent(i);
+        //const double UP_ERR = histo->GetBinErrorUp(i);
+        //const double DOWN_ERR = histo->GetBinErrorLow(i);
+        const double ERR = histo->GetBinError(i);
+        std::cout << '$' << LOW_EDGE << "--" << HIGH_EDGE << "$ ";
+        std::cout << '&' << " $" << VALUE;
+        std::cout << " \\pm " << ERR << "$ \\\\" << std::endl;
+    }
 }
 
 int main() {
@@ -295,7 +349,8 @@ int main() {
 
     // Fit the mass peak from each phistar bin using an MC template and
     // analytic QCD function
-    TH1D* qcd_phistar_histo = new TH1D("qcd_phistar", "QCD Phistar;#phi*;counts", zf::ATLAS_PHISTAR_BINNING.size() - 1, &zf::ATLAS_PHISTAR_BINNING[0]);
+    TH1D* qcd_phistar_histo = new TH1D("phistar", "QCD Phistar;#phi*;counts", zf::ATLAS_PHISTAR_BINNING.size() - 1, &zf::ATLAS_PHISTAR_BINNING[0]);
+    TH1D* fake_zmass = new TH1D("z_mass_all", "z_mass_all", 60, 60., 120.);
     qcd_phistar_histo->Sumw2();
     for (unsigned int i = 1; i < zf::ATLAS_PHISTAR_BINNING.size(); ++i) {
         // Get histograms for each phistar bin
@@ -321,18 +376,24 @@ int main() {
         // Fill the background histogram
         qcd_phistar_histo->SetBinContent(i, fit_result.first);
         qcd_phistar_histo->SetBinError(i, fit_result.second);
+        fake_zmass->Fill(91, fit_result.first);
 
         // Clean up
         delete data_histo;
         delete template_histo;
     }
 
-    // Divide by bin width
-    qcd_phistar_histo->Scale(1, "width");
+    // Divide by bin width and scale for the fact that we cosider only same
+    // sign here, but in the analysis have same sign and opposite.
+    const int SAME_SIGN_CORRECTION = 2;
+    qcd_phistar_histo->Scale(SAME_SIGN_CORRECTION);
+    fake_zmass->Scale(SAME_SIGN_CORRECTION);
 
     // Get the background subtracted MZ
-    TH1D* data_mass = data_histo2d->ProjectionY("data_mass", 1, -1, "e");
-    TH1D* mc_mass = template_histo2d->ProjectionY("mc_mass", 1, -1, "e");
+    const int FIRST_BIN = 1;
+    const int LAST_BIN = -1; // -1 means "ALL"
+    TH1D* data_mass = data_histo2d->ProjectionY("data_mass", FIRST_BIN, LAST_BIN, "e");
+    TH1D* mc_mass = template_histo2d->ProjectionY("mc_mass", FIRST_BIN, LAST_BIN, "e");
 
     data_mass->Add(mc_mass, -1);
 
@@ -343,7 +404,12 @@ int main() {
     data_histo2d->Write();
     template_histo2d->Write();
     data_mass->Write();
+
+    // Make a folder
+    output_file.mkdir("qcd");
+    output_file.cd("qcd");
     qcd_phistar_histo->Write();
+    fake_zmass->Write();
 
     MakePhistarPlot(qcd_phistar_histo);
 
