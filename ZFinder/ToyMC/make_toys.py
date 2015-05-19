@@ -4,13 +4,13 @@ from random import gauss, uniform, gammavariate
 from math import pi as PI
 from math import log, cosh, tan, sqrt
 
-RUNS = int(10e3)
+RUNS = int(1e6)
 
 E_MASS = 5.11e-4
 
-PT_SMEAR = 0.05
-ETA_SMEAR = 0.001
-PHI_SMEAR = 0.001
+PT_SMEAR = 0.1
+ETA_SMEAR = 0.01
+PHI_SMEAR = 0.01
 
 # Random distributions to draw from
 def get_z_mass(MASS = 91.1876, WIDTH = 2.4952):
@@ -24,6 +24,9 @@ def get_phi():
 def get_theta():
     """ Assume a spherical decay. """
     return uniform(0, PI)
+
+def get_z_eta():
+    return uniform(-2, 2)
 
 def get_pt(ALPHA=1.5, BETA=10):
     """ We assume a gamma distribution. """
@@ -62,8 +65,8 @@ def get_phistar(eta0, phi0, eta1, phi1):
 DOUBLE = 'd'
 PHISTAR_BIN_EDGES = array.array(
         DOUBLE,
-        sorted([
-            0.000, 0.004, 0.008, 0.012, 0.016, 0.020, 0.024, 0.029, 0.034,
+        sorted([ # The very small first value is to prevent a root drawing error
+            0.00000001, 0.004, 0.008, 0.012, 0.016, 0.020, 0.024, 0.029, 0.034,
             0.039, 0.045, 0.052, 0.057, 0.064, 0.072, 0.081, 0.091, 0.102,
             0.114, 0.128, 0.145, 0.165, 0.189, 0.219, 0.258, 0.312, 0.391,
             0.524, 0.695, 0.918, 1.153, 1.496, 1.947, 2.522, 3.277
@@ -87,7 +90,8 @@ while count <= RUNS:
 
     # The Z boosted (so we can get a boost vector to boost the electrons)
     Z_PT = get_pt()
-    Z_ETA = get_eta_from_theta(get_theta())
+    #Z_ETA = get_eta_from_theta(get_theta())
+    Z_ETA = get_z_eta()
     Z_PHI = get_phi()
     z_boost = ROOT.TLorentzVector()
     z_boost.SetPtEtaPhiM(Z_PT, Z_ETA, Z_PHI, Z_MASS)
